@@ -1,0 +1,188 @@
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import 'assignment_file_helper.dart';
+import 'assignment_section_card.dart';
+
+class AssignmentFilePickerCard extends StatelessWidget {
+  const AssignmentFilePickerCard({
+    super.key,
+    required this.selectedFile,
+    required this.onPickFile,
+    required this.onRemoveFile,
+  });
+
+  final PlatformFile? selectedFile;
+  final VoidCallback onPickFile;
+  final VoidCallback onRemoveFile;
+
+  @override
+  Widget build(BuildContext context) {
+    return AssignmentSectionCard(
+      title: 'ملف الحل',
+      icon: Icons.cloud_upload_outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'يمكنك رفع ملف PDF أو Word أو صورة أو ZIP',
+            style: AppTextStyles.body.copyWith(
+              fontSize: 13,
+              color: AppColors.textMuted,
+            ),
+          ),
+          const SizedBox(height: 14),
+          OutlinedButton.icon(
+            onPressed: onPickFile,
+            icon: const Icon(Icons.upload_file_outlined, size: 20),
+            label: const Text('اختيار ملف'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              side: BorderSide(color: AppColors.accent.withValues(alpha: 0.7)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+          ),
+          const SizedBox(height: 14),
+          if (selectedFile == null)
+            _EmptyFileBox()
+          else
+            _SelectedFileBox(
+              file: selectedFile!,
+              onRemove: onRemoveFile,
+            ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: 14,
+                color: AppColors.textMuted.withValues(alpha: 0.9),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'يجب كتابة إجابة أو رفع ملف واحد على الأقل',
+                  style: AppTextStyles.body.copyWith(
+                    fontSize: 12,
+                    color: AppColors.textMuted,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyFileBox extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.accent.withValues(alpha: 0.35),
+          style: BorderStyle.solid,
+          width: 1.2,
+        ),
+        color: AppColors.cardWhite.withValues(alpha: 0.35),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.folder_open_outlined,
+            size: 32,
+            color: AppColors.darkGold.withValues(alpha: 0.8),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'لم يتم اختيار ملف بعد',
+            style: AppTextStyles.body.copyWith(
+              color: AppColors.textMuted,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SelectedFileBox extends StatelessWidget {
+  const _SelectedFileBox({
+    required this.file,
+    required this.onRemove,
+  });
+
+  final PlatformFile file;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = AssignmentFileHelper.iconFor(fileName: file.name);
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: AppColors.cardWhite.withValues(alpha: 0.55),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.accent.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: AppColors.darkGold),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  file.name,
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  AssignmentFileHelper.formatSize(file.size),
+                  style: AppTextStyles.body.copyWith(
+                    fontSize: 12,
+                    color: AppColors.textMuted,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: onRemove,
+            child: Text(
+              'إزالة',
+              style: AppTextStyles.body.copyWith(
+                color: const Color(0xFF991B1B),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

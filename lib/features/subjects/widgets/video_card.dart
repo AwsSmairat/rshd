@@ -1,0 +1,118 @@
+import 'package:flutter/material.dart';
+
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/liquid_glass_surface.dart';
+import '../data/models/video_model.dart';
+
+class VideoCard extends StatelessWidget {
+  const VideoCard({
+    super.key,
+    required this.video,
+    required this.onTap,
+  });
+
+  final VideoModel video;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final locked = video.isLocked;
+
+    return LiquidGlassSurface(
+      borderRadius: BorderRadius.circular(14),
+      padding: const EdgeInsets.all(14),
+      onTap: onTap,
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: locked
+                ? AppColors.textMuted.withValues(alpha: 0.12)
+                : AppColors.primary.withValues(alpha: 0.12),
+            child: Icon(
+              locked ? Icons.lock_outline_rounded : Icons.play_arrow_rounded,
+              color: locked ? AppColors.textMuted : AppColors.primary,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  video.title,
+                  style: AppTextStyles.body.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'المدة: ${video.formattedDuration}',
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.textMuted,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: [
+                    if (video.isFree)
+                      _Badge(
+                        label: 'مجاني',
+                        color: AppColors.secondary,
+                      ),
+                    if (locked)
+                      _Badge(
+                        label: 'مقفل',
+                        color: AppColors.textMuted,
+                      )
+                    else
+                      _Badge(
+                        label: video.statusLabel,
+                        color: AppColors.secondary,
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            locked ? Icons.lock_outline_rounded : Icons.arrow_back_ios_new,
+            size: 16,
+            color: locked ? AppColors.textMuted : AppColors.primary,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Badge extends StatelessWidget {
+  const _Badge({required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label,
+        style: AppTextStyles.body.copyWith(
+          color: color,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}

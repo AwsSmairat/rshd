@@ -1,0 +1,55 @@
+name: rshd
+description: RSHD Educational Platform - Student App
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  dio: ^5.8.0+1
+  flutter_riverpod: ^2.6.1
+  flutter_secure_storage: ^9.2.4
+  device_info_plus: ^11.5.0
+  go_router: ^15.1.2
+  intl: ^0.20.2
+  url_launcher: ^6.3.1
+  video_player: ^2.9.5
+  chewie: ^1.11.3
+  syncfusion_flutter_pdfviewer: ^29.1.38
+  google_sign_in: ^6.3.0
+  file_picker: ^10.2.0
+  sign_in_with_apple: ^8.1.0
+  image_picker: ^1.1.2
+  package_info_plus: ^8.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/icons/app_icon.png
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: assets/icons/app_icon_foreground.png
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: assets/icons/app_icon.png
+    background_color: "#FFFFFF"
+    theme_color: "#FFFFFF"
+  min_sdk_android: 21
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/

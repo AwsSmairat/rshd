@@ -1,0 +1,9 @@
+// Copy this file to OAuth.xcconfig and fill in your Google OAuth credentials
+// from Google Cloud Console (OAuth client IDs for iOS + Web).
+//
+// iOS client: create with bundle ID com.example.rshd
+// Web client: required to obtain an ID token for the backend
+
+GOOGLE_IOS_CLIENT_ID=YOUR_IOS_CLIENT_ID.apps.googleusercontent.com
+GOOGLE_IOS_REVERSED_CLIENT_ID=com.googleusercontent.apps.YOUR_NUMERIC_ID
+GOOGLE_WEB_CLIENT_ID=YOUR_WEB_CLIENT_ID.apps.googleusercontent.com
