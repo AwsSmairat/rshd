@@ -5,7 +5,10 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
+import '../../assignments/data/models/assignment_model.dart';
+import '../../quizzes/data/models/quiz_model.dart';
 import '../data/models/lesson_model.dart';
+import 'lesson_content_tiles.dart';
 import 'lesson_file_card.dart';
 import 'video_card.dart';
 
@@ -80,10 +83,21 @@ class _LessonCardState extends State<LessonCard>
     context.push(AppRoutes.fileDetails(fileId));
   }
 
+  void _openAssignment(BuildContext context, int assignmentId) {
+    context.push(AppRoutes.assignmentDetails(assignmentId));
+  }
+
+  void _openQuiz(BuildContext context, int quizId) {
+    context.push(AppRoutes.quizDetails(quizId));
+  }
+
   @override
   Widget build(BuildContext context) {
     final lesson = widget.lesson;
-    final hasContent = lesson.videos.isNotEmpty || lesson.files.isNotEmpty;
+    final hasContent = lesson.videos.isNotEmpty ||
+        lesson.files.isNotEmpty ||
+        lesson.assignments.isNotEmpty ||
+        lesson.quizzes.isNotEmpty;
 
     return LiquidGlassSurface(
       borderRadius: BorderRadius.circular(14),
@@ -163,6 +177,8 @@ class _LessonCardState extends State<LessonCard>
               hasContent: hasContent,
               onVideoTap: _openVideo,
               onFileTap: _openFile,
+              onAssignmentTap: _openAssignment,
+              onQuizTap: _openQuiz,
             ),
             crossFadeState: _expanded
                 ? CrossFadeState.showSecond
@@ -183,6 +199,12 @@ class _LessonCardState extends State<LessonCard>
     if (lesson.filesCount > 0) {
       parts.add('${lesson.filesCount} ملف');
     }
+    if (lesson.assignmentsCount > 0) {
+      parts.add('${lesson.assignmentsCount} واجب');
+    }
+    if (lesson.quizzesCount > 0) {
+      parts.add('${lesson.quizzesCount} اختبار');
+    }
     if (parts.isEmpty) {
       return lesson.isActive ? 'متاح' : lesson.status;
     }
@@ -196,6 +218,8 @@ class _ExpandedBody extends StatelessWidget {
     required this.hasContent,
     required this.onVideoTap,
     required this.onFileTap,
+    required this.onAssignmentTap,
+    required this.onQuizTap,
   });
 
   final LessonModel lesson;
@@ -204,6 +228,8 @@ class _ExpandedBody extends StatelessWidget {
       onVideoTap;
   final void Function(BuildContext context, int fileId, {required bool locked})
       onFileTap;
+  final void Function(BuildContext context, int assignmentId) onAssignmentTap;
+  final void Function(BuildContext context, int quizId) onQuizTap;
 
   @override
   Widget build(BuildContext context) {
@@ -268,6 +294,52 @@ class _ExpandedBody extends StatelessWidget {
                       file.id,
                       locked: file.isLocked,
                     ),
+                  ),
+                ),
+              ),
+            ],
+            if (lesson.assignments.isNotEmpty) ...[
+              if (lesson.videos.isNotEmpty || lesson.files.isNotEmpty)
+                const SizedBox(height: 4),
+              Text(
+                'الواجبات',
+                style: AppTextStyles.body.copyWith(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  color: AppColors.textMuted,
+                ),
+              ),
+              const SizedBox(height: 8),
+              ...lesson.assignments.map(
+                (AssignmentModel assignment) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: LessonAssignmentTile(
+                    assignment: assignment,
+                    onTap: () => onAssignmentTap(context, assignment.id),
+                  ),
+                ),
+              ),
+            ],
+            if (lesson.quizzes.isNotEmpty) ...[
+              if (lesson.videos.isNotEmpty ||
+                  lesson.files.isNotEmpty ||
+                  lesson.assignments.isNotEmpty)
+                const SizedBox(height: 4),
+              Text(
+                'الاختبارات',
+                style: AppTextStyles.body.copyWith(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  color: AppColors.textMuted,
+                ),
+              ),
+              const SizedBox(height: 8),
+              ...lesson.quizzes.map(
+                (QuizModel quiz) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: LessonQuizTile(
+                    quiz: quiz,
+                    onTap: () => onQuizTap(context, quiz.id),
                   ),
                 ),
               ),

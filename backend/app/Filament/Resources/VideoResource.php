@@ -76,12 +76,16 @@ class VideoResource extends Resource
                                 'video/quicktime',
                                 'video/x-msvideo',
                                 'video/x-matroska',
+                                'video/avi',
+                                'application/octet-stream',
                             ])
                             ->maxSize(10485760)
                             ->storeFileNamesIn('original_file_name')
                             ->downloadable()
                             ->openable()
-                            ->helperText('ارفع ملف الفيديو مباشرة (MP4, WebM, MOV, MKV). الحد الأقصى 10 جيجابايت.')
+                            ->uploadingMessage('جاري رفع الفيديو...')
+                            ->uploadProgressIndicatorPosition('left')
+                            ->helperText('ارفع ملف الفيديو مباشرة (MP4, WebM, MOV, MKV). الحد الأقصى 10 جيجابايت. تأكد من تشغيل السيرفر عبر ./serve.sh')
                             ->required(fn (string $operation): bool => $operation === 'create')
                             ->columnSpanFull(),
                     ]),

@@ -76,28 +76,27 @@ class AssignmentsLoadingSkeleton extends StatelessWidget {
             fillOpacity: 0.3,
             borderOpacity: 0.55,
             blurSigma: 16,
-            child: SizedBox(
-              height: 108,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _SkeletonBox(width: double.infinity, height: 18),
-                        const SizedBox(height: 10),
-                        _SkeletonBox(width: 120, height: 14),
-                        const SizedBox(height: 10),
-                        _SkeletonBox(width: 170, height: 12),
-                        const SizedBox(height: 12),
-                        _SkeletonBox(width: 96, height: 24, radius: 20),
-                      ],
-                    ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _SkeletonBox(width: double.infinity, height: 18),
+                      const SizedBox(height: 10),
+                      _SkeletonBox(width: 120, height: 14),
+                      const SizedBox(height: 10),
+                      _SkeletonBox(width: 170, height: 12),
+                      const SizedBox(height: 12),
+                      _SkeletonBox(width: 96, height: 24, radius: 20),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  _SkeletonBox(width: 72, height: 88, radius: 16),
-                ],
-              ),
+                ),
+                const SizedBox(width: 12),
+                _SkeletonBox(width: 72, height: 88, radius: 16),
+              ],
             ),
           ),
         );

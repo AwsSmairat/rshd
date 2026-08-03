@@ -5,12 +5,14 @@ namespace App\Services;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Models\User;
-use App\Services\PlatformSettingsService;
+use App\Services\Concerns\ResolvesOAuthStudentAccounts;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
 class GoogleAuthService
 {
+    use ResolvesOAuthStudentAccounts;
+
     /**
      * @return array{
      *     google_id: string,
@@ -69,32 +71,34 @@ class GoogleAuthService
         ];
     }
 
+    /**
+     * @param  array{
+     *     google_id: string,
+     *     email: string,
+     *     name: string,
+     *     email_verified: bool
+     * }  $googleProfile
+     */
     public function resolveStudentUser(array $googleProfile): User
     {
         $user = User::query()
-            ->where(function ($query) use ($googleProfile): void {
-                $query->where('google_id', $googleProfile['google_id'])
-                    ->orWhere('email', $googleProfile['email']);
-            })
+            ->where('google_id', $googleProfile['google_id'])
             ->first();
 
         if ($user !== null) {
-            if (! $user->isStudent()) {
-                throw new RuntimeException('هذا التطبيق مخصص للطلاب فقط.');
-            }
-
-            if ($user->status === UserStatus::Blocked) {
-                throw new RuntimeException('الحساب موقوف.');
-            }
-
-            $user->fill([
+            return $this->finalizeOAuthLogin($user, [
                 'google_id' => $googleProfile['google_id'],
                 'name' => $user->name ?: $googleProfile['name'],
                 'email_verified_at' => $user->email_verified_at ?? now(),
             ]);
-            $user->save();
+        }
 
-            return $user;
+        $existingByEmail = User::query()
+            ->where('email', $googleProfile['email'])
+            ->first();
+
+        if ($existingByEmail !== null) {
+            $this->rejectConflictingEmailAccount($existingByEmail, 'google');
         }
 
         if (! app(PlatformSettingsService::class)->studentRegistrationEnabled()) {

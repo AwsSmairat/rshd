@@ -10,7 +10,6 @@
             'students' => 0,
             'pending_submissions' => 0,
             'active_quizzes' => 0,
-            'announcements' => 0,
         ],
         'pendingSubmissions' => collect(),
         'recentActivities' => collect(),
@@ -132,7 +131,7 @@
             </div>
         </div>
 
-        <div class="rshd-quick-grid rshd-quick-grid--7">
+        <div class="rshd-quick-grid rshd-quick-grid--6">
             @foreach ($quickActions as $action)
                 @if ($action['enabled'] && ($action['url'] ?? null))
                     <a href="{{ $action['url'] }}" class="rshd-quick-card">
@@ -213,7 +212,6 @@
                                 <div class="rshd-subject-card__meta">
                                     <span>{{ $item['students_count'] }} طالب</span>
                                     <span>{{ $item['lessons_count'] }} جزء</span>
-                                    <span>{{ $item['announcements_count'] }} إعلان</span>
                                 </div>
                             </div>
                         </div>

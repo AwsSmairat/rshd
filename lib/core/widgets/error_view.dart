@@ -10,10 +10,12 @@ class ErrorView extends StatelessWidget {
     super.key,
     required this.message,
     this.onRetry,
+    this.retryLabel = 'إعادة المحاولة',
   });
 
   final String message;
   final VoidCallback? onRetry;
+  final String retryLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,7 @@ class ErrorView extends StatelessWidget {
               ),
               if (onRetry != null) ...[
                 const SizedBox(height: 24),
-                AppButton(label: 'إعادة المحاولة', onPressed: onRetry),
+                AppButton(label: retryLabel, onPressed: onRetry),
               ],
             ],
           ),

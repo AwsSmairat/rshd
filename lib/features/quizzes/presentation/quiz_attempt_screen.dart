@@ -213,14 +213,23 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
       case QuizAttemptStatus.loading:
         return const LoadingWidget(message: 'جاري بدء الاختبار...');
       case QuizAttemptStatus.error:
+        final isRetakeBlocked =
+            state.errorMessage?.contains('إعادة الاختبار غير مسموحة') ?? false;
         return ErrorView(
           message: state.errorMessage ?? 'تعذر بدء الاختبار',
-          onRetry: () async {
-            final started = await controller.start();
-            if (started && mounted) {
-              _startTimer();
-            }
-          },
+          onRetry: isRetakeBlocked
+              ? () {
+                  if (mounted) {
+                    context.pop();
+                  }
+                }
+              : () async {
+                  final started = await controller.start();
+                  if (started && mounted) {
+                    _startTimer();
+                  }
+                },
+          retryLabel: isRetakeBlocked ? 'العودة' : 'إعادة المحاولة',
         );
       case QuizAttemptStatus.loaded:
       case QuizAttemptStatus.submitting:

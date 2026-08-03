@@ -2,22 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/auth/apple_sign_in_service.dart';
 import '../../../core/layout/auth_layout_metrics.dart';
 import '../../../core/network/api_client.dart';
-import '../../../core/storage/secure_storage_service.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import 'auth_controller.dart';
-import 'widgets/auth_or_divider.dart';
 import 'widgets/auth_screen_shell.dart';
 import 'widgets/gold_gradient_button.dart';
 import 'widgets/login_header.dart';
 import 'widgets/luxury_login_card.dart';
 import 'widgets/login_remember_row.dart';
 import 'widgets/luxury_text_field.dart';
-import 'widgets/social_auth_buttons_row.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -105,56 +101,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  Future<void> _signInWithGoogle() async {
-    final result =
-        await ref.read(authControllerProvider.notifier).signInWithGoogle();
-
-    if (!mounted || result == LoginFlowResult.cancelled) {
-      return;
-    }
-
-    switch (result) {
-      case LoginFlowResult.success:
-        context.go(AppRoutes.home);
-      case LoginFlowResult.requiresEmailVerification:
-        final email = ref.read(authControllerProvider).pendingVerificationEmail ??
-            _emailController.text.trim();
-        context.go(
-          '${AppRoutes.verifyEmail}?email=${Uri.encodeComponent(email)}',
-        );
-      case LoginFlowResult.failed:
-      case LoginFlowResult.cancelled:
-        break;
-    }
-  }
-
   void _showForgotPasswordMessage() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('ميزة استعادة كلمة المرور ستتوفر قريباً')),
     );
-  }
-
-  Future<void> _signInWithApple() async {
-    final result =
-        await ref.read(authControllerProvider.notifier).signInWithApple();
-
-    if (!mounted || result == LoginFlowResult.cancelled) {
-      return;
-    }
-
-    switch (result) {
-      case LoginFlowResult.success:
-        context.go(AppRoutes.home);
-      case LoginFlowResult.requiresEmailVerification:
-        final email = ref.read(authControllerProvider).pendingVerificationEmail ??
-            _emailController.text.trim();
-        context.go(
-          '${AppRoutes.verifyEmail}?email=${Uri.encodeComponent(email)}',
-        );
-      case LoginFlowResult.failed:
-      case LoginFlowResult.cancelled:
-        break;
-    }
   }
 
   @override
@@ -162,7 +112,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authControllerProvider);
     final fieldErrors = authState.fieldErrors;
     final metrics = AuthLayoutMetrics.of(context);
-    final showApple = ref.watch(appleSignInServiceProvider).isSupported;
 
     return Scaffold(
       body: AuthScreenShell(
@@ -261,15 +210,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   icon: Icons.arrow_back,
                   isLoading: authState.status == AuthStatus.loading,
                   onPressed: _submit,
-                ),
-                SizedBox(height: metrics.fieldSpacing),
-                const AuthOrDivider(),
-                SizedBox(height: metrics.fieldSpacing),
-                SocialAuthButtonsRow(
-                  showApple: showApple,
-                  isLoading: authState.status == AuthStatus.loading,
-                  onGooglePressed: _signInWithGoogle,
-                  onApplePressed: showApple ? _signInWithApple : null,
                 ),
                 SizedBox(height: metrics.fieldSpacing),
                 Wrap(

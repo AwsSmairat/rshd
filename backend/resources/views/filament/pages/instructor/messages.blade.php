@@ -23,7 +23,6 @@
             @if ($this->messages->isEmpty() && ! $this->loadError)
                 <div class="rshd-empty">
                     لا توجد رسائل أو إشعارات حالياً.
-                    <a href="{{ $this->createAnnouncementUrl() }}">أرسل إعلاناً لطلابك</a>
                 </div>
             @else
                 <div class="rshd-messages-list">

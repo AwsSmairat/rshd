@@ -27,10 +27,13 @@ class EditLesson extends EditRecord
         $record = $this->record;
 
         $subjectId = (int) ($data['subject_id'] ?? $record->subject_id);
-        $order = (int) ($data['order'] ?? 0);
 
-        if ($subjectId > 0 && $order <= 0) {
+        if ($subjectId !== (int) $record->subject_id) {
             $data['order'] = LessonResource::nextOrderForSubject($subjectId, $record->id);
+        } else {
+            $data['order'] = $record->order > 0
+                ? $record->order
+                : LessonResource::nextOrderForSubject($subjectId, $record->id);
         }
 
         return $data;

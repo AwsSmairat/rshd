@@ -24,6 +24,10 @@ class LessonResource extends JsonResource
             'subject' => SubjectResource::make($this->whenLoaded('subject')),
             'videos' => VideoResource::collection($this->whenLoaded('videos')),
             'files' => LessonFileResource::collection($this->whenLoaded('files')),
+            'assignments' => AssignmentResource::collection($this->whenLoaded('assignments')),
+            'quizzes' => $this->whenLoaded('quizzes', fn () => $this->quizzes->map(
+                fn ($quiz) => (new QuizResource($quiz, hideCorrectAnswers: true))->resolve(),
+            )),
         ];
     }
 }

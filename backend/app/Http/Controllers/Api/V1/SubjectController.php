@@ -122,4 +122,25 @@ class SubjectController extends Controller
             ),
         ], 'تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.', 201);
     }
+
+    public function cancelPurchaseRequest(
+        Request $request,
+        Subject $subject,
+        EnrollmentService $enrollmentService,
+    ): JsonResponse {
+        $user = $request->user();
+
+        if (! $user->isStudent()) {
+            return $this->forbiddenResponse('طلبات الشراء متاحة للطلاب فقط.');
+        }
+
+        $enrollmentService->cancelPurchaseRequest($user, $subject);
+
+        $subject->load('instructor');
+        $subject->setAttribute('enrollment_status', 'none');
+
+        return $this->successResponse([
+            'subject' => (new SubjectResource($subject))->resolve($request),
+        ], 'تم إلغاء طلب الشراء.');
+    }
 }

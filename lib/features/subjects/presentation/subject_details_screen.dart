@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/network/api_exception.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/loading_widget.dart';
+import '../../../core/widgets/responsive_content.dart';
 import '../../auth/presentation/auth_controller.dart';
 import '../data/models/subject_model.dart';
+import '../data/subjects_repository.dart';
 import '../widgets/lesson_card.dart';
+import '../widgets/subject_details_header.dart';
 import 'subjects_controller.dart';
 
 class SubjectDetailsScreen extends ConsumerStatefulWidget {
@@ -29,11 +32,24 @@ class SubjectDetailsScreen extends ConsumerStatefulWidget {
 
 class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
   bool _isRequesting = false;
+  bool _isCancelling = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cached = ref
+          .read(subjectsListControllerProvider.notifier)
+          .findSubjectById(widget.subjectId);
+
+      ref
+          .read(subjectDetailsControllerProvider(widget.subjectId).notifier)
+          .load(
+            widget.subjectId,
+            initial: widget.subject,
+            cached: cached,
+          );
+
       ref
           .read(subjectLessonsControllerProvider(widget.subjectId).notifier)
           .load(widget.subjectId);
@@ -49,37 +65,145 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
 
   Future<void> _requestPurchase() async {
     setState(() => _isRequesting = true);
-    final error = await ref
-        .read(subjectsListControllerProvider.notifier)
-        .requestPurchase(widget.subjectId);
-    if (!mounted) {
-      return;
-    }
-    setState(() => _isRequesting = false);
 
-    final messenger = ScaffoldMessenger.of(context);
-    if (error != null) {
-      messenger.showSnackBar(SnackBar(content: Text(error)));
-      return;
+    try {
+      final updated = await ref
+          .read(subjectsRepositoryProvider)
+          .requestPurchase(widget.subjectId);
+
+      if (!mounted) {
+        return;
+      }
+
+      final current =
+          ref.read(subjectDetailsControllerProvider(widget.subjectId)).subject;
+      final merged = (current ?? updated).copyWith(
+        enrollmentStatus: updated.enrollmentStatus,
+      );
+
+      ref
+          .read(subjectDetailsControllerProvider(widget.subjectId).notifier)
+          .updateSubject(merged);
+      ref
+          .read(subjectsListControllerProvider.notifier)
+          .syncEnrollmentStatus(widget.subjectId, updated.enrollmentStatus);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.'),
+        ),
+      );
+    } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(mapSubjectsError(error))),
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تعذر إرسال طلب الشراء')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isRequesting = false);
+      }
     }
-    messenger.showSnackBar(
-      const SnackBar(
-        content: Text('تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.'),
+  }
+
+  Future<void> _cancelPurchase() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('إلغاء طلب الشراء'),
+        content: const Text(
+          'هل تريد إلغاء طلب شراء هذه المادة؟ يمكنك إرسال طلب جديد لاحقاً.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('تراجع'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.error,
+            ),
+            child: const Text('إلغاء الطلب'),
+          ),
+        ],
       ),
     );
+
+    if (confirmed != true || !mounted) {
+      return;
+    }
+
+    setState(() => _isCancelling = true);
+
+    try {
+      final updated = await ref
+          .read(subjectsRepositoryProvider)
+          .cancelPurchaseRequest(widget.subjectId);
+
+      if (!mounted) {
+        return;
+      }
+
+      final current =
+          ref.read(subjectDetailsControllerProvider(widget.subjectId)).subject;
+      final merged = (current ?? updated).copyWith(
+        enrollmentStatus: updated.enrollmentStatus,
+      );
+
+      ref
+          .read(subjectDetailsControllerProvider(widget.subjectId).notifier)
+          .updateSubject(merged);
+      ref
+          .read(subjectsListControllerProvider.notifier)
+          .syncEnrollmentStatus(widget.subjectId, updated.enrollmentStatus);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم إلغاء طلب الشراء.')),
+      );
+    } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(mapSubjectsError(error))),
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تعذر إلغاء طلب الشراء')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isCancelling = false);
+      }
+    }
+  }
+
+  Future<void> _retry() async {
+    await ref
+        .read(subjectDetailsControllerProvider(widget.subjectId).notifier)
+        .load(widget.subjectId, refresh: true);
+    await ref
+        .read(subjectLessonsControllerProvider(widget.subjectId).notifier)
+        .load(widget.subjectId, refresh: true);
   }
 
   @override
   Widget build(BuildContext context) {
-    final listState = ref.watch(subjectsListControllerProvider);
-    SubjectModel? subject;
-    for (final item in listState.subjects) {
-      if (item.id == widget.subjectId) {
-        subject = item;
-        break;
-      }
-    }
-    subject ??= widget.subject;
+    final detailsState =
+        ref.watch(subjectDetailsControllerProvider(widget.subjectId));
+    final subject = detailsState.subject;
 
     final lessonsState =
         ref.watch(subjectLessonsControllerProvider(widget.subjectId));
@@ -88,117 +212,85 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
       _handleUnauthorized(next.errorMessage);
     });
 
+    ref.listen(subjectDetailsControllerProvider(widget.subjectId), (prev, next) {
+      _handleUnauthorized(next.errorMessage);
+    });
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(subject?.title ?? 'تفاصيل المادة'),
+      backgroundColor: AppColors.background,
+      body: _buildBody(detailsState, lessonsState, subject),
+    );
+  }
+
+  Widget _buildBody(
+    SubjectDetailsState detailsState,
+    LessonsListState lessonsState,
+    SubjectModel? subject,
+  ) {
+    switch (detailsState.status) {
+      case FeatureLoadStatus.initial:
+      case FeatureLoadStatus.loading:
+        return const LoadingWidget(message: 'جاري تحميل بيانات المادة...');
+      case FeatureLoadStatus.error:
+        return ErrorView(
+          message: detailsState.errorMessage ?? 'تعذر عرض بيانات المادة',
+          onRetry: _retry,
+        );
+      case FeatureLoadStatus.empty:
+      case FeatureLoadStatus.loaded:
+        if (subject == null) {
+          return ErrorView(
+            message: 'تعذر عرض بيانات المادة',
+            onRetry: _retry,
+          );
+        }
+        return _buildSubjectContent(subject, lessonsState);
+    }
+  }
+
+  Widget _buildSubjectContent(
+    SubjectModel subject,
+    LessonsListState lessonsState,
+  ) {
+    final lessonsCount = lessonsState.status == FeatureLoadStatus.loaded
+        ? lessonsState.lessons.length
+        : 0;
+
+    return CustomScrollView(
+      physics: const BouncingScrollPhysics(
+        parent: AlwaysScrollableScrollPhysics(),
       ),
-      body: subject == null
-          ? const ErrorView(message: 'تعذر عرض بيانات المادة')
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                if (subject.resolvedCoverImageUrl != null) ...[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(18),
-                    child: AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: Image.network(
-                        subject.resolvedCoverImageUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return ColoredBox(
-                            color: AppColors.primary.withValues(alpha: 0.08),
-                            child: const Icon(
-                              Icons.image_outlined,
-                              color: AppColors.textMuted,
-                              size: 40,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-                Text(subject.title, style: AppTextStyles.title),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _InfoChip(label: subject.categoryLabel),
-                    if (subject.price != null)
-                      _InfoChip(label: 'السعر: ${subject.price} د.أ'),
-                    if (subject.isEnrollmentPending)
-                      const _InfoChip(label: 'بانتظار التفعيل'),
-                    if (subject.isEnrollmentActive)
-                      const _InfoChip(label: 'مفعّلة'),
-                  ],
-                ),
-                if (subject.instructor != null) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    'المدرّس: ${subject.instructor!.name}',
-                    style: AppTextStyles.body,
-                  ),
-                ],
-                if (subject.description != null &&
-                    subject.description!.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Text(subject.description!, style: AppTextStyles.body),
-                ],
-                const SizedBox(height: 24),
-                if (!subject.isEnrollmentActive) ...[
-                  if (subject.isEnrollmentPending)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.accent.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        'طلب الشراء قيد المراجعة. يمكنك مشاهدة الفيديوهات المجانية حتى يتم تفعيل المادة.',
-                        style: AppTextStyles.body.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    )
-                  else
-                    FilledButton(
-                      onPressed: _isRequesting ? null : _requestPurchase,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: Text(
-                        _isRequesting ? 'جاري إرسال الطلب...' : 'طلب شراء المادة',
-                        style: const TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'معاينة المحتوى — الفيديوهات المجانية متاحة للمشاهدة',
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.textMuted,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-                Text(
-                  'الأجزاء',
-                  style: AppTextStyles.title.copyWith(fontSize: 20),
-                ),
-                const SizedBox(height: 12),
-                _buildLessonsSection(lessonsState),
-              ],
+      slivers: [
+        SubjectDetailsHero(subject: subject),
+        SliverToBoxAdapter(
+          child: ResponsiveContent(
+            padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+            child: SubjectDetailsMetaCard(
+              subject: subject,
+              lessonsCount: lessonsCount,
+              isRequesting: _isRequesting,
+              isCancelling: _isCancelling,
+              onRequestPurchase: _requestPurchase,
+              onCancelPurchase: _cancelPurchase,
             ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: ResponsiveContent(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
+            child: SubjectDetailsSectionHeader(
+              title: 'الأجزاء',
+              count: lessonsCount > 0 ? lessonsCount : null,
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: ResponsiveContent(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
+            child: _buildLessonsSection(lessonsState),
+          ),
+        ),
+      ],
     );
   }
 
@@ -211,9 +303,14 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
           child: LoadingWidget(message: 'جاري تحميل الأجزاء...'),
         );
       case FeatureLoadStatus.empty:
-        return const Padding(
-          padding: EdgeInsets.symmetric(vertical: 24),
-          child: Center(child: Text('لا توجد أجزاء في هذه المادة')),
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 28),
+          child: Center(
+            child: Text(
+              'لا توجد أجزاء في هذه المادة',
+              style: TextStyle(color: AppColors.textMuted.withValues(alpha: 0.9)),
+            ),
+          ),
         );
       case FeatureLoadStatus.error:
         return ErrorView(
@@ -229,39 +326,16 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
               .entries
               .map(
                 (entry) => Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.only(bottom: 12),
                   child: LessonCard(
                     lesson: entry.value,
                     displayOrder: entry.key + 1,
+                    initiallyExpanded: entry.key == 0 && state.lessons.length == 1,
                   ),
                 ),
               )
               .toList(),
         );
     }
-  }
-}
-
-class _InfoChip extends StatelessWidget {
-  const _InfoChip({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.accent.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: AppTextStyles.body.copyWith(
-          color: AppColors.primary,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
   }
 }

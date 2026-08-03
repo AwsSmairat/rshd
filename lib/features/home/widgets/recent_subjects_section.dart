@@ -63,8 +63,10 @@ class RecentSubjectsSection extends StatelessWidget {
                           progress: subject.isEnrollmentActive
                               ? subject.progressPercent! / 100
                               : null,
-                          onTap: () =>
-                              context.push(AppRoutes.subjectDetails(subject.id)),
+                          onTap: () => context.push(
+                            AppRoutes.subjectDetails(subject.id),
+                            extra: subject,
+                          ),
                         ),
                       ),
                   ],
@@ -87,8 +89,10 @@ class RecentSubjectsSection extends StatelessWidget {
                     progress: subject.isEnrollmentActive
                         ? subject.progressPercent! / 100
                         : null,
-                    onTap: () =>
-                        context.push(AppRoutes.subjectDetails(subject.id)),
+                    onTap: () => context.push(
+                      AppRoutes.subjectDetails(subject.id),
+                      extra: subject,
+                    ),
                   );
                 },
               ),

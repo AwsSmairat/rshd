@@ -61,68 +61,6 @@ class AuthRepository {
   final SecureStorageService _secureStorage;
   final DeviceService _deviceService;
 
-  Future<LoginOutcome> signInWithGoogle({required String idToken}) async {
-    final devicePayload = await _deviceService.getDevicePayload();
-
-    final response = await _apiClient.post<Map<String, dynamic>>(
-      ApiEndpoints.googleAuth,
-      data: {
-        'id_token': idToken,
-        ...devicePayload,
-      },
-    );
-
-    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
-      Map<String, dynamic>.from(response.data as Map),
-      (json) => Map<String, dynamic>.from(json as Map),
-    );
-
-    if (!apiResponse.success || apiResponse.data == null) {
-      throw ApiException(
-        message: apiResponse.message ?? 'فشل تسجيل الدخول عبر Google.',
-        errors: apiResponse.errors,
-        statusCode: response.statusCode,
-      );
-    }
-
-    final session = _parseSession(apiResponse.data!);
-    await _persistSession(session);
-    return LoginOutcome.success(session);
-  }
-
-  Future<LoginOutcome> signInWithApple({
-    required String identityToken,
-    String? name,
-  }) async {
-    final devicePayload = await _deviceService.getDevicePayload();
-
-    final response = await _apiClient.post<Map<String, dynamic>>(
-      ApiEndpoints.appleAuth,
-      data: {
-        'identity_token': identityToken,
-        if (name != null && name.isNotEmpty) 'name': name,
-        ...devicePayload,
-      },
-    );
-
-    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
-      Map<String, dynamic>.from(response.data as Map),
-      (json) => Map<String, dynamic>.from(json as Map),
-    );
-
-    if (!apiResponse.success || apiResponse.data == null) {
-      throw ApiException(
-        message: apiResponse.message ?? 'فشل تسجيل الدخول عبر Apple.',
-        errors: apiResponse.errors,
-        statusCode: response.statusCode,
-      );
-    }
-
-    final session = _parseSession(apiResponse.data!);
-    await _persistSession(session);
-    return LoginOutcome.success(session);
-  }
-
   Future<LoginOutcome> login({
     required String email,
     required String password,

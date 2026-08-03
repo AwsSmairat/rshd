@@ -4,8 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-import 'package:url_launcher/url_launcher.dart';
-
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/platform/platform_settings_controller.dart';
 import '../../../core/router/app_router.dart';
@@ -90,62 +88,6 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
     }
   }
 
-  Future<void> _confirmDeleteAccount() async {
-    final passwordController = TextEditingController();
-    final confirmationController = TextEditingController();
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('حذف الحساب'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('هذا الإجراء قد يكون نهائياً. اكتب «حذف» وأدخل كلمة المرور للتأكيد.'),
-            const SizedBox(height: 12),
-            TextField(
-              controller: confirmationController,
-              decoration: const InputDecoration(labelText: 'اكتب: حذف'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'كلمة المرور'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('حذف الحساب', style: TextStyle(color: Color(0xFF991B1B))),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true || !mounted) {
-      return;
-    }
-
-    if (confirmationController.text.trim() != 'حذف') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('اكتب «حذف» للتأكيد')),
-      );
-      return;
-    }
-
-    final success = await ref.read(studentSettingsControllerProvider.notifier).deleteAccount(
-          passwordController.text,
-        );
-    if (success && mounted) {
-      await ref.read(authControllerProvider.notifier).logout();
-      if (mounted) {
-        context.go(AppRoutes.login);
-      }
-    }
-  }
-
   bool _allNotificationsEnabled(StudentPreferencesModel prefs) =>
       prefs.notifyLessons &&
       prefs.notifyAssignments &&
@@ -174,23 +116,6 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
       'notification_sound': enable,
       'notification_vibration': enable,
     });
-  }
-
-  Future<void> _openContact(BuildContext context, String? email) async {
-    if (email == null || email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('بريد الدعم غير متوفر حالياً')),
-      );
-      return;
-    }
-
-    final uri = Uri(scheme: 'mailto', path: email);
-    final launched = await launchUrl(uri);
-    if (!launched && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تواصل معنا: $email')),
-      );
-    }
   }
 
   void _showInfoDialog(
@@ -372,15 +297,12 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
       onChanged: (key, value) => ref
           .read(studentSettingsControllerProvider.notifier)
           .updatePreference(key, value),
-      onDeleteAccount: _confirmDeleteAccount,
     );
-
-    final supportEmail = platformSettings?.supportEmail;
 
     final support = SupportLegalCard(
       appVersion: _appVersion.isEmpty ? '—' : _appVersion,
       onHelp: () => context.push(AppRoutes.helpCenter),
-      onContact: () => _openContact(context, supportEmail),
+      onContact: () => context.push(AppRoutes.contactUs),
       onTerms: () => context.push(AppRoutes.termsAndConditions),
       onPrivacy: () => context.push(AppRoutes.privacyPolicy),
       onAbout: () => _showInfoDialog(

@@ -23,9 +23,9 @@ dependencies:
   video_player: ^2.9.5
   chewie: ^1.11.3
   syncfusion_flutter_pdfviewer: ^29.1.38
-  google_sign_in: ^6.3.0
+  syncfusion_flutter_pdf: ^29.1.38
+  path_provider: ^2.1.5
   file_picker: ^10.2.0
-  sign_in_with_apple: ^8.1.0
   image_picker: ^1.1.2
   package_info_plus: ^8.3.0
 

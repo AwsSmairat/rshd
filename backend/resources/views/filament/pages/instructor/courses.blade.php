@@ -27,7 +27,6 @@
                         <div class="rshd-subject-card__meta">
                             <span>{{ $item['students_count'] }} طالب</span>
                             <span>{{ $item['lessons_count'] }} جزء</span>
-                            <span>{{ $item['announcements_count'] }} إعلان</span>
                         </div>
                     </div>
                 </div>

@@ -3,11 +3,9 @@
 namespace App\Services;
 
 use App\Enums\ContentStatus;
-use App\Filament\Resources\AnnouncementResource;
 use App\Filament\Resources\AssignmentResource;
 use App\Filament\Resources\LessonResource;
 use App\Filament\Resources\QuizResource;
-use App\Models\Announcement;
 use App\Models\Assignment;
 use App\Models\Lesson;
 use App\Models\Quiz;
@@ -126,29 +124,6 @@ class InstructorCalendarService
                     'subject_title' => $lesson->subject?->title,
                     'time' => $lesson->created_at?->timezone(config('app.timezone'))->format('H:i'),
                     'url' => LessonResource::getUrl('edit', ['record' => $lesson->id]),
-                ];
-            });
-
-        Announcement::query()
-            ->with('subject:id,title')
-            ->where(function ($query) use ($instructor, $subjectIds) {
-                $query->where('instructor_id', $instructor->id);
-
-                if ($subjectIds->isNotEmpty()) {
-                    $query->orWhereIn('subject_id', $subjectIds);
-                }
-            })
-            ->whereDate('created_at', $date)
-            ->orderBy('created_at')
-            ->get()
-            ->each(function (Announcement $announcement) use (&$events): void {
-                $events[] = [
-                    'title' => $announcement->title,
-                    'type' => 'announcement',
-                    'type_label' => 'إعلان',
-                    'subject_title' => $announcement->subject?->title,
-                    'time' => $announcement->created_at?->timezone(config('app.timezone'))->format('H:i'),
-                    'url' => AnnouncementResource::getUrl('edit', ['record' => $announcement->id]),
                 ];
             });
 

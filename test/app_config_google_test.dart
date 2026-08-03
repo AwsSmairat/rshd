@@ -3,6 +3,15 @@ import 'package:rshd/core/config/app_config.dart';
 
 void main() {
   group('AppConfig Google client validation', () {
+    test('rejects null, empty, and malformed client ids', () {
+      expect(AppConfig.isValidGoogleClientId(null), isFalse);
+      expect(AppConfig.isValidGoogleClientId(''), isFalse);
+      expect(AppConfig.isValidGoogleClientId('   '), isFalse);
+      expect(AppConfig.isValidGoogleClientId('not-a-client-id'), isFalse);
+      expect(AppConfig.reversedIosClientId(null), isNull);
+      expect(AppConfig.reversedIosClientId('invalid'), isNull);
+    });
+
     test('rejects placeholder client ids', () {
       expect(
         AppConfig.isValidGoogleClientId(

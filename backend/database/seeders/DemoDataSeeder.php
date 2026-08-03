@@ -288,6 +288,15 @@ class DemoDataSeeder extends Seeder
             ]
         );
 
+        $assignment2 = Assignment::query()
+            ->where('subject_id', $subject->id)
+            ->where('title', 'واجب 2: مراجعة عامة')
+            ->first();
+
+        if ($assignment2 !== null) {
+            $this->seedAssignmentAttachment($assignment2);
+        }
+
         $quiz = Quiz::updateOrCreate(
             [
                 'subject_id' => $subject->id,
@@ -715,5 +724,29 @@ class DemoDataSeeder extends Seeder
                 ]
             );
         }
+    }
+
+    private function seedAssignmentAttachment(Assignment $assignment): void
+    {
+        $relativePath = 'assignments/attachments/demo-review-questions.txt';
+        $content = <<<'TEXT'
+أسئلة المراجعة العامة — أساسيات التشريح
+
+1. ما تعريف التشريح؟
+2. اذكر الفرق بين التشريح الناحي والتشريح الوظيفي.
+3. ما هي Planes of the body؟
+4. اذكر أهم أنظمة جسم الإنسان.
+
+يرجى الإجابة باختصار في خانة النص أو رفع ملف PDF.
+TEXT;
+
+        Storage::disk('public')->put($relativePath, $content);
+
+        $assignment->update([
+            'attachment_path' => $relativePath,
+            'original_file_name' => 'أسئلة-المراجعة.txt',
+            'file_size' => strlen($content),
+            'file_mime_type' => 'text/plain',
+        ]);
     }
 }

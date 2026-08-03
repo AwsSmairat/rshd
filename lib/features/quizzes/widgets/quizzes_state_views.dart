@@ -77,30 +77,29 @@ class QuizzesLoadingSkeleton extends StatelessWidget {
             fillOpacity: 0.32,
             borderOpacity: 0.58,
             blurSigma: 16,
-            child: SizedBox(
-              height: 128,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _SkeletonBox(width: double.infinity, height: 18),
-                        const SizedBox(height: 10),
-                        _SkeletonBox(width: 130, height: 14),
-                        const SizedBox(height: 8),
-                        _SkeletonBox(width: 150, height: 12),
-                        const SizedBox(height: 10),
-                        _SkeletonBox(width: double.infinity, height: 28, radius: 999),
-                        const SizedBox(height: 10),
-                        _SkeletonBox(width: 88, height: 24, radius: 20),
-                      ],
-                    ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _SkeletonBox(width: double.infinity, height: 18),
+                      const SizedBox(height: 10),
+                      _SkeletonBox(width: 130, height: 14),
+                      const SizedBox(height: 8),
+                      _SkeletonBox(width: 150, height: 12),
+                      const SizedBox(height: 10),
+                      _SkeletonBox(width: double.infinity, height: 28, radius: 999),
+                      const SizedBox(height: 10),
+                      _SkeletonBox(width: 88, height: 24, radius: 20),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  _SkeletonBox(width: 72, height: 96, radius: 16),
-                ],
-              ),
+                ),
+                const SizedBox(width: 12),
+                _SkeletonBox(width: 72, height: 96, radius: 16),
+              ],
             ),
           ),
         );

@@ -92,7 +92,7 @@ class PlatformSettingsService
                 'allow_assignment_resubmission' => ['type' => 'boolean', 'value' => false, 'is_public' => false],
                 'assignment_max_file_size_mb' => ['type' => 'integer', 'value' => 10, 'is_public' => true],
                 'assignment_allowed_file_types' => ['type' => 'json', 'value' => ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'zip'], 'is_public' => true],
-                'allow_quiz_retake' => ['type' => 'boolean', 'value' => false, 'is_public' => false],
+                'allow_quiz_retake' => ['type' => 'boolean', 'value' => true, 'is_public' => true],
                 'show_quiz_correct_answers' => ['type' => 'boolean', 'value' => false, 'is_public' => false],
                 'allow_pdf_annotations' => ['type' => 'boolean', 'value' => true, 'is_public' => false],
                 'show_inactive_subjects' => ['type' => 'boolean', 'value' => false, 'is_public' => false],

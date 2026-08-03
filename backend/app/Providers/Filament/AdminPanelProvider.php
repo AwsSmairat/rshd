@@ -71,7 +71,7 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::STYLES_AFTER,
                 fn (): HtmlString => new HtmlString(
-                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=24">'.
+                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=26">'.
                     '<link rel="preconnect" href="https://fonts.googleapis.com">'.
                     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'.
                     '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">'
@@ -91,6 +91,20 @@ class AdminPanelProvider extends PanelProvider
                         '<link rel="apple-touch-icon" sizes="180x180" href="'.$apple.'?v=1">'
                     );
                 },
+            )
+            ->renderHook(
+                PanelsRenderHook::TOPBAR_START,
+                fn (): HtmlString => new HtmlString(
+                    '<button type="button" '
+                    .'class="fi-icon-btn fi-topbar-sidebar-toggle hidden lg:inline-flex items-center justify-center" '
+                    .'style="width:2.5rem;height:2.5rem" '
+                    .'x-data="{}" '
+                    .'x-on:click="$store.sidebar.isOpen ? $store.sidebar.close() : $store.sidebar.open()" '
+                    .'aria-label="تبديل القائمة">'
+                    .'<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="1.35rem" height="1.35rem">'
+                    .'<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>'
+                    .'</svg></button>'
+                ),
             )
             ->renderHook(
                 PanelsRenderHook::SIDEBAR_FOOTER,

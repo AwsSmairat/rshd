@@ -54,7 +54,12 @@ class AppConfig {
     defaultValue: '',
   );
 
-  static bool isValidGoogleClientId(String clientId) {
+  /// Returns `true` when [clientId] looks like a real Google OAuth client ID.
+  static bool isValidGoogleClientId(String? clientId) {
+    if (clientId == null) {
+      return false;
+    }
+
     final trimmed = clientId.trim();
     if (trimmed.isEmpty) {
       return false;
@@ -81,16 +86,15 @@ class AppConfig {
     return true;
   }
 
-  static String? reversedIosClientId(String iosClientId) {
+  /// Converts an iOS Google client ID to the reversed URL scheme form.
+  static String? reversedIosClientId(String? iosClientId) {
     if (!isValidGoogleClientId(iosClientId)) {
       return null;
     }
 
     const suffix = '.apps.googleusercontent.com';
-    final prefix = iosClientId.trim().substring(
-      0,
-      iosClientId.trim().length - suffix.length,
-    );
+    final trimmed = iosClientId!.trim();
+    final prefix = trimmed.substring(0, trimmed.length - suffix.length);
 
     return 'com.googleusercontent.apps.$prefix';
   }

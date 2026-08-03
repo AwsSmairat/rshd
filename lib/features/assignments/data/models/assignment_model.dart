@@ -1,3 +1,4 @@
+import '../../../../core/config/app_config.dart';
 import 'assignment_submission_model.dart';
 
 class AssignmentModel {
@@ -40,7 +41,30 @@ class AssignmentModel {
   bool get isSubmitted => submission != null;
 
   bool get hasAttachment =>
-      attachmentUrl != null && attachmentUrl!.trim().isNotEmpty;
+      resolvedAttachmentUrl != null && resolvedAttachmentUrl!.isNotEmpty;
+
+  String? get resolvedAttachmentUrl {
+    final value = attachmentUrl?.trim();
+    if (value == null || value.isEmpty) {
+      return null;
+    }
+
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      final uri = Uri.tryParse(value);
+      final path = uri?.path;
+      if (path != null && path.startsWith('/storage/')) {
+        return '${AppConfig.appOrigin}$path';
+      }
+      return value;
+    }
+
+    final path = value.startsWith('/') ? value : '/$value';
+    if (path.startsWith('/storage/')) {
+      return '${AppConfig.appOrigin}$path';
+    }
+
+    return '${AppConfig.appOrigin}/storage$path';
+  }
 
   bool get isOverdue {
     if (dueDate == null || dueDate!.isEmpty) {

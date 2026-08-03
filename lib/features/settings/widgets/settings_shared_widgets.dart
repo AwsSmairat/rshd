@@ -3,25 +3,44 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
-class SettingsSectionCard extends StatelessWidget {
+class SettingsSectionCard extends StatefulWidget {
   const SettingsSectionCard({
     super.key,
     required this.title,
     required this.icon,
     required this.child,
     this.trailing,
+    this.initiallyExpanded = false,
   });
 
   final String title;
   final IconData icon;
   final Widget child;
   final Widget? trailing;
+  final bool initiallyExpanded;
+
+  @override
+  State<SettingsSectionCard> createState() => _SettingsSectionCardState();
+}
+
+class _SettingsSectionCardState extends State<SettingsSectionCard> {
+  late bool _expanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _expanded = widget.initiallyExpanded;
+  }
+
+  void _toggleExpanded() {
+    setState(() => _expanded = !_expanded);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+      padding: EdgeInsets.fromLTRB(16, 14, 16, _expanded ? 6 : 14),
       decoration: BoxDecoration(
         color: AppColors.cardWhite,
         borderRadius: BorderRadius.circular(20),
@@ -38,24 +57,65 @@ class SettingsSectionCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(icon, color: AppColors.darkGold, size: 20),
-              const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  title,
-                  style: AppTextStyles.subtitle.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.text,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: _toggleExpanded,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      child: Row(
+                        children: [
+                          Icon(widget.icon, color: AppColors.darkGold, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              widget.title,
+                              style: AppTextStyles.subtitle.copyWith(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.text,
+                              ),
+                            ),
+                          ),
+                          AnimatedRotation(
+                            turns: _expanded ? 0.5 : 0,
+                            duration: const Duration(milliseconds: 200),
+                            child: Icon(
+                              Icons.expand_more,
+                              color: AppColors.textMuted.withValues(alpha: 0.85),
+                              size: 22,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
-              if (trailing != null) trailing!,
+              if (widget.trailing != null) widget.trailing!,
             ],
           ),
-          const SizedBox(height: 4),
-          child,
+          AnimatedCrossFade(
+            firstCurve: Curves.easeInOut,
+            secondCurve: Curves.easeInOut,
+            sizeCurve: Curves.easeInOut,
+            crossFadeState: _expanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 220),
+            firstChild: const SizedBox.shrink(),
+            secondChild: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 8),
+                widget.child,
+              ],
+            ),
+          ),
         ],
       ),
     );

@@ -28,6 +28,7 @@ class PublicSettingsController extends Controller
                 'payment_instructions' => $public['payment_instructions'] ?? $settings->stringValue('payment_instructions', '', 'payments'),
                 'maintenance_mode' => $settings->isMaintenanceModeEnabled(),
                 'maintenance_message' => $settings->maintenanceMessage(),
+                'allow_quiz_retake' => $settings->enabled('allow_quiz_retake', 'students'),
             ],
         ]);
     }

@@ -13,7 +13,6 @@ import 'widgets/academic_departments_section.dart';
 import 'widgets/continue_learning_card.dart';
 import 'widgets/dashboard_summary_card.dart';
 import 'widgets/quick_action_grid.dart';
-import 'widgets/recent_subjects_section.dart';
 import 'widgets/upcoming_assignments_section.dart';
 import 'widgets/welcome_header.dart';
 
@@ -123,14 +122,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           const SliverToBoxAdapter(child: QuickActionGrid()),
-          if (dashboard?.continueLearningSubject != null) ...[
+          if (dashboard != null && dashboard.continueLearningSubjects.isNotEmpty) ...[
             SliverToBoxAdapter(child: SizedBox(height: sectionGap)),
             SliverToBoxAdapter(
-              child: ContinueLearningCard(
-                subject: dashboard!.continueLearningSubject!,
-                progressPercent: dashboard.resolvedProgressPercent(
-                  dashboard.continueLearningSubject!,
-                ),
+              child: ContinueLearningSection(
+                subjects: dashboard.continueLearningSubjects,
+                progressFor: dashboard.resolvedProgressPercent,
               ),
             ),
           ],
@@ -145,12 +142,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           SliverToBoxAdapter(
             child: AcademicDepartmentsSection(
               subjects: dashboard?.catalogSubjects ?? const [],
-            ),
-          ),
-          SliverToBoxAdapter(child: SizedBox(height: sectionGap)),
-          SliverToBoxAdapter(
-            child: RecentSubjectsSection(
-              subjects: dashboard?.recentSubjects ?? const [],
             ),
           ),
           SliverToBoxAdapter(child: SizedBox(height: sectionGap)),

@@ -8,13 +8,9 @@ import '../data/help_center_model.dart';
 class HelpSupportCard extends StatelessWidget {
   const HelpSupportCard({
     super.key,
-    required this.supportEmail,
-    required this.supportPhone,
     required this.onContact,
   });
 
-  final String supportEmail;
-  final String supportPhone;
   final VoidCallback onContact;
 
   @override
@@ -63,28 +59,11 @@ class HelpSupportCard extends StatelessWidget {
               ),
             ],
           ),
-          if (supportEmail.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Text(
-              supportEmail,
-              style: AppTextStyles.body.copyWith(fontSize: 13),
-            ),
-          ],
-          if (supportPhone.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              supportPhone,
-              style: AppTextStyles.body.copyWith(
-                fontSize: 13,
-                color: AppColors.textMuted,
-              ),
-            ),
-          ],
           const SizedBox(height: 14),
           FilledButton.icon(
             onPressed: onContact,
-            icon: const Icon(Icons.mail_outline, size: 18),
-            label: const Text('تواصل مع الدعم الفني'),
+            icon: const Icon(Icons.chat_bubble_outline, size: 18),
+            label: const Text('بدء محادثة الدعم الفني'),
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.primary,
               minimumSize: const Size(double.infinity, 46),

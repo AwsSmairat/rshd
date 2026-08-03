@@ -16,9 +16,8 @@ class CreateLesson extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $subjectId = (int) ($data['subject_id'] ?? 0);
-        $order = (int) ($data['order'] ?? 0);
 
-        if ($subjectId > 0 && $order <= 0) {
+        if ($subjectId > 0) {
             $data['order'] = LessonResource::nextOrderForSubject($subjectId);
         }
 

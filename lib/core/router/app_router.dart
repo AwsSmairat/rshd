@@ -19,7 +19,9 @@ import '../../features/home/home_screen.dart';
 import '../../features/maintenance/maintenance_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
+import '../../features/contact/presentation/contact_us_screen.dart';
 import '../../features/help/presentation/help_center_screen.dart';
+import '../../features/help/presentation/technical_support_screen.dart';
 import '../../features/legal/terms/presentation/terms_and_conditions_screen.dart';
 import '../../features/legal/privacy/presentation/delete_account_screen.dart';
 import '../../features/legal/privacy/presentation/privacy_policy_screen.dart';
@@ -92,6 +94,10 @@ class AppRoutes {
   static const termsAndConditions = '/terms-and-conditions';
 
   static const helpCenter = '/help-center';
+
+  static const technicalSupport = '/technical-support';
+
+  static const contactUs = '/contact-us';
 
   static const maintenance = '/maintenance';
 }
@@ -386,6 +392,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.helpCenter,
         builder: (context, state) => const HelpCenterScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.technicalSupport,
+        builder: (context, state) => const TechnicalSupportScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.contactUs,
+        builder: (context, state) => const ContactUsScreen(),
       ),
       GoRoute(
         path: AppRoutes.privacyPolicy,

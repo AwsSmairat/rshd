@@ -8,6 +8,7 @@ class PlatformSettings {
     required this.assignmentMaxFileSizeMb,
     required this.assignmentAllowedFileTypes,
     required this.currencySymbol,
+    this.allowQuizRetake = true,
     this.supportEmail,
     this.supportPhone,
   });
@@ -33,6 +34,7 @@ class PlatformSettings {
           ? types.map((e) => e.toString()).toList()
           : const ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'zip'],
       currencySymbol: data['currency_symbol']?.toString() ?? 'د.أ',
+      allowQuizRetake: data['allow_quiz_retake'] != false,
       supportEmail: data['support_email']?.toString(),
       supportPhone: data['support_phone']?.toString(),
     );
@@ -46,6 +48,7 @@ class PlatformSettings {
   final int assignmentMaxFileSizeMb;
   final List<String> assignmentAllowedFileTypes;
   final String currencySymbol;
+  final bool allowQuizRetake;
   final String? supportEmail;
   final String? supportPhone;
 
@@ -58,6 +61,7 @@ class PlatformSettings {
     assignmentMaxFileSizeMb: 10,
     assignmentAllowedFileTypes: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'zip'],
     currencySymbol: 'د.أ',
+    allowQuizRetake: true,
     supportEmail: 'admin@rshdacademy.com',
   );
 }

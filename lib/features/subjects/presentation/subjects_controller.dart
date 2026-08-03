@@ -158,26 +158,34 @@ class SubjectsListController extends StateNotifier<SubjectsListState> {
   Future<String?> requestPurchase(int subjectId) async {
     try {
       final updated = await _repository.requestPurchase(subjectId);
-      final subjects = state.subjects.map((subject) {
-        if (subject.id != subjectId) {
-          return subject;
-        }
-        return subject.copyWith(enrollmentStatus: updated.enrollmentStatus);
-      }).toList(growable: false);
-
-      state = state.copyWith(
-        status: subjects.isEmpty
-            ? FeatureLoadStatus.empty
-            : FeatureLoadStatus.loaded,
-        subjects: subjects,
-        clearError: true,
-      );
+      syncEnrollmentStatus(subjectId, updated.enrollmentStatus);
       return null;
     } on ApiException catch (error) {
       return mapSubjectsError(error);
     } catch (_) {
       return 'تعذر إرسال طلب الشراء';
     }
+  }
+
+  void syncEnrollmentStatus(int subjectId, String enrollmentStatus) {
+    if (!state.subjects.any((subject) => subject.id == subjectId)) {
+      return;
+    }
+
+    final subjects = state.subjects.map((subject) {
+      if (subject.id != subjectId) {
+        return subject;
+      }
+      return subject.copyWith(enrollmentStatus: enrollmentStatus);
+    }).toList(growable: false);
+
+    state = state.copyWith(
+      status: subjects.isEmpty
+          ? FeatureLoadStatus.empty
+          : FeatureLoadStatus.loaded,
+      subjects: subjects,
+      clearError: true,
+    );
   }
 
   SubjectModel? findSubjectById(int id) {
@@ -187,6 +195,94 @@ class SubjectsListController extends StateNotifier<SubjectsListState> {
       }
     }
     return null;
+  }
+}
+
+class SubjectDetailsState {
+  const SubjectDetailsState({
+    this.status = FeatureLoadStatus.initial,
+    this.subject,
+    this.errorMessage,
+  });
+
+  final FeatureLoadStatus status;
+  final SubjectModel? subject;
+  final String? errorMessage;
+
+  SubjectDetailsState copyWith({
+    FeatureLoadStatus? status,
+    SubjectModel? subject,
+    String? errorMessage,
+    bool clearError = false,
+  }) {
+    return SubjectDetailsState(
+      status: status ?? this.status,
+      subject: subject ?? this.subject,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+    );
+  }
+}
+
+class SubjectDetailsController extends StateNotifier<SubjectDetailsState> {
+  SubjectDetailsController(this._repository) : super(const SubjectDetailsState());
+
+  final SubjectsRepository _repository;
+
+  Future<void> load(
+    int subjectId, {
+    SubjectModel? initial,
+    SubjectModel? cached,
+    bool refresh = false,
+  }) async {
+    if (!refresh) {
+      final existing = initial ?? cached ?? state.subject;
+      if (existing != null && existing.id == subjectId) {
+        state = SubjectDetailsState(
+          status: FeatureLoadStatus.loaded,
+          subject: existing,
+        );
+        return;
+      }
+    }
+
+    if (state.status == FeatureLoadStatus.loading && !refresh) {
+      return;
+    }
+
+    state = state.copyWith(
+      status: FeatureLoadStatus.loading,
+      clearError: true,
+    );
+
+    try {
+      final subject = await _repository.findSubjectById(subjectId);
+      if (subject == null) {
+        state = const SubjectDetailsState(
+          status: FeatureLoadStatus.error,
+          errorMessage: 'المادة غير موجودة',
+        );
+        return;
+      }
+
+      state = SubjectDetailsState(
+        status: FeatureLoadStatus.loaded,
+        subject: subject,
+      );
+    } on ApiException catch (error) {
+      state = SubjectDetailsState(
+        status: FeatureLoadStatus.error,
+        errorMessage: mapSubjectsError(error),
+      );
+    } catch (_) {
+      state = const SubjectDetailsState(
+        status: FeatureLoadStatus.error,
+        errorMessage: 'تعذر الاتصال بالسيرفر',
+      );
+    }
+  }
+
+  void updateSubject(SubjectModel subject) {
+    state = state.copyWith(subject: subject);
   }
 }
 
@@ -261,6 +357,11 @@ class LessonDetailsController extends StateNotifier<LessonDetailsState> {
 final subjectsListControllerProvider =
     StateNotifierProvider<SubjectsListController, SubjectsListState>((ref) {
   return SubjectsListController(ref.watch(subjectsRepositoryProvider));
+});
+
+final subjectDetailsControllerProvider = StateNotifierProvider.autoDispose
+    .family<SubjectDetailsController, SubjectDetailsState, int>((ref, subjectId) {
+  return SubjectDetailsController(ref.watch(subjectsRepositoryProvider));
 });
 
 final subjectLessonsControllerProvider = StateNotifierProvider.autoDispose

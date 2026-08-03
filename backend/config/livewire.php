@@ -64,16 +64,16 @@ return [
     */
 
     'temporary_file_upload' => [
-        'disk' => null,
-        'rules' => ['required', 'file', 'max:10485760'], // 10GB for lesson videos
+        'disk' => 'public',
+        'rules' => ['required', 'file', 'max:10485760'],
         'directory' => 'livewire-tmp',
         'middleware' => null,
         'preview_mimes' => [
-            'png', 'gif', 'bmp', 'svg', 'wav', 'mp4',
+            'png', 'gif', 'bmp', 'svg', 'wav', 'mp4', 'webm', 'mkv',
             'mov', 'avi', 'wmv', 'mp3', 'm4a',
             'jpg', 'jpeg', 'mpga', 'webp', 'wma',
         ],
-        'max_upload_time' => 180,
+        'max_upload_time' => 600,
         'cleanup' => true,
     ],
 

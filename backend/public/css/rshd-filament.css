@@ -39,24 +39,45 @@
 }
 
 /* أزرار تصغير/تكبير الشريط الجانبي */
-.fi-sidebar-header > .fi-icon-btn {
+.fi-sidebar-header > .fi-icon-btn,
+.fi-topbar-open-sidebar-btn,
+.fi-topbar-close-sidebar-btn,
+.fi-topbar-sidebar-toggle {
     color: var(--rshd-gold) !important;
     border: 1px solid rgba(214, 181, 109, 0.35) !important;
     border-radius: 0.75rem !important;
     background: rgba(255, 255, 255, 0.06) !important;
+    position: relative;
+    z-index: 5;
+    pointer-events: auto !important;
+    cursor: pointer;
 }
 
-.fi-sidebar-header > .fi-icon-btn svg {
+.fi-topbar-open-sidebar-btn,
+.fi-topbar-close-sidebar-btn,
+.fi-topbar-sidebar-toggle {
+    color: var(--rshd-navy) !important;
+    background: rgba(11, 31, 58, 0.04) !important;
+    border-color: rgba(11, 31, 58, 0.12) !important;
+}
+
+.fi-sidebar-header > .fi-icon-btn svg,
+.fi-topbar-open-sidebar-btn svg,
+.fi-topbar-close-sidebar-btn svg,
+.fi-topbar-sidebar-toggle svg {
     opacity: 1 !important;
-    color: var(--rshd-gold) !important;
+    color: inherit !important;
 }
 
-.fi-sidebar-header > .fi-icon-btn:hover {
+.fi-sidebar-header > .fi-icon-btn:hover,
+.fi-topbar-open-sidebar-btn:hover,
+.fi-topbar-close-sidebar-btn:hover,
+.fi-topbar-sidebar-toggle:hover {
     background: rgba(214, 181, 109, 0.18) !important;
 }
 
 @media (min-width: 1024px) {
-    /* شعار مصغّر عند طي الشريط — منفصل عن زر التوسيع */
+    /* شعار مصغّر عند طي الشريط — لا يحجب النقر */
     .fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-header::before {
         content: "";
         display: block;
@@ -64,17 +85,17 @@
         height: 1.75rem;
         margin: 0 auto 0.65rem;
         background: url("/images/favicon-32.png") center / contain no-repeat;
+        pointer-events: none;
     }
 
-    /* زر التوسيع يظهر بوضوح (سهم) وليس مخفياً */
     .fi-sidebar-header > .fi-icon-btn.mx-auto {
         background-image: none !important;
         min-width: 2.25rem;
         min-height: 2.25rem;
     }
 
-    /* زر احتياطي في الشريط العلوي عند طي القائمة على الشاشات الكبيرة */
-    .fi-topbar-open-sidebar-btn {
+    /* زر تبديل القائمة على الشاشات الكبيرة */
+    .fi-topbar-sidebar-toggle {
         display: inline-flex !important;
     }
 }
@@ -1243,6 +1264,10 @@
     text-decoration: none;
 }
 
+.rshd-quick-grid--6 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
 .rshd-quick-grid--7 {
     grid-template-columns: repeat(7, minmax(0, 1fr));
 }
@@ -1720,8 +1745,24 @@
 
 .rshd-grade-btn--outline {
     background: transparent;
-    color: var(--rshd-navy);
-    border: 1px solid rgba(11, 31, 58, 0.15);
+    color: var(--rshd-navy) !important;
+    border: 1px solid rgba(11, 31, 58, 0.22);
+}
+
+.rshd-grade-btn--outline:hover {
+    background: rgba(11, 31, 58, 0.06);
+    color: var(--rshd-navy) !important;
+}
+
+.rshd-grade-btn--danger {
+    background: #991b1b;
+    color: #fff !important;
+    border: 1px solid #991b1b;
+}
+
+.rshd-grade-btn--danger:hover {
+    background: #7f1515;
+    border-color: #7f1515;
 }
 
 .rshd-panel__footer-link {
@@ -1737,12 +1778,14 @@
         grid-template-columns: 1fr;
     }
 
+    .rshd-quick-grid--6,
     .rshd-quick-grid--7 {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 900px) {
+    .rshd-quick-grid--6,
     .rshd-quick-grid--7 {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }

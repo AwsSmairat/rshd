@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\HelpCenterController;
+use App\Http\Controllers\Api\V1\TechnicalSupportController;
 use App\Http\Controllers\Api\V1\StudentSettingsController;
 use App\Http\Controllers\Api\V1\StudentTermsController;
 use App\Http\Controllers\Api\V1\PublicSettingsController;
@@ -37,6 +38,7 @@ Route::prefix('v1')->group(function () {
         Route::get('my-subjects', [SubjectController::class, 'mySubjects']);
         Route::get('subjects', [SubjectController::class, 'catalog']);
         Route::post('subjects/{subject}/purchase-request', [SubjectController::class, 'purchaseRequest']);
+        Route::delete('subjects/{subject}/purchase-request', [SubjectController::class, 'cancelPurchaseRequest']);
 
         Route::get('subjects/{subject}/lessons', [LessonController::class, 'index']);
         Route::get('lessons/{lesson}', [LessonController::class, 'show']);
@@ -65,6 +67,8 @@ Route::prefix('v1')->group(function () {
         Route::prefix('student')->group(function () {
             Route::get('help/contacts', [HelpCenterController::class, 'contacts']);
             Route::post('help/messages', [HelpCenterController::class, 'sendMessage']);
+            Route::get('support/ticket', [TechnicalSupportController::class, 'show']);
+            Route::post('support/messages', [TechnicalSupportController::class, 'sendMessage']);
             Route::get('settings', [StudentSettingsController::class, 'show']);
             Route::patch('profile', [StudentSettingsController::class, 'updateProfile']);
             Route::post('avatar', [StudentSettingsController::class, 'uploadAvatar']);

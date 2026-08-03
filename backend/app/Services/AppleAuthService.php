@@ -5,12 +5,15 @@ namespace App\Services;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Models\User;
+use App\Services\Concerns\ResolvesOAuthStudentAccounts;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
 class AppleAuthService
 {
+    use ResolvesOAuthStudentAccounts;
+
     /**
      * @return array{
      *     apple_id: string,
@@ -108,32 +111,25 @@ class AppleAuthService
         }
 
         $user = User::query()
-            ->where(function ($query) use ($appleProfile): void {
-                $query->where('apple_id', $appleProfile['apple_id']);
-
-                if ($appleProfile['email'] !== null) {
-                    $query->orWhere('email', $appleProfile['email']);
-                }
-            })
+            ->where('apple_id', $appleProfile['apple_id'])
             ->first();
 
         if ($user !== null) {
-            if (! $user->isStudent()) {
-                throw new RuntimeException('هذا التطبيق مخصص للطلاب فقط.');
-            }
-
-            if ($user->status === UserStatus::Blocked) {
-                throw new RuntimeException('الحساب موقوف.');
-            }
-
-            $user->fill([
+            return $this->finalizeOAuthLogin($user, [
                 'apple_id' => $appleProfile['apple_id'],
                 'name' => $user->name ?: $displayName,
                 'email_verified_at' => $user->email_verified_at ?? now(),
             ]);
-            $user->save();
+        }
 
-            return $user;
+        if ($appleProfile['email'] !== null) {
+            $existingByEmail = User::query()
+                ->where('email', $appleProfile['email'])
+                ->first();
+
+            if ($existingByEmail !== null) {
+                $this->rejectConflictingEmailAccount($existingByEmail, 'apple');
+            }
         }
 
         if ($appleProfile['email'] === null) {

@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/auth/apple_sign_in_service.dart';
-import '../../../core/auth/google_sign_in_service.dart';
 import '../../../core/network/api_exception.dart';
 import '../data/auth_repository.dart';
 import '../data/models/user_model.dart';
@@ -53,18 +51,12 @@ class AuthState {
 }
 
 class AuthController extends StateNotifier<AuthState> {
-  AuthController(
-    this._repository,
-    this._googleSignInService,
-    this._appleSignInService,
-  ) : super(const AuthState());
+  AuthController(this._repository) : super(const AuthState());
 
   static const studentOnlyMessage =
       'هذا التطبيق مخصص للطلاب فقط. يرجى استخدام لوحة التحكم من المتصفح.';
 
   final AuthRepository _repository;
-  final GoogleSignInService _googleSignInService;
-  final AppleSignInService _appleSignInService;
 
   Future<bool> _rejectNonStudentAccess({required AuthStatus status}) async {
     await _repository.logout();
@@ -131,124 +123,6 @@ class AuthController extends StateNotifier<AuthState> {
     } catch (_) {
       await _repository.logout();
       state = const AuthState(status: AuthStatus.unauthenticated);
-    }
-  }
-
-  Future<LoginFlowResult> signInWithGoogle() async {
-    state = state.copyWith(
-      status: AuthStatus.loading,
-      clearError: true,
-      fieldErrors: {},
-      clearPendingVerificationEmail: true,
-    );
-
-    try {
-      final idToken = await _googleSignInService.signInAndGetIdToken();
-      if (idToken == null) {
-        state = state.copyWith(
-          status: AuthStatus.unauthenticated,
-          clearError: true,
-        );
-        return LoginFlowResult.cancelled;
-      }
-
-      final outcome = await _repository.signInWithGoogle(idToken: idToken);
-      final session = outcome.session!;
-
-      if (!session.user.isStudent) {
-        await _googleSignInService.signOut();
-        await _rejectNonStudentAccess(status: AuthStatus.error);
-        return LoginFlowResult.failed;
-      }
-
-      state = AuthState(
-        status: AuthStatus.authenticated,
-        user: session.user,
-      );
-      return LoginFlowResult.success;
-    } on GoogleSignInConfigurationException catch (error) {
-      state = AuthState(
-        status: AuthStatus.error,
-        errorMessage: error.message,
-      );
-      return LoginFlowResult.failed;
-    } on ApiException catch (error) {
-      await _googleSignInService.signOut();
-      state = AuthState(
-        status: AuthStatus.error,
-        errorMessage: error.message,
-      );
-      return LoginFlowResult.failed;
-    } catch (_) {
-      await _googleSignInService.signOut();
-      state = const AuthState(
-        status: AuthStatus.error,
-        errorMessage: 'تعذر تسجيل الدخول عبر Google.',
-      );
-      return LoginFlowResult.failed;
-    }
-  }
-
-  Future<LoginFlowResult> signInWithApple() async {
-    if (!_appleSignInService.isSupported) {
-      state = const AuthState(
-        status: AuthStatus.error,
-        errorMessage: 'تسجيل الدخول عبر Apple متاح على أجهزة Apple فقط.',
-      );
-      return LoginFlowResult.failed;
-    }
-
-    state = state.copyWith(
-      status: AuthStatus.loading,
-      clearError: true,
-      fieldErrors: {},
-      clearPendingVerificationEmail: true,
-    );
-
-    try {
-      final appleResult = await _appleSignInService.signIn();
-      if (appleResult == null) {
-        state = state.copyWith(
-          status: AuthStatus.unauthenticated,
-          clearError: true,
-        );
-        return LoginFlowResult.cancelled;
-      }
-
-      final outcome = await _repository.signInWithApple(
-        identityToken: appleResult.identityToken,
-        name: appleResult.fullName,
-      );
-      final session = outcome.session!;
-
-      if (!session.user.isStudent) {
-        await _rejectNonStudentAccess(status: AuthStatus.error);
-        return LoginFlowResult.failed;
-      }
-
-      state = AuthState(
-        status: AuthStatus.authenticated,
-        user: session.user,
-      );
-      return LoginFlowResult.success;
-    } on AppleSignInException catch (error) {
-      state = AuthState(
-        status: AuthStatus.error,
-        errorMessage: error.message,
-      );
-      return LoginFlowResult.failed;
-    } on ApiException catch (error) {
-      state = AuthState(
-        status: AuthStatus.error,
-        errorMessage: error.message,
-      );
-      return LoginFlowResult.failed;
-    } catch (_) {
-      state = const AuthState(
-        status: AuthStatus.error,
-        errorMessage: 'تعذر تسجيل الدخول عبر Apple.',
-      );
-      return LoginFlowResult.failed;
     }
   }
 
@@ -518,9 +392,5 @@ enum RegisterResult {
 
 final authControllerProvider =
     StateNotifierProvider<AuthController, AuthState>((ref) {
-  return AuthController(
-    ref.watch(authRepositoryProvider),
-    ref.watch(googleSignInServiceProvider),
-    ref.watch(appleSignInServiceProvider),
-  );
+  return AuthController(ref.watch(authRepositoryProvider));
 });

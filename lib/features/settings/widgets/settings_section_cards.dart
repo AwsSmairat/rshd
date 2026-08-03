@@ -460,12 +460,10 @@ class PrivacySettingsCard extends StatelessWidget {
     super.key,
     required this.preferences,
     required this.onChanged,
-    required this.onDeleteAccount,
   });
 
   final StudentPreferencesModel preferences;
   final void Function(String key, dynamic value) onChanged;
-  final VoidCallback onDeleteAccount;
 
   Future<void> _pickProfileVisibility(BuildContext context) async {
     final picked = await showSettingsOptionPicker<String>(
@@ -520,7 +518,6 @@ class PrivacySettingsCard extends StatelessWidget {
           ),
           SettingsSwitchTile(label: 'إظهار حالة النشاط', value: preferences.showActivityStatus, onChanged: (v) => onChanged('show_activity_status', v)),
           SettingsSwitchTile(label: 'السماح باستخدام الصورة الشخصية', value: preferences.allowProfilePhotoUse, onChanged: (v) => onChanged('allow_profile_photo_use', v), showDivider: false),
-          SettingsItemTile(icon: Icons.delete_forever_outlined, label: 'حذف الحساب', value: 'حذف نهائي', valueColor: const Color(0xFF991B1B), onTap: onDeleteAccount, showDivider: false),
         ],
       ),
     );

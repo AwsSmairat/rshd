@@ -66,20 +66,26 @@ class HomeDashboardModel {
 
   List<SubjectModel> get recentSubjects => subjects.take(3).toList();
 
-  /// Activated subject with the highest progress for "continue learning".
-  SubjectModel? get continueLearningSubject {
+  /// Activated subjects sorted by progress (highest first) for continue learning.
+  List<SubjectModel> get continueLearningSubjects {
     if (subjects.isEmpty) {
-      return null;
+      return const [];
     }
 
-    return subjects.reduce((best, current) {
-      final bestProgress = resolvedProgressPercent(best);
-      final currentProgress = resolvedProgressPercent(current);
-      if (currentProgress > bestProgress) {
-        return current;
-      }
-      return best;
-    });
+    final sorted = [...subjects];
+    sorted.sort(
+      (a, b) => resolvedProgressPercent(b).compareTo(resolvedProgressPercent(a)),
+    );
+    return sorted;
+  }
+
+  /// Activated subject with the highest progress for "continue learning".
+  SubjectModel? get continueLearningSubject {
+    final items = continueLearningSubjects;
+    if (items.isEmpty) {
+      return null;
+    }
+    return items.first;
   }
 
   double resolvedProgressPercent(SubjectModel subject) {

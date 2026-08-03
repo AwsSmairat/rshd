@@ -109,8 +109,8 @@ class AssignmentDownloadFileCard extends StatelessWidget {
           const SizedBox(height: 14),
           OutlinedButton.icon(
             onPressed: () => _openFile(context),
-            icon: const Icon(Icons.open_in_new_rounded, size: 18),
-            label: const Text('فتح الملف'),
+            icon: const Icon(Icons.download_rounded, size: 18),
+            label: const Text('تحميل الملف'),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primary,
               side: BorderSide(color: AppColors.accent.withValues(alpha: 0.65)),

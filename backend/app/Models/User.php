@@ -152,6 +152,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         return $this->password_set_at !== null;
     }
 
+    public function isOAuthOnly(): bool
+    {
+        return $this->password === null
+            && ($this->google_id !== null || $this->apple_id !== null);
+    }
+
     public function preference(string $key, mixed $default = null): mixed
     {
         return ($this->preferences ?? [])[$key] ?? $default;

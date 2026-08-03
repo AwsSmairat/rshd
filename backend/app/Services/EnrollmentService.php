@@ -109,6 +109,48 @@ class EnrollmentService
         return $enrollment;
     }
 
+    public function cancelPurchaseRequest(User $student, Subject $subject): void
+    {
+        if (! $student->isStudent()) {
+            throw ValidationException::withMessages([
+                'subject' => ['إلغاء الطلب متاح للطلاب فقط.'],
+            ]);
+        }
+
+        $enrollment = SubjectStudent::query()
+            ->where('student_id', $student->id)
+            ->where('subject_id', $subject->id)
+            ->first();
+
+        if ($enrollment === null) {
+            throw ValidationException::withMessages([
+                'subject' => ['لا يوجد طلب شراء لهذه المادة.'],
+            ]);
+        }
+
+        if ($enrollment->payment_status === PaymentStatus::Paid
+            && $enrollment->access_status === AccessStatus::Active) {
+            throw ValidationException::withMessages([
+                'subject' => ['لا يمكن إلغاء مادة مفعّلة.'],
+            ]);
+        }
+
+        if ($enrollment->access_status !== AccessStatus::Pending
+            && $enrollment->payment_status !== PaymentStatus::Unpaid) {
+            throw ValidationException::withMessages([
+                'subject' => ['لا يمكن إلغاء هذا الطلب.'],
+            ]);
+        }
+
+        $enrollment->delete();
+
+        $this->audit->logActivation(
+            'enrollment.cancelled',
+            $student,
+            'ألغى الطالب طلب تفعيل مادة «'.$subject->title.'».',
+        );
+    }
+
     public function activateStudent(
         User $student,
         Subject $subject,

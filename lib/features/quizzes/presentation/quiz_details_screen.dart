@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/platform/platform_settings.dart';
+import '../../../core/platform/platform_settings_controller.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../../auth/presentation/auth_controller.dart';
 import '../../subjects/presentation/subjects_controller.dart';
+import '../data/models/quiz_model.dart';
 import '../widgets/liquid_glass_quiz_info_card.dart';
 import '../widgets/luxury_quiz_header.dart';
 import '../widgets/quiz_not_attempted_card.dart';
@@ -53,6 +56,21 @@ class _QuizDetailsScreenState extends ConsumerState<QuizDetailsScreen> {
     context.push(AppRoutes.quizAttempt(widget.quizId));
   }
 
+  void _viewResult(QuizModel quiz) {
+    final attempt = quiz.latestAttempt;
+    final score = QuizScoreHelper.parseScore(attempt?.score);
+
+    context.push(
+      AppRoutes.quizResult(widget.quizId),
+      extra: {
+        'score': score?.toString() ?? attempt?.score?.toString() ?? '0',
+        'questionsCount': quiz.questionsCount ?? quiz.questions.length,
+        'submittedAt': attempt?.submittedAt ?? '',
+        'quizTitle': quiz.title,
+      },
+    );
+  }
+
   void _handleUnauthorized(String? message) {
     if (message != null && message.contains('انتهت الجلسة') && mounted) {
       ref.read(authControllerProvider.notifier).logout();
@@ -63,6 +81,10 @@ class _QuizDetailsScreenState extends ConsumerState<QuizDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(quizDetailsControllerProvider(widget.quizId));
+    final allowQuizRetake = ref.watch(platformSettingsProvider).maybeWhen(
+          data: (settings) => settings.allowQuizRetake,
+          orElse: () => PlatformSettings.fallback.allowQuizRetake,
+        );
 
     ref.listen(quizDetailsControllerProvider(widget.quizId), (previous, next) {
       _handleUnauthorized(next.errorMessage);
@@ -80,14 +102,17 @@ class _QuizDetailsScreenState extends ConsumerState<QuizDetailsScreen> {
               top: 8,
               bottom: 28,
             ),
-            sliver: _buildContent(state),
+            sliver: _buildContent(state, allowQuizRetake: allowQuizRetake),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildContent(QuizDetailsState state) {
+  Widget _buildContent(
+    QuizDetailsState state, {
+    required bool allowQuizRetake,
+  }) {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
@@ -120,8 +145,10 @@ class _QuizDetailsScreenState extends ConsumerState<QuizDetailsScreen> {
         }
 
         final score = QuizScoreHelper.parseScore(quiz.latestAttempt?.score);
-        final startLabel =
-            quiz.isCompleted ? 'بدء الاختبار مرة أخرى' : 'بدء الاختبار';
+        final canRetake = quiz.isCompleted && allowQuizRetake;
+        final startLabel = quiz.isCompleted
+            ? (allowQuizRetake ? 'بدء الاختبار مرة أخرى' : 'عرض النتيجة')
+            : 'بدء الاختبار';
 
         return SliverToBoxAdapter(
           child: Column(
@@ -138,7 +165,11 @@ class _QuizDetailsScreenState extends ConsumerState<QuizDetailsScreen> {
               const SizedBox(height: 24),
               ResultActionButtons(
                 primaryLabel: startLabel,
-                onPrimary: quiz.isActive ? _startQuiz : null,
+                onPrimary: quiz.isActive
+                    ? (canRetake || !quiz.isCompleted
+                        ? _startQuiz
+                        : () => _viewResult(quiz))
+                    : null,
               ),
             ],
           ),

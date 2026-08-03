@@ -4,7 +4,6 @@ namespace App\Filament\Pages;
 
 use App\Enums\AppNotificationType;
 use App\Filament\Concerns\InstructorOnlyPage;
-use App\Filament\Resources\AnnouncementResource;
 use App\Models\AppNotification;
 use App\Models\User;
 use App\Services\InstructorMessageService;
@@ -103,11 +102,6 @@ class InstructorMessages extends Page
             $this->loadError = 'تعذر تحميل الرسائل.';
             $this->messages = collect();
         }
-    }
-
-    public function createAnnouncementUrl(): string
-    {
-        return AnnouncementResource::getUrl('create');
     }
 
     public function unreadCount(): int

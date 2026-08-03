@@ -8,13 +8,10 @@ use App\Filament\Resources\LessonResource\Pages;
 use App\Models\Lesson;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
 class LessonResource extends Resource
 {
@@ -54,19 +51,6 @@ class LessonResource extends Resource
                             )
                             ->searchable()
                             ->preload()
-                            ->live()
-                            ->afterStateUpdated(function (Set $set, Get $get, ?Model $record, $state): void {
-                                if (blank($state) || $record !== null) {
-                                    return;
-                                }
-
-                                $currentOrder = (int) ($get('order') ?? 0);
-                                if ($currentOrder > 0) {
-                                    return;
-                                }
-
-                                $set('order', static::nextOrderForSubject((int) $state));
-                            })
                             ->required(),
                         Forms\Components\TextInput::make('title')
                             ->label('اسم الجزء')
@@ -79,21 +63,14 @@ class LessonResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
-                Forms\Components\Section::make('الترتيب والحالة')
+                Forms\Components\Section::make('الحالة')
                     ->schema([
-                        Forms\Components\TextInput::make('order')
-                            ->label('الترتيب')
-                            ->numeric()
-                            ->minValue(1)
-                            ->placeholder('يُحدد تلقائياً حسب المادة')
-                            ->helperText('إذا كان الرقم مستخدماً في نفس المادة، يُعيَّن الرقم التالي تلقائياً.'),
                         Forms\Components\Select::make('status')
                             ->label('الحالة')
                             ->options(ContentStatus::options())
                             ->default(ContentStatus::Active->value)
                             ->required(),
-                    ])
-                    ->columns(2),
+                    ]),
             ]);
     }
 

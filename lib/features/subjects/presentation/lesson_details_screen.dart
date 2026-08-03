@@ -8,6 +8,9 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/loading_widget.dart';
 import '../../auth/presentation/auth_controller.dart';
+import '../../assignments/data/models/assignment_model.dart';
+import '../../quizzes/data/models/quiz_model.dart';
+import '../widgets/lesson_content_tiles.dart';
 import '../widgets/lesson_file_card.dart';
 import '../widgets/video_card.dart';
 import 'subjects_controller.dart';
@@ -142,6 +145,40 @@ class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
                           }
                           context.push(AppRoutes.fileDetails(file.id));
                         },
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+            const SizedBox(height: 16),
+            _ContentSection(
+              title: 'الواجبات',
+              emptyMessage: 'لا توجد واجبات لهذا الجزء حالياً',
+              children: lesson.assignments
+                  .map(
+                    (AssignmentModel assignment) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: LessonAssignmentTile(
+                        assignment: assignment,
+                        onTap: () => context.push(
+                          AppRoutes.assignmentDetails(assignment.id),
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+            const SizedBox(height: 16),
+            _ContentSection(
+              title: 'الاختبارات',
+              emptyMessage: 'لا توجد اختبارات لهذا الجزء حالياً',
+              children: lesson.quizzes
+                  .map(
+                    (QuizModel quiz) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: LessonQuizTile(
+                        quiz: quiz,
+                        onTap: () => context.push(AppRoutes.quizDetails(quiz.id)),
                       ),
                     ),
                   )

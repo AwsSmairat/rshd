@@ -2,19 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/auth/apple_sign_in_service.dart';
 import '../../../core/platform/platform_settings_controller.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import 'auth_controller.dart';
-import 'widgets/auth_or_divider.dart';
 import 'widgets/register_form_field.dart';
 import 'widgets/register_header.dart';
 import 'widgets/register_login_link.dart';
 import 'widgets/register_submit_button.dart';
 import 'widgets/security_notice_card.dart';
-import 'widgets/social_auth_buttons_row.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -41,19 +38,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
-  }
-
-  Future<void> _signInWithGoogle() async {
-    final result =
-        await ref.read(authControllerProvider.notifier).signInWithGoogle();
-
-    if (!mounted || result == LoginFlowResult.cancelled) {
-      return;
-    }
-
-    if (result == LoginFlowResult.success) {
-      context.go(AppRoutes.home);
-    }
   }
 
   Future<void> _submit() async {
@@ -108,24 +92,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
-  Future<void> _signInWithApple() async {
-    final result =
-        await ref.read(authControllerProvider.notifier).signInWithApple();
-
-    if (!mounted || result == LoginFlowResult.cancelled) {
-      return;
-    }
-
-    if (result == LoginFlowResult.success) {
-      context.go(AppRoutes.home);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
     final platformSettings = ref.watch(platformSettingsProvider);
-    final showApple = ref.watch(appleSignInServiceProvider).isSupported;
     final registrationEnabled = platformSettings.maybeWhen(
       data: (settings) => settings.studentRegistrationEnabled,
       orElse: () => true,
@@ -295,18 +265,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         label: 'إنشاء حساب',
                         isLoading: authState.status == AuthStatus.loading,
                         onPressed: registrationEnabled ? _submit : null,
-                      ),
-                      const SizedBox(height: 20),
-                      const AuthOrDivider(),
-                      const SizedBox(height: 20),
-                      SocialAuthButtonsRow(
-                        showApple: showApple,
-                        isLoading: authState.status == AuthStatus.loading,
-                        onGooglePressed:
-                            registrationEnabled ? _signInWithGoogle : null,
-                        onApplePressed: registrationEnabled && showApple
-                            ? _signInWithApple
-                            : null,
                       ),
                       const SizedBox(height: 20),
                       RegisterLoginLink(

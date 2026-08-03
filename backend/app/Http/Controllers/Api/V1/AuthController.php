@@ -25,6 +25,9 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public const OAUTH_PASSWORD_LOGIN_MESSAGE =
+        'This account uses Google or Apple sign-in. Please continue with the original provider.';
+
     public function register(
         RegisterRequest $request,
         StudentEmailVerificationService $verificationService,
@@ -106,6 +109,15 @@ class AuthController extends Controller
             return $this->forbiddenResponse(
                 'يجب تعيين كلمة المرور أولاً من رابط الدعوة المرسل إلى بريدك.',
             );
+        }
+
+        if ($user && $user->isStudent() && $user->isOAuthOnly()) {
+            $throttle->hit($email);
+            $audit->logAuth('login.failed', $user, 'محاولة دخول بكلمة مرور لحساب OAuth «'.$email.'».');
+
+            throw ValidationException::withMessages([
+                'email' => [self::OAUTH_PASSWORD_LOGIN_MESSAGE],
+            ]);
         }
 
         if (! $user || ! $user->password || ! Hash::check($validated['password'], $user->password)) {

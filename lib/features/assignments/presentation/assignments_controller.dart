@@ -194,13 +194,12 @@ class AssignmentDetailsController extends StateNotifier<AssignmentDetailsState> 
         status: FeatureLoadStatus.loaded,
         assignment: cached,
       );
-      return;
+    } else {
+      state = state.copyWith(
+        status: FeatureLoadStatus.loading,
+        clearError: true,
+      );
     }
-
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
 
     try {
       final assignment = await _repository.getAssignmentDetails(assignmentId);

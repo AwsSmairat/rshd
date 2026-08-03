@@ -11,6 +11,7 @@ import '../../auth/presentation/auth_controller.dart';
 import '../../subjects/presentation/subjects_controller.dart';
 import '../data/models/assignment_model.dart';
 import '../widgets/assignment_action_button.dart';
+import '../widgets/assignment_download_file_card.dart';
 import '../widgets/assignment_file_helper.dart';
 import '../widgets/assignment_file_picker_card.dart';
 import '../widgets/assignment_section_card.dart';
@@ -208,6 +209,17 @@ class _SubmitAssignmentScreenState extends ConsumerState<SubmitAssignmentScreen>
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AssignmentSubmitInfoCard(assignment: assignment),
+          if (assignment.hasAttachment) ...[
+            const SizedBox(height: 16),
+            AssignmentDownloadFileCard(
+              title: 'ملف الواجب من المدرس',
+              fileUrl: assignment.resolvedAttachmentUrl!,
+              fileName: assignment.originalFileName,
+              fileSize: assignment.fileSize,
+              mimeType: assignment.fileMimeType,
+              icon: Icons.download_outlined,
+            ),
+          ],
           const SizedBox(height: 16),
           AssignmentSectionCard(
             title: 'نص الإجابة',

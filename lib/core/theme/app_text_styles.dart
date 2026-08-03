@@ -23,6 +23,12 @@ class AppTextStyles {
     color: AppColors.text,
   );
 
+  static const caption = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textMuted,
+  );
+
   static const button = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w600,

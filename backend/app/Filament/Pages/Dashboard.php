@@ -7,7 +7,6 @@ use App\Filament\Pages\InstructorCourses;
 use App\Filament\Pages\InstructorProfile;
 use App\Filament\Pages\InstructorReports;
 use App\Filament\Pages\InstructorStudents;
-use App\Filament\Resources\AnnouncementResource;
 use App\Filament\Resources\AssignmentResource;
 use App\Filament\Resources\AssignmentSubmissionResource;
 use App\Filament\Resources\ExpenseResource;
@@ -302,12 +301,6 @@ class Dashboard extends BaseDashboard
                 'url' => QuizResource::getUrl('create'),
                 'enabled' => true,
             ],
-            [
-                'label' => 'إرسال إعلان',
-                'icon' => 'megaphone',
-                'url' => AnnouncementResource::getUrl('create'),
-                'enabled' => AnnouncementResource::canCreate(),
-            ],
         ];
     }
 
@@ -342,11 +335,6 @@ class Dashboard extends BaseDashboard
         return $url.'?selectedDate='.urlencode($dateKey);
     }
 
-    public function announcementsIndexUrl(): string
-    {
-        return AnnouncementResource::getUrl('index');
-    }
-
     public function quizzesIndexUrl(): string
     {
         return QuizResource::getUrl('index');
@@ -377,7 +365,6 @@ class Dashboard extends BaseDashboard
             ['key' => 'students', 'label' => 'الطلاب', 'unit' => 'طالب', 'icon' => 'users', 'url' => $this->instructorStudentsUrl()],
             ['key' => 'active_quizzes', 'label' => 'اختبارات نشطة', 'unit' => 'اختبار', 'icon' => 'quiz', 'url' => $this->quizzesIndexUrl()],
             ['key' => 'pending_submissions', 'label' => 'بانتظار التصحيح', 'unit' => 'تسليم', 'icon' => 'clipboard', 'url' => $this->pendingSubmissionsUrl()],
-            ['key' => 'announcements', 'label' => 'إعلانات منشورة', 'unit' => 'إعلان', 'icon' => 'megaphone', 'url' => $this->announcementsIndexUrl()],
         ];
     }
 

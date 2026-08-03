@@ -56,5 +56,16 @@ class AppServiceProvider extends ServiceProvider
         $settings = app(PlatformSettingsService::class);
         $settings->applyMailPreferences();
         $settings->applySecurityPreferences();
+
+        foreach ([
+            storage_path('app/public/livewire-tmp'),
+            storage_path('app/public/lesson-videos'),
+            storage_path('app/public/lesson-files'),
+            storage_path('app/private/livewire-tmp'),
+        ] as $directory) {
+            if (! is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+        }
     }
 }

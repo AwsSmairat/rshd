@@ -23,6 +23,24 @@ class SubjectsRepository {
     );
   }
 
+  Future<SubjectModel?> findSubjectById(int subjectId) async {
+    final mySubjects = await getMySubjects();
+    for (final subject in mySubjects) {
+      if (subject.id == subjectId) {
+        return subject;
+      }
+    }
+
+    final catalog = await getSubjectsCatalog();
+    for (final subject in catalog) {
+      if (subject.id == subjectId) {
+        return subject;
+      }
+    }
+
+    return null;
+  }
+
   Future<List<SubjectModel>> getSubjectsCatalog({String? category}) async {
     final query = (category != null && category.isNotEmpty)
         ? '?category=${Uri.encodeQueryComponent(category)}'
@@ -52,7 +70,39 @@ class SubjectsRepository {
       );
     }
 
-    return SubjectModel.fromJson(apiResponse.data!);
+    final data = Map<String, dynamic>.from(apiResponse.data!);
+    final subjectJson = data['subject'];
+    if (subjectJson is! Map) {
+      throw ApiException(message: 'استجابة غير متوقعة من السيرفر.');
+    }
+
+    return SubjectModel.fromJson(Map<String, dynamic>.from(subjectJson));
+  }
+
+  Future<SubjectModel> cancelPurchaseRequest(int subjectId) async {
+    final response = await _apiClient.delete<Map<String, dynamic>>(
+      ApiEndpoints.subjectPurchaseRequest(subjectId),
+    );
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+      (json) => Map<String, dynamic>.from(json as Map),
+    );
+
+    if (!apiResponse.success || apiResponse.data == null) {
+      throw ApiException(
+        message: apiResponse.message ?? 'تعذر إلغاء طلب الشراء.',
+        errors: apiResponse.errors,
+      );
+    }
+
+    final data = Map<String, dynamic>.from(apiResponse.data!);
+    final subjectJson = data['subject'];
+    if (subjectJson is! Map) {
+      throw ApiException(message: 'استجابة غير متوقعة من السيرفر.');
+    }
+
+    return SubjectModel.fromJson(Map<String, dynamic>.from(subjectJson));
   }
 
   Future<List<LessonModel>> getSubjectLessons(int subjectId) async {

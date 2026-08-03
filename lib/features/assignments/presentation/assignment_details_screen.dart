@@ -140,7 +140,7 @@ class _AssignmentDetailsScreenState
               if (assignment.hasAttachment) ...[
                 AssignmentDownloadFileCard(
                   title: 'ملف الواجب',
-                  fileUrl: assignment.attachmentUrl!,
+                  fileUrl: assignment.resolvedAttachmentUrl!,
                   fileName: assignment.originalFileName,
                   fileSize: assignment.fileSize,
                   mimeType: assignment.fileMimeType,

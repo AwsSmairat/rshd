@@ -38,18 +38,12 @@ class AnnouncementResource extends Resource
 
     public static function canAccess(): bool
     {
-        $user = auth()->user();
-
-        if ($user?->isAdmin()) {
-            return true;
-        }
-
-        return static::instructorMay('instructor_can_publish_announcements');
+        return auth()->user()?->isAdmin() ?? false;
     }
 
     public static function canCreate(): bool
     {
-        return static::instructorMay('instructor_can_publish_announcements');
+        return auth()->user()?->isAdmin() ?? false;
     }
 
     public static function shouldRegisterNavigation(): bool

@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Enums\AccessStatus;
 use App\Enums\ContentStatus;
 use App\Enums\SubjectCategory;
-use App\Models\Announcement;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\Grade;
@@ -88,15 +87,6 @@ class InstructorDashboardService
                     ->whereIn('subject_id', $subjectIds)
                     ->where('status', ContentStatus::Active)
                     ->count(),
-            'announcements' => Announcement::query()
-                ->where(function ($q) use ($instructor, $subjectIds) {
-                    $q->where('instructor_id', $instructor->id);
-
-                    if ($subjectIds->isNotEmpty()) {
-                        $q->orWhereIn('subject_id', $subjectIds);
-                    }
-                })
-                ->count(),
         ];
     }
 
@@ -454,26 +444,6 @@ class InstructorDashboardService
                 });
         }
 
-        Announcement::query()
-            ->where(function ($q) use ($instructor, $subjectIds) {
-                $q->where('instructor_id', $instructor->id);
-
-                if ($subjectIds->isNotEmpty()) {
-                    $q->orWhereIn('subject_id', $subjectIds);
-                }
-            })
-            ->latest('created_at')
-            ->limit(5)
-            ->get()
-            ->each(function (Announcement $announcement) use ($items): void {
-                $items->push([
-                    'title' => 'تم نشر إعلان',
-                    'subtitle' => $announcement->title,
-                    'time' => $announcement->created_at,
-                    'icon' => 'megaphone',
-                ]);
-            });
-
         return $items
             ->sortByDesc(fn (array $item) => $item['time']?->timestamp ?? 0)
             ->take(5)
@@ -488,7 +458,6 @@ class InstructorDashboardService
         $query = $instructor->subjectsTeaching()
             ->withCount([
                 'lessons',
-                'announcements',
                 'enrollments as students_count' => fn ($q) => $q->where('access_status', AccessStatus::Active),
             ])
             ->latest();
@@ -503,7 +472,6 @@ class InstructorDashboardService
                 'subject' => $subject,
                 'students_count' => (int) $subject->students_count,
                 'lessons_count' => (int) $subject->lessons_count,
-                'announcements_count' => (int) $subject->announcements_count,
                 'icon' => $this->categoryIcon($subject->category),
             ]);
     }

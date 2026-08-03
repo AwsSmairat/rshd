@@ -13,7 +13,8 @@ import '../../../../core/widgets/responsive_content.dart';
 import '../data/privacy_policy_config.dart';
 import '../data/privacy_policy_model.dart';
 import 'privacy_policy_controller.dart';
-import '../widgets/privacy_policy_contact_card.dart';
+import '../widgets/privacy_policy_contact_card.dart'
+    show DeleteAccountButton, PrivacyContactInfo, launchPrivacyEmail, resolvePrivacyContactInfo;
 import '../widgets/privacy_policy_footer.dart';
 import '../widgets/privacy_policy_header.dart';
 import '../widgets/privacy_policy_intro_card.dart';
@@ -67,14 +68,6 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
     launchPrivacyEmail(
       email: email,
       subject: PrivacyPolicyConfig.privacyEmailSubject,
-      context: context,
-    );
-  }
-
-  void _reportIssue(String email) {
-    launchPrivacyEmail(
-      email: email,
-      subject: PrivacyPolicyConfig.reportIssueEmailSubject,
       context: context,
     );
   }
@@ -202,12 +195,6 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
           },
         ),
         const SizedBox(height: 12),
-        PrivacyPolicyContactCard(
-          contact: contact,
-          onPrivacyContact: () => _contactPrivacy(contact.privacyEmail),
-          onReportIssue: () => _reportIssue(contact.privacyEmail),
-        ),
-        const SizedBox(height: 12),
         PrivacyPolicyFooter(
           platformName: platformName,
           version: document.version,
@@ -233,40 +220,19 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
         const SizedBox(height: 12),
         _buildControls(accordionSections),
         const SizedBox(height: 8),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 3,
-              child: PrivacyPolicyAccordion(
-                sections: accordionSections,
-                expandedIds: _expandedIds,
-                onToggle: _toggleSection,
-                extraForSection: (section) {
-                  if (section.id != 'account_deletion') {
-                    return null;
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: DeleteAccountButton(onPressed: _openDeleteAccount),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              flex: 2,
-              child: Column(
-                children: [
-                  PrivacyPolicyContactCard(
-                    contact: contact,
-                    onPrivacyContact: () => _contactPrivacy(contact.privacyEmail),
-                    onReportIssue: () => _reportIssue(contact.privacyEmail),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        PrivacyPolicyAccordion(
+          sections: accordionSections,
+          expandedIds: _expandedIds,
+          onToggle: _toggleSection,
+          extraForSection: (section) {
+            if (section.id != 'account_deletion') {
+              return null;
+            }
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: DeleteAccountButton(onPressed: _openDeleteAccount),
+            );
+          },
         ),
         const SizedBox(height: 12),
         PrivacyPolicyFooter(

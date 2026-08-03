@@ -3,8 +3,6 @@ class ApiEndpoints {
 
   static const login = '/login';
   static const register = '/register';
-  static const googleAuth = '/auth/google';
-  static const appleAuth = '/auth/apple';
   static const verifyEmail = '/email/verify';
   static const resendVerificationEmail = '/email/resend';
   static const logout = '/logout';
@@ -62,6 +60,9 @@ class ApiEndpoints {
 
   static const studentHelpContacts = '/student/help/contacts';
   static const studentHelpMessages = '/student/help/messages';
+
+  static const studentSupportTicket = '/student/support/ticket';
+  static const studentSupportMessages = '/student/support/messages';
 
   static const studentSettings = '/student/settings';
   static const studentProfile = '/student/profile';
