@@ -16,7 +16,9 @@ import 'widgets/login_remember_row.dart';
 import 'widgets/luxury_text_field.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, this.initialEmail});
+
+  final String? initialEmail;
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -32,12 +34,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    final initialEmail = widget.initialEmail?.trim();
+    if (initialEmail != null && initialEmail.isNotEmpty) {
+      _emailController.text = initialEmail;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadRememberedCredentials();
     });
   }
 
   Future<void> _loadRememberedCredentials() async {
+    if (widget.initialEmail != null && widget.initialEmail!.trim().isNotEmpty) {
+      return;
+    }
+
     final storage = ref.read(secureStorageProvider);
     final credentials = await storage.getRememberedCredentials();
     if (!mounted || credentials == null) {
@@ -101,10 +111,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  void _showForgotPasswordMessage() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('ميزة استعادة كلمة المرور ستتوفر قريباً')),
-    );
+  void _openForgotPassword() {
+    final email = _emailController.text.trim();
+    if (email.isNotEmpty) {
+      context.push(
+        '${AppRoutes.forgotPassword}?email=${Uri.encodeComponent(email)}',
+      );
+      return;
+    }
+    context.push(AppRoutes.forgotPassword);
   }
 
   @override
@@ -201,7 +216,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       _rememberMe = value;
                     });
                   },
-                  onForgotPassword: _showForgotPasswordMessage,
+                  onForgotPassword: _openForgotPassword,
                   isTablet: metrics.isTablet,
                 ),
                 SizedBox(height: metrics.isTablet ? 22 : 18),

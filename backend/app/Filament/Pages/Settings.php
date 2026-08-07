@@ -105,7 +105,10 @@ class Settings extends Page implements HasForms
 
         $this->platformForm->fill($settings->getGroup('platform'));
         $this->emailForm->fill($settings->getGroup('email'));
-        $this->socialForm->fill($settings->getGroup('social'));
+        $this->socialForm->fill(array_merge(
+            $settings->getGroup('social'),
+            ['support_phone' => $settings->get('support_phone', '', 'platform')],
+        ));
         $this->paymentsForm->fill($settings->getGroup('payments'));
         $this->registrationForm->fill($settings->getGroup('registration'));
         $this->studentsForm->fill($settings->getGroup('students'));
@@ -276,6 +279,14 @@ class Settings extends Page implements HasForms
     public function socialForm(Form $form): Form
     {
         return $form->schema([
+            Forms\Components\Placeholder::make('social_notice')
+                ->label('')
+                ->content('تظهر هذه الروابط في صفحة «تواصل معنا» داخل تطبيق الطالب. الحقول الفارغة تظهر للطالب كـ «لم يضاف بعد». البريد من قسم البريد.')
+                ->columnSpanFull(),
+            Forms\Components\TextInput::make('support_phone')
+                ->label('هاتف التواصل')
+                ->tel()
+                ->maxLength(40),
             PSF::url('website_url', 'رابط الموقع'),
             PSF::url('facebook_url', 'فيسبوك'),
             PSF::url('instagram_url', 'إنستغرام'),
@@ -485,7 +496,15 @@ class Settings extends Page implements HasForms
 
     public function saveSocial(): void
     {
-        $this->persistGroup('social', $this->socialForm->getState());
+        $state = $this->socialForm->getState();
+        $phone = $state['support_phone'] ?? null;
+        unset($state['support_phone']);
+
+        $this->persistGroup('social', $state);
+
+        if ($phone !== null) {
+            app(PlatformSettingsService::class)->set('support_phone', $phone, 'platform');
+        }
     }
 
     public function savePayments(): void

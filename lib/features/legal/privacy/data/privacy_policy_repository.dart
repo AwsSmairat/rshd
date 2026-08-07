@@ -1,59 +1,86 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/storage_keys.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/network/api_response.dart';
+import '../../shared/legal_document_parser.dart';
+import '../../shared/legal_local_cache.dart';
 import 'privacy_policy_content.dart';
 import 'privacy_policy_model.dart';
 
-/// TODO: عند إضافة Endpoint في لوحة الإدارة، استخدم [ApiEndpoints.privacyPolicy]
-/// وحدّث [PrivacyPolicyRepository.fetch] لتحليل الاستجابة بعد التحقق (Sanitization).
 class PrivacyPolicyRepository {
-  PrivacyPolicyRepository(this._client);
+  PrivacyPolicyRepository(this._client, this._cache);
 
-  // ignore: unused_field — يُستخدم عند تفعيل Endpoint البعيد.
   final ApiClient _client;
+  final LegalLocalCache _cache;
 
-  PrivacyPolicyDocument? _cached;
+  PrivacyPolicyDocument? _memoryCached;
 
   Future<PrivacyPolicyDocument> fetch({bool forceRefresh = false}) async {
-    if (!forceRefresh && _cached != null) {
-      return _cached!.copyWithSource(PrivacyPolicySource.cached);
+    if (!forceRefresh && _memoryCached != null) {
+      return _memoryCached!.copyWithSource(PrivacyPolicySource.cached);
     }
 
     try {
       final remote = await _fetchRemote();
-      _cached = remote;
+      _memoryCached = remote;
       return remote;
     } on ApiException catch (error) {
       if (_isOfflineError(error)) {
-        return PrivacyPolicyContent.buildLocalDocument().copyWithSource(
-          PrivacyPolicySource.local,
-        );
+        return _loadCachedOrLocal();
       }
       rethrow;
     } on DioException catch (error) {
       if (_isDioOffline(error)) {
-        return PrivacyPolicyContent.buildLocalDocument().copyWithSource(
-          PrivacyPolicySource.local,
-        );
+        return _loadCachedOrLocal();
       }
       rethrow;
     } catch (_) {
-      return PrivacyPolicyContent.buildLocalDocument().copyWithSource(
-        PrivacyPolicySource.local,
-      );
+      return _loadCachedOrLocal();
     }
   }
 
   Future<PrivacyPolicyDocument> _fetchRemote() async {
-    // TODO: عند توفر Endpoint:
-    // final response = await _client.get<Map<String, dynamic>>(
-    //   ApiEndpoints.privacyPolicy,
-    // );
-    // return _parseRemote(response.data);
+    final response = await _client.get<Map<String, dynamic>>(
+      ApiEndpoints.legalPrivacyPolicy,
+    );
 
-    return PrivacyPolicyContent.buildLocalDocument();
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+      (json) => Map<String, dynamic>.from(json as Map),
+    );
+
+    if (!apiResponse.success || apiResponse.data == null) {
+      throw ApiException(
+        message: apiResponse.message ?? 'تعذر تحميل سياسة الخصوصية',
+        statusCode: response.statusCode,
+        errors: apiResponse.errors,
+      );
+    }
+
+    await _cache.save(StorageKeys.legalPrivacyCache, apiResponse.data!);
+
+    return LegalDocumentParser.parsePrivacyPolicy(
+      apiResponse.data!,
+      source: PrivacyPolicySource.remote,
+    );
+  }
+
+  Future<PrivacyPolicyDocument> _loadCachedOrLocal() async {
+    final cached = await _cache.load(StorageKeys.legalPrivacyCache);
+    if (cached != null) {
+      return LegalDocumentParser.parsePrivacyPolicy(
+        cached,
+        source: PrivacyPolicySource.cached,
+      );
+    }
+
+    return PrivacyPolicyContent.buildLocalDocument().copyWithSource(
+      PrivacyPolicySource.local,
+    );
   }
 
   bool _isOfflineError(ApiException error) {
@@ -85,5 +112,8 @@ extension on PrivacyPolicyDocument {
 }
 
 final privacyPolicyRepositoryProvider = Provider<PrivacyPolicyRepository>((ref) {
-  return PrivacyPolicyRepository(ref.watch(apiClientProvider));
+  return PrivacyPolicyRepository(
+    ref.watch(apiClientProvider),
+    LegalLocalCache(),
+  );
 });

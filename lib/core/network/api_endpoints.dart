@@ -5,6 +5,10 @@ class ApiEndpoints {
   static const register = '/register';
   static const verifyEmail = '/email/verify';
   static const resendVerificationEmail = '/email/resend';
+  static const passwordForgot = '/password/forgot';
+  static const passwordVerify = '/password/verify';
+  static const passwordReset = '/password/reset';
+  static const passwordResend = '/password/resend';
   static const logout = '/logout';
   static const me = '/me';
   static const mySubjects = '/my-subjects';
@@ -18,6 +22,8 @@ class ApiEndpoints {
   static String lessonDetails(int lessonId) => '/lessons/$lessonId';
 
   static String videoDetails(int videoId) => '/videos/$videoId';
+
+  static String videoPlayback(int videoId) => '/videos/$videoId/playback';
 
   static String videoProgress(int videoId) => '/videos/$videoId/progress';
 
@@ -49,11 +55,8 @@ class ApiEndpoints {
 
   static const publicSettings = '/settings/public';
 
-  /// TODO: Endpoint عام لسياسة الخصوصية عند إضافته في لوحة الإدارة.
-  static const privacyPolicy = '/settings/privacy-policy';
-
-  /// TODO: Endpoint عام للشروط عند إضافته في لوحة الإدارة.
-  static const termsAndConditions = '/settings/terms-and-conditions';
+  static const legalPrivacyPolicy = '/legal/privacy-policy';
+  static const legalTerms = '/legal/terms';
 
   static const studentTermsStatus = '/student/terms/status';
   static const studentTermsAccept = '/student/terms/accept';

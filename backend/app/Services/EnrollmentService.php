@@ -22,12 +22,36 @@ class EnrollmentService
 
     public function checkStudentAccessToSubject(User $student, Subject $subject): bool
     {
-        return SubjectStudent::query()
+        return $this->findActiveEnrollment($student, $subject) !== null;
+    }
+
+    public function findActiveEnrollment(User $student, Subject $subject): ?SubjectStudent
+    {
+        $enrollment = SubjectStudent::query()
             ->where('student_id', $student->id)
             ->where('subject_id', $subject->id)
             ->where('payment_status', PaymentStatus::Paid)
             ->where('access_status', AccessStatus::Active)
-            ->exists();
+            ->first();
+
+        if ($enrollment === null) {
+            return null;
+        }
+
+        if ($enrollment->activated_at !== null && $enrollment->activated_at->isFuture()) {
+            return null;
+        }
+
+        if ($enrollment->expires_at !== null && $enrollment->expires_at->lte(now())) {
+            return null;
+        }
+
+        return $enrollment;
+    }
+
+    public function enrollmentExpiresAt(User $student, Subject $subject): ?Carbon
+    {
+        return $this->findActiveEnrollment($student, $subject)?->expires_at;
     }
 
     public function requestPurchase(User $student, Subject $subject): SubjectStudent
@@ -235,6 +259,14 @@ class EnrollmentService
 
         if ($enrollment->payment_status === PaymentStatus::Paid
             && $enrollment->access_status === AccessStatus::Active) {
+            if ($enrollment->expires_at !== null && $enrollment->expires_at->lte(now())) {
+                return 'none';
+            }
+
+            if ($enrollment->activated_at !== null && $enrollment->activated_at->isFuture()) {
+                return 'none';
+            }
+
             return 'active';
         }
 

@@ -67,9 +67,9 @@ class VideoResource extends Resource
                             ->columnSpanFull(),
                         Forms\Components\FileUpload::make('video_path')
                             ->label('ملف الفيديو')
-                            ->disk('public')
+                            ->disk('lesson_videos')
                             ->directory('lesson-videos')
-                            ->visibility('public')
+                            ->visibility('private')
                             ->acceptedFileTypes([
                                 'video/mp4',
                                 'video/webm',
@@ -101,9 +101,22 @@ class VideoResource extends Resource
                             ->helperText('يمكن للطالب مشاهدته قبل تفعيل المادة (مثل اختبار / تيست).')
                             ->default(false),
                         Forms\Components\Hidden::make('storage_provider')
-                            ->default('local'),
+                            ->default(fn (): string => config('video.provider', 'local') === 'bunny' ? 'bunny' : 'local'),
                     ])
                     ->columns(2),
+                Forms\Components\Section::make('مزود التخزين')
+                    ->schema([
+                        Forms\Components\Placeholder::make('provider_label')
+                            ->label('المزود')
+                            ->content(fn (): string => config('video.provider', 'local') === 'bunny' ? 'Bunny Stream' : 'Local (Private)'),
+                        Forms\Components\TextInput::make('external_video_id')
+                            ->label('Bunny Video ID')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->visible(fn (?Video $record): bool => $record?->storage_provider === 'bunny'),
+                    ])
+                    ->columns(2)
+                    ->visible(fn (?Video $record): bool => $record !== null || config('video.provider') === 'bunny'),
             ]);
     }
 
@@ -139,6 +152,11 @@ class VideoResource extends Resource
                         ? gmdate($state >= 3600 ? 'H:i:s' : 'i:s', $state)
                         : '—')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('storage_provider')
+                    ->label('المزود')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => $state === 'bunny' ? 'Bunny' : 'Local')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label('الحالة')
                     ->badge()
@@ -151,7 +169,7 @@ class VideoResource extends Resource
                     })
                     ->color(fn (VideoStatus|string|null $state): string => match ($state instanceof VideoStatus ? $state : VideoStatus::tryFrom((string) $state)) {
                         VideoStatus::Ready => 'success',
-                        VideoStatus::Processing => 'warning',
+                        VideoStatus::Uploading, VideoStatus::Processing => 'warning',
                         VideoStatus::Failed => 'danger',
                         default => 'gray',
                     }),
@@ -233,26 +251,39 @@ class VideoResource extends Resource
             $data['video_path'] = $newPath;
         }
 
+        $usesBunny = config('video.provider', 'local') === 'bunny';
+
         if ($newPath && is_string($newPath)) {
             if ($record?->video_path && $record->video_path !== $newPath) {
+                Storage::disk('lesson_videos')->delete($record->video_path);
                 Storage::disk('public')->delete($record->video_path);
             }
 
-            $disk = Storage::disk('public');
+            $disk = Storage::disk('lesson_videos');
 
             if ($disk->exists($newPath)) {
                 $data['file_size'] = $disk->size($newPath);
                 $data['file_mime_type'] = $disk->mimeType($newPath) ?: null;
 
-                $duration = app(VideoMetadataService::class)
-                    ->durationSeconds($disk->path($newPath));
-                if ($duration !== null) {
-                    $data['duration_seconds'] = $duration;
+                if (! $usesBunny) {
+                    $duration = app(VideoMetadataService::class)
+                        ->durationSeconds($disk->path($newPath));
+                    if ($duration !== null) {
+                        $data['duration_seconds'] = $duration;
+                    }
                 }
             }
 
-            $data['video_url'] = $disk->url($newPath);
-            $data['storage_provider'] = 'local';
+            $data['video_url'] = '';
+
+            if ($usesBunny) {
+                $data['storage_provider'] = 'bunny';
+                $data['status'] = VideoStatus::Uploading->value;
+                $data['external_video_id'] = null;
+            } else {
+                $data['storage_provider'] = 'local';
+                $data['status'] = VideoStatus::Ready->value;
+            }
         } elseif ($record) {
             $data['video_path'] = $record->video_path;
             $data['video_url'] = $record->video_url;

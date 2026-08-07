@@ -40,7 +40,6 @@ class PlatformSettingsController extends AsyncNotifier<PlatformSettings> {
   }
 
   Future<void> refresh() async {
-    state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       return ref.read(platformSettingsRepositoryProvider).fetchPublicSettings();
     });

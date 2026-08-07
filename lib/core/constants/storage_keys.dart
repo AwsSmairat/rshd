@@ -7,4 +7,8 @@ class StorageKeys {
   static const rememberMeEnabled = 'remember_me_enabled';
   static const rememberedEmail = 'remembered_email';
   static const rememberedPassword = 'remembered_password';
+  static const passwordResetToken = 'password_reset_token';
+  static const passwordResetEmail = 'password_reset_email';
+  static const legalPrivacyCache = 'legal_privacy_cache';
+  static const legalTermsCache = 'legal_terms_cache';
 }

@@ -38,7 +38,19 @@
     padding-block: 1.25rem !important;
 }
 
-/* أزرار تصغير/تكبير الشريط الجانبي */
+/* أزرار طي الشريط — مخفية للأدمن والمدرس */
+.fi-topbar-sidebar-toggle,
+.fi-sidebar-header > .fi-icon-btn {
+    display: none !important;
+}
+
+@media (min-width: 1024px) {
+    .fi-topbar-open-sidebar-btn,
+    .fi-topbar-close-sidebar-btn {
+        display: none !important;
+    }
+}
+
 .fi-sidebar-header > .fi-icon-btn,
 .fi-topbar-open-sidebar-btn,
 .fi-topbar-close-sidebar-btn,
@@ -92,11 +104,6 @@
         background-image: none !important;
         min-width: 2.25rem;
         min-height: 2.25rem;
-    }
-
-    /* زر تبديل القائمة على الشاشات الكبيرة */
-    .fi-topbar-sidebar-toggle {
-        display: inline-flex !important;
     }
 }
 

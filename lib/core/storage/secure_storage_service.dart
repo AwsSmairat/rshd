@@ -56,6 +56,7 @@ class SecureStorageService {
   Future<void> clearAll() async {
     await _storage.delete(key: StorageKeys.authToken);
     await _storage.delete(key: StorageKeys.userJson);
+    await clearPasswordResetSession();
   }
 
   Future<bool> isRememberMeEnabled() async {
@@ -102,6 +103,31 @@ class SecureStorageService {
     await _storage.delete(key: StorageKeys.rememberMeEnabled);
     await _storage.delete(key: StorageKeys.rememberedEmail);
     await _storage.delete(key: StorageKeys.rememberedPassword);
+  }
+
+  Future<void> savePasswordResetSession({
+    required String email,
+    required String resetToken,
+  }) async {
+    await _storage.write(key: StorageKeys.passwordResetEmail, value: email);
+    await _storage.write(key: StorageKeys.passwordResetToken, value: resetToken);
+  }
+
+  Future<({String email, String resetToken})?> getPasswordResetSession() async {
+    final email = await _storage.read(key: StorageKeys.passwordResetEmail);
+    final resetToken = await _storage.read(key: StorageKeys.passwordResetToken);
+    if (email == null ||
+        email.isEmpty ||
+        resetToken == null ||
+        resetToken.isEmpty) {
+      return null;
+    }
+    return (email: email, resetToken: resetToken);
+  }
+
+  Future<void> clearPasswordResetSession() async {
+    await _storage.delete(key: StorageKeys.passwordResetEmail);
+    await _storage.delete(key: StorageKeys.passwordResetToken);
   }
 
   Future<String?> read(String key) {

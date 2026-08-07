@@ -57,12 +57,16 @@ class TermsAcceptanceStatus {
   const TermsAcceptanceStatus({
     required this.currentVersion,
     required this.requiresAcceptance,
+    this.accepted = false,
     this.acceptedVersion,
     this.acceptedAt,
+    this.lastUpdated,
   });
 
+  final bool accepted;
   final String currentVersion;
   final bool requiresAcceptance;
   final String? acceptedVersion;
   final String? acceptedAt;
+  final String? lastUpdated;
 }

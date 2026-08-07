@@ -29,6 +29,20 @@ class PublicSettingsController extends Controller
                 'maintenance_mode' => $settings->isMaintenanceModeEnabled(),
                 'maintenance_message' => $settings->maintenanceMessage(),
                 'allow_quiz_retake' => $settings->enabled('allow_quiz_retake', 'students'),
+                'contact' => [
+                    'email' => filled($public['public_contact_email'] ?? null)
+                        ? $public['public_contact_email']
+                        : ($public['support_email'] ?? null),
+                    'phone' => filled($public['support_phone'] ?? null)
+                        ? $public['support_phone']
+                        : null,
+                    'website_url' => $public['website_url'] ?? null,
+                    'facebook_url' => $public['facebook_url'] ?? null,
+                    'instagram_url' => $public['instagram_url'] ?? null,
+                    'youtube_url' => $public['youtube_url'] ?? null,
+                    'linkedin_url' => $public['linkedin_url'] ?? null,
+                    'whatsapp_number' => $public['whatsapp_number'] ?? null,
+                ],
             ],
         ]);
     }

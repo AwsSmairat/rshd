@@ -19,6 +19,7 @@ class Video extends Model
         'storage_provider',
         'video_url',
         'video_path',
+        'external_video_id',
         'original_file_name',
         'file_size',
         'file_mime_type',
@@ -47,12 +48,21 @@ class Video extends Model
         });
     }
 
-    public function resolvedVideoUrl(): ?string
+    public static function storageDiskName(): string
     {
-        if ($this->video_path) {
-            return url(Storage::disk('public')->url($this->video_path));
-        }
+        return (string) config('video.local.disk', 'lesson_videos');
+    }
 
+    public static function legacyPublicDiskName(): string
+    {
+        return (string) config('video.local.legacy_public_disk', 'public');
+    }
+
+    /**
+     * External/demo playback source only. Never exposes local disk paths.
+     */
+    public function resolvedExternalVideoUrl(): ?string
+    {
         if ($this->video_url === null || $this->video_url === '') {
             return null;
         }
@@ -62,16 +72,43 @@ class Video extends Model
             return $this->video_url;
         }
 
-        return url(Storage::disk('public')->url($this->video_url));
+        return null;
+    }
+
+    public function hasLocalStoredFile(): bool
+    {
+        if ($this->video_path === null || $this->video_path === '') {
+            return false;
+        }
+
+        $primary = Storage::disk(static::storageDiskName());
+
+        if ($primary->exists($this->video_path)) {
+            return true;
+        }
+
+        $legacyDisk = static::legacyPublicDiskName();
+
+        if (static::storageDiskName() !== $legacyDisk) {
+            return Storage::disk($legacyDisk)->exists($this->video_path);
+        }
+
+        return false;
     }
 
     public function deleteStoredFile(): void
     {
-        if (! $this->video_path) {
+        if ($this->video_path === null || $this->video_path === '') {
             return;
         }
 
-        Storage::disk('public')->delete($this->video_path);
+        Storage::disk(static::storageDiskName())->delete($this->video_path);
+
+        $legacyDisk = static::legacyPublicDiskName();
+
+        if (static::storageDiskName() !== $legacyDisk) {
+            Storage::disk($legacyDisk)->delete($this->video_path);
+        }
     }
 
     /**

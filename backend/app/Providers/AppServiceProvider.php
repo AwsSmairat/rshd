@@ -20,6 +20,7 @@ use App\Policies\UserPolicy;
 use App\Policies\VideoPolicy;
 use App\Services\PlatformSettingsService;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -54,17 +55,54 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(User::class, UserPolicy::class);
 
         $settings = app(PlatformSettingsService::class);
-        $settings->applyMailPreferences();
-        $settings->applySecurityPreferences();
+        if (\Illuminate\Support\Facades\Schema::hasTable('platform_settings')) {
+            $settings->applyMailPreferences();
+            $settings->applySecurityPreferences();
+        } elseif (app()->environment('local', 'testing')) {
+            // During first install or empty local DB, env defaults apply.
+        }
 
         foreach ([
             storage_path('app/public/livewire-tmp'),
             storage_path('app/public/lesson-videos'),
             storage_path('app/public/lesson-files'),
             storage_path('app/private/livewire-tmp'),
+            storage_path('app/private/lesson-videos'),
         ] as $directory) {
             if (! is_dir($directory)) {
                 mkdir($directory, 0755, true);
+            }
+        }
+
+        $this->assertProductionVideoSecurity();
+    }
+
+    protected function assertProductionVideoSecurity(): void
+    {
+        if (! app()->environment('production')) {
+            return;
+        }
+
+        if (! config('video.signed_playback', true)) {
+            Log::critical('VIDEO_SIGNED_PLAYBACK must be true in production.');
+
+            if (! app()->runningInConsole()) {
+                abort(503, 'Video playback is misconfigured.');
+            }
+        }
+
+        if (config('video.local.disk') === 'public') {
+            Log::critical('VIDEO_LOCAL_DISK must not be public in production.');
+        }
+
+        if (config('video.provider') === 'bunny') {
+            $bunnyReady = filled(config('video.bunny.library_id'))
+                && filled(config('video.bunny.api_key'))
+                && filled(config('video.bunny.token_key'))
+                && filled(config('video.bunny.cdn_hostname'));
+
+            if (! $bunnyReady) {
+                Log::critical('VIDEO_PROVIDER=bunny but Bunny Stream credentials are incomplete.');
             }
         }
     }

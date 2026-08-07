@@ -13,8 +13,7 @@ import '../services/video_progress_tracker.dart';
 import '../widgets/rshd_video_player.dart';
 import 'subjects_controller.dart';
 
-/// TODO: Add secure signed video URLs from backend.
-/// TODO: Integrate Bunny.net video storage.
+/// Secure playback via temporary signed URLs from backend.
 class VideoDetailsScreen extends ConsumerStatefulWidget {
   const VideoDetailsScreen({
     super.key,
@@ -168,9 +167,6 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
             const SizedBox(height: 12),
             _InfoRow(label: 'المدة', value: video.formattedDuration),
             _InfoRow(label: 'الحالة', value: video.statusLabel),
-            if (video.storageProvider != null &&
-                video.storageProvider!.isNotEmpty)
-              _InfoRow(label: 'مزود التخزين', value: video.storageProvider!),
             const SizedBox(height: 16),
             Container(
               width: double.infinity,
@@ -213,20 +209,32 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
   }
 
   Widget _buildPlayerSection(VideoModel video) {
-    final videoUrl = video.videoUrl?.trim() ?? '';
+    final playback = video.playback;
+    final playbackUrl = playback?.url.trim() ?? '';
 
-    if (videoUrl.isEmpty) {
-      return _MessageBox(message: 'رابط الفيديو غير متوفر حالياً');
+    if (playbackUrl.isEmpty) {
+      return _MessageBox(
+        message: video.isLocked
+            ? 'هذا الفيديو مقفل. يرجى تفعيل المادة للمشاهدة.'
+            : 'رابط التشغيل غير متوفر حالياً',
+      );
     }
 
     if (video.status != 'ready') {
       return _MessageBox(message: 'الفيديو غير جاهز للمشاهدة حالياً');
     }
 
+    final savedPosition = video.progress?.currentPosition ?? 0;
+
     return RshdVideoPlayer(
-      videoUrl: videoUrl,
+      playbackUrl: playbackUrl,
+      expiresAt: playback?.expiresAt,
+      initialPositionSeconds: savedPosition,
       onPositionChanged: _onPositionChanged,
       onPlaybackStateChanged: _onPlaybackStateChanged,
+      onRefreshPlayback: () => ref
+          .read(videoDetailsControllerProvider(widget.videoId).notifier)
+          .refreshPlayback(widget.videoId),
     );
   }
 }

@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Enums\ContentStatus;
+use App\Enums\UserStatus;
 use App\Models\User;
 use App\Models\Video;
 use App\Policies\Concerns\ChecksSubjectAccess;
@@ -13,6 +14,10 @@ class VideoPolicy
 
     public function view(User $user, Video $video): bool
     {
+        if ($user->status === UserStatus::Blocked) {
+            return false;
+        }
+
         $video->loadMissing('lesson.subject');
 
         if ($this->canAccessSubject($user, $video->lesson->subject)) {

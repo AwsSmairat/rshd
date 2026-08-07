@@ -10,42 +10,50 @@ class ContactChannelCard extends StatelessWidget {
     required this.title,
     required this.value,
     required this.icon,
-    required this.onTap,
+    this.onTap,
     this.iconColor,
+    this.isEnabled = true,
   });
 
   final String title;
   final String value;
   final IconData icon;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final Color? iconColor;
+  final bool isEnabled;
 
   @override
   Widget build(BuildContext context) {
     final accent = iconColor ?? AppColors.darkGold;
+    final disabled = !isEnabled;
 
     return Semantics(
-      button: true,
+      button: isEnabled,
+      enabled: isEnabled,
       label: '$title: $value',
       child: LiquidGlassSurface(
         borderRadius: BorderRadius.circular(20),
         padding: const EdgeInsets.all(18),
-        fillOpacity: 0.38,
-        borderOpacity: 0.65,
+        fillOpacity: disabled ? 0.22 : 0.38,
+        borderOpacity: disabled ? 0.35 : 0.65,
         blurSigma: 16,
         tintColor: AppColors.accent,
-        tintOpacity: 0.04,
-        onTap: onTap,
+        tintOpacity: disabled ? 0.02 : 0.04,
+        onTap: isEnabled ? onTap : null,
         child: Row(
           children: [
             Container(
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.14),
+                color: accent.withValues(alpha: disabled ? 0.08 : 0.14),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, color: accent, size: 26),
+              child: Icon(
+                icon,
+                color: disabled ? AppColors.textMuted : accent,
+                size: 26,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -66,17 +74,20 @@ class ContactChannelCard extends StatelessWidget {
                     style: AppTextStyles.body.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
+                      color: disabled
+                          ? AppColors.textMuted
+                          : AppColors.primary,
                       height: 1.35,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_left_rounded,
-              color: AppColors.primary.withValues(alpha: 0.45),
-            ),
+            if (isEnabled)
+              Icon(
+                Icons.chevron_left_rounded,
+                color: AppColors.primary.withValues(alpha: 0.45),
+              ),
           ],
         ),
       ),

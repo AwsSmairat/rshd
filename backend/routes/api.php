@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\V1\LegalDocumentController;
 use App\Http\Controllers\Api\V1\HelpCenterController;
 use App\Http\Controllers\Api\V1\TechnicalSupportController;
 use App\Http\Controllers\Api\V1\StudentSettingsController;
 use App\Http\Controllers\Api\V1\StudentTermsController;
+use App\Http\Controllers\Api\V1\PasswordResetController;
 use App\Http\Controllers\Api\V1\PublicSettingsController;
 use App\Http\Controllers\Api\V1\AnnouncementController;
 use App\Http\Controllers\Api\V1\AssignmentController;
@@ -16,6 +18,8 @@ use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\QuizController;
 use App\Http\Controllers\Api\V1\SubjectController;
 use App\Http\Controllers\Api\V1\VideoController;
+use App\Http\Controllers\Api\BunnyStreamWebhookController;
+use App\Http\Controllers\Api\V1\VideoStreamController;
 use App\Models\LessonFile;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +27,8 @@ Route::bind('file', fn (string $value) => LessonFile::findOrFail($value));
 
 Route::prefix('v1')->group(function () {
     Route::get('settings/public', PublicSettingsController::class);
+    Route::get('legal/privacy-policy', [LegalDocumentController::class, 'privacyPolicy']);
+    Route::get('legal/terms', [LegalDocumentController::class, 'terms']);
 
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
@@ -30,6 +36,16 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/apple', [AuthController::class, 'appleAuth']);
     Route::post('email/verify', [EmailVerificationController::class, 'verify']);
     Route::post('email/resend', [EmailVerificationController::class, 'resend']);
+    Route::post('password/forgot', [PasswordResetController::class, 'forgot']);
+    Route::post('password/verify', [PasswordResetController::class, 'verify']);
+    Route::post('password/reset', [PasswordResetController::class, 'reset']);
+    Route::post('password/resend', [PasswordResetController::class, 'resend']);
+
+    Route::get('videos/{video}/stream', [VideoStreamController::class, 'stream'])
+        ->name('api.v1.videos.stream');
+
+    Route::post('webhooks/bunny/stream', BunnyStreamWebhookController::class)
+        ->name('api.webhooks.bunny.stream');
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
@@ -44,6 +60,7 @@ Route::prefix('v1')->group(function () {
         Route::get('lessons/{lesson}', [LessonController::class, 'show']);
 
         Route::get('videos/{video}', [VideoController::class, 'show']);
+        Route::get('videos/{video}/playback', [VideoController::class, 'playback']);
         Route::post('videos/{video}/progress', [VideoController::class, 'updateProgress']);
 
         Route::get('files/{file}', [LessonFileController::class, 'show']);

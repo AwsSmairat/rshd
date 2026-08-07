@@ -95,8 +95,11 @@ String mapSubjectsError(ApiException error) {
   return mapContentError(error, subjectContext: true);
 }
 
-String mapContentError(ApiException error, {bool subjectContext = false, bool fileContext = false}) {
+String mapContentError(ApiException error, {bool subjectContext = false, bool fileContext = false, bool videoContext = false}) {
   if (error.isForbidden) {
+    if (videoContext) {
+      return 'انتهت صلاحية الوصول إلى هذه المادة أو لا تملك صلاحية مشاهدة هذا الفيديو.';
+    }
     if (subjectContext) {
       return 'لا تملك صلاحية الوصول إلى هذه المادة';
     }
@@ -452,7 +455,7 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
     } on ApiException catch (error) {
       state = VideoDetailsState(
         status: FeatureLoadStatus.error,
-        errorMessage: mapContentError(error),
+        errorMessage: mapContentError(error, videoContext: true),
       );
     } catch (_) {
       state = const VideoDetailsState(
@@ -495,18 +498,7 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
       state = state.copyWith(
         progressMessage:
             showSuccessMessage ? 'تم حفظ تقدم المشاهدة' : state.progressMessage,
-        video: VideoModel(
-          id: currentVideo.id,
-          lessonId: currentVideo.lessonId,
-          title: currentVideo.title,
-          videoUrl: currentVideo.videoUrl,
-          durationSeconds: currentVideo.durationSeconds,
-          status: currentVideo.status,
-          storageProvider: currentVideo.storageProvider,
-          progress: progress,
-          createdAt: currentVideo.createdAt,
-          updatedAt: currentVideo.updatedAt,
-        ),
+        video: currentVideo.copyWith(progress: progress),
       );
     } on ApiException catch (error) {
       if (kDebugMode) {
@@ -516,6 +508,35 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
       if (kDebugMode) {
         debugPrint('Video progress sync failed: $error');
       }
+    }
+  }
+
+  Future<String?> refreshPlayback(int videoId) async {
+    try {
+      final playback = await _repository.refreshVideoPlayback(videoId);
+      final currentVideo = state.video;
+
+      if (currentVideo != null) {
+        state = state.copyWith(
+          video: currentVideo.copyWith(playback: playback),
+        );
+      }
+
+      return playback.url;
+    } on ApiException catch (error) {
+      if (error.isForbidden || error.isUnauthorized) {
+        state = state.copyWith(
+          errorMessage: mapContentError(error, videoContext: true),
+        );
+      } else if (kDebugMode) {
+        debugPrint('Video playback refresh failed: ${error.message}');
+      }
+      return null;
+    } catch (error) {
+      if (kDebugMode) {
+        debugPrint('Video playback refresh failed: $error');
+      }
+      return null;
     }
   }
 }

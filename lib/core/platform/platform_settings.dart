@@ -1,3 +1,5 @@
+import '../../features/contact/data/contact_channels.dart';
+
 class PlatformSettings {
   const PlatformSettings({
     required this.platformName,
@@ -8,6 +10,7 @@ class PlatformSettings {
     required this.assignmentMaxFileSizeMb,
     required this.assignmentAllowedFileTypes,
     required this.currencySymbol,
+    required this.contact,
     this.allowQuizRetake = true,
     this.supportEmail,
     this.supportPhone,
@@ -19,6 +22,7 @@ class PlatformSettings {
         : json;
 
     final types = data['assignment_allowed_file_types'];
+    final contactRaw = data['contact'];
     return PlatformSettings(
       platformName: data['platform_name']?.toString() ?? 'RSHD',
       maintenanceMode: data['maintenance_mode'] == true,
@@ -37,6 +41,9 @@ class PlatformSettings {
       allowQuizRetake: data['allow_quiz_retake'] != false,
       supportEmail: data['support_email']?.toString(),
       supportPhone: data['support_phone']?.toString(),
+      contact: ContactChannels.fromJson(
+        contactRaw is Map<String, dynamic> ? contactRaw : null,
+      ),
     );
   }
 
@@ -51,8 +58,9 @@ class PlatformSettings {
   final bool allowQuizRetake;
   final String? supportEmail;
   final String? supportPhone;
+  final ContactChannels contact;
 
-  static const fallback = PlatformSettings(
+  static final fallback = PlatformSettings(
     platformName: 'RSHD',
     maintenanceMode: false,
     maintenanceMessage: 'الموقع حالياً تحت الصيانة، يرجى المحاولة لاحقاً.',
@@ -63,5 +71,6 @@ class PlatformSettings {
     currencySymbol: 'د.أ',
     allowQuizRetake: true,
     supportEmail: 'admin@rshdacademy.com',
+    contact: ContactChannels.empty,
   );
 }

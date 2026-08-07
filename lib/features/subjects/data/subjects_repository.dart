@@ -141,6 +141,34 @@ class SubjectsRepository {
     );
   }
 
+  Future<VideoPlaybackModel> refreshVideoPlayback(int videoId) async {
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      ApiEndpoints.videoPlayback(videoId),
+    );
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+      (json) => Map<String, dynamic>.from(json as Map),
+    );
+
+    if (!apiResponse.success || apiResponse.data == null) {
+      throw ApiException(
+        message: apiResponse.message ?? 'تعذر تجديد رابط التشغيل.',
+        errors: apiResponse.errors,
+      );
+    }
+
+    final playbackJson = apiResponse.data!['playback'];
+
+    if (playbackJson is! Map) {
+      throw ApiException(message: 'تعذر تجديد رابط التشغيل.');
+    }
+
+    return VideoPlaybackModel.fromJson(
+      Map<String, dynamic>.from(playbackJson),
+    );
+  }
+
   Future<LessonFileModel> getFileDetails(int fileId) async {
     return _fetchEntity(
       ApiEndpoints.fileDetails(fileId),

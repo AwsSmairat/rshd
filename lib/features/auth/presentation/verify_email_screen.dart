@@ -1,15 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/layout/auth_layout_metrics.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/widgets/app_button.dart';
 import 'auth_controller.dart';
+import 'widgets/auth_screen_shell.dart';
+import 'widgets/gold_gradient_button.dart';
+import 'widgets/login_header.dart';
+import 'widgets/luxury_login_card.dart';
+import 'widgets/otp_input_row.dart';
 
 class VerifyEmailScreen extends ConsumerStatefulWidget {
   const VerifyEmailScreen({
@@ -24,11 +28,11 @@ class VerifyEmailScreen extends ConsumerStatefulWidget {
 }
 
 class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _codeController = TextEditingController();
+  final _otpKey = GlobalKey<OtpInputRowState>();
   Timer? _resendTimer;
-  int _secondsRemaining = 0;
+  int _secondsRemaining = 60;
   bool _isResending = false;
+  String _code = '';
 
   @override
   void initState() {
@@ -39,7 +43,6 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   @override
   void dispose() {
     _resendTimer?.cancel();
-    _codeController.dispose();
     super.dispose();
   }
 
@@ -61,13 +64,16 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) {
+    if (_code.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى إدخال رمز مكوّن من 6 أرقام')),
+      );
       return;
     }
 
     final success = await ref.read(authControllerProvider.notifier).verifyEmail(
           email: widget.email,
-          code: _codeController.text,
+          code: _code,
         );
 
     if (success && mounted) {
@@ -93,6 +99,8 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     setState(() => _isResending = false);
 
     if (success) {
+      _otpKey.currentState?.clear();
+      setState(() => _code = '');
       _startResendTimer();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('تم إرسال رمز جديد')),
@@ -104,102 +112,124 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
     final isVerifying = authState.status == AuthStatus.authenticating;
+    final metrics = AuthLayoutMetrics.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('تأكيد البريد الإلكتروني')),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text('تأكيد البريد الإلكتروني', style: AppTextStyles.title),
-                const SizedBox(height: 8),
-                Text(
-                  'أدخل رمز التحقق المرسل إلى بريدك الإلكتروني',
-                  style: AppTextStyles.subtitle,
+      body: AuthScreenShell(
+        header: const LoginHeader(),
+        footer: const LoginFooter(),
+        body: LuxuryLoginCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: IconButton(
+                  tooltip: 'رجوع',
+                  onPressed: () => context.go(AppRoutes.login),
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                  color: AppColors.primary,
                 ),
-                const SizedBox(height: 16),
+              ),
+              Text(
+                'تأكيد البريد الإلكتروني',
+                style: AppTextStyles.title.copyWith(color: AppColors.primary),
+                textAlign: TextAlign.right,
+              ),
+              SizedBox(height: metrics.fieldSpacing * 0.5),
+              Text(
+                'أدخل رمز التحقق المرسل إلى\n${widget.email}',
+                style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                textAlign: TextAlign.right,
+              ),
+              SizedBox(height: metrics.sectionSpacing),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  horizontal: metrics.isTablet ? 16 : 14,
+                  vertical: metrics.isTablet ? 14 : 12,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.35),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.mail_outline_rounded,
+                      color: AppColors.accent,
+                      size: metrics.isTablet ? 22 : 20,
+                    ),
+                    SizedBox(width: metrics.fieldSpacing * 0.75),
+                    Expanded(
+                      child: Text(
+                        widget.email,
+                        style: AppTextStyles.body.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                        ),
+                        textAlign: TextAlign.right,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: metrics.sectionSpacing),
+              SizedBox(
+                width: double.infinity,
+                child: OtpInputRow(
+                  key: _otpKey,
+                  length: 6,
+                  onChanged: (value) => _code = value,
+                  onCompleted: (value) {
+                    _code = value;
+                    _submit();
+                  },
+                ),
+              ),
+              if (authState.errorMessage != null) ...[
+                SizedBox(height: metrics.fieldSpacing),
                 Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
+                  padding: EdgeInsets.all(metrics.isTablet ? 14 : 12),
                   decoration: BoxDecoration(
-                    color: AppColors.cardWhite,
+                    color: AppColors.error.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(
+                      color: AppColors.error.withValues(alpha: 0.2),
+                    ),
                   ),
                   child: Text(
-                    widget.email,
-                    style: AppTextStyles.body.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
-                    ),
+                    authState.errorMessage!,
+                    style: AppTextStyles.error,
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 24),
-                if (authState.errorMessage != null) ...[
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.error.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      authState.errorMessage!,
-                      style: AppTextStyles.error,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-                TextFormField(
-                  controller: _codeController,
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.done,
-                  maxLength: 6,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(
-                    labelText: 'رمز التحقق',
-                    hintText: '123456',
-                    counterText: '',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'الرمز مطلوب';
-                    }
-                    if (value.trim().length != 6) {
-                      return 'الرمز يجب أن يكون 6 أرقام';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
-                AppButton(
-                  label: 'تأكيد الرمز',
-                  isLoading: isVerifying,
-                  onPressed: isVerifying ? null : _submit,
-                ),
-                const SizedBox(height: 12),
-                OutlinedButton(
-                  onPressed: (_secondsRemaining > 0 || _isResending)
-                      ? null
-                      : _resend,
-                  child: Text(
-                    _secondsRemaining > 0
-                        ? 'إعادة إرسال الرمز (${_secondsRemaining}s)'
-                        : 'إعادة إرسال الرمز',
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () => context.go(AppRoutes.login),
-                  child: const Text('العودة لتسجيل الدخول'),
-                ),
               ],
-            ),
+              SizedBox(height: metrics.sectionSpacing),
+              GoldGradientButton(
+                label: 'تأكيد الرمز',
+                isLoading: isVerifying,
+                onPressed: isVerifying ? null : _submit,
+              ),
+              SizedBox(height: metrics.fieldSpacing),
+              TextButton(
+                onPressed: (_secondsRemaining > 0 || _isResending) ? null : _resend,
+                child: Text(
+                  _secondsRemaining > 0
+                      ? 'إعادة الإرسال بعد $_secondsRemaining ث'
+                      : 'إعادة إرسال الرمز',
+                ),
+              ),
+              SizedBox(height: metrics.fieldSpacing * 0.5),
+              TextButton(
+                onPressed: () => context.go(AppRoutes.login),
+                child: const Text('العودة لتسجيل الدخول'),
+              ),
+            ],
           ),
         ),
       ),

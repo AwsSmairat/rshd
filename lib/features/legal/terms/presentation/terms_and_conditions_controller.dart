@@ -63,8 +63,7 @@ class TermsAndConditionsController
 
     try {
       final document = await _repository.fetch(forceRefresh: refresh);
-      final isOffline = document.source == TermsSource.local ||
-          document.source == TermsSource.cached;
+      final isOffline = document.source != TermsSource.remote;
 
       state = state.copyWith(
         status: TermsLoadStatus.loaded,

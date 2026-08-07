@@ -4,6 +4,7 @@ namespace App\Enums;
 
 enum VideoStatus: string
 {
+    case Uploading = 'uploading';
     case Processing = 'processing';
     case Ready = 'ready';
     case Failed = 'failed';
@@ -11,6 +12,7 @@ enum VideoStatus: string
     public function label(): string
     {
         return match ($this) {
+            self::Uploading => 'جاري الرفع',
             self::Processing => 'قيد المعالجة',
             self::Ready => 'جاهز',
             self::Failed => 'فشل',

@@ -50,8 +50,7 @@ class PrivacyPolicyController extends StateNotifier<PrivacyPolicyState> {
 
     try {
       final document = await _repository.fetch(forceRefresh: refresh);
-      final isOffline = document.source == PrivacyPolicySource.local ||
-          document.source == PrivacyPolicySource.cached;
+      final isOffline = document.source != PrivacyPolicySource.remote;
 
       state = state.copyWith(
         status: PrivacyPolicyLoadStatus.loaded,

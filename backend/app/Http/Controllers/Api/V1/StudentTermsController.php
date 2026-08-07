@@ -43,7 +43,11 @@ class StudentTermsController extends Controller
             ?: $request->header('X-App-Platform')
             ?: 'flutter';
 
-        $updated = $terms->recordAcceptance($user, $platform);
+        try {
+            $updated = $terms->recordAcceptance($user, $platform, $request);
+        } catch (\InvalidArgumentException $exception) {
+            return $this->errorResponse($exception->getMessage(), 422);
+        }
 
         return $this->successResponse(
             $terms->acceptanceStatus($updated),

@@ -209,6 +209,116 @@ class AuthRepository {
     }
   }
 
+  Future<void> requestPasswordReset({required String email}) async {
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      ApiEndpoints.passwordForgot,
+      data: {'email': email.trim().toLowerCase()},
+    );
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+      (json) => Map<String, dynamic>.from(json as Map),
+    );
+
+    if (!apiResponse.success) {
+      throw ApiException(
+        message: apiResponse.message ?? 'تعذر إرسال رمز الاستعادة.',
+        errors: apiResponse.errors,
+        statusCode: response.statusCode,
+      );
+    }
+  }
+
+  Future<String> verifyPasswordResetCode({
+    required String email,
+    required String code,
+  }) async {
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      ApiEndpoints.passwordVerify,
+      data: {
+        'email': email.trim().toLowerCase(),
+        'code': code.trim(),
+      },
+    );
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+      (json) => Map<String, dynamic>.from(json as Map),
+    );
+
+    if (!apiResponse.success || apiResponse.data == null) {
+      throw ApiException(
+        message: apiResponse.message ?? 'تعذر التحقق من الرمز.',
+        errors: apiResponse.errors,
+        statusCode: response.statusCode,
+      );
+    }
+
+    final resetToken = apiResponse.data!['reset_token']?.toString();
+    if (resetToken == null || resetToken.isEmpty) {
+      throw ApiException(message: 'استجابة الاستعادة غير صالحة.');
+    }
+
+    await _secureStorage.savePasswordResetSession(
+      email: email.trim().toLowerCase(),
+      resetToken: resetToken,
+    );
+
+    return resetToken;
+  }
+
+  Future<void> resendPasswordResetCode({required String email}) async {
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      ApiEndpoints.passwordResend,
+      data: {'email': email.trim().toLowerCase()},
+    );
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+      (json) => Map<String, dynamic>.from(json as Map),
+    );
+
+    if (!apiResponse.success) {
+      throw ApiException(
+        message: apiResponse.message ?? 'تعذر إعادة إرسال الرمز.',
+        errors: apiResponse.errors,
+        statusCode: response.statusCode,
+      );
+    }
+  }
+
+  Future<void> resetPassword({
+    required String email,
+    required String resetToken,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      ApiEndpoints.passwordReset,
+      data: {
+        'email': email.trim().toLowerCase(),
+        'reset_token': resetToken,
+        'password': password,
+        'password_confirmation': passwordConfirmation,
+      },
+    );
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+      (json) => Map<String, dynamic>.from(json as Map),
+    );
+
+    if (!apiResponse.success) {
+      throw ApiException(
+        message: apiResponse.message ?? 'تعذر تغيير كلمة المرور.',
+        errors: apiResponse.errors,
+        statusCode: response.statusCode,
+      );
+    }
+
+    await _secureStorage.clearPasswordResetSession();
+  }
+
   Future<void> logout() async {
     try {
       if (await _secureStorage.hasToken()) {

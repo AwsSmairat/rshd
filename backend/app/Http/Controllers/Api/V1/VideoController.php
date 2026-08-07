@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\UpdateVideoProgressRequest;
 use App\Http\Resources\VideoResource;
 use App\Models\Video;
 use App\Services\ProgressService;
+use App\Services\VideoPlaybackService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -22,7 +23,28 @@ class VideoController extends Controller
             $video->load(['progress' => fn ($query) => $query->where('student_id', $request->user()->id)]);
         }
 
-        return $this->successResource(new VideoResource($video));
+        return $this->playbackResponse(new VideoResource($video));
+    }
+
+    public function playback(Request $request, Video $video, VideoPlaybackService $playbackService): JsonResponse
+    {
+        $this->authorize('view', $video);
+
+        $video->load('lesson.subject');
+
+        $playback = $playbackService->generatePlaybackUrl($video, $request->user());
+
+        if ($playback === null) {
+            return $this->forbiddenResponse('غير مصرح لك بتشغيل هذا الفيديو.');
+        }
+
+        return $this->playbackResponse([
+            'id' => $video->id,
+            'playback' => [
+                'url' => $playback['url'],
+                'expires_at' => $playback['expires_at']->toIso8601String(),
+            ],
+        ]);
     }
 
     public function updateProgress(
@@ -48,5 +70,15 @@ class VideoController extends Controller
             ]),
             'تم تحديث تقدم المشاهدة بنجاح.',
         );
+    }
+
+    protected function playbackResponse(mixed $data): JsonResponse
+    {
+        return $this->successResponse(
+            $data instanceof VideoResource ? $data->resolve(request()) : $data,
+        )->withHeaders([
+            'Cache-Control' => 'private, no-store, no-cache, must-revalidate',
+            'Pragma' => 'no-cache',
+        ]);
     }
 }

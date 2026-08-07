@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/config/contact_settings.dart';
 import '../../../core/layout/app_layout_metrics.dart';
+import '../../../core/platform/platform_settings_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../contact_launcher.dart';
+import '../data/contact_channels.dart';
 import '../widgets/contact_channel_card.dart';
 import '../widgets/contact_us_header.dart';
 
@@ -14,125 +16,185 @@ class ContactChannelDefinition {
     required this.title,
     required this.value,
     required this.icon,
-    required this.onTap,
+    required this.isEnabled,
+    this.onTap,
     this.iconColor,
   });
 
   final String title;
   final String value;
   final IconData icon;
-  final Future<void> Function(BuildContext context) onTap;
+  final bool isEnabled;
+  final Future<void> Function(BuildContext context)? onTap;
   final Color? iconColor;
 }
 
-/// Builds contact cards from [ContactSettings] — no duplicated contact data.
-List<ContactChannelDefinition> buildContactChannels() {
+List<ContactChannelDefinition> buildContactChannels(ContactChannels channels) {
+  final launcher = ContactLauncher(channels);
+
   return [
     ContactChannelDefinition(
       title: 'البريد الإلكتروني',
-      value: ContactSettings.supportEmail,
+      value: channels.displayFor(channels.email),
       icon: Icons.email_outlined,
-      onTap: ContactLauncher.openEmail,
+      isEnabled: channels.hasEmail,
+      onTap: launcher.openEmail,
     ),
     ContactChannelDefinition(
-      title: 'إنستغرام',
-      value: ContactSettings.instagramUsername,
-      icon: Icons.camera_alt_outlined,
-      onTap: ContactLauncher.openInstagram,
+      title: 'رابط الموقع',
+      value: channels.websiteDisplay,
+      icon: Icons.language_outlined,
+      isEnabled: channels.hasWebsite,
+      onTap: launcher.openWebsite,
     ),
     ContactChannelDefinition(
       title: 'فيسبوك',
-      value: ContactSettings.facebookDisplayName,
+      value: channels.facebookDisplay,
       icon: Icons.facebook_outlined,
-      onTap: ContactLauncher.openFacebook,
+      isEnabled: channels.hasFacebook,
+      onTap: launcher.openFacebook,
+    ),
+    ContactChannelDefinition(
+      title: 'إنستغرام',
+      value: channels.instagramDisplay,
+      icon: Icons.camera_alt_outlined,
+      isEnabled: channels.hasInstagram,
+      onTap: launcher.openInstagram,
+    ),
+    ContactChannelDefinition(
+      title: 'يوتيوب',
+      value: channels.youtubeDisplay,
+      icon: Icons.play_circle_outline,
+      isEnabled: channels.hasYoutube,
+      onTap: launcher.openYoutube,
+    ),
+    ContactChannelDefinition(
+      title: 'لينكدإن',
+      value: channels.linkedinDisplay,
+      icon: Icons.work_outline,
+      isEnabled: channels.hasLinkedin,
+      onTap: launcher.openLinkedin,
     ),
     ContactChannelDefinition(
       title: 'اتصل بنا',
-      value: ContactSettings.phoneDisplay,
+      value: channels.phoneDisplay,
       icon: Icons.phone_outlined,
-      onTap: ContactLauncher.openPhone,
+      isEnabled: channels.hasPhone,
+      onTap: launcher.openPhone,
     ),
     ContactChannelDefinition(
       title: 'واتساب',
-      value: ContactSettings.phoneDisplay,
+      value: channels.whatsappDisplay,
       icon: Icons.chat_outlined,
-      onTap: ContactLauncher.openWhatsApp,
+      isEnabled: channels.hasWhatsapp,
+      onTap: launcher.openWhatsApp,
       iconColor: const Color(0xFF25D366),
     ),
   ];
 }
 
-class ContactUsScreen extends StatelessWidget {
+class ContactUsScreen extends ConsumerStatefulWidget {
   const ContactUsScreen({super.key});
 
   @override
+  ConsumerState<ContactUsScreen> createState() => _ContactUsScreenState();
+}
+
+class _ContactUsScreenState extends ConsumerState<ContactUsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(_refreshContactSettings);
+  }
+
+  Future<void> _refreshContactSettings() async {
+    await ref.read(platformSettingsProvider.notifier).refresh();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final settings = ref.watch(platformSettingsProvider);
     final metrics = AppLayoutMetrics.of(context);
-    final channels = buildContactChannels();
+    final channels = settings.maybeWhen(
+      data: (value) => buildContactChannels(value.contact),
+      orElse: () => buildContactChannels(ContactChannels.empty),
+    );
     final columns = metrics.isTablet ? 2 : 1;
+    final isRefreshing = settings.isLoading;
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          const SliverToBoxAdapter(child: ContactUsHeader()),
-          SliverToBoxAdapter(
-            child: ResponsiveContent(
-              padding: EdgeInsets.fromLTRB(
-                metrics.outerHorizontalInset,
-                16,
-                metrics.outerHorizontalInset,
-                MediaQuery.paddingOf(context).bottom + 24,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'وسائل التواصل',
-                    style: AppTextStyles.subtitle.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
+      body: RefreshIndicator(
+        onRefresh: _refreshContactSettings,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            const SliverToBoxAdapter(child: ContactUsHeader()),
+            SliverToBoxAdapter(
+              child: ResponsiveContent(
+                padding: EdgeInsets.fromLTRB(
+                  metrics.outerHorizontalInset,
+                  16,
+                  metrics.outerHorizontalInset,
+                  MediaQuery.paddingOf(context).bottom + 24,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'وسائل التواصل',
+                      style: AppTextStyles.subtitle.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'اضغط على أي بطاقة للتواصل مع فريق RSHD',
-                    style: AppTextStyles.body.copyWith(
-                      fontSize: 13,
-                      color: AppColors.textMuted,
+                    const SizedBox(height: 6),
+                    Text(
+                      'اضغط على أي بطاقة للتواصل مع فريق RSHD',
+                      style: AppTextStyles.body.copyWith(
+                        fontSize: 13,
+                        color: AppColors.textMuted,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final gap = 12.0;
-                      final itemWidth = columns == 1
-                          ? constraints.maxWidth
-                          : (constraints.maxWidth - gap) / 2;
+                    if (isRefreshing) ...[
+                      const SizedBox(height: 12),
+                      const LinearProgressIndicator(minHeight: 2),
+                    ],
+                    const SizedBox(height: 16),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final gap = 12.0;
+                        final itemWidth = columns == 1
+                            ? constraints.maxWidth
+                            : (constraints.maxWidth - gap) / 2;
 
-                      return Wrap(
-                        spacing: gap,
-                        runSpacing: gap,
-                        children: channels.map((channel) {
-                          return SizedBox(
-                            width: itemWidth,
-                            child: ContactChannelCard(
-                              title: channel.title,
-                              value: channel.value,
-                              icon: channel.icon,
-                              iconColor: channel.iconColor,
-                              onTap: () => channel.onTap(context),
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    },
-                  ),
-                ],
+                        return Wrap(
+                          spacing: gap,
+                          runSpacing: gap,
+                          children: channels.map((channel) {
+                            return SizedBox(
+                              width: itemWidth,
+                              child: ContactChannelCard(
+                                title: channel.title,
+                                value: channel.value,
+                                icon: channel.icon,
+                                iconColor: channel.iconColor,
+                                isEnabled: channel.isEnabled,
+                                onTap: channel.isEnabled && channel.onTap != null
+                                    ? () => channel.onTap!(context)
+                                    : null,
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

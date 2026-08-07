@@ -10,18 +10,23 @@ import '../../features/assignments/presentation/assignments_screen.dart';
 import '../../features/assignments/presentation/submit_assignment_screen.dart';
 import '../../core/platform/platform_settings_controller.dart';
 import '../../features/auth/presentation/auth_controller.dart';
+import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
+import '../../features/auth/presentation/password_reset_verification_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
+import '../../features/auth/presentation/reset_password_screen.dart';
 import '../../features/auth/presentation/verify_email_screen.dart';
 import '../../features/grades/presentation/grade_details_screen.dart';
 import '../../features/grades/presentation/grades_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/maintenance/maintenance_screen.dart';
+import '../../features/legal/terms/presentation/terms_acceptance_gate_controller.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
 import '../../features/contact/presentation/contact_us_screen.dart';
 import '../../features/help/presentation/help_center_screen.dart';
 import '../../features/help/presentation/technical_support_screen.dart';
+import '../../features/legal/terms/presentation/terms_acceptance_screen.dart';
 import '../../features/legal/terms/presentation/terms_and_conditions_screen.dart';
 import '../../features/legal/privacy/presentation/delete_account_screen.dart';
 import '../../features/legal/privacy/presentation/privacy_policy_screen.dart';
@@ -45,6 +50,9 @@ class AppRoutes {
   static const login = '/login';
   static const register = '/register';
   static const verifyEmail = '/verify-email';
+  static const forgotPassword = '/forgot-password';
+  static const passwordResetVerify = '/password-reset/verify';
+  static const passwordResetNew = '/password-reset/new';
   static const home = '/home';
   static const subjects = '/subjects';
 
@@ -93,6 +101,8 @@ class AppRoutes {
 
   static const termsAndConditions = '/terms-and-conditions';
 
+  static const termsAcceptance = '/terms-acceptance';
+
   static const helpCenter = '/help-center';
 
   static const technicalSupport = '/technical-support';
@@ -114,6 +124,7 @@ class RouterNotifier extends ChangeNotifier {
   RouterNotifier(this.ref) {
     ref.listen(authControllerProvider, (_, next) => notifyListeners());
     ref.listen(platformSettingsProvider, (_, next) => notifyListeners());
+    ref.listen(termsAcceptanceGateProvider, (_, next) => notifyListeners());
   }
 
   final Ref ref;
@@ -135,7 +146,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isLogin = location == AppRoutes.login;
       final isRegister = location == AppRoutes.register;
       final isVerifyEmail = location.startsWith(AppRoutes.verifyEmail);
-      final isAuthRoute = isLogin || isRegister || isVerifyEmail;
+      final isForgotPassword = location.startsWith(AppRoutes.forgotPassword);
+      final isPasswordResetVerify =
+          location.startsWith(AppRoutes.passwordResetVerify);
+      final isPasswordResetNew =
+          location.startsWith(AppRoutes.passwordResetNew);
+      final isPasswordResetRoute =
+          isForgotPassword || isPasswordResetVerify || isPasswordResetNew;
+      final isAuthRoute =
+          isLogin || isRegister || isVerifyEmail || isPasswordResetRoute;
 
       if (platformSettings?.maintenanceMode == true &&
           !isMaintenance &&
@@ -184,6 +203,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         if (user != null && !user.isEmailVerified) {
           return '${AppRoutes.verifyEmail}?email=${Uri.encodeComponent(user.email)}';
         }
+
+        final termsGate = ref.read(termsAcceptanceGateProvider);
+        final isTermsAcceptance = location == AppRoutes.termsAcceptance;
+        final isTermsPage = location == AppRoutes.termsAndConditions;
+        final isPrivacyPage = location == AppRoutes.privacyPolicy;
+
+        if (termsGate.requiresAcceptance &&
+            !isTermsAcceptance &&
+            !isTermsPage &&
+            !isPrivacyPage) {
+          return AppRoutes.termsAcceptance;
+        }
+
         if (isAuthRoute || isSplash) {
           return AppRoutes.home;
         }
@@ -219,7 +251,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.login,
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email'];
+          return LoginScreen(initialEmail: email);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.forgotPassword,
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email'];
+          return ForgotPasswordScreen(initialEmail: email);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.passwordResetVerify,
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email'] ?? '';
+          return PasswordResetVerificationScreen(email: email);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.passwordResetNew,
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email'] ?? '';
+          return ResetPasswordScreen(email: email);
+        },
       ),
       GoRoute(
         path: AppRoutes.register,
@@ -404,6 +460,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.privacyPolicy,
         builder: (context, state) => const PrivacyPolicyPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.termsAcceptance,
+        builder: (context, state) => const TermsAcceptanceScreen(),
       ),
       GoRoute(
         path: AppRoutes.termsAndConditions,

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\PlatformSetting;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class PlatformSettingsService
@@ -22,7 +23,7 @@ class PlatformSettingsService
                 'platform_name' => ['type' => 'string', 'value' => 'RSHD', 'is_public' => true],
                 'platform_subtitle' => ['type' => 'string', 'value' => 'منصة تعليمية ذكية', 'is_public' => true],
                 'support_email' => ['type' => 'string', 'value' => 'admin@rshdacademy.com', 'is_public' => true],
-                'support_phone' => ['type' => 'string', 'value' => '', 'is_public' => true],
+                'support_phone' => ['type' => 'string', 'value' => '0799532264', 'is_public' => true],
                 'currency_code' => ['type' => 'string', 'value' => 'JOD', 'is_public' => true],
                 'currency_symbol' => ['type' => 'string', 'value' => 'د.أ', 'is_public' => true],
                 'activation_note' => ['type' => 'string', 'value' => 'يتم تفعيل المواد يدوياً من الإدارة بعد الدفع النقدي.', 'is_public' => true],
@@ -58,7 +59,7 @@ class PlatformSettingsService
                 'instagram_url' => ['type' => 'string', 'value' => '', 'is_public' => true],
                 'youtube_url' => ['type' => 'string', 'value' => '', 'is_public' => true],
                 'linkedin_url' => ['type' => 'string', 'value' => '', 'is_public' => true],
-                'whatsapp_number' => ['type' => 'string', 'value' => '', 'is_public' => true],
+                'whatsapp_number' => ['type' => 'string', 'value' => '0799532264', 'is_public' => true],
             ],
             'payments' => [
                 'cash_payment_enabled' => ['type' => 'boolean', 'value' => true, 'is_public' => false],
@@ -204,6 +205,12 @@ class PlatformSettingsService
         $definition = $this->definitions()[$group][$key] ?? null;
         $defaultValue = $definition['value'] ?? $default;
         $type = $definition['type'] ?? 'string';
+
+        if (! Schema::hasTable('platform_settings')) {
+            if (app()->environment('local', 'testing')) {
+                return $this->castStoredValue($defaultValue, $type, $defaultValue);
+            }
+        }
 
         $cacheKey = self::CACHE_PREFIX.$group.'.'.$key;
 
