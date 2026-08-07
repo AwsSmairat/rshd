@@ -36,6 +36,10 @@ return [
         'cdn_hostname' => env('BUNNY_STREAM_CDN_HOSTNAME'),
         'token_ip_binding' => env('BUNNY_STREAM_TOKEN_IP_BINDING', false),
         'upload_timeout' => (int) env('BUNNY_STREAM_UPLOAD_TIMEOUT', 3600),
+        // embed = Bunny iframe player (works when CDN token auth is misconfigured)
+        // cdn   = signed HLS direct to Pull Zone (requires correct BUNNY_STREAM_TOKEN_KEY)
+        'playback_mode' => env('BUNNY_STREAM_PLAYBACK_MODE', 'embed'),
+        'embed_token_key' => env('BUNNY_STREAM_EMBED_TOKEN_KEY'),
     ],
 
 ];

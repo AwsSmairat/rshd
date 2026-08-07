@@ -9,6 +9,7 @@ use App\Enums\SubjectCategory;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Enums\VideoStatus;
+use App\Filament\Resources\VideoResource;
 use App\Jobs\UploadVideoToBunnyJob;
 use App\Models\Lesson;
 use App\Models\Subject;
@@ -24,6 +25,7 @@ use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
@@ -46,6 +48,7 @@ class BunnyStreamTest extends TestCase
         Config::set('video.bunny.token_key', 'cdn-token-key');
         Config::set('video.bunny.cdn_hostname', 'vz-test.b-cdn.net');
         Config::set('video.bunny.token_ip_binding', false);
+        Config::set('video.bunny.playback_mode', 'embed');
         Config::set('video.signing_key', 'test-signing-key');
         Config::set('video.playback_ttl', 600);
     }
@@ -137,6 +140,8 @@ class BunnyStreamTest extends TestCase
 
     public function test_enrolled_student_receives_signed_bunny_playback_url(): void
     {
+        Config::set('video.bunny.playback_mode', 'cdn');
+
         [$student, $video] = $this->createBunnyVideoScenario();
 
         Sanctum::actingAs($student);
@@ -149,6 +154,7 @@ class BunnyStreamTest extends TestCase
         $this->assertStringContainsString('vz-test.b-cdn.net', $playbackUrl);
         $this->assertStringContainsString('/bcdn_token=HS256-', $playbackUrl);
         $this->assertStringContainsString('/bunny-guid-3/playlist.m3u8', $playbackUrl);
+        $this->assertSame('hls', $response->json('data.playback.type'));
 
         $payload = json_encode($response->json(), JSON_THROW_ON_ERROR);
         $this->assertStringNotContainsString('stream-api-key', $payload);
@@ -172,33 +178,157 @@ class BunnyStreamTest extends TestCase
 
         $video = $this->createBunnyVideo('bunny-guid-4');
 
-        $payload = json_encode([
-            'VideoLibraryId' => 12345,
-            'VideoGuid' => 'bunny-guid-4',
-            'Status' => 3,
-        ], JSON_THROW_ON_ERROR);
+        $rawBody = '{"VideoLibraryId":12345,"VideoGuid":"bunny-guid-4","Status":3}';
 
-        $signature = hash_hmac('sha256', $payload, 'read-only-key');
-
-        $this->postJson('/api/v1/webhooks/bunny/stream', json_decode($payload, true), [
-            'X-BunnyStream-Signature-Version' => 'v1',
-            'X-BunnyStream-Signature-Algorithm' => 'hmac-sha256',
-            'X-BunnyStream-Signature' => $signature,
+        $this->postBunnyStreamWebhook($rawBody, [
+            'HTTP_X-BunnyStream-Signature' => $this->signBunnyStreamWebhookBody($rawBody),
         ])->assertOk();
 
         $this->assertSame(VideoStatus::Ready, $video->fresh()->status);
     }
 
+    public function test_webhook_rejects_missing_signature(): void
+    {
+        $rawBody = '{"VideoGuid":"bunny-guid-4","Status":3}';
+
+        $this->postBunnyStreamWebhook($rawBody, [
+            'HTTP_X-BunnyStream-Signature' => '',
+        ])->assertUnauthorized();
+    }
+
     public function test_webhook_rejects_invalid_signature(): void
     {
-        $this->postJson('/api/v1/webhooks/bunny/stream', [
-            'VideoGuid' => 'invalid',
-            'Status' => 3,
-        ], [
-            'X-BunnyStream-Signature-Version' => 'v1',
-            'X-BunnyStream-Signature-Algorithm' => 'hmac-sha256',
-            'X-BunnyStream-Signature' => 'deadbeef',
+        $rawBody = '{"VideoGuid":"invalid","Status":3}';
+
+        $this->postBunnyStreamWebhook($rawBody, [
+            'HTTP_X-BunnyStream-Signature' => str_repeat('a', 64),
         ])->assertUnauthorized();
+    }
+
+    public function test_webhook_rejects_invalid_signature_version(): void
+    {
+        $rawBody = '{"VideoGuid":"bunny-guid-4","Status":3}';
+
+        $this->postBunnyStreamWebhook($rawBody, [
+            'HTTP_X-BunnyStream-Signature-Version' => 'v2',
+            'HTTP_X-BunnyStream-Signature' => $this->signBunnyStreamWebhookBody($rawBody),
+        ])->assertUnauthorized();
+    }
+
+    public function test_webhook_rejects_invalid_signature_algorithm(): void
+    {
+        $rawBody = '{"VideoGuid":"bunny-guid-4","Status":3}';
+
+        $this->postBunnyStreamWebhook($rawBody, [
+            'HTTP_X-BunnyStream-Signature-Algorithm' => 'sha256',
+            'HTTP_X-BunnyStream-Signature' => $this->signBunnyStreamWebhookBody($rawBody),
+        ])->assertUnauthorized();
+    }
+
+    public function test_webhook_rejects_reserialized_body_when_signature_uses_original_raw_bytes(): void
+    {
+        $signedBody = '{"VideoGuid":"bunny-guid-4","Status":3,"VideoLibraryId":12345}';
+        $reserializedBody = json_encode([
+            'Status' => 3,
+            'VideoLibraryId' => 12345,
+            'VideoGuid' => 'bunny-guid-4',
+        ], JSON_THROW_ON_ERROR);
+
+        $this->assertNotSame($signedBody, $reserializedBody);
+
+        $this->postBunnyStreamWebhook($reserializedBody, [
+            'HTTP_X-BunnyStream-Signature' => $this->signBunnyStreamWebhookBody($signedBody),
+        ])->assertUnauthorized();
+    }
+
+    public function test_webhook_validation_uses_constant_time_comparison(): void
+    {
+        $service = app(BunnyStreamWebhookService::class);
+        $rawBody = '{"Status":3}';
+
+        $validSignature = $this->signBunnyStreamWebhookBody($rawBody);
+        $request = \Illuminate\Http\Request::create('/webhooks/bunny/stream', 'POST', [], [], [], [
+            'HTTP_X-BunnyStream-Signature-Version' => 'v1',
+            'HTTP_X-BunnyStream-Signature-Algorithm' => 'hmac-sha256',
+            'HTTP_X-BunnyStream-Signature' => $validSignature,
+            'CONTENT_TYPE' => 'application/json',
+        ], $rawBody);
+
+        $this->assertTrue($service->validateSignature($request, $rawBody));
+    }
+
+    public function test_webhook_does_not_log_secrets(): void
+    {
+        Queue::fake();
+
+        $this->createBunnyVideo('bunny-guid-log');
+
+        $loggedMessages = [];
+        \Illuminate\Support\Facades\Log::listen(function ($message) use (&$loggedMessages): void {
+            $loggedMessages[] = is_string($message->message)
+                ? $message->message
+                : json_encode($message->message, JSON_THROW_ON_ERROR);
+        });
+
+        $rawBody = '{"VideoLibraryId":12345,"VideoGuid":"bunny-guid-log","Status":3}';
+        $signature = $this->signBunnyStreamWebhookBody($rawBody);
+
+        $this->postBunnyStreamWebhook($rawBody, [
+            'HTTP_X-BunnyStream-Signature' => $signature,
+        ])->assertOk();
+
+        $combined = implode("\n", $loggedMessages);
+
+        $this->assertStringNotContainsString('read-only-key', $combined);
+        $this->assertStringNotContainsString($signature, $combined);
+    }
+
+    public function test_prepare_video_data_sets_storage_provider_for_bunny_uploads(): void
+    {
+        Storage::disk('lesson_videos')->put('lesson-videos/bunny-create.mp4', 'video-bytes');
+
+        $prepared = VideoResource::prepareVideoData([
+            'lesson_id' => 1,
+            'title' => 'Bunny upload',
+            'video_path' => 'lesson-videos/bunny-create.mp4',
+            'original_file_name' => 'bunny-create.mp4',
+            'status' => VideoStatus::Ready->value,
+            'is_free' => false,
+        ]);
+
+        $this->assertSame('bunny', $prepared['storage_provider']);
+        $this->assertSame(VideoStatus::Uploading->value, $prepared['status']);
+        $this->assertNull($prepared['external_video_id']);
+    }
+
+    public function test_video_model_sets_storage_provider_on_create_when_missing(): void
+    {
+        Config::set('video.provider', 'bunny');
+
+        $lessonId = $this->createLesson($this->createSubject())->id;
+
+        $video = Video::query()->create([
+            'lesson_id' => $lessonId,
+            'title' => 'Fallback provider',
+            'video_url' => '',
+            'status' => VideoStatus::Uploading,
+            'is_free' => false,
+        ]);
+
+        $this->assertSame('bunny', $video->storage_provider);
+    }
+
+    public function test_bunny_config_validator_warns_when_token_key_matches_hostname_prefix(): void
+    {
+        Config::set('video.provider', 'bunny');
+        Config::set('video.bunny.cdn_hostname', 'vz-example.b-cdn.net');
+        Config::set('video.bunny.token_key', 'vz-example');
+
+        Log::shouldReceive('critical')
+            ->once()
+            ->with('bunny.stream.token_key_looks_like_hostname', \Mockery::type('array'));
+
+        \App\Services\Bunny\BunnyStreamConfigValidator::warnIfMisconfigured();
     }
 
     public function test_migrate_to_bunny_command_queues_eligible_videos(): void
@@ -213,8 +343,33 @@ class BunnyStreamTest extends TestCase
         Queue::assertPushed(UploadVideoToBunnyJob::class, fn (UploadVideoToBunnyJob $job): bool => $job->videoId === $video->id);
     }
 
+    public function test_migrate_to_bunny_command_queues_stuck_bunny_uploads(): void
+    {
+        Queue::fake();
+
+        Storage::disk('lesson_videos')->put('lesson-videos/stuck.mp4', 'video-bytes');
+
+        $video = Video::query()->create([
+            'lesson_id' => $this->createLesson($this->createSubject())->id,
+            'title' => 'Stuck Bunny upload',
+            'storage_provider' => 'bunny',
+            'video_url' => '',
+            'video_path' => 'lesson-videos/stuck.mp4',
+            'duration_seconds' => 0,
+            'status' => VideoStatus::Uploading,
+            'is_free' => false,
+        ]);
+
+        $this->artisan('videos:migrate-to-bunny', ['--video' => (string) $video->id])
+            ->assertSuccessful();
+
+        Queue::assertPushed(UploadVideoToBunnyJob::class, fn (UploadVideoToBunnyJob $job): bool => $job->videoId === $video->id);
+    }
+
     public function test_bunny_provider_generates_playback_with_expiry(): void
     {
+        Config::set('video.bunny.playback_mode', 'cdn');
+
         [$student, $video] = $this->createBunnyVideoScenario(
             expiresAt: now()->addSeconds(120),
         );
@@ -223,7 +378,38 @@ class BunnyStreamTest extends TestCase
             ->generateSignedPlaybackUrl($video, $student);
 
         $this->assertStringContainsString('playlist.m3u8', $playback['url']);
+        $this->assertSame('hls', $playback['type']);
         $this->assertTrue($playback['expires_at']->lte(now()->addSeconds(120)));
+    }
+
+    public function test_bunny_provider_generates_embed_playback_url_by_default(): void
+    {
+        [$student, $video] = $this->createBunnyVideoScenario(
+            expiresAt: now()->addSeconds(120),
+        );
+
+        $playback = app(BunnyStreamVideoProvider::class)
+            ->generateSignedPlaybackUrl($video, $student);
+
+        $this->assertStringContainsString('iframe.mediadelivery.net/embed/12345/bunny-guid-3', $playback['url']);
+        $this->assertSame('embed', $playback['type']);
+    }
+
+    public function test_embed_token_is_appended_when_embed_key_configured(): void
+    {
+        Config::set('video.bunny.embed_token_key', 'embed-secret-key');
+
+        [$student, $video] = $this->createBunnyVideoScenario();
+
+        $playback = app(BunnyStreamVideoProvider::class)
+            ->generateSignedPlaybackUrl($video, $student);
+
+        $this->assertStringContainsString('token=', $playback['url']);
+        $this->assertStringContainsString('expires=', $playback['url']);
+        $this->assertStringContainsString(
+            hash('sha256', 'embed-secret-keybunny-guid-3'.$playback['expires_at']->getTimestamp()),
+            $playback['url'],
+        );
     }
 
     /**
@@ -305,6 +491,33 @@ class BunnyStreamTest extends TestCase
             'description' => 'وصف',
             'status' => ContentStatus::Active,
         ]);
+    }
+
+    /**
+     * @param  array<string, string>  $headers
+     */
+    protected function postBunnyStreamWebhook(string $rawBody, array $headers = []): \Illuminate\Testing\TestResponse
+    {
+        $defaults = [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_X-BunnyStream-Signature-Version' => 'v1',
+            'HTTP_X-BunnyStream-Signature-Algorithm' => 'hmac-sha256',
+        ];
+
+        return $this->call(
+            'POST',
+            '/api/v1/webhooks/bunny/stream',
+            [],
+            [],
+            [],
+            array_merge($defaults, $headers),
+            $rawBody,
+        );
+    }
+
+    protected function signBunnyStreamWebhookBody(string $rawBody, string $secret = 'read-only-key'): string
+    {
+        return hash_hmac('sha256', $rawBody, $secret);
     }
 
     /**

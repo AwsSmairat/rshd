@@ -14,6 +14,18 @@ void main() {
 
       expect(playback.url, contains('token=abc'));
       expect(playback.expiresAt, isNotNull);
+      expect(playback.type, 'hls');
+    });
+
+    test('parses embed playback type', () {
+      final playback = VideoPlaybackModel.fromJson({
+        'url': 'https://iframe.mediadelivery.net/embed/123/guid?autoplay=true',
+        'expires_at': '2026-08-07T12:00:00.000000Z',
+        'type': 'embed',
+      });
+
+      expect(playback.isEmbed, isTrue);
+      expect(playback.url, contains('iframe.mediadelivery.net'));
     });
 
     test('detects expired playback', () {

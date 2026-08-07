@@ -36,6 +36,7 @@ class VideoResource extends JsonResource
             'playback' => $playback !== null ? [
                 'url' => $playback['url'],
                 'expires_at' => $playback['expires_at']->toIso8601String(),
+                'type' => $playback['type'] ?? 'hls',
             ] : null,
             'lesson' => LessonResource::make($this->whenLoaded('lesson')),
             'progress' => $this->when(

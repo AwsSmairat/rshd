@@ -31,7 +31,7 @@ class BunnyStreamWebhookService
 
         $expected = hash_hmac('sha256', $rawBody, $secret);
 
-        if ($signature === '' || strlen($signature) !== strlen($expected)) {
+        if ($signature === '' || ! preg_match('/^[0-9a-f]{64}$/', $signature)) {
             return false;
         }
 

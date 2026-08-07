@@ -5,6 +5,7 @@ namespace App\Services\Bunny;
 use App\Enums\VideoStatus;
 use App\Jobs\SyncBunnyVideoStatusJob;
 use App\Models\Video;
+use App\Services\Video\BunnyStreamVideoProvider;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
@@ -19,8 +20,7 @@ class BunnyStreamService
     public function isConfigured(): bool
     {
         return $this->api->isConfigured()
-            && filled(config('video.bunny.token_key'))
-            && filled(config('video.bunny.cdn_hostname'));
+            && app(BunnyStreamVideoProvider::class)->isConfigured();
     }
 
     public function uploadLocalVideo(Video $video): void

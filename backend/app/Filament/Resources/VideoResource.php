@@ -101,7 +101,7 @@ class VideoResource extends Resource
                             ->helperText('يمكن للطالب مشاهدته قبل تفعيل المادة (مثل اختبار / تيست).')
                             ->default(false),
                         Forms\Components\Hidden::make('storage_provider')
-                            ->default(fn (): string => config('video.provider', 'local') === 'bunny' ? 'bunny' : 'local'),
+                            ->dehydrated(false),
                     ])
                     ->columns(2),
                 Forms\Components\Section::make('مزود التخزين')
@@ -242,8 +242,6 @@ class VideoResource extends Resource
      */
     public static function prepareVideoData(array $data, ?Video $record = null): array
     {
-        $data['storage_provider'] = $data['storage_provider'] ?? 'local';
-
         $newPath = $data['video_path'] ?? null;
 
         if (is_array($newPath)) {
@@ -292,6 +290,12 @@ class VideoResource extends Resource
             $data['duration_seconds'] = $record->duration_seconds;
             $data['original_file_name'] = $data['original_file_name'] ?? $record->original_file_name;
         }
+
+        if (! filled($data['storage_provider'] ?? null)) {
+            $data['storage_provider'] = config('video.provider') === 'bunny' ? 'bunny' : 'local';
+        }
+
+        $data['video_url'] = $data['video_url'] ?? '';
 
         return $data;
     }

@@ -43,6 +43,7 @@ class VideoController extends Controller
             'playback' => [
                 'url' => $playback['url'],
                 'expires_at' => $playback['expires_at']->toIso8601String(),
+                'type' => $playback['type'] ?? 'hls',
             ],
         ]);
     }

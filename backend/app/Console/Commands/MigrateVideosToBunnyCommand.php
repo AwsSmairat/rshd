@@ -27,13 +27,13 @@ class MigrateVideosToBunnyCommand extends Command
         $singleVideoId = $this->option('video');
 
         $query = Video::query()
-            ->where('storage_provider', 'local')
             ->whereNotNull('video_path')
             ->where('video_path', '!=', '')
             ->where(function ($builder): void {
                 $builder->whereNull('external_video_id')
                     ->orWhere('external_video_id', '');
             })
+            ->whereIn('storage_provider', ['local', 'bunny'])
             ->orderBy('id');
 
         if ($singleVideoId !== null) {
@@ -43,7 +43,7 @@ class MigrateVideosToBunnyCommand extends Command
         $videos = $query->get();
 
         if ($videos->isEmpty()) {
-            $this->info('No eligible local videos found for Bunny migration.');
+            $this->info('No eligible videos found for Bunny upload.');
 
             return self::SUCCESS;
         }

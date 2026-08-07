@@ -18,6 +18,21 @@ if [[ -n "$EXISTING_PID" ]]; then
   sleep 1
 fi
 
+QUEUE_PID_FILE="storage/framework/queue-worker.pid"
+QUEUE_LOG="storage/logs/queue-worker.log"
+mkdir -p storage/logs storage/framework
+
+if [[ -f "$QUEUE_PID_FILE" ]]; then
+  OLD_QUEUE_PID="$(cat "$QUEUE_PID_FILE" 2>/dev/null || true)"
+  if [[ -n "$OLD_QUEUE_PID" ]]; then
+    kill "$OLD_QUEUE_PID" 2>/dev/null || true
+  fi
+fi
+
+nohup php artisan queue:work database --sleep=3 --timeout=7200 --tries=3 >> "$QUEUE_LOG" 2>&1 &
+echo "$!" > "$QUEUE_PID_FILE"
+echo "Queue worker started (PID $(cat "$QUEUE_PID_FILE")). Logs: ${QUEUE_LOG}"
+
 exec php \
   -c "$(dirname "$0")/php-upload.ini" \
   -d upload_max_filesize=10G \

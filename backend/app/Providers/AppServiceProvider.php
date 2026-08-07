@@ -75,6 +75,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->assertProductionVideoSecurity();
+        \App\Services\Bunny\BunnyStreamConfigValidator::warnIfMisconfigured();
     }
 
     protected function assertProductionVideoSecurity(): void
@@ -97,9 +98,13 @@ class AppServiceProvider extends ServiceProvider
 
         if (config('video.provider') === 'bunny') {
             $bunnyReady = filled(config('video.bunny.library_id'))
-                && filled(config('video.bunny.api_key'))
-                && filled(config('video.bunny.token_key'))
-                && filled(config('video.bunny.cdn_hostname'));
+                && filled(config('video.bunny.api_key'));
+
+            if (config('video.bunny.playback_mode', 'embed') === 'cdn') {
+                $bunnyReady = $bunnyReady
+                    && filled(config('video.bunny.token_key'))
+                    && filled(config('video.bunny.cdn_hostname'));
+            }
 
             if (! $bunnyReady) {
                 Log::critical('VIDEO_PROVIDER=bunny but Bunny Stream credentials are incomplete.');

@@ -43,6 +43,16 @@ class Video extends Model
 
     protected static function booted(): void
     {
+        static::creating(function (Video $video): void {
+            if (! filled($video->storage_provider)) {
+                $video->storage_provider = config('video.provider') === 'bunny' ? 'bunny' : 'local';
+            }
+
+            if ($video->video_url === null) {
+                $video->video_url = '';
+            }
+        });
+
         static::deleting(function (Video $video): void {
             $video->deleteStoredFile();
         });

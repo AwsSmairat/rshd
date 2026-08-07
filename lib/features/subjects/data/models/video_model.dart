@@ -20,10 +20,25 @@ class VideoPlaybackModel {
   const VideoPlaybackModel({
     required this.url,
     this.expiresAt,
+    this.type,
   });
 
   final String url;
   final DateTime? expiresAt;
+  final String? type;
+
+  String get playbackType {
+    final value = type?.trim();
+    if (value == null || value.isEmpty) {
+      return 'hls';
+    }
+
+    return value;
+  }
+
+  bool get isEmbed => playbackType == 'embed';
+
+  bool get isHls => playbackType == 'hls';
 
   bool get isExpired {
     final expiry = expiresAt;
@@ -47,16 +62,20 @@ class VideoPlaybackModel {
     return VideoPlaybackModel(
       url: json['url']?.toString() ?? '',
       expiresAt: _parseDateTime(json['expires_at']),
+      type: json['type']?.toString() ?? 'hls',
     );
   }
 
   VideoPlaybackModel copyWith({
     String? url,
     DateTime? expiresAt,
+    String? type,
+    bool clearType = false,
   }) {
     return VideoPlaybackModel(
       url: url ?? this.url,
       expiresAt: expiresAt ?? this.expiresAt,
+      type: clearType ? null : (type ?? this.type),
     );
   }
 }
@@ -181,6 +200,22 @@ class VideoModel {
         return 'فشل';
       default:
         return status;
+    }
+  }
+
+  bool get isPendingPlayback =>
+      status == 'uploading' || status == 'processing';
+
+  String get pendingPlaybackMessage {
+    switch (status) {
+      case 'uploading':
+        return 'الفيديو قيد الرفع إلى Bunny Stream. انتظر قليلاً ثم اسحب للأسفل لتحديث الصفحة.';
+      case 'processing':
+        return 'الفيديو قيد المعالجة. سيظهر رابط التشغيل تلقائياً عند اكتمال الترميز.';
+      case 'failed':
+        return 'فشل تجهيز الفيديو. يرجى التواصل مع الدعم أو إعادة رفعه من لوحة الإدارة.';
+      default:
+        return 'رابط التشغيل غير متوفر حالياً';
     }
   }
 
