@@ -7,10 +7,15 @@ use InvalidArgumentException;
 /**
  * Advanced CDN token authentication (HMAC-SHA256) per Bunny official spec.
  *
+ * Ported from BunnyWay/BunnyCDN.TokenAuthentication php/url_signing.php
+ *
  * @see https://bunny.net/docs/cdn/security/token-authentication/advanced
  */
 class BunnyCdnTokenSigner
 {
+    /**
+     * @throws InvalidArgumentException
+     */
     public function signUrl(
         string $url,
         string $securityKey,
@@ -18,7 +23,19 @@ class BunnyCdnTokenSigner
         bool $isDirectory = false,
         string $pathAllowed = '',
         string $userIp = '',
+        string $countriesAllowed = '',
+        string $countriesBlocked = '',
+        bool $ignoreParams = false,
+        int $speedLimit = 0,
     ): string {
+        if ($securityKey === '') {
+            throw new InvalidArgumentException('security_key must not be empty');
+        }
+
+        if ($expiresAt < 0) {
+            throw new InvalidArgumentException('expires_at must be non-negative');
+        }
+
         $parsed = parse_url($url);
 
         if ($parsed === false || ! isset($parsed['scheme'], $parsed['host'])) {
@@ -28,8 +45,37 @@ class BunnyCdnTokenSigner
         $urlScheme = $parsed['scheme'];
         $urlHost = $parsed['host'];
         $urlPath = $parsed['path'] ?? '/';
+        $urlQuery = $parsed['query'] ?? '';
 
-        $parameters = [];
+        $queryParams = $this->parseQueryParams($urlQuery);
+
+        if ($countriesAllowed !== '') {
+            if (array_key_exists('token_countries', $queryParams)) {
+                throw new InvalidArgumentException("Duplicate query parameter 'token_countries' is not supported");
+            }
+
+            $queryParams['token_countries'] = $countriesAllowed;
+        }
+
+        if ($countriesBlocked !== '') {
+            if (array_key_exists('token_countries_blocked', $queryParams)) {
+                throw new InvalidArgumentException("Duplicate query parameter 'token_countries_blocked' is not supported");
+            }
+
+            $queryParams['token_countries_blocked'] = $countriesBlocked;
+        }
+
+        if ($speedLimit > 0) {
+            $queryParams['limit'] = (string) $speedLimit;
+        }
+
+        $expires = $expiresAt;
+
+        if ($ignoreParams) {
+            $parameters = ['token_ignore_params' => 'true'];
+        } else {
+            $parameters = $queryParams;
+        }
 
         if ($pathAllowed !== '') {
             $parameters['token_path'] = $pathAllowed;
@@ -54,7 +100,7 @@ class BunnyCdnTokenSigner
         $ipBytes = $hasIp ? $this->userIpToBytes($userIp) : '';
         $flagsPrefix = $hasIp ? '1-' : '';
 
-        $message = $signaturePath.$expiresAt.$ipBytes.$signingData;
+        $message = $signaturePath.$expires.$ipBytes.$signingData;
         $digest = hash_hmac('sha256', $message, $securityKey, true);
         $token = 'HS256-'.$flagsPrefix.rtrim(strtr(base64_encode($digest), '+/', '-_'), '=');
 
@@ -62,10 +108,36 @@ class BunnyCdnTokenSigner
         $tail = $urlData !== '' ? "&{$urlData}" : '';
 
         if ($isDirectory) {
-            return "{$base}/bcdn_token={$token}{$tail}&expires={$expiresAt}{$urlPath}";
+            return "{$base}/bcdn_token={$token}{$tail}&expires={$expires}{$urlPath}";
         }
 
-        return "{$base}{$urlPath}?token={$token}{$tail}&expires={$expiresAt}";
+        return "{$base}{$urlPath}?token={$token}{$tail}&expires={$expires}";
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function parseQueryParams(string $urlQuery): array
+    {
+        if ($urlQuery === '') {
+            return [];
+        }
+
+        $queryParams = [];
+
+        foreach (explode('&', $urlQuery) as $pair) {
+            $parts = explode('=', $pair, 2);
+            $key = rawurldecode($parts[0]);
+            $value = isset($parts[1]) ? rawurldecode($parts[1]) : '';
+
+            if (array_key_exists($key, $queryParams)) {
+                throw new InvalidArgumentException("Duplicate query parameter '{$key}' is not supported");
+            }
+
+            $queryParams[$key] = $value;
+        }
+
+        return $queryParams;
     }
 
     protected function userIpToBytes(string $userIp): string

@@ -68,6 +68,7 @@ class AppServiceProvider extends ServiceProvider
             storage_path('app/public/lesson-files'),
             storage_path('app/private/livewire-tmp'),
             storage_path('app/private/lesson-videos'),
+            storage_path('app/private/lesson-files'),
         ] as $directory) {
             if (! is_dir($directory)) {
                 mkdir($directory, 0755, true);
@@ -75,7 +76,23 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->assertProductionVideoSecurity();
+        $this->assertProductionFileSecurity();
         \App\Services\Bunny\BunnyStreamConfigValidator::warnIfMisconfigured();
+    }
+
+    protected function assertProductionFileSecurity(): void
+    {
+        if (! app()->environment('production')) {
+            return;
+        }
+
+        if (! config('files.signed_download', true)) {
+            Log::critical('FILES_SIGNED_DOWNLOAD must be true in production.');
+        }
+
+        if (config('files.local_disk') === 'public') {
+            Log::critical('FILES_LOCAL_DISK must not be public in production.');
+        }
     }
 
     protected function assertProductionVideoSecurity(): void

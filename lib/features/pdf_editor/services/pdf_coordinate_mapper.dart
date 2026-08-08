@@ -1,42 +1,61 @@
-import 'dart:math';
-import 'dart:ui';
+import 'package:flutter/rendering.dart';
 
 import '../models/pdf_editor_models.dart';
 
 /// Maps between screen coordinates and normalized PDF page coordinates (0–1).
 class PdfPageLayoutMetrics {
   PdfPageLayoutMetrics({
-    required this.pdfPageSize,
+    required this.displayPageSize,
     required this.viewportSize,
     required this.zoomLevel,
     this.scrollOffset = Offset.zero,
   });
 
-  final Size pdfPageSize;
+  /// Builds metrics that mirror Syncfusion [SfPdfViewer] page sizing on mobile.
+  factory PdfPageLayoutMetrics.fromViewport({
+    required Size pdfPageSize,
+    required Size viewportSize,
+    required double zoomLevel,
+    Offset scrollOffset = Offset.zero,
+    bool fitToWidth = true,
+  }) {
+    final fitted = fitToWidth
+        ? BoxConstraints.tightFor(width: viewportSize.width)
+            .constrainSizeAndAttemptToPreserveAspectRatio(pdfPageSize)
+        : BoxConstraints.tightFor(height: viewportSize.height)
+            .constrainSizeAndAttemptToPreserveAspectRatio(pdfPageSize);
+    return PdfPageLayoutMetrics(
+      displayPageSize: fitted,
+      viewportSize: viewportSize,
+      zoomLevel: zoomLevel,
+      scrollOffset: scrollOffset,
+    );
+  }
+
+  /// Display size of the page at zoom 1 (after Syncfusion fit).
+  final Size displayPageSize;
   final Size viewportSize;
   final double zoomLevel;
   final Offset scrollOffset;
 
-  double get _fitScale {
-    if (pdfPageSize.width <= 0 || pdfPageSize.height <= 0) {
-      return 1;
-    }
-    return min(
-      viewportSize.width / pdfPageSize.width,
-      viewportSize.height / pdfPageSize.height,
-    );
-  }
-
   Size get displaySize => Size(
-        pdfPageSize.width * _fitScale * zoomLevel,
-        pdfPageSize.height * _fitScale * zoomLevel,
+        displayPageSize.width * zoomLevel,
+        displayPageSize.height * zoomLevel,
       );
 
-  Offset get pageTopLeft => Offset(
-        (viewportSize.width - displaySize.width) / 2,
-        (viewportSize.height - displaySize.height) / 2,
-      ) -
-      scrollOffset;
+  /// Top-left of the visible page in viewport coordinates.
+  Offset get pageTopLeft {
+    final center = Offset(
+      (viewportSize.width - displaySize.width) / 2,
+      (viewportSize.height - displaySize.height) / 2,
+    );
+    // At zoom 1 the page is centered; scrollOffset is unreliable here.
+    if (zoomLevel <= 1.0) {
+      return center;
+    }
+    return center -
+        Offset(scrollOffset.dx * zoomLevel, scrollOffset.dy * zoomLevel);
+  }
 
   Rect get pageRect => pageTopLeft & displaySize;
 
@@ -100,5 +119,17 @@ class PdfCoordinateMapper {
     PdfPageLayoutMetrics metrics,
   ) {
     return points.map(metrics.screenToNormalized).toList();
+  }
+
+  /// Returns the page size as displayed by Syncfusion (accounts for 90°/270° rotation).
+  static Size effectivePageSize({
+    required double width,
+    required double height,
+    required int rotationDegrees,
+  }) {
+    if (rotationDegrees == 90 || rotationDegrees == 270) {
+      return Size(height, width);
+    }
+    return Size(width, height);
   }
 }

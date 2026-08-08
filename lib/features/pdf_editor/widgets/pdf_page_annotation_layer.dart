@@ -7,6 +7,7 @@ import '../controllers/pdf_editor_controller.dart';
 import '../models/annotation_enums.dart';
 import '../models/pdf_editor_models.dart';
 import '../services/pdf_coordinate_mapper.dart';
+import '../utils/annotation_hit_test.dart';
 import '../utils/path_smoother.dart';
 import 'painters/pdf_annotation_painters.dart';
 
@@ -33,6 +34,9 @@ class PdfPageAnnotationLayer extends StatefulWidget {
     required this.onNoteMarkerTap,
     required this.onSelectAnnotation,
     required this.onMoveAnnotation,
+    required this.onBatchBegin,
+    required this.onBatchEnd,
+    required this.onTextAnnotationTap,
   });
 
   final PdfEditorTool tool;
@@ -58,6 +62,9 @@ class PdfPageAnnotationLayer extends StatefulWidget {
   final void Function(PdfEditorAnnotation note) onNoteMarkerTap;
   final void Function(String? id) onSelectAnnotation;
   final void Function(String id, double x, double y) onMoveAnnotation;
+  final VoidCallback onBatchBegin;
+  final VoidCallback onBatchEnd;
+  final void Function(PdfEditorAnnotation annotation) onTextAnnotationTap;
 
   @override
   State<PdfPageAnnotationLayer> createState() => _PdfPageAnnotationLayerState();
@@ -69,14 +76,18 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
   Rect? _previewRect;
   String? _movingAnnotationId;
   Offset? _moveStartNormalized;
+  bool _batchActive = false;
+  int _activePointers = 0;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fromRect(
-          rect: widget.metrics.pageRect,
-          child: RepaintBoundary(
+    return SizedBox.expand(
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned.fromRect(
+            rect: widget.metrics.pageRect,
+            child: RepaintBoundary(
             child: CustomPaint(
               painter: ShapeAnnotationPainter(
                 annotations: widget.annotations,
@@ -84,6 +95,7 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
                 previewRect: _previewRect,
                 previewShape: widget.shapeTool,
                 previewColor: widget.penSettings.color,
+                selectedId: widget.selectedAnnotationId,
               ),
               foregroundPainter: InkAnnotationPainter(
                 annotations: widget.annotations,
@@ -99,34 +111,22 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
             ),
           ),
         ),
-        Positioned.fromRect(
-          rect: widget.metrics.pageRect,
-          child: _buildInteractionLayer(),
-        ),
+        if (widget.tool != PdfEditorTool.view)
+          Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: _onPointerDown,
+            onPointerMove: _onPointerMove,
+            onPointerUp: _onPointerUp,
+            onPointerCancel: _onPointerCancel,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTapUp: _handleTapUp,
+              child: const SizedBox.expand(),
+            ),
+          ),
         ..._buildNoteMarkers(),
         ..._buildTextBoxes(),
-      ],
-    );
-  }
-
-  Widget _buildInteractionLayer() {
-    if (widget.tool == PdfEditorTool.view) {
-      return const SizedBox.expand();
-    }
-
-    return Listener(
-      behavior: HitTestBehavior.translucent,
-      onPointerDown: _onPointerDown,
-      onPointerMove: _onPointerMove,
-      onPointerUp: _onPointerUp,
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTapUp: widget.tool == PdfEditorTool.note
-            ? (details) => _handleNoteTap(details.localPosition)
-            : widget.tool == PdfEditorTool.text
-                ? (details) => _handleTextTap(details.localPosition)
-                : null,
-        child: const SizedBox.expand(),
+        ],
       ),
     );
   }
@@ -161,21 +161,64 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
         widget.tool == PdfEditorTool.lasso;
   }
 
-  void _onPointerDown(PointerDownEvent event) {
-    if (!_allowPointer(event)) return;
-    if (!widget.metrics.containsScreenPoint(event.localPosition)) return;
+  /// Converts viewport coordinates to normalized page coordinates.
+  NormalizedPoint _viewportToNormalized(Offset viewportPoint) {
+    return widget.metrics.screenToNormalized(viewportPoint);
+  }
 
-    final normalized = widget.metrics.screenToNormalized(event.localPosition);
+  Offset _viewportToPageLocal(Offset viewportPoint) {
+    return viewportPoint - widget.metrics.pageTopLeft;
+  }
+
+  bool _isInsidePageViewport(Offset viewportPoint) {
+    return widget.metrics.containsScreenPoint(viewportPoint);
+  }
+
+  /// Pointer events inside [pageRect] use page-local coordinates (0..displaySize).
+  NormalizedPoint _localToNormalized(Offset pageLocal) {
+    final size = widget.metrics.displaySize;
+    if (size.width <= 0 || size.height <= 0) {
+      return const NormalizedPoint(0, 0);
+    }
+    return NormalizedPoint(
+      (pageLocal.dx / size.width).clamp(0.0, 1.0),
+      (pageLocal.dy / size.height).clamp(0.0, 1.0),
+    );
+  }
+
+  void _ensureBatchStarted() {
+    if (!_batchActive) {
+      widget.onBatchBegin();
+      _batchActive = true;
+    }
+  }
+
+  void _finishBatchIfNeeded() {
+    if (!_batchActive) return;
+    widget.onBatchEnd();
+    _batchActive = false;
+  }
+
+  void _onPointerDown(PointerDownEvent event) {
+    _activePointers++;
+    if (_activePointers > 1) return;
+    if (!_allowPointer(event)) return;
+    if (!_isInsidePageViewport(event.localPosition)) return;
+
+    final pageLocal = _viewportToPageLocal(event.localPosition);
+    final normalized = _viewportToNormalized(event.localPosition);
 
     if (widget.tool == PdfEditorTool.eraser) {
+      _ensureBatchStarted();
       widget.onErase(normalized);
       return;
     }
 
     if (widget.tool == PdfEditorTool.lasso) {
-      final selected = _findAnnotationAt(normalized);
+      final selected = AnnotationHitTest.findAt(widget.annotations, normalized);
       widget.onSelectAnnotation(selected?.id);
       if (selected != null) {
+        _ensureBatchStarted();
         _movingAnnotationId = selected.id;
         _moveStartNormalized = Offset(normalized.nx, normalized.ny);
       }
@@ -187,18 +230,17 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
       setState(() {
         _currentStroke
           ..clear()
-          ..add(event.localPosition);
+          ..add(pageLocal);
       });
       return;
     }
 
-    if (widget.tool == PdfEditorTool.shapes ||
-        widget.tool == PdfEditorTool.highlighter) {
+    if (widget.tool == PdfEditorTool.shapes) {
       setState(() {
-        _dragStart = event.localPosition;
+        _dragStart = pageLocal;
         _previewRect = Rect.fromLTWH(
-          event.localPosition.dx,
-          event.localPosition.dy,
+          pageLocal.dx,
+          pageLocal.dy,
           0,
           0,
         );
@@ -207,10 +249,13 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
   }
 
   void _onPointerMove(PointerMoveEvent event) {
+    if (_activePointers > 1) return;
     if (!_allowPointer(event)) return;
 
+    final pageLocal = _viewportToPageLocal(event.localPosition);
+
     if (_movingAnnotationId != null && _moveStartNormalized != null) {
-      final normalized = widget.metrics.screenToNormalized(event.localPosition);
+      final normalized = _viewportToNormalized(event.localPosition);
       final deltaX = normalized.nx - _moveStartNormalized!.dx;
       final deltaY = normalized.ny - _moveStartNormalized!.dy;
       final annotation = widget.annotations
@@ -225,7 +270,7 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
     }
 
     if (widget.tool == PdfEditorTool.eraser) {
-      widget.onErase(widget.metrics.screenToNormalized(event.localPosition));
+      widget.onErase(_viewportToNormalized(event.localPosition));
       return;
     }
 
@@ -233,35 +278,49 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
             widget.tool == PdfEditorTool.highlighter) &&
         _currentStroke.isNotEmpty) {
       setState(() {
-        _currentStroke.add(event.localPosition);
+        _currentStroke.add(pageLocal);
       });
       return;
     }
 
-    if (_dragStart != null &&
-        (widget.tool == PdfEditorTool.shapes ||
-            widget.tool == PdfEditorTool.highlighter)) {
+    if (_dragStart != null && widget.tool == PdfEditorTool.shapes) {
       setState(() {
-        _previewRect = Rect.fromPoints(_dragStart!, event.localPosition);
+        _previewRect = Rect.fromPoints(_dragStart!, pageLocal);
       });
     }
   }
 
   void _onPointerUp(PointerUpEvent event) {
+    _activePointers = _activePointers > 0 ? _activePointers - 1 : 0;
+    if (_activePointers > 0) return;
+    _completePointerAction();
+  }
+
+  void _onPointerCancel(PointerCancelEvent event) {
+    _activePointers = _activePointers > 0 ? _activePointers - 1 : 0;
+    if (_activePointers > 0) return;
+    _completePointerAction(cancelled: true);
+  }
+
+  void _completePointerAction({bool cancelled = false}) {
     if (_movingAnnotationId != null) {
       _movingAnnotationId = null;
       _moveStartNormalized = null;
+      _finishBatchIfNeeded();
       return;
     }
 
-    if ((widget.tool == PdfEditorTool.pen ||
+    if (widget.tool == PdfEditorTool.eraser) {
+      _finishBatchIfNeeded();
+      return;
+    }
+
+    if (!cancelled &&
+        (widget.tool == PdfEditorTool.pen ||
             widget.tool == PdfEditorTool.highlighter) &&
         _currentStroke.length > 1) {
       final simplified = PathSmoother.simplify(_currentStroke);
-      final normalized = PdfCoordinateMapper.screenPointsToNormalized(
-        simplified,
-        widget.metrics,
-      );
+      final normalized = simplified.map(_localToNormalized).toList();
       widget.onInkComplete(
         normalized,
         widget.tool == PdfEditorTool.highlighter
@@ -270,12 +329,10 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
       );
     }
 
-    if (_previewRect != null && _dragStart != null) {
+    if (!cancelled && _previewRect != null && _dragStart != null) {
       final rect = _normalizedRect(_previewRect!);
       if (widget.tool == PdfEditorTool.shapes) {
         widget.onShapeComplete(rect.left, rect.top, rect.width, rect.height);
-      } else if (widget.tool == PdfEditorTool.highlighter) {
-        widget.onHighlightComplete(rect.left, rect.top, rect.width, rect.height);
       }
     }
 
@@ -286,11 +343,33 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
     });
   }
 
-  Rect _normalizedRect(Rect screenRect) {
-    final topLeft =
-        widget.metrics.screenToNormalized(screenRect.topLeft);
-    final bottomRight =
-        widget.metrics.screenToNormalized(screenRect.bottomRight);
+  void _handleTapUp(TapUpDetails details) {
+    if (!_isInsidePageViewport(details.localPosition)) return;
+    final point = _viewportToNormalized(details.localPosition);
+    final pageLocal = _viewportToPageLocal(details.localPosition);
+
+    if (widget.tool == PdfEditorTool.note) {
+      _handleNoteTap(pageLocal);
+      return;
+    }
+
+    if (widget.tool == PdfEditorTool.text) {
+      _handleTextTap(pageLocal);
+      return;
+    }
+
+    if (widget.tool == PdfEditorTool.lasso) {
+      final selected = AnnotationHitTest.findAt(widget.annotations, point);
+      widget.onSelectAnnotation(selected?.id);
+      if (selected?.type == AnnotationType.text) {
+        widget.onTextAnnotationTap(selected!);
+      }
+    }
+  }
+
+  Rect _normalizedRect(Rect pageLocalRect) {
+    final topLeft = _localToNormalized(pageLocalRect.topLeft);
+    final bottomRight = _localToNormalized(pageLocalRect.bottomRight);
     return Rect.fromLTRB(
       topLeft.nx < bottomRight.nx ? topLeft.nx : bottomRight.nx,
       topLeft.ny < bottomRight.ny ? topLeft.ny : bottomRight.ny,
@@ -299,29 +378,14 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
     );
   }
 
-  void _handleNoteTap(Offset localPosition) {
-    if (!widget.metrics.containsScreenPoint(localPosition)) return;
-    final point = widget.metrics.screenToNormalized(localPosition);
+  void _handleNoteTap(Offset pageLocal) {
+    final point = _localToNormalized(pageLocal);
     widget.onNoteTap(point.nx, point.ny);
   }
 
-  void _handleTextTap(Offset localPosition) {
-    if (!widget.metrics.containsScreenPoint(localPosition)) return;
-    final point = widget.metrics.screenToNormalized(localPosition);
+  void _handleTextTap(Offset pageLocal) {
+    final point = _localToNormalized(pageLocal);
     widget.onTextTap(point.nx, point.ny);
-  }
-
-  PdfEditorAnnotation? _findAnnotationAt(NormalizedPoint point) {
-    for (final annotation in widget.annotations.reversed) {
-      if (annotation.type == AnnotationType.note ||
-          annotation.type == AnnotationType.text) {
-        final distance = (Offset(point.nx, point.ny) -
-                Offset(annotation.x, annotation.y))
-            .distance;
-        if (distance < 0.05) return annotation;
-      }
-    }
-    return null;
   }
 
   List<Widget> _buildNoteMarkers() {
@@ -331,18 +395,27 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
       final screen = widget.metrics.normalizedToScreen(
         NormalizedPoint(note.x, note.y),
       );
+      final selected = widget.selectedAnnotationId == note.id;
       return Positioned(
         left: screen.dx - 14,
         top: screen.dy - 14,
         child: GestureDetector(
-          onTap: () => widget.onNoteMarkerTap(note),
+          onTap: () {
+            if (widget.tool == PdfEditorTool.lasso) {
+              widget.onSelectAnnotation(note.id);
+            }
+            widget.onNoteMarkerTap(note);
+          },
           child: Container(
             width: 28,
             height: 28,
             decoration: BoxDecoration(
               color: const Color(0xFF0B1F3A),
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFFD6B56D), width: 2),
+              border: Border.all(
+                color: selected ? const Color(0xFFD6B56D) : const Color(0xFFD6B56D),
+                width: selected ? 3 : 2,
+              ),
             ),
             alignment: Alignment.center,
             child: const Icon(Icons.sticky_note_2, color: Colors.white, size: 14),
@@ -362,18 +435,38 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
         width: textBox.width,
         height: textBox.height,
       );
+      final selected = widget.selectedAnnotationId == textBox.id;
+      final directionName = textBox.data['text_direction']?.toString();
+      final textDirection = directionName == 'ltr'
+          ? TextDirection.ltr
+          : TextDirection.rtl;
+
       return Positioned.fromRect(
         rect: rect,
         child: IgnorePointer(
-          child: Text(
-            textBox.data['text']?.toString() ?? '',
-            textAlign: TextAlign.right,
-            textDirection: TextDirection.rtl,
-            style: TextStyle(
-              color: _parseColor(textBox.data['color']?.toString()),
-              fontSize: widget.metrics.displaySize.width *
-                  (textBox.data['font_size'] as num? ?? 0.025).toDouble(),
-              fontWeight: FontWeight.w500,
+          child: DecoratedBox(
+            decoration: selected
+                ? BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xFFD6B56D),
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(4),
+                  )
+                : const BoxDecoration(),
+            child: Padding(
+              padding: const EdgeInsets.all(2),
+              child: Text(
+                textBox.data['text']?.toString() ?? '',
+                textAlign: TextAlign.right,
+                textDirection: textDirection,
+                style: TextStyle(
+                  color: _parseColor(textBox.data['color']?.toString()),
+                  fontSize: widget.metrics.displaySize.width *
+                      (textBox.data['font_size'] as num? ?? 0.025).toDouble(),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
           ),
         ),

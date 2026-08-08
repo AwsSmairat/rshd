@@ -64,6 +64,14 @@ class VideoPlaybackService
     protected function resolveProvider(Video $video): VideoProviderInterface
     {
         if ($video->storage_provider === 'bunny') {
+            if ($this->shouldServeLocalFallback($video)) {
+                Log::info('video.playback.bunny_local_fallback', [
+                    'video_id' => $video->id,
+                ]);
+
+                return $this->localProvider;
+            }
+
             if ($this->bunnyProvider->isConfigured()) {
                 return $this->bunnyProvider;
             }
@@ -84,5 +92,14 @@ class VideoPlaybackService
         }
 
         return $this->localProvider;
+    }
+
+    protected function shouldServeLocalFallback(Video $video): bool
+    {
+        if (! config('video.bunny.local_fallback', false)) {
+            return false;
+        }
+
+        return $video->hasLocalStoredFile();
     }
 }

@@ -161,6 +161,7 @@ class ShapeAnnotationPainter extends CustomPainter {
     this.previewShape = PdfEditorShapeTool.rectangle,
     this.previewColor = AppColors.primary,
     this.previewStrokeWidth = 2,
+    this.selectedId,
   });
 
   final List<PdfEditorAnnotation> annotations;
@@ -169,6 +170,7 @@ class ShapeAnnotationPainter extends CustomPainter {
   final PdfEditorShapeTool previewShape;
   final Color previewColor;
   final double previewStrokeWidth;
+  final String? selectedId;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -251,6 +253,14 @@ class ShapeAnnotationPainter extends CustomPainter {
         canvas.drawRect(rect, stroke);
         if (fill != null) canvas.drawRect(rect, fill);
     }
+
+    if (selectedId == annotation.id) {
+      final border = Paint()
+        ..color = AppColors.accent
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5;
+      canvas.drawRect(rect.inflate(4), border);
+    }
   }
 
   void _paintPreview(Canvas canvas, Rect rect) {
@@ -299,6 +309,7 @@ class ShapeAnnotationPainter extends CustomPainter {
   bool shouldRepaint(covariant ShapeAnnotationPainter oldDelegate) {
     return oldDelegate.annotations != annotations ||
         oldDelegate.previewRect != previewRect ||
-        oldDelegate.metrics.pageRect != metrics.pageRect;
+        oldDelegate.metrics.pageRect != metrics.pageRect ||
+        oldDelegate.selectedId != selectedId;
   }
 }

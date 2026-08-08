@@ -42,6 +42,7 @@ import '../../features/subjects/presentation/my_subjects_screen.dart';
 import '../../features/subjects/presentation/pdf_viewer_screen.dart';
 import '../../features/subjects/presentation/subject_details_screen.dart';
 import '../../features/subjects/presentation/video_details_screen.dart';
+import '../../core/security/protected_content_scope.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -128,6 +129,16 @@ class RouterNotifier extends ChangeNotifier {
   }
 
   final Ref ref;
+}
+
+Widget _protectedContent({
+  required String scopeId,
+  required Widget child,
+}) {
+  return ProtectedContentScope(
+    scopeId: scopeId,
+    child: child,
+  );
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -307,9 +318,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ? state.extra! as SubjectModel
               : null;
 
-          return SubjectDetailsScreen(
-            subjectId: id,
-            subject: subject,
+          return _protectedContent(
+            scopeId: 'subject:$id',
+            child: SubjectDetailsScreen(
+              subjectId: id,
+              subject: subject,
+            ),
           );
         },
       ),
@@ -317,14 +331,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/lessons/:id',
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return LessonDetailsScreen(lessonId: id);
+          return _protectedContent(
+            scopeId: 'lesson:$id',
+            child: LessonDetailsScreen(lessonId: id),
+          );
         },
       ),
       GoRoute(
         path: '/videos/:id',
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return VideoDetailsScreen(videoId: id);
+          return _protectedContent(
+            scopeId: 'video:$id',
+            child: VideoDetailsScreen(videoId: id),
+          );
         },
       ),
       GoRoute(
@@ -337,10 +357,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   ? Map<String, dynamic>.from(state.extra! as Map)
                   : const <String, dynamic>{};
 
-          return PdfViewerScreen(
-            fileId: id,
-            title: extra['title']?.toString() ?? 'ملف PDF',
-            fileUrl: extra['fileUrl']?.toString() ?? '',
+          return _protectedContent(
+            scopeId: 'pdf:$id',
+            child: PdfViewerScreen(
+              fileId: id,
+              title: extra['title']?.toString() ?? 'ملف PDF',
+              courseTitle: extra['courseTitle']?.toString(),
+            ),
           );
         },
       ),
@@ -348,7 +371,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/files/:id',
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return FileDetailsScreen(fileId: id);
+          return _protectedContent(
+            scopeId: 'file:$id',
+            child: FileDetailsScreen(fileId: id),
+          );
         },
       ),
       GoRoute(
@@ -377,7 +403,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/quizzes/:id/attempt',
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return QuizAttemptScreen(quizId: id);
+          return _protectedContent(
+            scopeId: 'quiz_attempt:$id',
+            child: QuizAttemptScreen(quizId: id),
+          );
         },
       ),
       GoRoute(

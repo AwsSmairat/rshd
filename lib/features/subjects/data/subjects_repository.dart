@@ -4,6 +4,7 @@ import '../../../core/network/api_client.dart';
 import '../../../core/network/api_endpoints.dart';
 import '../../../core/network/api_exception.dart';
 import '../../../core/network/api_response.dart';
+import 'models/file_download_model.dart';
 import 'models/lesson_file_model.dart';
 import 'models/lesson_model.dart';
 import 'models/subject_model.dart';
@@ -175,6 +176,27 @@ class SubjectsRepository {
       LessonFileModel.fromJson,
       emptyMessage: 'تعذر جلب تفاصيل الملف.',
     );
+  }
+
+  Future<FileDownloadModel> getFileDownloadUrl(int fileId) async {
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      ApiEndpoints.fileDownload(fileId),
+    );
+
+    final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+      (json) => Map<String, dynamic>.from(json as Map),
+    );
+
+    if (!apiResponse.success || apiResponse.data == null) {
+      throw ApiException(
+        message: apiResponse.message ?? 'غير مصرح لك بتنزيل هذا الملف.',
+        errors: apiResponse.errors,
+        statusCode: response.statusCode,
+      );
+    }
+
+    return FileDownloadModel.fromJson(apiResponse.data!);
   }
 
   Future<VideoProgressModel> updateVideoProgress(

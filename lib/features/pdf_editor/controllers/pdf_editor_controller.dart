@@ -41,7 +41,7 @@ class PenSettings {
 
 class HighlighterSettings {
   const HighlighterSettings({
-    this.color = const Color(0xFFD6B56D),
+    this.color = const Color(0xFFFFEB3B),
     this.strokeWidth = 0.02,
     this.opacity = 0.35,
   });
@@ -63,6 +63,23 @@ class HighlighterSettings {
   }
 }
 
+class TextSettings {
+  const TextSettings({
+    this.color = const Color(0xFF0B1F3A),
+    this.fontSize = 0.027,
+  });
+
+  final Color color;
+  final double fontSize;
+
+  TextSettings copyWith({Color? color, double? fontSize}) {
+    return TextSettings(
+      color: color ?? this.color,
+      fontSize: fontSize ?? this.fontSize,
+    );
+  }
+}
+
 class PdfEditorState {
   const PdfEditorState({
     this.status = PdfAnnotationStatus.initial,
@@ -77,12 +94,14 @@ class PdfEditorState {
     this.pendingSync = false,
     this.penSettings = const PenSettings(),
     this.highlighterSettings = const HighlighterSettings(),
-    this.eraserMode = EraserMode.partial,
+    this.eraserMode = EraserMode.whole,
     this.eraserSize = 0.015,
     this.allowFingerDrawing = true,
     this.selectedAnnotationId,
     this.shapeTool = PdfEditorShapeTool.rectangle,
     this.toolbarVisible = true,
+    this.toolbarExpanded = true,
+    this.textSettings = const TextSettings(),
     this.zoomLevel = 1.0,
   });
 
@@ -104,6 +123,8 @@ class PdfEditorState {
   final String? selectedAnnotationId;
   final PdfEditorShapeTool shapeTool;
   final bool toolbarVisible;
+  final bool toolbarExpanded;
+  final TextSettings textSettings;
   final double zoomLevel;
 
   PdfAnnotationDocumentV2 get document =>
@@ -131,6 +152,8 @@ class PdfEditorState {
     String? selectedAnnotationId,
     PdfEditorShapeTool? shapeTool,
     bool? toolbarVisible,
+    bool? toolbarExpanded,
+    TextSettings? textSettings,
     double? zoomLevel,
     bool clearSelected = false,
     bool clearError = false,
@@ -155,6 +178,8 @@ class PdfEditorState {
           clearSelected ? null : (selectedAnnotationId ?? this.selectedAnnotationId),
       shapeTool: shapeTool ?? this.shapeTool,
       toolbarVisible: toolbarVisible ?? this.toolbarVisible,
+      toolbarExpanded: toolbarExpanded ?? this.toolbarExpanded,
+      textSettings: textSettings ?? this.textSettings,
       zoomLevel: zoomLevel ?? this.zoomLevel,
     );
   }
@@ -191,6 +216,8 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
   Timer? _autoSaveTimer;
   Timer? _syncTimer;
   bool _isDisposed = false;
+  Map<String, dynamic>? _batchSnapshot;
+  PdfAnnotationDocumentV2? _batchDocument;
 
   @override
   void dispose() {
@@ -299,6 +326,14 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
     state = state.copyWith(toolbarVisible: !state.toolbarVisible);
   }
 
+  void toggleToolbarExpanded() {
+    state = state.copyWith(toolbarExpanded: !state.toolbarExpanded);
+  }
+
+  void setTextSettings(TextSettings settings) {
+    state = state.copyWith(textSettings: settings);
+  }
+
   void setPenSettings(PenSettings settings) {
     state = state.copyWith(penSettings: settings);
   }
@@ -333,6 +368,43 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
 
   void _commitDocument(PdfAnnotationDocumentV2 document) {
     _history.push(Map<String, dynamic>.from(state.annotationJson));
+    _applyDocument(document, schedulePersistence: true);
+  }
+
+  void beginBatch() {
+    _batchSnapshot ??= Map<String, dynamic>.from(state.annotationJson);
+    _batchDocument = PdfAnnotationDocumentV2(
+      Map<String, dynamic>.from(state.annotationJson),
+    );
+  }
+
+  void endBatch() {
+    if (_batchSnapshot == null || _batchDocument == null) return;
+
+    final json = _batchDocument!.toJson();
+    json['pending_sync'] = true;
+    if (!_mapsEqual(_batchSnapshot!, json)) {
+      _history.push(_batchSnapshot!);
+      state = state.copyWith(
+        annotationJson: json,
+        hasUnsavedChanges: true,
+        saveStatus: PdfSaveStatus.unsaved,
+        pendingSync: true,
+      );
+      _scheduleLocalSave(json);
+      _scheduleRemoteSync();
+    } else {
+      state = state.copyWith(annotationJson: json);
+    }
+
+    _batchSnapshot = null;
+    _batchDocument = null;
+  }
+
+  void _applyDocument(
+    PdfAnnotationDocumentV2 document, {
+    required bool schedulePersistence,
+  }) {
     final json = document.toJson();
     json['pending_sync'] = true;
     state = state.copyWith(
@@ -341,8 +413,37 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
       saveStatus: PdfSaveStatus.unsaved,
       pendingSync: true,
     );
-    _scheduleLocalSave(json);
-    _scheduleRemoteSync();
+    if (schedulePersistence) {
+      _scheduleLocalSave(json);
+      _scheduleRemoteSync();
+    }
+  }
+
+  bool _mapsEqual(Map<String, dynamic> a, Map<String, dynamic> b) {
+    return a.toString() == b.toString();
+  }
+
+  PdfAnnotationDocumentV2 _workingDocument() {
+    if (_batchDocument != null) return _batchDocument!;
+    return PdfAnnotationDocumentV2(
+      Map<String, dynamic>.from(state.annotationJson),
+    );
+  }
+
+  void _replaceWorkingDocument(PdfAnnotationDocumentV2 document) {
+    if (_batchDocument != null) {
+      _batchDocument = document;
+      final json = document.toJson();
+      json['pending_sync'] = true;
+      state = state.copyWith(
+        annotationJson: json,
+        hasUnsavedChanges: true,
+        saveStatus: PdfSaveStatus.unsaved,
+        pendingSync: true,
+      );
+      return;
+    }
+    _applyDocument(document, schedulePersistence: false);
   }
 
   void _scheduleLocalSave(Map<String, dynamic> json) {
@@ -585,12 +686,16 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
     required double x,
     required double y,
     required String text,
-    Color color = const Color(0xFF0B1F3A),
-    double fontSize = 0.025,
+    Color? color,
+    double? fontSize,
     TextAlign align = TextAlign.right,
   }) {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return;
+
+    final resolvedColor = color ?? state.textSettings.color;
+    final resolvedFontSize = fontSize ?? state.textSettings.fontSize;
+    final direction = _detectTextDirection(trimmed);
 
     final document = PdfAnnotationDocumentV2(
       Map<String, dynamic>.from(state.annotationJson),
@@ -609,10 +714,11 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
         updatedAt: now,
         data: {
           'text': trimmed,
-          'color': _colorToHex(color),
-          'font_size': fontSize,
+          'color': _colorToHex(resolvedColor),
+          'font_size': resolvedFontSize,
           'align': align.name,
           'font_weight': 'normal',
+          'text_direction': direction.name,
         },
       ),
     );
@@ -660,6 +766,95 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
     _commitDocument(document);
   }
 
+  void updateTextBox({
+    required String id,
+    required int pageNumber,
+    required String text,
+    Color? color,
+    double? fontSize,
+  }) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return;
+
+    final document = _workingDocument();
+    final items = document.annotationsForPage(pageNumber);
+    final index = items.indexWhere((item) => item.id == id);
+    if (index < 0) return;
+
+    final current = items[index];
+    final nextData = Map<String, dynamic>.from(current.data);
+    nextData['text'] = trimmed;
+    nextData['text_direction'] = _detectTextDirection(trimmed).name;
+    if (color != null) nextData['color'] = _colorToHex(color);
+    if (fontSize != null) nextData['font_size'] = fontSize;
+
+    items[index] = current.copyWith(
+      updatedAt: DateTime.now(),
+      data: nextData,
+    );
+    document.setAnnotationsForPage(pageNumber, items);
+
+    if (_batchDocument != null) {
+      _replaceWorkingDocument(document);
+    } else {
+      _commitDocument(document);
+    }
+  }
+
+  void updateAnnotationStyle({
+    required String id,
+    required int pageNumber,
+    Color? color,
+    double? strokeWidth,
+    double? opacity,
+    double? fontSize,
+  }) {
+    final document = _workingDocument();
+    final items = document.annotationsForPage(pageNumber);
+    final index = items.indexWhere((item) => item.id == id);
+    if (index < 0) return;
+
+    final current = items[index];
+    final nextData = Map<String, dynamic>.from(current.data);
+
+    switch (current.type) {
+      case AnnotationType.ink:
+      case AnnotationType.highlighter:
+        if (color != null) nextData['color'] = _colorToHex(color);
+        if (strokeWidth != null) nextData['stroke_width'] = strokeWidth;
+        if (opacity != null) nextData['opacity'] = opacity;
+      case AnnotationType.text:
+        if (color != null) nextData['color'] = _colorToHex(color);
+        if (fontSize != null) nextData['font_size'] = fontSize;
+      case AnnotationType.shape:
+        if (color != null) nextData['stroke_color'] = _colorToHex(color);
+        if (strokeWidth != null) nextData['stroke_width'] = strokeWidth;
+        if (opacity != null) nextData['opacity'] = opacity;
+      case AnnotationType.note:
+      case AnnotationType.image:
+        break;
+    }
+
+    items[index] = current.copyWith(
+      updatedAt: DateTime.now(),
+      data: nextData,
+    );
+    document.setAnnotationsForPage(pageNumber, items);
+
+    if (_batchDocument != null) {
+      _replaceWorkingDocument(document);
+    } else {
+      _commitDocument(document);
+    }
+  }
+
+  void deleteSelectedAnnotation() {
+    final id = state.selectedAnnotationId;
+    if (id == null) return;
+    deleteAnnotation(id, state.currentPage);
+    selectAnnotation(null);
+  }
+
   void deleteAnnotation(String id, int pageNumber) {
     final document = PdfAnnotationDocumentV2(
       Map<String, dynamic>.from(state.annotationJson),
@@ -691,9 +886,7 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
     required double x,
     required double y,
   }) {
-    final document = PdfAnnotationDocumentV2(
-      Map<String, dynamic>.from(state.annotationJson),
-    );
+    final document = _workingDocument();
     final items = document.annotationsForPage(pageNumber);
     final index = items.indexWhere((item) => item.id == id);
     if (index < 0) return;
@@ -705,7 +898,7 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
       updatedAt: DateTime.now(),
     );
     document.setAnnotationsForPage(pageNumber, items);
-    _commitDocument(document);
+    _replaceWorkingDocument(document);
   }
 
   void selectAnnotation(String? id) {
@@ -720,18 +913,25 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
     required NormalizedPoint point,
     required double radius,
   }) {
-    final document = PdfAnnotationDocumentV2(
-      Map<String, dynamic>.from(state.annotationJson),
-    );
+    final document = _workingDocument();
     final items = document.annotationsForPage(pageNumber);
+    final radiusSquared = radius * radius;
 
     if (state.eraserMode == EraserMode.whole) {
       for (final item in List.of(items)) {
+        if (item.type == AnnotationType.note ||
+            item.type == AnnotationType.text) {
+          continue;
+        }
         if (_hitTest(item, point, radius)) {
           document.removeAnnotation(item.id, pageNumber);
         }
       }
-      _commitDocument(document);
+      if (_batchDocument != null) {
+        _replaceWorkingDocument(document);
+      } else {
+        _commitDocument(document);
+      }
       return;
     }
 
@@ -748,7 +948,7 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
       final points = rawPoints
           .whereType<Map>()
           .map((entry) => NormalizedPoint.fromJson(Map<String, dynamic>.from(entry)))
-          .where((p) => _distance(p, point) > radius)
+          .where((p) => _distanceSquared(p, point) > radiusSquared)
           .toList();
 
       if (points.length != rawPoints.length) {
@@ -766,36 +966,57 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
     }
 
     if (changed) {
-      _commitDocument(document);
+      if (_batchDocument != null) {
+        _replaceWorkingDocument(document);
+      } else {
+        _commitDocument(document);
+      }
     }
   }
 
   bool _hitTest(PdfEditorAnnotation item, NormalizedPoint point, double radius) {
     if (item.type == AnnotationType.note || item.type == AnnotationType.text) {
-      return _distance(NormalizedPoint(item.x, item.y), point) <= radius * 2;
+      return _distanceSquared(NormalizedPoint(item.x, item.y), point) <=
+          (radius * 2) * (radius * 2);
     }
     final rawPoints = item.data['points'];
     if (rawPoints is List) {
+      final radiusSquared = radius * radius;
       for (final raw in rawPoints.whereType<Map>()) {
-        if (_distance(
+        if (_distanceSquared(
           NormalizedPoint.fromJson(Map<String, dynamic>.from(raw)),
           point,
-        ) <= radius) {
+        ) <= radiusSquared) {
           return true;
         }
       }
     }
-    if (item.width > 0 && item.height > 0) {
-      final rect = Rect.fromLTWH(item.x, item.y, item.width, item.height);
+    if (item.width != 0 || item.height != 0) {
+      final left = item.width >= 0 ? item.x : item.x + item.width;
+      final top = item.height >= 0 ? item.y : item.y + item.height;
+      final rect = Rect.fromLTWH(
+        left,
+        top,
+        item.width.abs(),
+        item.height.abs(),
+      );
       return rect.contains(Offset(point.nx, point.ny));
     }
     return false;
   }
 
-  double _distance(NormalizedPoint a, NormalizedPoint b) {
+  double _distanceSquared(NormalizedPoint a, NormalizedPoint b) {
     final dx = a.nx - b.nx;
     final dy = a.ny - b.ny;
-    return (dx * dx + dy * dy);
+    return dx * dx + dy * dy;
+  }
+
+  TextDirection _detectTextDirection(String text) {
+    final hasArabic = RegExp(r'[\u0600-\u06FF]').hasMatch(text);
+    final hasLatin = RegExp(r'[A-Za-z]').hasMatch(text);
+    if (hasArabic && !hasLatin) return TextDirection.rtl;
+    if (hasLatin && !hasArabic) return TextDirection.ltr;
+    return TextDirection.rtl;
   }
 
   String _colorToHex(Color color) {

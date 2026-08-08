@@ -412,6 +412,47 @@ class BunnyStreamTest extends TestCase
         );
     }
 
+    public function test_bunny_video_uses_local_fallback_when_staged_file_exists(): void
+    {
+        Config::set('video.bunny.local_fallback', true);
+
+        Storage::disk('lesson_videos')->put('lesson-videos/bunny-local.mp4', 'video-bytes');
+
+        $student = $this->createStudent();
+        $subject = $this->createSubject();
+        $lesson = $this->createLesson($subject);
+
+        SubjectStudent::query()->create([
+            'subject_id' => $subject->id,
+            'student_id' => $student->id,
+            'payment_status' => PaymentStatus::Paid,
+            'access_status' => AccessStatus::Active,
+            'activated_at' => now(),
+        ]);
+
+        $video = Video::query()->create([
+            'lesson_id' => $lesson->id,
+            'title' => 'Bunny with local copy',
+            'storage_provider' => 'bunny',
+            'video_url' => '',
+            'video_path' => 'lesson-videos/bunny-local.mp4',
+            'external_video_id' => 'bunny-guid-local',
+            'duration_seconds' => 16,
+            'status' => VideoStatus::Ready,
+            'is_free' => false,
+        ]);
+
+        Sanctum::actingAs($student);
+
+        $response = $this->getJson('/api/v1/videos/'.$video->id)
+            ->assertOk();
+
+        $playbackUrl = (string) $response->json('data.playback.url');
+
+        $this->assertStringContainsString('/api/v1/videos/'.$video->id.'/stream', $playbackUrl);
+        $this->assertSame('hls', $response->json('data.playback.type'));
+    }
+
     /**
      * @return array{0: User, 1: Video}
      */

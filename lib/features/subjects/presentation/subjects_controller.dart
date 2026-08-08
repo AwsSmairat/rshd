@@ -191,6 +191,22 @@ class SubjectsListController extends StateNotifier<SubjectsListState> {
     );
   }
 
+  void syncSubjectProgress(SubjectModel subject) {
+    if (!state.subjects.any((entry) => entry.id == subject.id)) {
+      return;
+    }
+
+    final subjects = state.subjects.map((entry) {
+      if (entry.id != subject.id) {
+        return entry;
+      }
+
+      return entry.copyWith(progressPercent: subject.progressPercent);
+    }).toList(growable: false);
+
+    state = state.copyWith(subjects: subjects);
+  }
+
   SubjectModel? findSubjectById(int id) {
     for (final subject in state.subjects) {
       if (subject.id == id) {
@@ -511,7 +527,7 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
     }
   }
 
-  Future<String?> refreshPlayback(int videoId) async {
+  Future<VideoPlaybackModel?> refreshPlayback(int videoId) async {
     try {
       final playback = await _repository.refreshVideoPlayback(videoId);
       final currentVideo = state.video;
@@ -522,7 +538,7 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
         );
       }
 
-      return playback.url;
+      return playback;
     } on ApiException catch (error) {
       if (error.isForbidden || error.isUnauthorized) {
         state = state.copyWith(

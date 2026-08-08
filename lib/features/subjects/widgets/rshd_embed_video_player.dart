@@ -6,6 +6,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import '../../../core/platform/webview_bootstrap.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../data/models/video_model.dart';
+import '../utils/playback_refresh_scheduler.dart';
 
 /// Bunny Stream embed player (iframe.mediadelivery.net) for when CDN HLS is blocked.
 class RshdEmbedVideoPlayer extends StatefulWidget {
@@ -13,12 +15,14 @@ class RshdEmbedVideoPlayer extends StatefulWidget {
     super.key,
     required this.playbackUrl,
     this.expiresAt,
+    this.blockPlayback = false,
     this.onRefreshPlayback,
   });
 
   final String playbackUrl;
   final DateTime? expiresAt;
-  final Future<String?> Function()? onRefreshPlayback;
+  final bool blockPlayback;
+  final Future<VideoPlaybackModel?> Function()? onRefreshPlayback;
 
   @override
   State<RshdEmbedVideoPlayer> createState() => _RshdEmbedVideoPlayerState();
@@ -32,6 +36,7 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
   bool _isRefreshing = false;
   String? _errorMessage;
   String _activePlaybackUrl = '';
+  DateTime? _activeExpiresAt;
 
   static const _playbackErrorMessage =
       'تعذّر تشغيل الفيديو. أعد المحاولة أو حدّث الصفحة.';
@@ -42,6 +47,7 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
   void initState() {
     super.initState();
     _activePlaybackUrl = widget.playbackUrl;
+    _activeExpiresAt = widget.expiresAt;
     unawaited(_initializePlayer());
     _scheduleRefreshTimer();
   }
@@ -49,6 +55,12 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
   @override
   void didUpdateWidget(covariant RshdEmbedVideoPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    if (widget.blockPlayback && !oldWidget.blockPlayback) {
+      unawaited(_suspendForProtection());
+    } else if (!widget.blockPlayback && oldWidget.blockPlayback) {
+      unawaited(_loadUrl(_activePlaybackUrl));
+    }
 
     if (oldWidget.playbackUrl != widget.playbackUrl &&
         widget.playbackUrl.isNotEmpty &&
@@ -58,6 +70,7 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
     }
 
     if (oldWidget.expiresAt != widget.expiresAt) {
+      _activeExpiresAt = widget.expiresAt;
       _scheduleRefreshTimer();
     }
   }
@@ -137,15 +150,17 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
   void _scheduleRefreshTimer() {
     _refreshTimer?.cancel();
 
-    final expiry = widget.expiresAt;
+    final expiry = _activeExpiresAt ?? widget.expiresAt;
     if (expiry == null || widget.onRefreshPlayback == null) {
       return;
     }
 
-    final refreshAt = expiry.subtract(const Duration(seconds: 60));
-    final delay = refreshAt.difference(DateTime.now());
+    final delay = playbackRefreshDelay(expiry);
+    if (delay == null) {
+      return;
+    }
 
-    if (delay.isNegative) {
+    if (delay == Duration.zero) {
       unawaited(_refreshPlayback());
       return;
     }
@@ -161,13 +176,14 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
     setState(() => _isRefreshing = true);
 
     try {
-      final refreshedUrl = await widget.onRefreshPlayback!();
-      if (!mounted || refreshedUrl == null || refreshedUrl.isEmpty) {
+      final refreshedPlayback = await widget.onRefreshPlayback!();
+      if (!mounted || refreshedPlayback == null || refreshedPlayback.url.isEmpty) {
         return;
       }
 
-      _activePlaybackUrl = refreshedUrl;
-      await _loadUrl(refreshedUrl);
+      _activePlaybackUrl = refreshedPlayback.url;
+      _activeExpiresAt = refreshedPlayback.expiresAt ?? widget.expiresAt;
+      await _loadUrl(_activePlaybackUrl);
       _scheduleRefreshTimer();
     } finally {
       if (mounted) {
@@ -198,8 +214,18 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
     await _loadUrl(_activePlaybackUrl);
   }
 
+  Future<void> _suspendForProtection() async {
+    final controller = _controller;
+    if (controller == null) return;
+    await controller.loadRequest(Uri.parse('about:blank'));
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.blockPlayback) {
+      return const ColoredBox(color: AppColors.primary);
+    }
+
     if (_errorMessage != null) {
       return _PlaybackErrorState(
         message: _errorMessage!,

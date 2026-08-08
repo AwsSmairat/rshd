@@ -36,6 +36,7 @@ class LocalVideoProvider implements VideoProviderInterface
             return [
                 'url' => $url,
                 'expires_at' => now()->addHours(24),
+                'type' => 'hls',
             ];
         }
 
@@ -67,6 +68,7 @@ class LocalVideoProvider implements VideoProviderInterface
         return [
             'url' => $url,
             'expires_at' => $expiresAt,
+            'type' => 'hls',
         ];
     }
 

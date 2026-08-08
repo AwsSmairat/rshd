@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\FileType;
+use App\Enums\LessonFileStorageStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -22,6 +23,11 @@ class LessonFile extends Model
         'file_url',
         'file_size',
         'file_mime_type',
+        'storage_provider',
+        'storage_disk',
+        'external_path',
+        'storage_status',
+        'uploaded_at',
     ];
 
     /**
@@ -32,6 +38,8 @@ class LessonFile extends Model
         return [
             'file_type' => FileType::class,
             'file_size' => 'integer',
+            'storage_status' => LessonFileStorageStatus::class,
+            'uploaded_at' => 'datetime',
         ];
     }
 
@@ -44,7 +52,15 @@ class LessonFile extends Model
 
     public function resolvedFileUrl(): ?string
     {
+        if ($this->requiresSignedDownload()) {
+            return null;
+        }
+
         if ($this->file_path) {
+            if ($this->localSourceDiskName() !== 'public') {
+                return null;
+            }
+
             return url(Storage::disk('public')->url($this->file_path));
         }
 
@@ -60,13 +76,46 @@ class LessonFile extends Model
         return url(Storage::disk('public')->url($this->file_url));
     }
 
+    public function isBunnyStored(): bool
+    {
+        return $this->storage_provider === 'bunny' && filled($this->external_path);
+    }
+
+    public function requiresSignedDownload(): bool
+    {
+        if ($this->isBunnyStored()) {
+            return true;
+        }
+
+        return (bool) config('files.signed_download', true);
+    }
+
+    public function cdnPath(): ?string
+    {
+        return $this->external_path;
+    }
+
+    public static function defaultLocalSourceDisk(): string
+    {
+        return (string) config('files.local_disk', 'lesson_files');
+    }
+
+    public function localSourceDiskName(): string
+    {
+        if (filled($this->storage_disk)) {
+            return (string) $this->storage_disk;
+        }
+
+        return self::defaultLocalSourceDisk();
+    }
+
     public function deleteStoredFile(): void
     {
         if (! $this->file_path) {
             return;
         }
 
-        Storage::disk('public')->delete($this->file_path);
+        Storage::disk($this->localSourceDiskName())->delete($this->file_path);
     }
 
     /**

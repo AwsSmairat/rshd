@@ -153,10 +153,12 @@ class PdfEditorToolbar extends StatelessWidget {
     required this.canUndo,
     required this.canRedo,
     required this.visible,
+    required this.expanded,
     required this.isTabletLandscape,
     required this.onToolSelected,
     required this.onUndo,
     required this.onRedo,
+    required this.onToggleExpanded,
     required this.onToggleVisibility,
   });
 
@@ -164,11 +166,27 @@ class PdfEditorToolbar extends StatelessWidget {
   final bool canUndo;
   final bool canRedo;
   final bool visible;
+  final bool expanded;
   final bool isTabletLandscape;
   final ValueChanged<PdfEditorTool> onToolSelected;
   final VoidCallback onUndo;
   final VoidCallback onRedo;
+  final VoidCallback onToggleExpanded;
   final VoidCallback onToggleVisibility;
+
+  static const _primaryTools = [
+    (PdfEditorTool.view, 'عرض', Icons.pan_tool_alt_outlined),
+    (PdfEditorTool.pen, 'قلم', Icons.draw_outlined),
+    (PdfEditorTool.highlighter, 'تظليل', Icons.highlight_outlined),
+    (PdfEditorTool.eraser, 'ممحاة', Icons.auto_fix_off_outlined),
+    (PdfEditorTool.lasso, 'تحديد', Icons.crop_free_outlined),
+  ];
+
+  static const _secondaryTools = [
+    (PdfEditorTool.text, 'نص', Icons.text_fields_outlined),
+    (PdfEditorTool.note, 'ملاحظة', Icons.sticky_note_2_outlined),
+    (PdfEditorTool.shapes, 'أشكال', Icons.category_outlined),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -187,17 +205,6 @@ class PdfEditorToolbar extends StatelessWidget {
       );
     }
 
-    final tools = [
-      (PdfEditorTool.view, 'عرض', Icons.pan_tool_alt_outlined),
-      (PdfEditorTool.pen, 'قلم', Icons.draw_outlined),
-      (PdfEditorTool.highlighter, 'تظليل', Icons.highlight_outlined),
-      (PdfEditorTool.eraser, 'ممحاة', Icons.auto_fix_off_outlined),
-      (PdfEditorTool.lasso, 'تحديد', Icons.crop_free_outlined),
-      (PdfEditorTool.text, 'نص', Icons.text_fields_outlined),
-      (PdfEditorTool.note, 'ملاحظة', Icons.sticky_note_2_outlined),
-      (PdfEditorTool.shapes, 'أشكال', Icons.category_outlined),
-    ];
-
     final content = Material(
       color: AppColors.glassToolbar,
       elevation: 8,
@@ -212,75 +219,8 @@ class PdfEditorToolbar extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: isTabletLandscape
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ...tools.map((item) => _ToolButton(
-                          label: item.$2,
-                          icon: item.$3,
-                          selected: currentTool == item.$1,
-                          onTap: () => onToolSelected(item.$1),
-                        )),
-                    const Divider(height: 16),
-                    _ToolButton(
-                      label: 'تراجع',
-                      icon: Icons.undo_rounded,
-                      selected: false,
-                      enabled: canUndo,
-                      onTap: onUndo,
-                    ),
-                    _ToolButton(
-                      label: 'إعادة',
-                      icon: Icons.redo_rounded,
-                      selected: false,
-                      enabled: canRedo,
-                      onTap: onRedo,
-                    ),
-                    IconButton(
-                      onPressed: onToggleVisibility,
-                      icon: const Icon(Icons.keyboard_arrow_down),
-                    ),
-                  ],
-                )
-              : Row(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Row(
-                          children: [
-                            ...tools.map((item) => _ToolButton(
-                                  label: item.$2,
-                                  icon: item.$3,
-                                  selected: currentTool == item.$1,
-                                  onTap: () => onToolSelected(item.$1),
-                                )),
-                            _ToolButton(
-                              label: 'تراجع',
-                              icon: Icons.undo_rounded,
-                              selected: false,
-                              enabled: canUndo,
-                              onTap: onUndo,
-                            ),
-                            _ToolButton(
-                              label: 'إعادة',
-                              icon: Icons.redo_rounded,
-                              selected: false,
-                              enabled: canRedo,
-                              onTap: onRedo,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      tooltip: 'إخفاء الشريط',
-                      onPressed: onToggleVisibility,
-                      icon: const Icon(Icons.keyboard_arrow_down),
-                    ),
-                  ],
-                ),
+              ? _buildTabletLayout()
+              : _buildPhoneLayout(),
         ),
       ),
     );
@@ -289,6 +229,123 @@ class PdfEditorToolbar extends StatelessWidget {
       return Align(alignment: Alignment.centerRight, child: content);
     }
     return content;
+  }
+
+  Widget _buildPhoneLayout() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            IconButton(
+              tooltip: expanded ? 'طي الأدوات' : 'إظهار الأدوات',
+              onPressed: onToggleExpanded,
+              icon: Icon(
+                expanded
+                    ? Icons.keyboard_arrow_down
+                    : Icons.keyboard_arrow_down,
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Row(
+                  children: _primaryTools
+                      .map(
+                        (item) => _ToolButton(
+                          label: item.$2,
+                          icon: item.$3,
+                          selected: currentTool == item.$1,
+                          onTap: () => onToolSelected(item.$1),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (expanded)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
+            child: Row(
+              children: [
+                ..._secondaryTools.map(
+                  (item) => _ToolButton(
+                    label: item.$2,
+                    icon: item.$3,
+                    selected: currentTool == item.$1,
+                    onTap: () => onToolSelected(item.$1),
+                  ),
+                ),
+                _ToolButton(
+                  label: 'تراجع',
+                  icon: Icons.undo_rounded,
+                  selected: false,
+                  enabled: canUndo,
+                  onTap: onUndo,
+                ),
+                _ToolButton(
+                  label: 'إعادة',
+                  icon: Icons.redo_rounded,
+                  selected: false,
+                  enabled: canRedo,
+                  onTap: onRedo,
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildTabletLayout() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ..._primaryTools.map(
+          (item) => _ToolButton(
+            label: item.$2,
+            icon: item.$3,
+            selected: currentTool == item.$1,
+            onTap: () => onToolSelected(item.$1),
+          ),
+        ),
+        if (expanded) ...[
+          const Divider(height: 16),
+          ..._secondaryTools.map(
+            (item) => _ToolButton(
+              label: item.$2,
+              icon: item.$3,
+              selected: currentTool == item.$1,
+              onTap: () => onToolSelected(item.$1),
+            ),
+          ),
+          _ToolButton(
+            label: 'تراجع',
+            icon: Icons.undo_rounded,
+            selected: false,
+            enabled: canUndo,
+            onTap: onUndo,
+          ),
+          _ToolButton(
+            label: 'إعادة',
+            icon: Icons.redo_rounded,
+            selected: false,
+            enabled: canRedo,
+            onTap: onRedo,
+          ),
+        ],
+        IconButton(
+          onPressed: onToggleExpanded,
+          icon: Icon(
+            expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up,
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -340,46 +397,46 @@ class _ToolButton extends StatelessWidget {
             splashColor: AppColors.accent.withValues(alpha: 0.2),
             highlightColor: AppColors.primary.withValues(alpha: 0.08),
             child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                constraints: const BoxConstraints(minWidth: 58, minHeight: 52),
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: borderColor,
-                    width: selected ? 2 : 1,
-                  ),
-                  boxShadow: selected
-                      ? [
-                          BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.12),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ]
-                      : null,
+              duration: const Duration(milliseconds: 180),
+              constraints: const BoxConstraints(minWidth: 58, minHeight: 52),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: borderColor,
+                  width: selected ? 2 : 1,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(icon, size: 22, color: iconColor),
-                    const SizedBox(height: 4),
-                    Text(
-                      label,
-                      style: AppTextStyles.caption.copyWith(
-                        fontSize: 10,
-                        color: labelColor,
-                        fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-                      ),
+                boxShadow: selected
+                    ? [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.12),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, size: 22, color: iconColor),
+                  const SizedBox(height: 4),
+                  Text(
+                    label,
+                    style: AppTextStyles.caption.copyWith(
+                      fontSize: 10,
+                      color: labelColor,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
+      ),
     );
   }
 }

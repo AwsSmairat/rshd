@@ -17,6 +17,18 @@ void main() {
       expect(playback.type, 'hls');
     });
 
+    test('prefers native player for local stream urls even if type is embed', () {
+      final playback = VideoPlaybackModel.fromJson({
+        'url': 'http://127.0.0.1:8765/api/v1/videos/8/stream?token=abc',
+        'expires_at': '2026-08-07T12:00:00.000000Z',
+        'type': 'embed',
+      });
+
+      expect(playback.isEmbed, isTrue);
+      expect(playback.usesEmbedPlayer, isFalse);
+      expect(playback.usesNativePlayer, isTrue);
+    });
+
     test('parses embed playback type', () {
       final playback = VideoPlaybackModel.fromJson({
         'url': 'https://iframe.mediadelivery.net/embed/123/guid?autoplay=true',
@@ -24,7 +36,7 @@ void main() {
         'type': 'embed',
       });
 
-      expect(playback.isEmbed, isTrue);
+      expect(playback.usesEmbedPlayer, isTrue);
       expect(playback.url, contains('iframe.mediadelivery.net'));
     });
 

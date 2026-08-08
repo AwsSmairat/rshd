@@ -29,6 +29,8 @@ class ApiEndpoints {
 
   static String fileDetails(int fileId) => '/files/$fileId';
 
+  static String fileDownload(int fileId) => '/files/$fileId/download';
+
   static String fileAnnotations(int fileId) => '/files/$fileId/annotations';
 
   static const assignments = '/assignments';

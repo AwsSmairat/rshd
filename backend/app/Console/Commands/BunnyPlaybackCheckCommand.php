@@ -65,10 +65,10 @@ class BunnyPlaybackCheckCommand extends Command
         $cdnStatus = $this->probe($signedCdn ?? $unsignedCdn);
 
         if ($cdnStatus === '403') {
-            $this->warn('- CDN returns 403: verify Pull Zone → Security → URL Token Authentication Key.');
-            $this->warn('- Disable Token IP Validation unless BUNNY_STREAM_TOKEN_IP_BINDING=true.');
-            $this->warn('- If Block Direct URL File Access is enabled, signed CDN URLs must use the Pull Zone key (not the embed key).');
-            $this->warn('- Use BUNNY_STREAM_PLAYBACK_MODE=embed until CDN signing works.');
+            $this->warn('- CDN returns 403: Pull Zone security is blocking direct playback.');
+            $this->warn('- Stream tokenAuthEnabled=false but CDN still blocks → disable "Block Direct URL File Access" on the linked Pull Zone.');
+            $this->warn('- Or enable Pull Zone Token Authentication and set the correct BUNNY_STREAM_TOKEN_KEY.');
+            $this->warn('- Until CDN works, keep BUNNY_STREAM_LOCAL_FALLBACK=true to play staged local files.');
         }
 
         if ($this->probe($embedUrl) === '200' && $cdnStatus === '403') {

@@ -7,8 +7,11 @@ use App\Http\Requests\Api\V1\StoreAnnotationRequest;
 use App\Http\Resources\LessonFileResource;
 use App\Models\LessonFile;
 use App\Models\PdfAnnotation;
+use App\Services\LessonFileDownloadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LessonFileController extends Controller
 {
@@ -19,6 +22,54 @@ class LessonFileController extends Controller
         $lessonFile->load('lesson.subject');
 
         return $this->successResource(new LessonFileResource($lessonFile));
+    }
+
+    public function download(
+        Request $request,
+        LessonFile $lessonFile,
+        LessonFileDownloadService $downloadService,
+    ): JsonResponse {
+        $this->authorize('view', $lessonFile);
+
+        $lessonFile->load('lesson.subject');
+
+        $download = $downloadService->generateDownloadUrl($lessonFile, $request->user());
+
+        if ($download === null) {
+            return $this->forbiddenResponse('غير مصرح لك بتنزيل هذا الملف.');
+        }
+
+        return $this->successResponse([
+            'url' => $download['url'],
+            'expires_at' => $download['expires_at']->toIso8601String(),
+        ]);
+    }
+
+    public function stream(Request $request, LessonFile $lessonFile): StreamedResponse
+    {
+        if (! $request->hasValidSignature()) {
+            abort(403, 'Download link is invalid or expired.');
+        }
+
+        $diskName = $lessonFile->localSourceDiskName();
+        $path = (string) $lessonFile->file_path;
+
+        if ($path === '' || ! Storage::disk($diskName)->exists($path)) {
+            abort(404, 'File was not found.');
+        }
+
+        $mimeType = $lessonFile->file_mime_type ?: 'application/pdf';
+        $filename = $lessonFile->original_file_name ?: basename($path);
+
+        return Storage::disk($diskName)->response(
+            $path,
+            $filename,
+            [
+                'Content-Type' => $mimeType,
+                'Cache-Control' => 'private, no-store, no-cache, must-revalidate',
+                'Pragma' => 'no-cache',
+            ],
+        );
     }
 
     public function getAnnotations(Request $request, LessonFile $lessonFile): JsonResponse

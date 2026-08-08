@@ -40,6 +40,15 @@ class VideoPlaybackModel {
 
   bool get isHls => playbackType == 'hls';
 
+  /// Prefer URL shape over stale `type` values after hot reload/cache.
+  bool get usesEmbedPlayer {
+    final value = url.trim().toLowerCase();
+    return value.contains('iframe.mediadelivery.net') ||
+        value.contains('player.mediadelivery.net');
+  }
+
+  bool get usesNativePlayer => !usesEmbedPlayer;
+
   bool get isExpired {
     final expiry = expiresAt;
     if (expiry == null) {

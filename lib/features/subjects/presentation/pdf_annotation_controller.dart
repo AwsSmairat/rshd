@@ -2,6 +2,9 @@ export '../../pdf_editor/controllers/pdf_editor_controller.dart';
 export '../../pdf_editor/models/annotation_enums.dart';
 export '../../pdf_editor/models/pdf_editor_models.dart';
 
+import '../../pdf_editor/models/annotation_enums.dart';
+import '../../pdf_editor/models/pdf_editor_models.dart';
+
 // Legacy document helper kept for older widgets.
 class PdfAnnotationDocument {
   PdfAnnotationDocument([Map<String, dynamic>? json])

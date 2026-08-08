@@ -21,7 +21,10 @@ class LessonFileResource extends JsonResource
             'lesson_id' => $this->lesson_id,
             'title' => $this->title,
             'file_type' => $this->file_type?->value,
-            'file_url' => $canOpen ? $this->resolvedFileUrl() : null,
+            'file_url' => $canOpen && ! $this->requiresSignedDownload()
+                ? $this->resolvedFileUrl()
+                : null,
+            'requires_signed_download' => $canOpen && $this->requiresSignedDownload(),
             'original_file_name' => $this->original_file_name,
             'is_locked' => ! $canOpen,
             'file_size' => $this->file_size,

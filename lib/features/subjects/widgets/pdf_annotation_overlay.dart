@@ -67,7 +67,7 @@ class _PdfAnnotationOverlayState extends State<PdfAnnotationOverlay> {
       return const [];
     }
 
-    final notes = PdfAnnotationDocumentList.listOf(widget.pageData, 'notes');
+    final notes = PdfAnnotationDocument.listOf(widget.pageData, 'notes');
     return notes.map((note) {
       final x = _asDouble(note['x']);
       final y = _asDouble(note['y']);
@@ -93,7 +93,7 @@ class _PdfAnnotationOverlayState extends State<PdfAnnotationOverlay> {
       return;
     }
 
-    if (widget.tool == PdfAnnotationTool.highlight) {
+    if (widget.tool == PdfAnnotationTool.highlighter) {
       setState(() {
         _highlightStart = details.localPosition;
         _previewHighlight = Rect.fromLTWH(
@@ -114,7 +114,7 @@ class _PdfAnnotationOverlayState extends State<PdfAnnotationOverlay> {
       return;
     }
 
-    if (widget.tool == PdfAnnotationTool.highlight && _highlightStart != null) {
+    if (widget.tool == PdfAnnotationTool.highlighter && _highlightStart != null) {
       final start = _highlightStart!;
       final current = details.localPosition;
       setState(() {
@@ -131,7 +131,7 @@ class _PdfAnnotationOverlayState extends State<PdfAnnotationOverlay> {
       widget.onDrawingComplete(points);
     }
 
-    if (widget.tool == PdfAnnotationTool.highlight && _previewHighlight != null) {
+    if (widget.tool == PdfAnnotationTool.highlighter && _previewHighlight != null) {
       final rect = _normalizeRect(_previewHighlight!);
       widget.onHighlightComplete(rect);
     }

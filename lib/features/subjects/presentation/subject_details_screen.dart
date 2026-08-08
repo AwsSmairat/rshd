@@ -48,6 +48,7 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
             widget.subjectId,
             initial: widget.subject,
             cached: cached,
+            refresh: true,
           );
 
       ref
@@ -197,6 +198,15 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
     await ref
         .read(subjectLessonsControllerProvider(widget.subjectId).notifier)
         .load(widget.subjectId, refresh: true);
+
+    final refreshedSubject = ref
+        .read(subjectDetailsControllerProvider(widget.subjectId))
+        .subject;
+    if (refreshedSubject != null) {
+      ref
+          .read(subjectsListControllerProvider.notifier)
+          .syncSubjectProgress(refreshedSubject);
+    }
   }
 
   @override
@@ -244,7 +254,10 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
             onRetry: _retry,
           );
         }
-        return _buildSubjectContent(subject, lessonsState);
+        return RefreshIndicator(
+          onRefresh: _retry,
+          child: _buildSubjectContent(subject, lessonsState),
+        );
     }
   }
 
@@ -257,8 +270,8 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
         : 0;
 
     return CustomScrollView(
-      physics: const BouncingScrollPhysics(
-        parent: AlwaysScrollableScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
       ),
       slivers: [
         SubjectDetailsHero(subject: subject),

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
+import '../../../core/security/screen_protection_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/error_view.dart';
@@ -278,11 +279,13 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
 
     final savedPosition = video.progress?.currentPosition ?? 0;
     final playback = video.playback;
+    final blockPlayback = ref.watch(shouldHideProtectedContentProvider);
 
-    if (playback?.isEmbed ?? false) {
+    if (playback?.usesEmbedPlayer ?? false) {
       return RshdEmbedVideoPlayer(
         playbackUrl: playbackUrl,
         expiresAt: expiresAt,
+        blockPlayback: blockPlayback,
         onRefreshPlayback: () => ref
             .read(videoDetailsControllerProvider(widget.videoId).notifier)
             .refreshPlayback(widget.videoId),
@@ -293,6 +296,7 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
       playbackUrl: playbackUrl,
       expiresAt: expiresAt,
       initialPositionSeconds: savedPosition,
+      blockPlayback: blockPlayback,
       onPositionChanged: _onPositionChanged,
       onPlaybackStateChanged: _onPlaybackStateChanged,
       onRefreshPlayback: () => ref

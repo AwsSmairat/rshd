@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\FileType;
+use App\Enums\LessonFileStorageStatus;
 use App\Filament\Concerns\ChecksPlatformInstructorSettings;
 use App\Filament\Concerns\HasInstructorScope;
 use App\Filament\Concerns\HasSubjectLessonFormFields;
@@ -68,12 +69,12 @@ class LessonFileResource extends Resource
                         Forms\Components\Select::make('file_type')
                             ->label('نوع الملف')
                             ->options(FileType::options())
-                            ->required(),
+                            ->required()
+                            ->live(),
                         Forms\Components\FileUpload::make('file_path')
                             ->label('رفع ملف')
-                            ->disk('public')
-                            ->directory('lesson-files')
-                            ->visibility('public')
+                            ->disk(fn (Get $get): string => static::uploadDiskForType($get('file_type')))
+                            ->directory(fn (Get $get): string => static::isPdfType($get('file_type')) ? 'staging' : 'lesson-files')
                             ->acceptedFileTypes([
                                 'application/pdf',
                                 'application/msword',
@@ -92,15 +93,24 @@ class LessonFileResource extends Resource
                             ->downloadable()
                             ->openable()
                             ->live()
-                            ->helperText('PDF، Word، PowerPoint، Excel، صور، ZIP — حتى 50 ميجابايت.')
+                            ->helperText('PDF يُخزَّن محليًا بشكل خاص ثم يُرفع إلى Bunny عبر قائمة الانتظار.')
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('file_url')
                             ->label('أو رابط خارجي')
                             ->url()
                             ->maxLength(2048)
-                            ->visible(fn (Get $get): bool => blank($get('file_path')))
-                            ->required(fn (Get $get, string $operation): bool => blank($get('file_path')) && $operation === 'create')
-                            ->helperText('استخدمه فقط إذا الملف مستضاف خارج المنصة.'),
+                            ->visible(fn (Get $get): bool => blank($get('file_path')) && ! static::isPdfType($get('file_type')))
+                            ->required(fn (Get $get, string $operation): bool => blank($get('file_path')) && $operation === 'create' && ! static::isPdfType($get('file_type')))
+                            ->helperText('استخدمه فقط للملفات غير PDF المستضافة خارج المنصة.'),
+                        Forms\Components\Placeholder::make('bunny_status')
+                            ->label('حالة Bunny')
+                            ->content(fn (?LessonFile $record): string => match ($record?->storage_status) {
+                                LessonFileStorageStatus::Ready => 'جاهز على Bunny',
+                                LessonFileStorageStatus::Pending => 'قيد الرفع/المعالجة',
+                                LessonFileStorageStatus::Failed => 'فشل الرفع — راجع السجلات',
+                                default => '—',
+                            })
+                            ->visible(fn (?LessonFile $record): bool => $record?->file_type === FileType::Pdf),
                     ])
                     ->columns(2),
             ]);
@@ -126,7 +136,7 @@ class LessonFileResource extends Resource
                 Tables\Columns\TextColumn::make('original_file_name')
                     ->label('الملف')
                     ->formatStateUsing(fn (?string $state, LessonFile $record): string => $state
-                        ?? ($record->file_path ? basename($record->file_path) : 'رابط خارجي'))
+                        ?? ($record->file_path ? basename($record->file_path) : '—'))
                     ->limit(28),
                 Tables\Columns\TextColumn::make('file_type')
                     ->label('النوع')
@@ -139,6 +149,16 @@ class LessonFileResource extends Resource
                         FileType::Other => FileType::Other->label(),
                         default => (string) $state,
                     }),
+                Tables\Columns\TextColumn::make('storage_status')
+                    ->label('Bunny')
+                    ->badge()
+                    ->formatStateUsing(fn (?LessonFileStorageStatus $state): string => match ($state) {
+                        LessonFileStorageStatus::Ready => 'ready',
+                        LessonFileStorageStatus::Pending => 'pending',
+                        LessonFileStorageStatus::Failed => 'failed',
+                        default => '—',
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('file_size')
                     ->label('الحجم')
                     ->formatStateUsing(fn (?int $state): string => $state && $state > 0
@@ -181,37 +201,55 @@ class LessonFileResource extends Resource
             $data['file_path'] = $newPath;
         }
 
+        $fileType = $data['file_type'] ?? $record?->file_type?->value;
+        $isPdf = static::isPdfType($fileType);
+
         if ($newPath && is_string($newPath)) {
             if ($record?->file_path && $record->file_path !== $newPath) {
-                Storage::disk('public')->delete($record->file_path);
+                Storage::disk($record->localSourceDiskName())->delete($record->file_path);
             }
 
-            $disk = Storage::disk('public');
+            $diskName = static::uploadDiskForType($fileType);
+            $disk = Storage::disk($diskName);
 
             if ($disk->exists($newPath)) {
                 $data['file_size'] = $disk->size($newPath);
                 $data['file_mime_type'] = $disk->mimeType($newPath) ?: null;
             }
 
-            $data['file_url'] = $disk->url($newPath);
+            $data['storage_disk'] = $diskName;
+
+            if ($isPdf) {
+                $data['file_url'] = '';
+                $data['storage_provider'] = 'bunny';
+                $data['storage_status'] = LessonFileStorageStatus::Pending;
+                $data['external_path'] = null;
+            } elseif ($diskName === 'public') {
+                $data['file_url'] = Storage::disk('public')->url($newPath);
+            }
         } elseif ($record) {
             if (array_key_exists('file_path', $data) && blank($data['file_path'])) {
                 if ($record->file_path) {
-                    Storage::disk('public')->delete($record->file_path);
+                    Storage::disk($record->localSourceDiskName())->delete($record->file_path);
                 }
 
                 $data['file_path'] = null;
                 $data['file_mime_type'] = null;
                 $data['file_size'] = $record->file_size;
                 $data['original_file_name'] = null;
-                $data['file_url'] = $data['file_url'] ?? $record->file_url;
+                $data['file_url'] = $isPdf ? '' : ($data['file_url'] ?? $record->file_url);
             } else {
                 $data['file_path'] = $record->file_path;
-                $data['file_url'] = $data['file_url'] ?? $record->file_url;
+                $data['file_url'] = $isPdf ? '' : ($data['file_url'] ?? $record->file_url);
                 $data['file_size'] = $record->file_size;
                 $data['file_mime_type'] = $record->file_mime_type;
                 $data['original_file_name'] = $data['original_file_name'] ?? $record->original_file_name;
+                $data['storage_disk'] = $record->storage_disk;
             }
+        }
+
+        if ($isPdf) {
+            $data['file_url'] = '';
         }
 
         if (blank($data['file_url'] ?? null) && blank($data['file_path'] ?? null)) {
@@ -221,6 +259,22 @@ class LessonFileResource extends Resource
         }
 
         return $data;
+    }
+
+    public static function uploadDiskForType(mixed $fileType): string
+    {
+        return static::isPdfType($fileType)
+            ? LessonFile::defaultLocalSourceDisk()
+            : 'public';
+    }
+
+    public static function isPdfType(mixed $fileType): bool
+    {
+        if ($fileType instanceof FileType) {
+            return $fileType === FileType::Pdf;
+        }
+
+        return (string) $fileType === FileType::Pdf->value;
     }
 
     public static function canCreate(): bool

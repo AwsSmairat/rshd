@@ -6,6 +6,8 @@ import 'package:video_player/video_player.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../data/models/video_model.dart';
+import '../utils/playback_refresh_scheduler.dart';
 
 /// Network video player with Chewie controls and signed URL refresh support.
 class RshdVideoPlayer extends StatefulWidget {
@@ -14,6 +16,7 @@ class RshdVideoPlayer extends StatefulWidget {
     required this.playbackUrl,
     this.expiresAt,
     this.initialPositionSeconds = 0,
+    this.blockPlayback = false,
     this.onPositionChanged,
     this.onPlaybackStateChanged,
     this.onRefreshPlayback,
@@ -22,9 +25,10 @@ class RshdVideoPlayer extends StatefulWidget {
   final String playbackUrl;
   final DateTime? expiresAt;
   final int initialPositionSeconds;
+  final bool blockPlayback;
   final ValueChanged<Duration>? onPositionChanged;
   final ValueChanged<bool>? onPlaybackStateChanged;
-  final Future<String?> Function()? onRefreshPlayback;
+  final Future<VideoPlaybackModel?> Function()? onRefreshPlayback;
 
   @override
   State<RshdVideoPlayer> createState() => _RshdVideoPlayerState();
@@ -38,6 +42,7 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
   bool _isRefreshing = false;
   String? _errorMessage;
   String _activePlaybackUrl = '';
+  DateTime? _activeExpiresAt;
 
   static const _playbackErrorMessage =
       'تعذّر تشغيل الفيديو. أعد المحاولة أو حدّث الصفحة.';
@@ -46,6 +51,7 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
   void initState() {
     super.initState();
     _activePlaybackUrl = widget.playbackUrl;
+    _activeExpiresAt = widget.expiresAt;
     _initializePlayer();
     _scheduleRefreshTimer();
   }
@@ -53,6 +59,10 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
   @override
   void didUpdateWidget(covariant RshdVideoPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    if (widget.blockPlayback && !oldWidget.blockPlayback) {
+      _pauseForProtection();
+    }
 
     if (oldWidget.playbackUrl != widget.playbackUrl &&
         widget.playbackUrl.isNotEmpty &&
@@ -62,6 +72,7 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
     }
 
     if (oldWidget.expiresAt != widget.expiresAt) {
+      _activeExpiresAt = widget.expiresAt;
       _scheduleRefreshTimer();
     }
   }
@@ -175,13 +186,16 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
     _isRefreshing = true;
 
     try {
-      final refreshedUrl = await widget.onRefreshPlayback!.call();
-      if (refreshedUrl == null || refreshedUrl.trim().isEmpty) {
+      final refreshedPlayback = await widget.onRefreshPlayback!.call();
+      final refreshedUrl = refreshedPlayback?.url ?? '';
+      if (refreshedUrl.trim().isEmpty) {
         return false;
       }
 
       _activePlaybackUrl = refreshedUrl;
+      _activeExpiresAt = refreshedPlayback?.expiresAt ?? widget.expiresAt;
       await _reloadPlayer(preservePosition: true);
+      _scheduleRefreshTimer();
       return true;
     } finally {
       _isRefreshing = false;
@@ -203,15 +217,17 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
   void _scheduleRefreshTimer() {
     _refreshTimer?.cancel();
 
-    final expiry = widget.expiresAt;
+    final expiry = _activeExpiresAt ?? widget.expiresAt;
     if (expiry == null || widget.onRefreshPlayback == null) {
       return;
     }
 
-    final refreshAt = expiry.subtract(const Duration(seconds: 60));
-    final delay = refreshAt.difference(DateTime.now());
+    final delay = playbackRefreshDelay(expiry);
+    if (delay == null) {
+      return;
+    }
 
-    if (delay.isNegative) {
+    if (delay == Duration.zero) {
       unawaited(_refreshPlaybackAndRetry());
       return;
     }
@@ -239,6 +255,17 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
 
     widget.onPositionChanged?.call(controller.value.position);
     widget.onPlaybackStateChanged?.call(controller.value.isPlaying);
+  }
+
+  void _pauseForProtection() {
+    final controller = _videoController;
+    if (controller == null || !controller.value.isInitialized) {
+      return;
+    }
+    if (controller.value.isPlaying) {
+      unawaited(controller.pause());
+      widget.onPlaybackStateChanged?.call(false);
+    }
   }
 
   @override

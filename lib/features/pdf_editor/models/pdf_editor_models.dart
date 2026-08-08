@@ -264,9 +264,23 @@ class PdfAnnotationDocumentV2 {
     return result;
   }
 
-  Map<String, dynamic> _pagesMap() =>
-      _root.putIfAbsent('pages', () => <String, dynamic>{})
-          as Map<String, dynamic>;
+  Map<String, dynamic> _pagesMap() {
+    final raw = _root['pages'];
+    if (raw is Map) {
+      final normalized = <String, dynamic>{};
+      for (final entry in raw.entries) {
+        final value = entry.value;
+        normalized[entry.key.toString()] = value is Map
+            ? Map<String, dynamic>.from(value)
+            : value;
+      }
+      _root['pages'] = normalized;
+      return normalized;
+    }
+    final created = <String, dynamic>{};
+    _root['pages'] = created;
+    return created;
+  }
 
   static Map<String, dynamic> _emptyPage() => {
         'page_width': 595.0,

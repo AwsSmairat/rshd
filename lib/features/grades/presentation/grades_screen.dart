@@ -7,10 +7,13 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/loading_widget.dart';
+import '../../../core/widgets/responsive_content.dart';
 import '../../auth/presentation/auth_controller.dart';
 import '../../subjects/presentation/subjects_controller.dart';
-import '../../../core/layout/app_layout_metrics.dart';
 import '../widgets/grade_card.dart';
+import '../widgets/grades_empty_state.dart';
+import '../widgets/grades_header.dart';
+import '../widgets/grades_summary_card.dart';
 import 'grades_controller.dart';
 
 class GradesScreen extends ConsumerStatefulWidget {
@@ -49,150 +52,84 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('درجاتي')),
-      body: _buildBody(state),
+      backgroundColor: Colors.transparent,
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        color: AppColors.darkGold,
+        backgroundColor: AppColors.cardWhite,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            const SliverToBoxAdapter(child: GradesHeader()),
+            ResponsiveSliverContent(
+              sliver: _buildContent(state),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildBody(GradesListState state) {
+  Widget _buildContent(GradesListState state) {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
-        return const LoadingWidget(message: 'جاري تحميل الدرجات...');
-      case FeatureLoadStatus.empty:
-        return RefreshIndicator(
-          onRefresh: _refresh,
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            children: const [
-              SizedBox(height: 120),
-              Center(child: Text('لا توجد درجات حالياً')),
-            ],
+        return const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.only(top: 24),
+            child: LoadingWidget(message: 'جاري تحميل الدرجات...'),
           ),
         );
+      case FeatureLoadStatus.empty:
+        return const SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(child: GradesEmptyState()),
+        );
       case FeatureLoadStatus.error:
-        return ErrorView(
-          message: state.errorMessage ?? 'حدث خطأ غير متوقع',
-          onRetry: () => ref.read(gradesListControllerProvider.notifier).load(),
+        return SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(
+            child: ErrorView(
+              message: state.errorMessage ?? 'حدث خطأ غير متوقع',
+              onRetry: () =>
+                  ref.read(gradesListControllerProvider.notifier).load(),
+            ),
+          ),
         );
       case FeatureLoadStatus.loaded:
-        final pagePadding = AppLayoutMetrics.of(context).pagePadding(
-          top: 16,
-          bottom: 16,
-        );
-        return RefreshIndicator(
-          onRefresh: _refresh,
-          child: ListView.separated(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: pagePadding,
-            itemCount: state.grades.length + 1,
-            separatorBuilder: (context, index) {
+        return SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
               if (index == 0) {
-                return const SizedBox(height: 12);
+                return GradesSummaryCard(state: state);
               }
-              return const SizedBox(height: 12);
-            },
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return _GradesSummary(state: state);
+              if (index == 1) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 12),
+                  child: Text(
+                    'سجل الدرجات',
+                    style: AppTextStyles.subtitle.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                );
               }
 
-              final grade = state.grades[index - 1];
-              return GradeCard(
-                grade: grade,
-                onTap: () => context.push(AppRoutes.gradeDetails(grade.id)),
+              final grade = state.grades[index - 2];
+              final isLast = index == state.grades.length + 1;
+
+              return Padding(
+                padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
+                child: GradeCard(
+                  grade: grade,
+                  onTap: () => context.push(AppRoutes.gradeDetails(grade.id)),
+                ),
               );
             },
+            childCount: state.grades.length + 2,
           ),
         );
     }
-  }
-}
-
-class _GradesSummary extends StatelessWidget {
-  const _GradesSummary({required this.state});
-
-  final GradesListState state;
-
-  @override
-  Widget build(BuildContext context) {
-    final average = state.averageGrade;
-    final highest = state.highestGrade;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.cardWhite,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.accent.withValues(alpha: 0.35)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text('ملخص الدرجات', style: AppTextStyles.subtitle),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _SummaryItem(
-                  label: 'عدد الدرجات',
-                  value: '${state.count}',
-                ),
-              ),
-              Expanded(
-                child: _SummaryItem(
-                  label: 'المتوسط',
-                  value: average != null
-                      ? '${average.toStringAsFixed(1)}%'
-                      : '—',
-                ),
-              ),
-              Expanded(
-                child: _SummaryItem(
-                  label: 'الأعلى',
-                  value: highest != null
-                      ? '${highest.toStringAsFixed(1)}%'
-                      : '—',
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SummaryItem extends StatelessWidget {
-  const _SummaryItem({
-    required this.label,
-    required this.value,
-  });
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: AppTextStyles.title.copyWith(
-            fontSize: 18,
-            color: AppColors.primary,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: AppTextStyles.body.copyWith(
-            fontSize: 12,
-            color: AppColors.textMuted,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
   }
 }

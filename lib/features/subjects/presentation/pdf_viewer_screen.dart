@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -12,11 +13,14 @@ import '../../../core/widgets/loading_widget.dart';
 import '../../pdf_editor/controllers/pdf_editor_controller.dart';
 import '../../pdf_editor/models/annotation_enums.dart';
 import '../../pdf_editor/models/pdf_editor_models.dart';
-import '../../pdf_editor/services/pdf_coordinate_mapper.dart';
 import '../../pdf_editor/services/pdf_export_service.dart';
+import '../../pdf_editor/services/pdf_share_service.dart';
+import '../../pdf_editor/services/pdf_viewer_source_loader.dart';
+import '../data/subjects_repository.dart';
+import '../../pdf_editor/widgets/pdf_annotation_overlay_host.dart';
 import '../../pdf_editor/widgets/pdf_editor_toolbar.dart';
-import '../../pdf_editor/widgets/pdf_page_annotation_layer.dart';
 import '../../pdf_editor/widgets/pen_settings_sheet.dart';
+import '../../pdf_editor/widgets/text_settings_sheet.dart';
 
 /// Professional in-app PDF editor with page-bound annotations.
 class PdfViewerScreen extends ConsumerStatefulWidget {
@@ -24,12 +28,12 @@ class PdfViewerScreen extends ConsumerStatefulWidget {
     super.key,
     required this.fileId,
     required this.title,
-    required this.fileUrl,
+    this.courseTitle,
   });
 
   final int fileId;
   final String title;
-  final String fileUrl;
+  final String? courseTitle;
 
   @override
   ConsumerState<PdfViewerScreen> createState() => _PdfViewerScreenState();
@@ -39,12 +43,17 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     with WidgetsBindingObserver {
   final PdfViewerController _pdfController = PdfViewerController();
   final PdfExportService _exportService = PdfExportService();
+  final PdfShareService _shareService = PdfShareService();
+  final PdfViewerSourceLoader _sourceLoader = PdfViewerSourceLoader();
 
   bool _isLoading = true;
   bool _hasError = false;
+  String? _loadErrorMessage;
+  Uint8List? _pdfBytes;
   Size _viewportSize = Size.zero;
   Size _pdfPageSize = const Size(595, 842);
   final Map<int, Size> _pageSizes = {};
+  final Map<int, int> _pageRotations = {};
   bool _sessionRestored = false;
 
   @override
@@ -53,7 +62,35 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(pdfEditorControllerProvider(widget.fileId).notifier).load();
+      _preparePdfSource();
     });
+  }
+
+  Future<void> _preparePdfSource() async {
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+      _loadErrorMessage = null;
+    });
+
+    try {
+      final bytes = await _sourceLoader.load(
+        fileId: widget.fileId,
+        repository: ref.read(subjectsRepositoryProvider),
+      );
+      if (!mounted) return;
+      setState(() {
+        _pdfBytes = bytes;
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _hasError = true;
+        _isLoading = false;
+        _loadErrorMessage = 'تعذر فتح ملف PDF، يرجى المحاولة لاحقاً';
+      });
+    }
   }
 
   @override
@@ -142,7 +179,94 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
       x: x,
       y: y,
       text: text,
-      color: _state.penSettings.color,
+      color: _state.textSettings.color,
+      fontSize: _state.textSettings.fontSize,
+    );
+  }
+
+  Future<void> _showTextEditDialog(PdfEditorAnnotation annotation) async {
+    final controller =
+        TextEditingController(text: annotation.data['text']?.toString() ?? '');
+    final text = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('تعديل النص'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLines: 3,
+          textDirection: TextDirection.rtl,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              _editor.deleteAnnotation(annotation.id, annotation.pageNumber);
+              _editor.selectAnnotation(null);
+              Navigator.pop(context);
+            },
+            child: const Text('حذف', style: TextStyle(color: AppColors.error)),
+          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, controller.text),
+            child: const Text('حفظ'),
+          ),
+        ],
+      ),
+    );
+
+    if (text == null || text.trim().isEmpty || !mounted) return;
+    _editor.updateTextBox(
+      id: annotation.id,
+      pageNumber: annotation.pageNumber,
+      text: text,
+      color: _state.textSettings.color,
+      fontSize: _state.textSettings.fontSize,
+    );
+  }
+
+  void _showSelectionActions(PdfEditorAnnotation annotation) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.cardWhite,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (annotation.type == AnnotationType.text)
+                ListTile(
+                  leading: const Icon(Icons.edit_outlined),
+                  title: const Text('تعديل النص'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showTextEditDialog(annotation);
+                  },
+                ),
+              if (annotation.type == AnnotationType.note)
+                ListTile(
+                  leading: const Icon(Icons.sticky_note_2_outlined),
+                  title: const Text('فتح الملاحظة'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showExistingNote(annotation);
+                  },
+                ),
+              ListTile(
+                leading: const Icon(Icons.delete_outline, color: AppColors.error),
+                title: const Text('حذف'),
+                onTap: () {
+                  _editor.deleteSelectedAnnotation();
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -204,23 +328,35 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     );
     if (confirmed != true || !mounted) return;
 
-    var progress = 0.0;
+    final progressNotifier = ValueNotifier<double>(0);
+    final messageNotifier = ValueNotifier<String>('جاري تجهيز الملف...');
+
+    if (!mounted) return;
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setLocalState) {
-            return AlertDialog(
-              title: const Text('جاري التصدير'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  LinearProgressIndicator(value: progress),
-                  const SizedBox(height: 12),
-                  Text('${(progress * 100).round()}%'),
-                ],
-              ),
+      builder: (dialogContext) {
+        return ValueListenableBuilder<double>(
+          valueListenable: progressNotifier,
+          builder: (context, progress, _) {
+            return ValueListenableBuilder<String>(
+              valueListenable: messageNotifier,
+              builder: (context, message, __) {
+                return AlertDialog(
+                  title: const Text('تصدير PDF'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      LinearProgressIndicator(
+                        value: progress > 0 && progress < 1 ? progress : null,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(message, textAlign: TextAlign.center),
+                    ],
+                  ),
+                );
+              },
             );
           },
         );
@@ -228,22 +364,78 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     );
 
     try {
-      final file = await _exportService.exportAnnotatedPdf(
-        sourceUrl: widget.fileUrl,
-        originalFileName: widget.title,
+      final result = await _exportService.exportAnnotatedPdf(
+        fileId: widget.fileId,
+        courseTitle: widget.courseTitle,
+        documentTitle: widget.title,
         annotationJson: _state.annotationJson,
-        onProgress: (value, _) {
-          progress = value;
+        onProgress: (value, message) {
+          progressNotifier.value = value;
+          messageNotifier.value = message;
         },
       );
       if (!mounted) return;
       Navigator.pop(context);
-      _showSnackBar('تم حفظ النسخة: ${file.path.split('/').last}');
+      await _showExportSuccessDialog(result);
     } catch (_) {
       if (!mounted) return;
       Navigator.pop(context);
-      _showSnackBar('تعذر تصدير الملف');
+      await _showExportErrorDialog(
+        onRetry: () => _handleExport(saveAsCopy: saveAsCopy),
+      );
+    } finally {
+      progressNotifier.dispose();
+      messageNotifier.dispose();
     }
+  }
+
+  Future<void> _showExportSuccessDialog(PdfExportResult result) async {
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('نجاح التصدير'),
+        content: Text('تم إنشاء الملف:\n${result.fileName}'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إغلاق'),
+          ),
+          FilledButton.icon(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await _shareService.shareExportedPdf(
+                  file: result.file,
+                  subject: widget.title,
+                );
+              } catch (_) {
+                if (!mounted) return;
+                _showSnackBar('تعذر فتح نافذة المشاركة');
+              }
+            },
+            icon: const Icon(Icons.share_outlined),
+            label: const Text('مشاركة'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showExportErrorDialog({required VoidCallback onRetry}) async {
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('تعذر التصدير'),
+        content: const Text('حدث خطأ أثناء إنشاء ملف PDF. يمكنك المحاولة مرة أخرى.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('إغلاق')),
+          FilledButton(onPressed: () {
+            Navigator.pop(context);
+            onRetry();
+          }, child: const Text('إعادة المحاولة')),
+        ],
+      ),
+    );
   }
 
   void _openMoreMenu() {
@@ -343,28 +535,44 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
   }
 
   void _handleToolSelected(PdfEditorTool tool) {
+    final previousTool = _state.currentTool;
     _editor.setTool(tool);
 
     if (tool == PdfEditorTool.shapes) {
-      _showShapePicker();
+      if (previousTool != PdfEditorTool.shapes) {
+        _showShapePicker();
+      }
+      return;
+    }
+
+    if (tool == PdfEditorTool.text) {
+      if (previousTool != PdfEditorTool.text) {
+        showTextSettingsSheet(
+          context,
+          settings: _state.textSettings,
+          onChanged: _editor.setTextSettings,
+        );
+      }
       return;
     }
 
     if (tool == PdfEditorTool.pen ||
         tool == PdfEditorTool.highlighter ||
         tool == PdfEditorTool.eraser) {
-      showPenSettingsSheet(
-        context,
-        tool: tool,
-        penSettings: _state.penSettings,
-        highlighterSettings: _state.highlighterSettings,
-        eraserMode: _state.eraserMode,
-        eraserSize: _state.eraserSize,
-        onPenChanged: _editor.setPenSettings,
-        onHighlighterChanged: _editor.setHighlighterSettings,
-        onEraserModeChanged: _editor.setEraserMode,
-        onEraserSizeChanged: _editor.setEraserSize,
-      );
+      if (previousTool != tool) {
+        showPenSettingsSheet(
+          context,
+          tool: tool,
+          penSettings: _state.penSettings,
+          highlighterSettings: _state.highlighterSettings,
+          eraserMode: _state.eraserMode,
+          eraserSize: _state.eraserSize,
+          onPenChanged: _editor.setPenSettings,
+          onHighlighterChanged: _editor.setHighlighterSettings,
+          onEraserModeChanged: _editor.setEraserMode,
+          onEraserSizeChanged: _editor.setEraserSize,
+        );
+      }
     }
   }
 
@@ -436,13 +644,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     );
   }
 
-  PdfPageLayoutMetrics _metrics(PdfEditorState state) {
-    return PdfPageLayoutMetrics(
-      pdfPageSize: _pdfPageSize,
-      viewportSize: _viewportSize,
-      zoomLevel: state.zoomLevel,
-    );
-  }
+  int get _currentPageRotation => _pageRotations[_state.currentPage] ?? 0;
 
   @override
   Widget build(BuildContext context) {
@@ -457,7 +659,6 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
       }
     });
 
-    final fileUrl = widget.fileUrl.trim();
     final isTabletLandscape = MediaQuery.sizeOf(context).shortestSide >= 600 &&
         MediaQuery.orientationOf(context) == Orientation.landscape;
 
@@ -495,7 +696,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
             onSave: _handleSave,
             onRetrySave: _handleSave,
           ),
-          body: _buildBody(fileUrl),
+          body: _buildBody(),
           bottomNavigationBar: isTabletLandscape
               ? null
               : PdfEditorToolbar(
@@ -503,10 +704,12 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                   canUndo: _editor.canUndo,
                   canRedo: _editor.canRedo,
                   visible: _state.toolbarVisible,
+                  expanded: _state.toolbarExpanded,
                   isTabletLandscape: false,
                   onToolSelected: _handleToolSelected,
                   onUndo: _editor.undo,
                   onRedo: _editor.redo,
+                  onToggleExpanded: _editor.toggleToolbarExpanded,
                   onToggleVisibility: _editor.toggleToolbar,
                 ),
           floatingActionButton: null,
@@ -515,75 +718,46 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     );
   }
 
-  Widget _buildBody(String fileUrl) {
-    if (fileUrl.isEmpty) {
-      return const ErrorView(message: 'رابط الملف غير متوفر حالياً');
-    }
-
-    final uri = Uri.tryParse(fileUrl);
-    if (uri == null || !uri.hasScheme) {
-      return const ErrorView(message: 'تعذر فتح ملف PDF، يرجى المحاولة لاحقاً');
-    }
-
+  Widget _buildBody() {
     if (_hasError) {
       return ErrorView(
-        message: 'تعذر فتح ملف PDF، يرجى المحاولة لاحقاً',
-        onRetry: () => setState(() {
-          _hasError = false;
-          _isLoading = true;
-        }),
+        message: _loadErrorMessage ?? 'تعذر فتح ملف PDF، يرجى المحاولة لاحقاً',
+        onRetry: _preparePdfSource,
       );
+    }
+
+    if (_isLoading || _pdfBytes == null) {
+      return const LoadingWidget(message: 'جاري تحميل ملف PDF...');
     }
 
     return LayoutBuilder(
       builder: (context, constraints) {
         _viewportSize = Size(constraints.maxWidth, constraints.maxHeight);
-        final metrics = _metrics(_state);
+        final isViewTool = _state.currentTool == PdfEditorTool.view;
 
         return Stack(
           children: [
-            SfPdfViewer.network(
-              fileUrl,
+            IgnorePointer(
+              ignoring: !isViewTool,
+              child: SfPdfViewer.memory(
+              _pdfBytes!,
               controller: _pdfController,
               pageLayoutMode: PdfPageLayoutMode.single,
               scrollDirection: PdfScrollDirection.vertical,
               canShowScrollHead: false,
               canShowScrollStatus: false,
               canShowPaginationDialog: false,
-              enableTextSelection: _state.currentTool == PdfEditorTool.view,
+              enableDoubleTapZooming: true,
+              enableTextSelection: isViewTool,
               canShowTextSelectionMenu: false,
               canShowHyperlinkDialog: false,
-              onDocumentLoaded: (details) {
-                if (!mounted) return;
-                final pageCount = _pdfController.pageCount;
-                if (details.document.pages.count > 0) {
-                  for (var i = 0; i < details.document.pages.count; i++) {
-                    final page = details.document.pages[i];
-                    _pageSizes[i + 1] =
-                        Size(page.size.width, page.size.height);
-                  }
-                  final firstPage = details.document.pages[0];
-                  _pdfPageSize = Size(firstPage.size.width, firstPage.size.height);
-                  _editor.registerPageSize(1, firstPage.size.width, firstPage.size.height);
-                }
-                setState(() => _isLoading = false);
-                _editor.setTotalPages(pageCount);
-                _editor.setCurrentPage(_pdfController.pageNumber);
-                if (!_sessionRestored) {
-                  _sessionRestored = true;
-                  _editor.restoreSession(
-                    PdfViewerSessionController(
-                      (page) => _pdfController.jumpToPage(page),
-                      (zoom) => _pdfController.zoomLevel = zoom,
-                    ),
-                  );
-                }
-              },
+              onDocumentLoaded: (details) => _handleDocumentLoaded(details),
               onDocumentLoadFailed: (_) {
                 if (!mounted) return;
                 setState(() {
                   _isLoading = false;
                   _hasError = true;
+                  _loadErrorMessage = 'تعذر فتح ملف PDF، يرجى المحاولة لاحقاً';
                 });
               },
               onPageChanged: (details) {
@@ -603,11 +777,16 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                 _editor.setZoomLevel(details.newZoomLevel);
               },
             ),
+            ),
             if (!_isLoading && _viewportSize != Size.zero)
-              PdfPageAnnotationLayer(
+              PdfAnnotationOverlayHost(
+                pdfController: _pdfController,
+                viewportSize: _viewportSize,
+                pdfPageSize: _pdfPageSize,
+                pageRotationDegrees: _currentPageRotation,
+                passThroughTouches: isViewTool,
                 tool: _state.currentTool,
                 annotations: _state.currentPageAnnotations,
-                metrics: metrics,
                 penSettings: _state.penSettings,
                 highlighterSettings: _state.highlighterSettings,
                 eraserMode: _state.eraserMode,
@@ -672,7 +851,17 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                   );
                 },
                 onNoteMarkerTap: _showExistingNote,
-                onSelectAnnotation: _editor.selectAnnotation,
+                onSelectAnnotation: (id) {
+                  _editor.selectAnnotation(id);
+                  if (id != null && _state.currentTool == PdfEditorTool.lasso) {
+                    final annotation = _state.currentPageAnnotations
+                        .firstWhere((item) => item.id == id);
+                    if (annotation.type != AnnotationType.text &&
+                        annotation.type != AnnotationType.note) {
+                      _showSelectionActions(annotation);
+                    }
+                  }
+                },
                 onMoveAnnotation: (id, x, y) {
                   _editor.moveAnnotation(
                     id: id,
@@ -681,6 +870,9 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                     y: y,
                   );
                 },
+                onBatchBegin: _editor.beginBatch,
+                onBatchEnd: _editor.endBatch,
+                onTextAnnotationTap: _showTextEditDialog,
               ),
             if (_isLoading) const LoadingWidget(message: 'جاري تحميل ملف PDF...'),
             if (MediaQuery.sizeOf(context).shortestSide >= 600 &&
@@ -690,16 +882,53 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                 canUndo: _editor.canUndo,
                 canRedo: _editor.canRedo,
                 visible: _state.toolbarVisible,
+                expanded: _state.toolbarExpanded,
                 isTabletLandscape: true,
                 onToolSelected: _handleToolSelected,
                 onUndo: _editor.undo,
                 onRedo: _editor.redo,
+                onToggleExpanded: _editor.toggleToolbarExpanded,
                 onToggleVisibility: _editor.toggleToolbar,
               ),
           ],
         );
       },
     );
+  }
+
+  void _handleDocumentLoaded(PdfDocumentLoadedDetails details) {
+    if (!mounted) return;
+    final pageCount = _pdfController.pageCount;
+    if (details.document.pages.count > 0) {
+      for (var i = 0; i < details.document.pages.count; i++) {
+        final page = details.document.pages[i];
+        _pageSizes[i + 1] = Size(page.size.width, page.size.height);
+        _pageRotations[i + 1] = _rotationDegrees(page.rotation);
+      }
+      final firstPage = details.document.pages[0];
+      _pdfPageSize = Size(firstPage.size.width, firstPage.size.height);
+      _editor.registerPageSize(1, firstPage.size.width, firstPage.size.height);
+    }
+    setState(() => _isLoading = false);
+    _editor.setTotalPages(pageCount);
+    _editor.setCurrentPage(_pdfController.pageNumber);
+    if (!_sessionRestored) {
+      _sessionRestored = true;
+      _editor.restoreSession(
+        PdfViewerSessionController(
+          (page) => _pdfController.jumpToPage(page),
+          (zoom) => _pdfController.zoomLevel = zoom,
+        ),
+      );
+    }
+  }
+
+  int _rotationDegrees(dynamic rotation) {
+    final name = rotation.toString();
+    if (name.contains('rotateAngle90')) return 90;
+    if (name.contains('rotateAngle180')) return 180;
+    if (name.contains('rotateAngle270')) return 270;
+    return 0;
   }
 }
 

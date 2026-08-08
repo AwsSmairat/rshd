@@ -44,6 +44,10 @@ Route::prefix('v1')->group(function () {
     Route::get('videos/{video}/stream', [VideoStreamController::class, 'stream'])
         ->name('api.v1.videos.stream');
 
+    Route::get('files/{file}/stream', [LessonFileController::class, 'stream'])
+        ->middleware('signed')
+        ->name('api.v1.files.stream');
+
     Route::post('webhooks/bunny/stream', BunnyStreamWebhookController::class)
         ->name('api.webhooks.bunny.stream');
 
@@ -64,6 +68,7 @@ Route::prefix('v1')->group(function () {
         Route::post('videos/{video}/progress', [VideoController::class, 'updateProgress']);
 
         Route::get('files/{file}', [LessonFileController::class, 'show']);
+        Route::get('files/{file}/download', [LessonFileController::class, 'download']);
         Route::get('files/{file}/annotations', [LessonFileController::class, 'getAnnotations']);
         Route::post('files/{file}/annotations', [LessonFileController::class, 'storeAnnotations']);
 
