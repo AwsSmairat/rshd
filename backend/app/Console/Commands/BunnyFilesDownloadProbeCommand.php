@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\LessonFile;
+use App\Models\User;
 use App\Services\Bunny\BunnyFilesCdnTokenSigner;
 use App\Services\LessonFileDownloadService;
-use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 

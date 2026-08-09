@@ -174,8 +174,9 @@ class PdfEditorState {
       eraserMode: eraserMode ?? this.eraserMode,
       eraserSize: eraserSize ?? this.eraserSize,
       allowFingerDrawing: allowFingerDrawing ?? this.allowFingerDrawing,
-      selectedAnnotationId:
-          clearSelected ? null : (selectedAnnotationId ?? this.selectedAnnotationId),
+      selectedAnnotationId: clearSelected
+          ? null
+          : (selectedAnnotationId ?? this.selectedAnnotationId),
       shapeTool: shapeTool ?? this.shapeTool,
       toolbarVisible: toolbarVisible ?? this.toolbarVisible,
       toolbarExpanded: toolbarExpanded ?? this.toolbarExpanded,
@@ -185,13 +186,7 @@ class PdfEditorState {
   }
 }
 
-enum PdfAnnotationStatus {
-  initial,
-  loading,
-  loaded,
-  saving,
-  error,
-}
+enum PdfAnnotationStatus { initial, loading, loaded, saving, error }
 
 String mapPdfEditorError(ApiException error) {
   if (error.isForbidden) {
@@ -205,7 +200,7 @@ String mapPdfEditorError(ApiException error) {
 
 class PdfEditorController extends StateNotifier<PdfEditorState> {
   PdfEditorController(this._repository, this._fileId)
-      : super(const PdfEditorState()) {
+    : super(const PdfEditorState()) {
     _localCache = AnnotationLocalCache();
   }
 
@@ -228,7 +223,10 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
   }
 
   Future<void> load() async {
-    state = state.copyWith(status: PdfAnnotationStatus.loading, clearError: true);
+    state = state.copyWith(
+      status: PdfAnnotationStatus.loading,
+      clearError: true,
+    );
 
     Map<String, dynamic>? local;
     try {
@@ -640,10 +638,7 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
         height: height,
         createdAt: now,
         updatedAt: now,
-        data: {
-          'color': _colorToHex(color),
-          'opacity': opacity,
-        },
+        data: {'color': _colorToHex(color), 'opacity': opacity},
       ),
     );
     _commitDocument(document);
@@ -672,10 +667,7 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
         y: y,
         createdAt: now,
         updatedAt: now,
-        data: {
-          'text': trimmed,
-          if (author != null) 'author': author,
-        },
+        data: {'text': trimmed, 'author': ?author},
       ),
     );
     _commitDocument(document);
@@ -788,10 +780,7 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
     if (color != null) nextData['color'] = _colorToHex(color);
     if (fontSize != null) nextData['font_size'] = fontSize;
 
-    items[index] = current.copyWith(
-      updatedAt: DateTime.now(),
-      data: nextData,
-    );
+    items[index] = current.copyWith(updatedAt: DateTime.now(), data: nextData);
     document.setAnnotationsForPage(pageNumber, items);
 
     if (_batchDocument != null) {
@@ -835,10 +824,7 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
         break;
     }
 
-    items[index] = current.copyWith(
-      updatedAt: DateTime.now(),
-      data: nextData,
-    );
+    items[index] = current.copyWith(updatedAt: DateTime.now(), data: nextData);
     document.setAnnotationsForPage(pageNumber, items);
 
     if (_batchDocument != null) {
@@ -902,10 +888,7 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
   }
 
   void selectAnnotation(String? id) {
-    state = state.copyWith(
-      selectedAnnotationId: id,
-      clearSelected: id == null,
-    );
+    state = state.copyWith(selectedAnnotationId: id, clearSelected: id == null);
   }
 
   void eraseAtPoint({
@@ -947,7 +930,10 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
 
       final points = rawPoints
           .whereType<Map>()
-          .map((entry) => NormalizedPoint.fromJson(Map<String, dynamic>.from(entry)))
+          .map(
+            (entry) =>
+                NormalizedPoint.fromJson(Map<String, dynamic>.from(entry)),
+          )
           .where((p) => _distanceSquared(p, point) > radiusSquared)
           .toList();
 
@@ -958,7 +944,10 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
         } else {
           items[i] = item.copyWith(
             updatedAt: DateTime.now(),
-            data: {...item.data, 'points': points.map((p) => p.toJson()).toList()},
+            data: {
+              ...item.data,
+              'points': points.map((p) => p.toJson()).toList(),
+            },
           );
           document.setAnnotationsForPage(pageNumber, items);
         }
@@ -974,7 +963,11 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
     }
   }
 
-  bool _hitTest(PdfEditorAnnotation item, NormalizedPoint point, double radius) {
+  bool _hitTest(
+    PdfEditorAnnotation item,
+    NormalizedPoint point,
+    double radius,
+  ) {
     if (item.type == AnnotationType.note || item.type == AnnotationType.text) {
       return _distanceSquared(NormalizedPoint(item.x, item.y), point) <=
           (radius * 2) * (radius * 2);
@@ -984,9 +977,10 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
       final radiusSquared = radius * radius;
       for (final raw in rawPoints.whereType<Map>()) {
         if (_distanceSquared(
-          NormalizedPoint.fromJson(Map<String, dynamic>.from(raw)),
-          point,
-        ) <= radiusSquared) {
+              NormalizedPoint.fromJson(Map<String, dynamic>.from(raw)),
+              point,
+            ) <=
+            radiusSquared) {
           return true;
         }
       }
@@ -1037,8 +1031,8 @@ class PdfViewerSessionController {
 
 final pdfEditorControllerProvider = StateNotifierProvider.autoDispose
     .family<PdfEditorController, PdfEditorState, int>((ref, fileId) {
-  return PdfEditorController(ref.watch(subjectsRepositoryProvider), fileId);
-});
+      return PdfEditorController(ref.watch(subjectsRepositoryProvider), fileId);
+    });
 
 // Backward compatibility aliases for existing imports.
 typedef PdfAnnotationTool = PdfEditorTool;

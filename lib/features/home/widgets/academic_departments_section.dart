@@ -11,10 +11,7 @@ import 'department_card.dart';
 import 'home_section_header.dart';
 
 class AcademicDepartmentsSection extends StatelessWidget {
-  const AcademicDepartmentsSection({
-    super.key,
-    required this.subjects,
-  });
+  const AcademicDepartmentsSection({super.key, required this.subjects});
 
   final List<SubjectModel> subjects;
 
@@ -114,10 +111,7 @@ class AcademicDepartmentsSection extends StatelessWidget {
                 itemCount: cards.length,
                 separatorBuilder: (context, index) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
-                  return SizedBox(
-                    width: 168,
-                    child: cards[index],
-                  );
+                  return SizedBox(width: 168, child: cards[index]);
                 },
               ),
             ),

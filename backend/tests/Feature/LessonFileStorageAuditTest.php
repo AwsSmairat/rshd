@@ -2,11 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Enums\AccessStatus;
 use App\Enums\ContentStatus;
 use App\Enums\FileType;
 use App\Enums\LessonFileStorageStatus;
-use App\Enums\PaymentStatus;
 use App\Enums\SubjectCategory;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
@@ -19,6 +17,7 @@ use App\Services\LessonFiles\LessonFileBunnyStorageAuditService;
 use App\Services\LessonFiles\LessonFileStorageAuditService;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class LessonFileStorageAuditTest extends TestCase
@@ -34,7 +33,7 @@ class LessonFileStorageAuditTest extends TestCase
 
     public function test_local_audit_flags_public_pdf_delivery_source(): void
     {
-        \Illuminate\Support\Facades\Storage::disk('public')->put('lesson-files/demo.pdf', 'pdf');
+        Storage::disk('public')->put('lesson-files/demo.pdf', 'pdf');
 
         $lesson = $this->createLesson();
 

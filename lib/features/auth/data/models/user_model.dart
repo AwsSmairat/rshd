@@ -66,10 +66,7 @@ class UserModel {
 }
 
 class AuthSession {
-  const AuthSession({
-    required this.token,
-    required this.user,
-  });
+  const AuthSession({required this.token, required this.user});
 
   final String token;
   final UserModel user;

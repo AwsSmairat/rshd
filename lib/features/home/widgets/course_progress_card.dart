@@ -46,7 +46,8 @@ class CourseProgressCard extends StatelessWidget {
   }
 
   String _badgeLabel() {
-    if (subject.categoryLabel.isNotEmpty && subject.categoryLabel != subject.category) {
+    if (subject.categoryLabel.isNotEmpty &&
+        subject.categoryLabel != subject.category) {
       return subject.categoryLabel;
     }
     return subject.title.split(' ').first;
@@ -81,9 +82,9 @@ class CourseProgressCard extends StatelessWidget {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
                               _CoverFallback(
-                            gradientStart: _gradientStart(),
-                            gradientEnd: _gradientEnd(),
-                          ),
+                                gradientStart: _gradientStart(),
+                                gradientEnd: _gradientEnd(),
+                              ),
                         )
                       : _CoverFallback(
                           gradientStart: _gradientStart(),
@@ -170,8 +171,9 @@ class CourseProgressCard extends StatelessWidget {
                           child: LinearProgressIndicator(
                             value: progress!.clamp(0, 1),
                             minHeight: 6,
-                            backgroundColor:
-                                AppColors.accent.withValues(alpha: 0.18),
+                            backgroundColor: AppColors.accent.withValues(
+                              alpha: 0.18,
+                            ),
                             color: AppColors.accent,
                           ),
                         ),

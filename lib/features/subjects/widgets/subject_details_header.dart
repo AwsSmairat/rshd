@@ -24,16 +24,15 @@ class SubjectCoverPalette {
 }
 
 class SubjectDetailsHero extends StatelessWidget {
-  const SubjectDetailsHero({
-    super.key,
-    required this.subject,
-  });
+  const SubjectDetailsHero({super.key, required this.subject});
 
   final SubjectModel subject;
 
   @override
   Widget build(BuildContext context) {
-    final (gradientStart, gradientEnd) = SubjectCoverPalette.gradientFor(subject);
+    final (gradientStart, gradientEnd) = SubjectCoverPalette.gradientFor(
+      subject,
+    );
     final coverUrl = subject.resolvedCoverImageUrl;
     final topInset = MediaQuery.paddingOf(context).top;
 
@@ -49,10 +48,7 @@ class SubjectDetailsHero extends StatelessWidget {
         subject.title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          fontWeight: FontWeight.w700,
-          fontSize: 17,
-        ),
+        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
       ),
       flexibleSpace: FlexibleSpaceBar(
         stretchModes: const [
@@ -216,7 +212,8 @@ class SubjectDetailsMetaCard extends StatelessWidget {
                 ),
             ],
           ),
-          if (subject.description != null && subject.description!.isNotEmpty) ...[
+          if (subject.description != null &&
+              subject.description!.isNotEmpty) ...[
             const SizedBox(height: 16),
             Text(
               subject.description!,
@@ -373,10 +370,7 @@ class SubjectDetailsSectionHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        Text(
-          title,
-          style: AppTextStyles.title.copyWith(fontSize: 20),
-        ),
+        Text(title, style: AppTextStyles.title.copyWith(fontSize: 20)),
         if (count != null && count! > 0) ...[
           const SizedBox(width: 10),
           Container(
@@ -401,10 +395,7 @@ class SubjectDetailsSectionHeader extends StatelessWidget {
 }
 
 class _GradientCover extends StatelessWidget {
-  const _GradientCover({
-    required this.start,
-    required this.end,
-  });
+  const _GradientCover({required this.start, required this.end});
 
   final Color start;
   final Color end;
@@ -499,10 +490,7 @@ class _MetaChip extends StatelessWidget {
 }
 
 class _PurchaseButton extends StatelessWidget {
-  const _PurchaseButton({
-    required this.isRequesting,
-    this.onPressed,
-  });
+  const _PurchaseButton({required this.isRequesting, this.onPressed});
 
   final bool isRequesting;
   final VoidCallback? onPressed;

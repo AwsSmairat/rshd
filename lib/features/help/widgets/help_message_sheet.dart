@@ -17,20 +17,14 @@ Future<bool> showHelpMessageSheet({
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (context) => _HelpMessageSheet(
-      teacher: teacher,
-      onSend: onSend,
-    ),
+    builder: (context) => _HelpMessageSheet(teacher: teacher, onSend: onSend),
   );
 
   return sent ?? false;
 }
 
 class _HelpMessageSheet extends StatefulWidget {
-  const _HelpMessageSheet({
-    required this.teacher,
-    required this.onSend,
-  });
+  const _HelpMessageSheet({required this.teacher, required this.onSend});
 
   final TeacherContactModel teacher;
   final Future<void> Function(String message) onSend;

@@ -5,7 +5,10 @@ class PdfExportFilename {
     required String documentTitle,
     DateTime? exportedAt,
   }) {
-    final date = (exportedAt ?? DateTime.now()).toIso8601String().substring(0, 10);
+    final date = (exportedAt ?? DateTime.now()).toIso8601String().substring(
+      0,
+      10,
+    );
     final course = sanitizeSegment(courseTitle);
     final document = sanitizeSegment(documentTitle);
 

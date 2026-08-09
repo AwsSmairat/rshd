@@ -29,91 +29,91 @@ class NotificationCard extends StatelessWidget {
       tintOpacity: isUnread ? 0.14 : 0.08,
       borderOpacity: isUnread ? 0.62 : 0.5,
       child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              NotificationTypeIcon(type: notification.effectiveType),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          NotificationTypeIcon(type: notification.effectiveType),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            notification.title,
-                            style: AppTextStyles.title.copyWith(
-                              fontSize: 16,
-                              fontWeight: isUnread
-                                  ? FontWeight.w800
-                                  : FontWeight.w600,
-                            ),
-                          ),
+                    Expanded(
+                      child: Text(
+                        notification.title,
+                        style: AppTextStyles.title.copyWith(
+                          fontSize: 16,
+                          fontWeight: isUnread
+                              ? FontWeight.w800
+                              : FontWeight.w600,
                         ),
-                        if (isUnread)
-                          Container(
-                            width: 8,
-                            height: 8,
-                            margin: const EdgeInsetsDirectional.only(start: 8),
-                            decoration: const BoxDecoration(
-                              color: AppColors.accent,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      notification.shortBody,
-                      style: AppTextStyles.body.copyWith(
-                        color: AppColors.textMuted,
-                        fontSize: 13,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Text(
-                          notification.typeLabel,
-                          style: AppTextStyles.body.copyWith(fontSize: 12),
+                    if (isUnread)
+                      Container(
+                        width: 8,
+                        height: 8,
+                        margin: const EdgeInsetsDirectional.only(start: 8),
+                        decoration: const BoxDecoration(
+                          color: AppColors.accent,
+                          shape: BoxShape.circle,
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '•',
-                          style: AppTextStyles.body.copyWith(
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          isUnread ? 'غير مقروء' : 'مقروء',
-                          style: AppTextStyles.body.copyWith(
-                            fontSize: 12,
-                            color: isUnread
-                                ? AppColors.primary
-                                : AppColors.textMuted,
-                          ),
-                        ),
-                        if (notification.createdAt != null &&
-                            notification.createdAt!.isNotEmpty) ...[
-                          const Spacer(),
-                          Text(
-                            _formatDate(notification.createdAt!),
-                            style: AppTextStyles.body.copyWith(
-                              fontSize: 11,
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
+                      ),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 6),
+                Text(
+                  notification.shortBody,
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.textMuted,
+                    fontSize: 13,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Text(
+                      notification.typeLabel,
+                      style: AppTextStyles.body.copyWith(fontSize: 12),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '•',
+                      style: AppTextStyles.body.copyWith(
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      isUnread ? 'غير مقروء' : 'مقروء',
+                      style: AppTextStyles.body.copyWith(
+                        fontSize: 12,
+                        color: isUnread
+                            ? AppColors.primary
+                            : AppColors.textMuted,
+                      ),
+                    ),
+                    if (notification.createdAt != null &&
+                        notification.createdAt!.isNotEmpty) ...[
+                      const Spacer(),
+                      Text(
+                        _formatDate(notification.createdAt!),
+                        style: AppTextStyles.body.copyWith(
+                          fontSize: 11,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
           ),
+        ],
+      ),
     );
   }
 

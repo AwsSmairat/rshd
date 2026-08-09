@@ -153,11 +153,7 @@ class SubjectsErrorState extends StatelessWidget {
       borderOpacity: 0.52,
       child: Column(
         children: [
-          const Icon(
-            Icons.error_outline,
-            color: AppColors.error,
-            size: 36,
-          ),
+          const Icon(Icons.error_outline, color: AppColors.error, size: 36),
           const SizedBox(height: 12),
           Text(
             message,

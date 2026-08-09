@@ -49,9 +49,10 @@ class HelpCenterContactsModel {
   factory HelpCenterContactsModel.fromJson(Map<String, dynamic> json) {
     final teachers = (json['teachers'] as List? ?? [])
         .whereType<Map>()
-        .map((item) => TeacherContactModel.fromJson(
-              Map<String, dynamic>.from(item),
-            ))
+        .map(
+          (item) =>
+              TeacherContactModel.fromJson(Map<String, dynamic>.from(item)),
+        )
         .toList();
 
     return HelpCenterContactsModel(

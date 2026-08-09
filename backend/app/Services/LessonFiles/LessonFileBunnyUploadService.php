@@ -6,6 +6,7 @@ use App\Enums\FileType;
 use App\Enums\LessonFileStorageStatus;
 use App\Models\LessonFile;
 use App\Services\Bunny\BunnyFilesStorageClient;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class LessonFileBunnyUploadService
@@ -23,11 +24,11 @@ class LessonFileBunnyUploadService
         $sourceDisk = $lessonFile->localSourceDiskName();
         $sourcePath = (string) $lessonFile->file_path;
 
-        if ($sourcePath === '' || ! \Illuminate\Support\Facades\Storage::disk($sourceDisk)->exists($sourcePath)) {
+        if ($sourcePath === '' || ! Storage::disk($sourceDisk)->exists($sourcePath)) {
             throw new \RuntimeException('Local source file is missing.');
         }
 
-        $contents = \Illuminate\Support\Facades\Storage::disk($sourceDisk)->get($sourcePath);
+        $contents = Storage::disk($sourceDisk)->get($sourcePath);
         $extension = pathinfo($sourcePath, PATHINFO_EXTENSION) ?: 'pdf';
         $remotePath = 'lesson-files/'.$lessonFile->id.'/'.Str::ulid().'.'.$extension;
 

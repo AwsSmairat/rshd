@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rshd/features/pdf_editor/services/pdf_cache_service.dart';
@@ -51,10 +50,7 @@ void main() {
       await cacheService.save(fileId, bytes);
 
       final loader = PdfViewerSourceLoader(cacheService: cacheService);
-      final loaded = await loader.load(
-        fileId: fileId,
-        allowNetwork: false,
-      );
+      final loaded = await loader.load(fileId: fileId, allowNetwork: false);
 
       expect(loaded, bytes);
       expect(await loader.hasCached(fileId), isTrue);
@@ -76,7 +72,8 @@ void main() {
 
       final repo = _FakeDownloadRepository((_) async {
         return FileDownloadModel(
-          url: 'https://cdn.example.test/files/pilot.pdf?token=abc&expires=9999999999',
+          url:
+              'https://cdn.example.test/files/pilot.pdf?token=abc&expires=9999999999',
           expiresAt: DateTime.now().add(const Duration(minutes: 10)),
         );
       });

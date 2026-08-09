@@ -19,6 +19,7 @@ use App\Services\Bunny\BunnyFilesCdnTokenSigner;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -169,7 +170,7 @@ class LessonFileDownloadTest extends TestCase
             'file_path' => 'sources/pending-local.pdf',
         ])->save();
 
-        \Illuminate\Support\Facades\Storage::disk('lesson_files')->put(
+        Storage::disk('lesson_files')->put(
             'sources/pending-local.pdf',
             '%PDF-1.4 pending-local',
         );

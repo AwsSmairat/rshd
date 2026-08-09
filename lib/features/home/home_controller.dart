@@ -17,13 +17,7 @@ import '../quizzes/data/quizzes_repository.dart';
 import '../subjects/data/subjects_repository.dart';
 import 'home_dashboard_model.dart';
 
-enum HomeLoadStatus {
-  initial,
-  loading,
-  loaded,
-  refreshing,
-  error,
-}
+enum HomeLoadStatus { initial, loading, loaded, refreshing, error }
 
 class HomeState {
   const HomeState({
@@ -72,14 +66,14 @@ class HomeController extends StateNotifier<HomeState> {
     required GradesRepository gradesRepository,
     required NotificationsRepository notificationsRepository,
     required AnnouncementsRepository announcementsRepository,
-  })  : _profileRepository = profileRepository,
-        _subjectsRepository = subjectsRepository,
-        _assignmentsRepository = assignmentsRepository,
-        _quizzesRepository = quizzesRepository,
-        _gradesRepository = gradesRepository,
-        _notificationsRepository = notificationsRepository,
-        _announcementsRepository = announcementsRepository,
-        super(const HomeState());
+  }) : _profileRepository = profileRepository,
+       _subjectsRepository = subjectsRepository,
+       _assignmentsRepository = assignmentsRepository,
+       _quizzesRepository = quizzesRepository,
+       _gradesRepository = gradesRepository,
+       _notificationsRepository = notificationsRepository,
+       _announcementsRepository = announcementsRepository,
+       super(const HomeState());
 
   final ProfileRepository _profileRepository;
   final SubjectsRepository _subjectsRepository;
@@ -89,10 +83,7 @@ class HomeController extends StateNotifier<HomeState> {
   final NotificationsRepository _notificationsRepository;
   final AnnouncementsRepository _announcementsRepository;
 
-  Future<void> load({
-    bool refresh = false,
-    String? fallbackStudentName,
-  }) async {
+  Future<void> load({bool refresh = false, String? fallbackStudentName}) async {
     if (state.status == HomeLoadStatus.loading && !refresh) {
       return;
     }
@@ -174,8 +165,9 @@ class HomeController extends StateNotifier<HomeState> {
       }
 
       final notifications = notificationsResult.data ?? const [];
-      final unreadCount =
-          notifications.where((notification) => !notification.isRead).length;
+      final unreadCount = notifications
+          .where((notification) => !notification.isRead)
+          .length;
 
       state = HomeState(
         status: HomeLoadStatus.loaded,
@@ -210,8 +202,8 @@ class HomeController extends StateNotifier<HomeState> {
         errorMessage: error.isUnauthorized
             ? 'انتهت الجلسة. يرجى تسجيل الدخول مجدداً.'
             : (error.statusCode == null && error.message.contains('اتصال')
-                ? 'تعذر الاتصال بالسيرفر'
-                : 'تعذر تحميل الصفحة الرئيسية'),
+                  ? 'تعذر الاتصال بالسيرفر'
+                  : 'تعذر تحميل الصفحة الرئيسية'),
       );
     } catch (_) {
       state = const HomeState(
@@ -229,25 +221,23 @@ class HomeController extends StateNotifier<HomeState> {
       if (error.isUnauthorized) {
         return const _SectionResult(unauthorized: true);
       }
-      return _SectionResult(
-        failed: true,
-        data: null,
-      );
+      return _SectionResult(failed: true, data: null);
     } catch (_) {
       return const _SectionResult(failed: true);
     }
   }
 }
 
-final homeControllerProvider =
-    StateNotifierProvider<HomeController, HomeState>((ref) {
-  return HomeController(
-    profileRepository: ref.watch(profileRepositoryProvider),
-    subjectsRepository: ref.watch(subjectsRepositoryProvider),
-    assignmentsRepository: ref.watch(assignmentsRepositoryProvider),
-    quizzesRepository: ref.watch(quizzesRepositoryProvider),
-    gradesRepository: ref.watch(gradesRepositoryProvider),
-    notificationsRepository: ref.watch(notificationsRepositoryProvider),
-    announcementsRepository: ref.watch(announcementsRepositoryProvider),
-  );
-});
+final homeControllerProvider = StateNotifierProvider<HomeController, HomeState>(
+  (ref) {
+    return HomeController(
+      profileRepository: ref.watch(profileRepositoryProvider),
+      subjectsRepository: ref.watch(subjectsRepositoryProvider),
+      assignmentsRepository: ref.watch(assignmentsRepositoryProvider),
+      quizzesRepository: ref.watch(quizzesRepositoryProvider),
+      gradesRepository: ref.watch(gradesRepositoryProvider),
+      notificationsRepository: ref.watch(notificationsRepositoryProvider),
+      announcementsRepository: ref.watch(announcementsRepositoryProvider),
+    );
+  },
+);

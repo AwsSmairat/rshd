@@ -45,7 +45,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
-    final result = await ref.read(authControllerProvider.notifier).register(
+    final result = await ref
+        .read(authControllerProvider.notifier)
+        .register(
           name: _nameController.text,
           email: _emailController.text,
           phone: _phoneController.text,
@@ -66,7 +68,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
           ),
         );
-        final email = ref.read(authControllerProvider).pendingVerificationEmail ??
+        final email =
+            ref.read(authControllerProvider).pendingVerificationEmail ??
             _emailController.text.trim();
         context.go(
           '${AppRoutes.verifyEmail}?email=${Uri.encodeComponent(email)}',

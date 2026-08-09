@@ -60,7 +60,7 @@ class InstructorCalendarService
     }
 
     /**
-     * @param  Collection<int, int>|\Illuminate\Support\Collection  $subjectIds
+     * @param  Collection<int, int>|Collection  $subjectIds
      * @return list<array{
      *     title: string,
      *     type: string,

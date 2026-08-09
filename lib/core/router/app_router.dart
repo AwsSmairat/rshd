@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'route_page.dart';
 import '../../features/announcements/data/models/announcement_model.dart';
 import '../../features/announcements/presentation/announcement_details_screen.dart';
 import '../../features/announcements/presentation/announcements_screen.dart';
@@ -131,14 +132,8 @@ class RouterNotifier extends ChangeNotifier {
   final Ref ref;
 }
 
-Widget _protectedContent({
-  required String scopeId,
-  required Widget child,
-}) {
-  return ProtectedContentScope(
-    scopeId: scopeId,
-    child: child,
-  );
+Widget _protectedContent({required String scopeId, required Widget child}) {
+  return ProtectedContentScope(scopeId: scopeId, child: child);
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -158,10 +153,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isRegister = location == AppRoutes.register;
       final isVerifyEmail = location.startsWith(AppRoutes.verifyEmail);
       final isForgotPassword = location.startsWith(AppRoutes.forgotPassword);
-      final isPasswordResetVerify =
-          location.startsWith(AppRoutes.passwordResetVerify);
-      final isPasswordResetNew =
-          location.startsWith(AppRoutes.passwordResetNew);
+      final isPasswordResetVerify = location.startsWith(
+        AppRoutes.passwordResetVerify,
+      );
+      final isPasswordResetNew = location.startsWith(
+        AppRoutes.passwordResetNew,
+      );
       final isPasswordResetRoute =
           isForgotPassword || isPasswordResetVerify || isPasswordResetNew;
       final isAuthRoute =
@@ -238,7 +235,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         if (isVerifyEmail) {
           return null;
         }
-        if (platformSettings?.studentRegistrationEnabled == false && isRegister) {
+        if (platformSettings?.studentRegistrationEnabled == false &&
+            isRegister) {
           return AppRoutes.login;
         }
         if (!isAuthRoute && !isSplash && !isMaintenance) {
@@ -254,253 +252,327 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: AppRoutes.splash,
-        builder: (context, state) => const SplashScreen(),
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const SplashScreen()),
       ),
       GoRoute(
         path: AppRoutes.maintenance,
-        builder: (context, state) => const MaintenanceScreen(),
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const MaintenanceScreen()),
       ),
       GoRoute(
         path: AppRoutes.login,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final email = state.uri.queryParameters['email'];
-          return LoginScreen(initialEmail: email);
+          return buildAppRoutePage(
+            state: state,
+            child: LoginScreen(initialEmail: email),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.forgotPassword,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final email = state.uri.queryParameters['email'];
-          return ForgotPasswordScreen(initialEmail: email);
+          return buildAppRoutePage(
+            state: state,
+            child: ForgotPasswordScreen(initialEmail: email),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.passwordResetVerify,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final email = state.uri.queryParameters['email'] ?? '';
-          return PasswordResetVerificationScreen(email: email);
+          return buildAppRoutePage(
+            state: state,
+            child: PasswordResetVerificationScreen(email: email),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.passwordResetNew,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final email = state.uri.queryParameters['email'] ?? '';
-          return ResetPasswordScreen(email: email);
+          return buildAppRoutePage(
+            state: state,
+            child: ResetPasswordScreen(email: email),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.register,
-        builder: (context, state) => const RegisterScreen(),
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const RegisterScreen()),
       ),
       GoRoute(
         path: AppRoutes.verifyEmail,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final email = state.uri.queryParameters['email'] ?? '';
-          return VerifyEmailScreen(email: email);
+          return buildAppRoutePage(
+            state: state,
+            child: VerifyEmailScreen(email: email),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.home,
-        builder: (context, state) => const HomeScreen(),
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const HomeScreen()),
       ),
       GoRoute(
         path: AppRoutes.subjects,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final category = state.uri.queryParameters['category'];
-          return MySubjectsScreen(category: category);
+          return buildAppRoutePage(
+            state: state,
+            child: MySubjectsScreen(category: category),
+          );
         },
       ),
       GoRoute(
         path: '/subjects/:id',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
           final subject = state.extra is SubjectModel
               ? state.extra! as SubjectModel
               : null;
 
-          return _protectedContent(
-            scopeId: 'subject:$id',
-            child: SubjectDetailsScreen(
-              subjectId: id,
-              subject: subject,
+          return buildAppRoutePage(
+            state: state,
+            child: _protectedContent(
+              scopeId: 'subject:$id',
+              child: SubjectDetailsScreen(subjectId: id, subject: subject),
             ),
           );
         },
       ),
       GoRoute(
         path: '/lessons/:id',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return _protectedContent(
-            scopeId: 'lesson:$id',
-            child: LessonDetailsScreen(lessonId: id),
+          return buildAppRoutePage(
+            state: state,
+            child: _protectedContent(
+              scopeId: 'lesson:$id',
+              child: LessonDetailsScreen(lessonId: id),
+            ),
           );
         },
       ),
       GoRoute(
         path: '/videos/:id',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return _protectedContent(
-            scopeId: 'video:$id',
-            child: VideoDetailsScreen(videoId: id),
+          return buildAppRoutePage(
+            state: state,
+            child: _protectedContent(
+              scopeId: 'video:$id',
+              child: VideoDetailsScreen(videoId: id),
+            ),
           );
         },
       ),
       GoRoute(
         path: '/files/:id/pdf',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
           final extra = state.extra is Map<String, dynamic>
               ? state.extra! as Map<String, dynamic>
               : state.extra is Map
-                  ? Map<String, dynamic>.from(state.extra! as Map)
-                  : const <String, dynamic>{};
+              ? Map<String, dynamic>.from(state.extra! as Map)
+              : const <String, dynamic>{};
 
-          return _protectedContent(
-            scopeId: 'pdf:$id',
-            child: PdfViewerScreen(
-              fileId: id,
-              title: extra['title']?.toString() ?? 'ملف PDF',
-              courseTitle: extra['courseTitle']?.toString(),
+          return buildAppRoutePage(
+            state: state,
+            child: _protectedContent(
+              scopeId: 'pdf:$id',
+              child: PdfViewerScreen(
+                fileId: id,
+                title: extra['title']?.toString() ?? 'ملف PDF',
+                courseTitle: extra['courseTitle']?.toString(),
+              ),
             ),
           );
         },
       ),
       GoRoute(
         path: '/files/:id',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return _protectedContent(
-            scopeId: 'file:$id',
-            child: FileDetailsScreen(fileId: id),
+          return buildAppRoutePage(
+            state: state,
+            child: _protectedContent(
+              scopeId: 'file:$id',
+              child: FileDetailsScreen(fileId: id),
+            ),
           );
         },
       ),
       GoRoute(
         path: AppRoutes.assignments,
-        builder: (context, state) => const AssignmentsScreen(),
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const AssignmentsScreen()),
       ),
       GoRoute(
         path: '/assignments/:id/submit',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return SubmitAssignmentScreen(assignmentId: id);
+          return buildAppRoutePage(
+            state: state,
+            child: SubmitAssignmentScreen(assignmentId: id),
+          );
         },
       ),
       GoRoute(
         path: '/assignments/:id',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return AssignmentDetailsScreen(assignmentId: id);
+          return buildAppRoutePage(
+            state: state,
+            child: AssignmentDetailsScreen(assignmentId: id),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.quizzes,
-        builder: (context, state) => const QuizzesScreen(),
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const QuizzesScreen()),
       ),
       GoRoute(
         path: '/quizzes/:id/attempt',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return _protectedContent(
-            scopeId: 'quiz_attempt:$id',
-            child: QuizAttemptScreen(quizId: id),
+          return buildAppRoutePage(
+            state: state,
+            child: _protectedContent(
+              scopeId: 'quiz_attempt:$id',
+              child: QuizAttemptScreen(quizId: id),
+            ),
           );
         },
       ),
       GoRoute(
         path: '/quizzes/:id/result',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
           final extra = state.extra is Map<String, dynamic>
               ? state.extra! as Map<String, dynamic>
               : state.extra is Map
-                  ? Map<String, dynamic>.from(state.extra! as Map)
-                  : const <String, dynamic>{};
+              ? Map<String, dynamic>.from(state.extra! as Map)
+              : const <String, dynamic>{};
 
-          return QuizResultScreen(
-            quizId: id,
-            score: extra['score']?.toString() ?? '0',
-            questionsCount: int.tryParse(
-                  extra['questionsCount']?.toString() ?? '',
-                ) ??
-                0,
-            submittedAt: extra['submittedAt']?.toString() ?? '',
-            quizTitle: extra['quizTitle']?.toString() ?? 'الاختبار',
+          return buildAppRoutePage(
+            state: state,
+            child: QuizResultScreen(
+              quizId: id,
+              score: extra['score']?.toString() ?? '0',
+              questionsCount:
+                  int.tryParse(extra['questionsCount']?.toString() ?? '') ?? 0,
+              submittedAt: extra['submittedAt']?.toString() ?? '',
+              quizTitle: extra['quizTitle']?.toString() ?? 'الاختبار',
+            ),
           );
         },
       ),
       GoRoute(
         path: '/quizzes/:id',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return QuizDetailsScreen(quizId: id);
+          return buildAppRoutePage(
+            state: state,
+            child: QuizDetailsScreen(quizId: id),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.grades,
-        builder: (context, state) => const GradesScreen(),
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const GradesScreen()),
       ),
       GoRoute(
         path: '/grades/:id',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return GradeDetailsScreen(gradeId: id);
+          return buildAppRoutePage(
+            state: state,
+            child: GradeDetailsScreen(gradeId: id),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.notifications,
-        builder: (context, state) => const NotificationsScreen(),
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const NotificationsScreen()),
       ),
       GoRoute(
         path: AppRoutes.announcements,
-        builder: (context, state) => const AnnouncementsScreen(),
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const AnnouncementsScreen()),
       ),
       GoRoute(
         path: '/announcements/:id',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
           final announcement = state.extra is AnnouncementModel
               ? state.extra! as AnnouncementModel
               : null;
-          return AnnouncementDetailsScreen(
-            announcementId: id,
-            initialAnnouncement: announcement,
+          return buildAppRoutePage(
+            state: state,
+            child: AnnouncementDetailsScreen(
+              announcementId: id,
+              initialAnnouncement: announcement,
+            ),
           );
         },
       ),
       GoRoute(
         path: AppRoutes.profile,
-        builder: (context, state) => const StudentSettingsScreen(),
+        pageBuilder: (context, state) => buildAppRoutePage(
+          state: state,
+          child: const StudentSettingsScreen(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.helpCenter,
-        builder: (context, state) => const HelpCenterScreen(),
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const HelpCenterScreen()),
       ),
       GoRoute(
         path: AppRoutes.technicalSupport,
-        builder: (context, state) => const TechnicalSupportScreen(),
+        pageBuilder: (context, state) => buildAppRoutePage(
+          state: state,
+          child: const TechnicalSupportScreen(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.contactUs,
-        builder: (context, state) => const ContactUsScreen(),
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const ContactUsScreen()),
       ),
       GoRoute(
         path: AppRoutes.privacyPolicy,
-        builder: (context, state) => const PrivacyPolicyPage(),
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const PrivacyPolicyPage()),
       ),
       GoRoute(
         path: AppRoutes.termsAcceptance,
-        builder: (context, state) => const TermsAcceptanceScreen(),
+        pageBuilder: (context, state) => buildAppRoutePage(
+          state: state,
+          child: const TermsAcceptanceScreen(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.termsAndConditions,
-        builder: (context, state) => const TermsAndConditionsPage(),
+        pageBuilder: (context, state) => buildAppRoutePage(
+          state: state,
+          child: const TermsAndConditionsPage(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.deleteAccount,
-        builder: (context, state) => const DeleteAccountScreen(),
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const DeleteAccountScreen()),
       ),
     ],
   );

@@ -20,10 +20,7 @@ import 'subjects_controller.dart';
 
 /// Secure playback via temporary signed URLs from backend.
 class VideoDetailsScreen extends ConsumerStatefulWidget {
-  const VideoDetailsScreen({
-    super.key,
-    required this.videoId,
-  });
+  const VideoDetailsScreen({super.key, required this.videoId});
 
   final int videoId;
 
@@ -89,9 +86,9 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _ensureProgressTracker(VideoModel video) {
@@ -102,25 +99,27 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     _progressTracker?.dispose();
     _trackerVideoId = video.id;
 
-    final durationSeconds =
-        video.durationSeconds > 0 ? video.durationSeconds : 1;
+    final durationSeconds = video.durationSeconds > 0
+        ? video.durationSeconds
+        : 1;
 
     _progressTracker = VideoProgressTracker(
       durationSeconds: durationSeconds,
-      onSync: ({
-        required int currentPositionSeconds,
-        required int durationSeconds,
-        bool showSuccessMessage = false,
-      }) {
-        return ref
-            .read(videoDetailsControllerProvider(widget.videoId).notifier)
-            .syncProgress(
-              videoId: widget.videoId,
-              currentPositionSeconds: currentPositionSeconds,
-              durationSeconds: durationSeconds,
-              showSuccessMessage: showSuccessMessage,
-            );
-      },
+      onSync:
+          ({
+            required int currentPositionSeconds,
+            required int durationSeconds,
+            bool showSuccessMessage = false,
+          }) {
+            return ref
+                .read(videoDetailsControllerProvider(widget.videoId).notifier)
+                .syncProgress(
+                  videoId: widget.videoId,
+                  currentPositionSeconds: currentPositionSeconds,
+                  durationSeconds: durationSeconds,
+                  showSuccessMessage: showSuccessMessage,
+                );
+          },
     );
   }
 
@@ -180,10 +179,12 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
         _syncStatusPolling(video);
 
         final savedProgress = video.progress;
-        final livePercentage = _progressTracker?.completionPercentage ??
+        final livePercentage =
+            _progressTracker?.completionPercentage ??
             savedProgress?.completionPercentage ??
             0;
-        final livePosition = _progressTracker?.currentPositionSeconds ??
+        final livePosition =
+            _progressTracker?.currentPositionSeconds ??
             savedProgress?.currentPosition ??
             0;
 
@@ -223,10 +224,12 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
   Widget _buildPlayerSection(VideoModel video) {
     final playback = video.playback;
     final playbackUrl = playback?.url.trim() ?? '';
-    final showsVideoPlayer =
-        playbackUrl.isNotEmpty && video.status == 'ready';
-    final content =
-        _buildPlayerContent(video, playbackUrl, playback?.expiresAt);
+    final showsVideoPlayer = playbackUrl.isNotEmpty && video.status == 'ready';
+    final content = _buildPlayerContent(
+      video,
+      playbackUrl,
+      playback?.expiresAt,
+    );
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -262,7 +265,9 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
         message: video.isLocked
             ? 'فعّل المادة لمشاهدة هذا الفيديو.'
             : video.pendingPlaybackMessage,
-        tone: video.isLocked ? _PlaceholderTone.locked : _PlaceholderTone.pending,
+        tone: video.isLocked
+            ? _PlaceholderTone.locked
+            : _PlaceholderTone.pending,
         onRetry: video.isPendingPlayback ? _reloadVideo : null,
       );
     }
@@ -339,20 +344,14 @@ class _VideoDetailsHero extends StatelessWidget {
         title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          fontWeight: FontWeight.w700,
-          fontSize: 16,
-        ),
+        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
       ),
       flexibleSpace: DecoratedBox(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.centerRight,
             end: Alignment.centerLeft,
-            colors: [
-              AppColors.primary,
-              AppColors.secondaryNavy,
-            ],
+            colors: [AppColors.primary, AppColors.secondaryNavy],
           ),
         ),
       ),
@@ -392,10 +391,7 @@ class _PlayerPlaceholder extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            AppColors.cardWhite,
-            accent.withValues(alpha: 0.07),
-          ],
+          colors: [AppColors.cardWhite, accent.withValues(alpha: 0.07)],
         ),
       ),
       child: Column(
@@ -438,8 +434,13 @@ class _PlayerPlaceholder extends StatelessWidget {
               label: const Text('تحديث'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.secondary,
-                side: BorderSide(color: AppColors.secondary.withValues(alpha: 0.35)),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                side: BorderSide(
+                  color: AppColors.secondary.withValues(alpha: 0.35),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 visualDensity: VisualDensity.compact,
               ),
             ),
@@ -468,10 +469,7 @@ class _VideoInfoSection extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             video.title,
-            style: AppTextStyles.title.copyWith(
-              fontSize: 22,
-              height: 1.25,
-            ),
+            style: AppTextStyles.title.copyWith(fontSize: 22, height: 1.25),
           ),
           const SizedBox(height: 16),
           Wrap(
@@ -577,10 +575,7 @@ class _SurfaceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.cardWhite,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.white,
-          width: 1.2,
-        ),
+        border: Border.all(color: AppColors.white, width: 1.2),
         boxShadow: [
           BoxShadow(
             color: AppColors.glassShadow.withValues(alpha: 0.07),
@@ -595,10 +590,7 @@ class _SurfaceCard extends StatelessWidget {
 }
 
 class _SectionHeading extends StatelessWidget {
-  const _SectionHeading({
-    required this.icon,
-    required this.title,
-  });
+  const _SectionHeading({required this.icon, required this.title});
 
   final IconData icon;
   final String title;
@@ -654,10 +646,7 @@ class _ProgressBadge extends StatelessWidget {
 }
 
 class _StatusChip extends StatelessWidget {
-  const _StatusChip({
-    required this.label,
-    required this.status,
-  });
+  const _StatusChip({required this.label, required this.status});
 
   final String label;
   final String status;

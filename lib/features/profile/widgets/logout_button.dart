@@ -59,11 +59,7 @@ class ProfileLogoutButton extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 8),
-                      Icon(
-                        Icons.logout_rounded,
-                        color: Colors.white,
-                        size: 22,
-                      ),
+                      Icon(Icons.logout_rounded, color: Colors.white, size: 22),
                     ],
                   ),
           ),

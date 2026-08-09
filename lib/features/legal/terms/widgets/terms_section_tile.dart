@@ -140,7 +140,8 @@ class TermsSectionTile extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          trailing: trailing ??
+          trailing:
+              trailing ??
               Icon(
                 isExpanded
                     ? Icons.keyboard_arrow_up_rounded

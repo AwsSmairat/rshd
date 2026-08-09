@@ -1,0 +1,46 @@
+rules:
+  - id: rshd-flutter-001-hardcoded-secret
+    message: "RSHD-FLUTTER-001: Possible hardcoded API secret/token."
+    severity: ERROR
+    languages: [dart]
+    pattern-regex: (?i)(api[_-]?key|secret|token|password)\s*=\s*['"][^'"]{8,}['"]
+
+  - id: rshd-flutter-002-auth-log
+    message: "RSHD-FLUTTER-002: Possible Authorization/token logging."
+    severity: WARNING
+    languages: [dart]
+    pattern-regex: (debugPrint|print)\(.*(?i)(authorization|bearer|token|password).*\)
+
+  - id: rshd-flutter-004-insecure-token-storage
+    message: "RSHD-FLUTTER-004: Auth token in SharedPreferences — use flutter_secure_storage."
+    severity: ERROR
+    languages: [dart]
+    pattern: SharedPreferences
+
+  - id: rshd-flutter-008-sensitive-debugprint
+    message: "RSHD-FLUTTER-008: debugPrint may log sensitive response — review."
+    severity: INFO
+    languages: [dart]
+    pattern: debugPrint($MSG)
+    metavariable-regex:
+      metavariable: $MSG
+      regex: (?i).*(url|token|response|error\.message).*
+
+  - id: rshd-flutter-007-missing-timeout
+    message: "RSHD-FLUTTER-007: Dio call without observable timeout — review api_client."
+    severity: INFO
+    languages: [dart]
+    pattern: Dio(...)
+    paths:
+      include:
+        - lib/
+
+  - id: rshd-quality-dart-async-context
+    message: "BuildContext used across async gap — verify mounted check."
+    severity: WARNING
+    languages: [dart]
+    pattern: |
+      await $EXPR;
+      ...
+      $CTX
+    requires_manual_review: true

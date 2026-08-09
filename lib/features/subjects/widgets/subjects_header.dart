@@ -41,6 +41,7 @@ class SubjectsHeader extends StatelessWidget {
           ),
         ),
         child: Stack(
+          clipBehavior: Clip.hardEdge,
           children: [
             Positioned(
               left: -20,
@@ -125,9 +126,7 @@ class _BackButton extends StatelessWidget {
           height: 40,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.white.withValues(alpha: 0.22),
-            ),
+            border: Border.all(color: AppColors.white.withValues(alpha: 0.22)),
           ),
           child: const Icon(
             Icons.arrow_forward_ios_rounded,

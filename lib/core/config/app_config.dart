@@ -2,9 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
+import 'release_environment_guard.dart';
+
 /// Central configuration for API and environment settings.
 class AppConfig {
   AppConfig._();
+
+  /// Production API URL — required in release via `--dart-define=API_BASE_URL=...`
+  static const String apiBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: '',
+  );
 
   /// Change this port to match your Laravel server (`php artisan serve --port=8765`).
   static const int apiPort = 8765;
@@ -13,6 +21,17 @@ class AppConfig {
   static const String? deviceBaseUrlOverride = null;
 
   static String get baseUrl {
+    if (apiBaseUrl.isNotEmpty) {
+      ReleaseEnvironmentGuard.assertProductionApiUrl(apiBaseUrl);
+      return apiBaseUrl;
+    }
+
+    if (kReleaseMode) {
+      throw StateError(
+        'Release build requires --dart-define=API_BASE_URL=https://your-api/api/v1',
+      );
+    }
+
     if (deviceBaseUrlOverride != null && deviceBaseUrlOverride!.isNotEmpty) {
       return deviceBaseUrlOverride!;
     }
@@ -25,6 +44,10 @@ class AppConfig {
   }
 
   static String get appOrigin {
+    if (apiBaseUrl.isNotEmpty) {
+      return apiBaseUrl.replaceAll(RegExp(r'/api/v1/?$'), '');
+    }
+
     if (deviceBaseUrlOverride != null && deviceBaseUrlOverride!.isNotEmpty) {
       return deviceBaseUrlOverride!.replaceAll('/api/v1', '');
     }
@@ -38,8 +61,11 @@ class AppConfig {
 
   static const Duration connectTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 20);
+  static const Duration sendTimeout = Duration(seconds: 20);
 
   static bool get enableNetworkLogs => kDebugMode;
+
+  static bool get allowsCleartextHttp => !kReleaseMode;
 
   /// Web OAuth client ID — required on Android to obtain an ID token.
   /// Set via `--dart-define=GOOGLE_WEB_CLIENT_ID=...` or replace the default.

@@ -5,10 +5,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../data/privacy_policy_model.dart';
 
 class PrivacyPolicySection extends StatelessWidget {
-  const PrivacyPolicySection({
-    super.key,
-    required this.section,
-  });
+  const PrivacyPolicySection({super.key, required this.section});
 
   final PrivacyPolicySectionData section;
 

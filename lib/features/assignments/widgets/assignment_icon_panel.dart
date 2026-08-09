@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 
 class AssignmentIconPanel extends StatelessWidget {
-  const AssignmentIconPanel({
-    super.key,
-    required this.icon,
-  });
+  const AssignmentIconPanel({super.key, required this.icon});
 
   final IconData icon;
 
@@ -23,10 +20,7 @@ class AssignmentIconPanel extends StatelessWidget {
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                AppColors.primary,
-                AppColors.secondaryNavy,
-              ],
+              colors: [AppColors.primary, AppColors.secondaryNavy],
             ),
             boxShadow: [
               BoxShadow(
@@ -43,15 +37,9 @@ class AssignmentIconPanel extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withValues(alpha: 0.14),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.22),
-                ),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
               ),
-              child: Icon(
-                icon,
-                color: AppColors.accent,
-                size: 24,
-              ),
+              child: Icon(icon, color: AppColors.accent, size: 24),
             ),
           ),
         ),

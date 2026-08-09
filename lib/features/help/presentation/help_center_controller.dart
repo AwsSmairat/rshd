@@ -84,5 +84,5 @@ class HelpCenterController extends StateNotifier<HelpCenterState> {
 
 final helpCenterControllerProvider =
     StateNotifierProvider<HelpCenterController, HelpCenterState>((ref) {
-  return HelpCenterController(ref.watch(helpCenterRepositoryProvider));
-});
+      return HelpCenterController(ref.watch(helpCenterRepositoryProvider));
+    });

@@ -1,0 +1,19 @@
+timestamp: 2026-08-09T22:15:41Z
+security_score: 95
+semgrep_status: SCAN_COMPLETED_NO_BLOCKERS
+secrets: 0
+critical: 0
+high: 0
+medium: 1
+low: 0
+results:
+  - secret_scan|PASS|secrets=0
+  - composer_advisories|PASS|exceptions valid
+  - semgrep_security_scan|WARN|non-zero exit — see /Users/dollar/Dev/rshd/security/reports/semgrep-security.json
+  - semgrep_quality_scan|PASS|see /Users/dollar/Dev/rshd/security/reports/semgrep-quality.json
+  - semgrep_mobile_scan|WARN|see semgrep-mobile.json
+  - semgrep_enforcement|PASS|reviewed=46 false_positive=32
+  - contract_gaps|WARN|0 coverage gaps documented
+  - env_outside_config|PASS|No env() in app/
+  - dd_dump|PASS|Clean
+  - remember_me_password|PASS|No password persistence detected

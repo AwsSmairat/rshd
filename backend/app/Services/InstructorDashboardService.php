@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Enums\AccessStatus;
 use App\Enums\ContentStatus;
 use App\Enums\SubjectCategory;
+use App\Filament\Resources\AssignmentResource;
+use App\Filament\Resources\AssignmentSubmissionResource;
+use App\Filament\Resources\SubjectResource;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\Grade;
@@ -56,7 +59,7 @@ class InstructorDashboardService
     }
 
     /**
-     * @param  Collection<int, int>|\Illuminate\Support\Collection  $subjectIds
+     * @param  Collection<int, int>|Collection  $subjectIds
      * @return array<string, int>
      */
     protected function stats(User $instructor, $subjectIds): array
@@ -91,7 +94,7 @@ class InstructorDashboardService
     }
 
     /**
-     * @param  Collection<int, int>|\Illuminate\Support\Collection  $subjectIds
+     * @param  Collection<int, int>|Collection  $subjectIds
      * @return array{total: int, active: int, avg_progress: float, success_rate: float}
      */
     protected function studentOverview($subjectIds): array
@@ -178,7 +181,7 @@ class InstructorDashboardService
     }
 
     /**
-     * @param  Collection<int, int>|\Illuminate\Support\Collection  $subjectIds
+     * @param  Collection<int, int>|Collection  $subjectIds
      * @return array{labels: list<string>, views: list<int>, submissions: list<int>, max_value: int}
      */
     protected function coursePerformance($subjectIds): array
@@ -222,7 +225,7 @@ class InstructorDashboardService
     }
 
     /**
-     * @param  Collection<int, int>|\Illuminate\Support\Collection  $subjectIds
+     * @param  Collection<int, int>|Collection  $subjectIds
      * @param  array<string, int>  $stats
      * @return Collection<int, array{type: string, title: string, message: string, url: string|null}>
      */
@@ -236,7 +239,7 @@ class InstructorDashboardService
                 'type' => 'warning',
                 'title' => 'تسليمات بانتظار التصحيح',
                 'message' => 'لديك '.$stats['pending_submissions'].' تسليم يحتاج إلى تصحيح.',
-                'url' => \App\Filament\Resources\AssignmentSubmissionResource::getUrl('index', [
+                'url' => AssignmentSubmissionResource::getUrl('index', [
                     'tableFilters' => ['ungraded' => ['isActive' => true]],
                 ]),
             ]);
@@ -254,7 +257,7 @@ class InstructorDashboardService
                     'type' => 'info',
                     'title' => 'مواعيد تسليم قريبة',
                     'message' => $dueSoon.' واجب/واجبات تنتهي خلال 3 أيام.',
-                    'url' => \App\Filament\Resources\AssignmentResource::getUrl('index'),
+                    'url' => AssignmentResource::getUrl('index'),
                 ]);
             }
         }
@@ -264,7 +267,7 @@ class InstructorDashboardService
                 'type' => 'info',
                 'title' => 'ابدأ بإضافة مادة',
                 'message' => 'لم تُضف أي مواد بعد. أنشئ مادتك الأولى لبدء التعليم.',
-                'url' => \App\Filament\Resources\SubjectResource::getUrl('create'),
+                'url' => SubjectResource::getUrl('create'),
             ]);
         }
 
@@ -272,7 +275,7 @@ class InstructorDashboardService
     }
 
     /**
-     * @param  Collection<int, int>|\Illuminate\Support\Collection  $subjectIds
+     * @param  Collection<int, int>|Collection  $subjectIds
      * @return Collection<int, AssignmentSubmission>
      */
     protected function pendingSubmissions($subjectIds): Collection
@@ -293,7 +296,7 @@ class InstructorDashboardService
     }
 
     /**
-     * @param  Collection<int, int>|\Illuminate\Support\Collection  $subjectIds
+     * @param  Collection<int, int>|Collection  $subjectIds
      * @return Collection<int, array{title: string, subtitle: string, time: Carbon, icon: string}>
      */
     protected function recentActivities(User $instructor, $subjectIds): Collection

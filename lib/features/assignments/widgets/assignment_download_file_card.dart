@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/security/safe_url_launcher.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import 'assignment_file_helper.dart';
@@ -27,20 +29,23 @@ class AssignmentDownloadFileCard extends StatelessWidget {
   Future<void> _openFile(BuildContext context) async {
     final uri = Uri.tryParse(fileUrl);
     if (uri == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تعذر فتح الملف')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تعذر فتح الملف')));
       return;
     }
 
-    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final launched = await SafeUrlLauncher.launch(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
     if (!context.mounted) {
       return;
     }
     if (!launched) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تعذر فتح الملف')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تعذر فتح الملف')));
     }
   }
 

@@ -31,9 +31,9 @@ class PdfExportService {
     PdfCacheService? cacheService,
     PdfArabicFontLoader? fontLoader,
     Future<Directory> Function()? tempDirectoryProvider,
-  })  : _cacheService = cacheService ?? PdfCacheService(),
-        _fontLoader = fontLoader ?? PdfArabicFontLoader(),
-        _tempDirectoryProvider = tempDirectoryProvider ?? getTemporaryDirectory;
+  }) : _cacheService = cacheService ?? PdfCacheService(),
+       _fontLoader = fontLoader ?? PdfArabicFontLoader(),
+       _tempDirectoryProvider = tempDirectoryProvider ?? getTemporaryDirectory;
 
   final PdfCacheService _cacheService;
   final PdfArabicFontLoader _fontLoader;
@@ -75,13 +75,7 @@ class PdfExportService {
       final pageHeight = page.size.height;
 
       for (final annotation in pageAnnotations) {
-        _drawAnnotation(
-          page,
-          annotation,
-          pageWidth,
-          pageHeight,
-          fontBytes,
-        );
+        _drawAnnotation(page, annotation, pageWidth, pageHeight, fontBytes);
       }
 
       onProgress?.call(
@@ -209,18 +203,21 @@ class PdfExportService {
 
     final points = rawPoints
         .whereType<Map>()
-        .map((entry) => NormalizedPoint.fromJson(Map<String, dynamic>.from(entry)))
+        .map(
+          (entry) => NormalizedPoint.fromJson(Map<String, dynamic>.from(entry)),
+        )
         .map((p) => Offset(p.nx * pageWidth, p.ny * pageHeight))
         .toList();
 
-    final opacity = ((annotation.data['opacity'] as num?)?.toDouble() ?? 1) * 255;
+    final opacity =
+        ((annotation.data['opacity'] as num?)?.toDouble() ?? 1) * 255;
     final color = _parsePdfColor(
       annotation.data['color']?.toString(),
       opacity: opacity.toInt(),
     );
     final strokeWidth =
         ((annotation.data['stroke_width'] as num?)?.toDouble() ?? 0.004) *
-            pageWidth;
+        pageWidth;
 
     final pen = PdfPen(color, width: strokeWidth);
 
@@ -235,7 +232,8 @@ class PdfExportService {
     double pageWidth,
     double pageHeight,
   ) {
-    final opacity = ((annotation.data['opacity'] as num?)?.toDouble() ?? 0.35) * 255;
+    final opacity =
+        ((annotation.data['opacity'] as num?)?.toDouble() ?? 0.35) * 255;
     final brush = PdfSolidBrush(
       _parsePdfColor(
         annotation.data['color']?.toString(),
@@ -265,9 +263,11 @@ class PdfExportService {
 
     final fontSize =
         ((annotation.data['font_size'] as num?)?.toDouble() ?? 0.025) *
-            pageWidth;
+        pageWidth;
     final font = _fontLoader.createFontFromBytes(fontBytes, fontSize);
-    final brush = PdfSolidBrush(_parsePdfColor(annotation.data['color']?.toString()));
+    final brush = PdfSolidBrush(
+      _parsePdfColor(annotation.data['color']?.toString()),
+    );
 
     page.graphics.drawString(
       text,
@@ -277,7 +277,9 @@ class PdfExportService {
         annotation.x * pageWidth,
         annotation.y * pageHeight,
         annotation.width > 0 ? annotation.width * pageWidth : pageWidth * 0.4,
-        annotation.height > 0 ? annotation.height * pageHeight : pageHeight * 0.12,
+        annotation.height > 0
+            ? annotation.height * pageHeight
+            : pageHeight * 0.12,
       ),
       format: PdfArabicFontLoader.textFormat(text),
     );
@@ -339,7 +341,8 @@ class PdfExportService {
     );
     final pen = PdfPen(
       _parsePdfColor(annotation.data['stroke_color']?.toString()),
-      width: ((annotation.data['stroke_width'] as num?)?.toDouble() ?? 0.003) *
+      width:
+          ((annotation.data['stroke_width'] as num?)?.toDouble() ?? 0.003) *
           pageWidth,
     );
 

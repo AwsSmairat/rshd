@@ -8,11 +8,7 @@ import '../data/models/grade_model.dart';
 import 'grade_type_badge.dart';
 
 class GradeCard extends StatelessWidget {
-  const GradeCard({
-    super.key,
-    required this.grade,
-    required this.onTap,
-  });
+  const GradeCard({super.key, required this.grade, required this.onTap});
 
   final GradeModel grade;
   final VoidCallback onTap;
@@ -140,10 +136,7 @@ class GradeCard extends StatelessWidget {
 }
 
 class _GradeScoreRing extends StatelessWidget {
-  const _GradeScoreRing({
-    required this.value,
-    required this.accent,
-  });
+  const _GradeScoreRing({required this.value, required this.accent});
 
   final double value;
   final Color accent;

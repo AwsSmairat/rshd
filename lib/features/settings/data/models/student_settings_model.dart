@@ -101,7 +101,9 @@ class StudentProfileModel {
     final deviceJson = json['active_device'];
     if (deviceJson is Map) {
       try {
-        activeDevice = DeviceModel.fromJson(Map<String, dynamic>.from(deviceJson));
+        activeDevice = DeviceModel.fromJson(
+          Map<String, dynamic>.from(deviceJson),
+        );
       } catch (_) {
         activeDevice = null;
       }
@@ -210,8 +212,10 @@ class StudentPreferencesModel {
       defaultVideoQuality: json['default_video_quality']?.toString() ?? 'auto',
       saveWatchPosition: json['save_watch_position'] != false,
       timezone: json['timezone']?.toString() ?? 'Asia/Amman',
-      profileVisibility: json['profile_visibility']?.toString() ?? 'teachers_only',
-      messagingPermission: json['messaging_permission']?.toString() ?? 'teachers_only',
+      profileVisibility:
+          json['profile_visibility']?.toString() ?? 'teachers_only',
+      messagingPermission:
+          json['messaging_permission']?.toString() ?? 'teachers_only',
       showActivityStatus: json['show_activity_status'] != false,
       allowProfilePhotoUse: json['allow_profile_photo_use'] != false,
       twoFactorEnabled: json['two_factor_enabled'] == true,

@@ -4,10 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
 class AnnouncementTypeBadge extends StatelessWidget {
-  const AnnouncementTypeBadge({
-    super.key,
-    required this.type,
-  });
+  const AnnouncementTypeBadge({super.key, required this.type});
 
   final String type;
 
@@ -53,9 +50,7 @@ class AnnouncementTypeBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: _backgroundColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: _textColor.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: _textColor.withValues(alpha: 0.2)),
       ),
       child: Text(
         _label,
@@ -70,11 +65,7 @@ class AnnouncementTypeBadge extends StatelessWidget {
 }
 
 class AnnouncementTypeIcon extends StatelessWidget {
-  const AnnouncementTypeIcon({
-    super.key,
-    required this.type,
-    this.size = 22,
-  });
+  const AnnouncementTypeIcon({super.key, required this.type, this.size = 22});
 
   final String type;
   final double size;

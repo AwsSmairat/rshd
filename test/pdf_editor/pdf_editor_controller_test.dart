@@ -46,10 +46,7 @@ void main() {
   test('pen stroke creates ink annotation', () {
     controller.addInkStroke(
       pageNumber: 1,
-      points: const [
-        NormalizedPoint(0.1, 0.1),
-        NormalizedPoint(0.2, 0.2),
-      ],
+      points: const [NormalizedPoint(0.1, 0.1), NormalizedPoint(0.2, 0.2)],
       type: AnnotationType.ink,
       color: Colors.black,
       strokeWidth: 0.004,
@@ -64,10 +61,7 @@ void main() {
   test('highlight creates highlighter annotation', () {
     controller.addInkStroke(
       pageNumber: 1,
-      points: const [
-        NormalizedPoint(0.1, 0.1),
-        NormalizedPoint(0.2, 0.2),
-      ],
+      points: const [NormalizedPoint(0.1, 0.1), NormalizedPoint(0.2, 0.2)],
       type: AnnotationType.highlighter,
       color: Colors.yellow,
       strokeWidth: 0.02,
@@ -80,12 +74,7 @@ void main() {
   });
 
   test('text creates text annotation', () {
-    controller.addTextBox(
-      pageNumber: 1,
-      x: 0.2,
-      y: 0.2,
-      text: 'Hello',
-    );
+    controller.addTextBox(pageNumber: 1, x: 0.2, y: 0.2, text: 'Hello');
 
     final annotations = controller.state.document.annotationsForPage(1);
     expect(annotations.first.type, AnnotationType.text);
@@ -93,36 +82,21 @@ void main() {
   });
 
   test('Arabic text stores RTL direction', () {
-    controller.addTextBox(
-      pageNumber: 1,
-      x: 0.2,
-      y: 0.2,
-      text: 'مرحبا',
-    );
+    controller.addTextBox(pageNumber: 1, x: 0.2, y: 0.2, text: 'مرحبا');
 
     final annotations = controller.state.document.annotationsForPage(1);
     expect(annotations.first.data['text_direction'], 'rtl');
   });
 
   test('English text stores LTR direction', () {
-    controller.addTextBox(
-      pageNumber: 1,
-      x: 0.2,
-      y: 0.2,
-      text: 'Hello',
-    );
+    controller.addTextBox(pageNumber: 1, x: 0.2, y: 0.2, text: 'Hello');
 
     final annotations = controller.state.document.annotationsForPage(1);
     expect(annotations.first.data['text_direction'], 'ltr');
   });
 
   test('note creates note annotation', () {
-    controller.addNote(
-      pageNumber: 1,
-      x: 0.3,
-      y: 0.3,
-      text: 'ملاحظة',
-    );
+    controller.addNote(pageNumber: 1, x: 0.3, y: 0.3, text: 'ملاحظة');
 
     final annotations = controller.state.document.annotationsForPage(1);
     expect(annotations.first.type, AnnotationType.note);
@@ -208,10 +182,7 @@ void main() {
     controller.setEraserMode(EraserMode.whole);
     controller.addInkStroke(
       pageNumber: 1,
-      points: const [
-        NormalizedPoint(0.1, 0.1),
-        NormalizedPoint(0.2, 0.2),
-      ],
+      points: const [NormalizedPoint(0.1, 0.1), NormalizedPoint(0.2, 0.2)],
       type: AnnotationType.ink,
       color: Colors.black,
       strokeWidth: 0.004,

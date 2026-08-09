@@ -7,7 +7,8 @@ import '../../../core/network/api_response.dart';
 import 'models/notification_model.dart';
 
 class NotificationsRepository {
-  NotificationsRepository({required ApiClient apiClient}) : _apiClient = apiClient;
+  NotificationsRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 
@@ -35,7 +36,9 @@ class NotificationsRepository {
 
     return rawList
         .whereType<Map>()
-        .map((item) => NotificationModel.fromJson(Map<String, dynamic>.from(item)))
+        .map(
+          (item) => NotificationModel.fromJson(Map<String, dynamic>.from(item)),
+        )
         .toList();
   }
 
@@ -60,6 +63,8 @@ class NotificationsRepository {
   }
 }
 
-final notificationsRepositoryProvider = Provider<NotificationsRepository>((ref) {
+final notificationsRepositoryProvider = Provider<NotificationsRepository>((
+  ref,
+) {
   return NotificationsRepository(apiClient: ref.watch(apiClientProvider));
 });

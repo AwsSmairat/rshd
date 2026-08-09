@@ -84,10 +84,7 @@ class AssignmentActionButton extends StatelessWidget {
         icon: Icon(icon, color: AppColors.darkGold, size: 20),
         label: Text(
           label,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-          ),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,

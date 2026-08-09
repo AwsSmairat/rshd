@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/security/safe_url_launcher.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../data/models/assignment_submission_model.dart';
@@ -9,10 +11,7 @@ import 'assignment_file_helper.dart';
 import 'assignment_section_card.dart';
 
 class SubmittedFileCard extends StatelessWidget {
-  const SubmittedFileCard({
-    super.key,
-    required this.submission,
-  });
+  const SubmittedFileCard({super.key, required this.submission});
 
   final AssignmentSubmissionModel submission;
 
@@ -24,20 +23,23 @@ class SubmittedFileCard extends StatelessWidget {
 
     final uri = Uri.tryParse(url);
     if (uri == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تعذر فتح الملف')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تعذر فتح الملف')));
       return;
     }
 
-    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final launched = await SafeUrlLauncher.launch(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
     if (!context.mounted) {
       return;
     }
     if (!launched) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تعذر فتح الملف')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تعذر فتح الملف')));
     }
   }
 
@@ -53,7 +55,8 @@ class SubmittedFileCard extends StatelessWidget {
     );
     final fileName = submission.originalFileName ?? 'ملف الحل';
     final size = AssignmentFileHelper.formatSize(submission.fileSize);
-    final mime = submission.fileMimeType?.split('/').last.toUpperCase() ?? 'FILE';
+    final mime =
+        submission.fileMimeType?.split('/').last.toUpperCase() ?? 'FILE';
 
     return AssignmentSectionCard(
       title: 'ملف الحل',
@@ -128,10 +131,7 @@ class SubmittedFileCard extends StatelessWidget {
 }
 
 class AssignmentSubmissionDetailsCard extends StatelessWidget {
-  const AssignmentSubmissionDetailsCard({
-    super.key,
-    required this.submission,
-  });
+  const AssignmentSubmissionDetailsCard({super.key, required this.submission});
 
   final AssignmentSubmissionModel submission;
 

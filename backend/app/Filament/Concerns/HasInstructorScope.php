@@ -2,8 +2,11 @@
 
 namespace App\Filament\Concerns;
 
+use App\Models\Lesson;
+use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 trait HasInstructorScope
@@ -36,8 +39,8 @@ trait HasInstructorScope
     }
 
     /**
-     * @param  Builder<\App\Models\Subject>  $query
-     * @return Builder<\App\Models\Subject>
+     * @param  Builder<Subject>  $query
+     * @return Builder<Subject>
      */
     protected static function scopeSubjectsQuery(Builder $query): Builder
     {
@@ -49,8 +52,8 @@ trait HasInstructorScope
     }
 
     /**
-     * @param  Builder<\App\Models\Lesson>  $query
-     * @return Builder<\App\Models\Lesson>
+     * @param  Builder<Lesson>  $query
+     * @return Builder<Lesson>
      */
     protected static function scopeLessonsQuery(Builder $query): Builder
     {
@@ -62,8 +65,8 @@ trait HasInstructorScope
     }
 
     /**
-     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
-     * @return Builder<\Illuminate\Database\Eloquent\Model>
+     * @param  Builder<Model>  $query
+     * @return Builder<Model>
      */
     protected static function scopeBySubjectInstructor(Builder $query, string $relation = 'subject'): Builder
     {
@@ -85,7 +88,7 @@ trait HasInstructorScope
      */
     protected static function subjectFilterOptions(): array
     {
-        $query = \App\Models\Subject::query();
+        $query = Subject::query();
 
         return static::scopeSubjectsQuery($query)
             ->orderBy('title')
@@ -94,8 +97,8 @@ trait HasInstructorScope
     }
 
     /**
-     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
-     * @return Builder<\Illuminate\Database\Eloquent\Model>
+     * @param  Builder<Model>  $query
+     * @return Builder<Model>
      */
     protected static function applyLessonSubjectFilter(Builder $query, array $data): Builder
     {

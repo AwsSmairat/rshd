@@ -55,12 +55,16 @@ class InkAnnotationPainter extends CustomPainter {
 
     final points = rawPoints
         .whereType<Map>()
-        .map((entry) => NormalizedPoint.fromJson(Map<String, dynamic>.from(entry)))
+        .map(
+          (entry) => NormalizedPoint.fromJson(Map<String, dynamic>.from(entry)),
+        )
         .toList();
     if (points.length < 2) return;
 
-    final screenPoints =
-        PdfCoordinateMapper.normalizedPointsToScreen(points, metrics);
+    final screenPoints = PdfCoordinateMapper.normalizedPointsToScreen(
+      points,
+      metrics,
+    );
     final color = _parseColor(annotation.data['color']?.toString());
     final opacity = _asDouble(annotation.data['opacity'], 1);
     final strokeWidth = metrics.normalizedStrokeWidth(
@@ -202,8 +206,9 @@ class ShapeAnnotationPainter extends CustomPainter {
       height: annotation.height,
     );
     final paint = Paint()
-      ..color = _parseColor(annotation.data['color']?.toString())
-          .withValues(alpha: _asDouble(annotation.data['opacity'], 0.35))
+      ..color = _parseColor(
+        annotation.data['color']?.toString(),
+      ).withValues(alpha: _asDouble(annotation.data['opacity'], 0.35))
       ..blendMode = BlendMode.multiply
       ..style = PaintingStyle.fill;
     canvas.drawRect(rect, paint);
@@ -216,8 +221,9 @@ class ShapeAnnotationPainter extends CustomPainter {
       width: annotation.width,
       height: annotation.height,
     );
-    final strokeColor =
-        _parseColor(annotation.data['stroke_color']?.toString());
+    final strokeColor = _parseColor(
+      annotation.data['stroke_color']?.toString(),
+    );
     final fillColor = annotation.data['fill_color'] != null
         ? _parseColor(annotation.data['fill_color']?.toString())
         : null;
@@ -236,8 +242,8 @@ class ShapeAnnotationPainter extends CustomPainter {
     final fill = fillColor == null
         ? null
         : (Paint()
-          ..color = fillColor.withValues(alpha: 0.2)
-          ..style = PaintingStyle.fill);
+            ..color = fillColor.withValues(alpha: 0.2)
+            ..style = PaintingStyle.fill);
 
     switch (shapeName) {
       case 'line':

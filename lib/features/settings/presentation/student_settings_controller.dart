@@ -38,8 +38,9 @@ class StudentSettingsState {
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       isSaving: isSaving ?? this.isSaving,
       isUploadingAvatar: isUploadingAvatar ?? this.isUploadingAvatar,
-      actionMessage:
-          clearMessage ? null : (actionMessage ?? this.actionMessage),
+      actionMessage: clearMessage
+          ? null
+          : (actionMessage ?? this.actionMessage),
     );
   }
 }
@@ -55,7 +56,8 @@ String mapSettingsError(ApiException error) {
 }
 
 class StudentSettingsController extends StateNotifier<StudentSettingsState> {
-  StudentSettingsController(this._repository) : super(const StudentSettingsState());
+  StudentSettingsController(this._repository)
+    : super(const StudentSettingsState());
 
   final SettingsRepository _repository;
 
@@ -92,7 +94,11 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
     String? gender,
     String? country,
   }) async {
-    state = state.copyWith(isSaving: true, clearError: true, clearMessage: true);
+    state = state.copyWith(
+      isSaving: true,
+      clearError: true,
+      clearMessage: true,
+    );
     try {
       final settings = await _repository.updateProfile(
         name: name,
@@ -302,39 +308,51 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
       next = switch (key) {
         'notify_lessons' => next.copyWith(notifyLessons: value as bool),
         'notify_assignments' => next.copyWith(notifyAssignments: value as bool),
-        'notify_assignment_reminders' =>
-          next.copyWith(notifyAssignmentReminders: value as bool),
+        'notify_assignment_reminders' => next.copyWith(
+          notifyAssignmentReminders: value as bool,
+        ),
         'notify_quizzes' => next.copyWith(notifyQuizzes: value as bool),
-        'notify_quiz_reminders' =>
-          next.copyWith(notifyQuizReminders: value as bool),
+        'notify_quiz_reminders' => next.copyWith(
+          notifyQuizReminders: value as bool,
+        ),
         'notify_grades' => next.copyWith(notifyGrades: value as bool),
         'notify_messages' => next.copyWith(notifyMessages: value as bool),
-        'notify_announcements' =>
-          next.copyWith(notifyAnnouncements: value as bool),
-        'notify_platform_updates' =>
-          next.copyWith(notifyPlatformUpdates: value as bool),
+        'notify_announcements' => next.copyWith(
+          notifyAnnouncements: value as bool,
+        ),
+        'notify_platform_updates' => next.copyWith(
+          notifyPlatformUpdates: value as bool,
+        ),
         'notification_sound' => next.copyWith(notificationSound: value as bool),
-        'notification_vibration' =>
-          next.copyWith(notificationVibration: value as bool),
+        'notification_vibration' => next.copyWith(
+          notificationVibration: value as bool,
+        ),
         'language' => next.copyWith(language: value as String),
         'theme' => next.copyWith(theme: value as String),
         'font_size' => next.copyWith(fontSize: value as String),
-        'downloads_wifi_only' =>
-          next.copyWith(downloadsWifiOnly: value as bool),
+        'downloads_wifi_only' => next.copyWith(
+          downloadsWifiOnly: value as bool,
+        ),
         'auto_play_video' => next.copyWith(autoPlayVideo: value as bool),
-        'default_video_quality' =>
-          next.copyWith(defaultVideoQuality: value as String),
-        'save_watch_position' =>
-          next.copyWith(saveWatchPosition: value as bool),
+        'default_video_quality' => next.copyWith(
+          defaultVideoQuality: value as String,
+        ),
+        'save_watch_position' => next.copyWith(
+          saveWatchPosition: value as bool,
+        ),
         'timezone' => next.copyWith(timezone: value as String),
-        'profile_visibility' =>
-          next.copyWith(profileVisibility: value as String),
-        'messaging_permission' =>
-          next.copyWith(messagingPermission: value as String),
-        'show_activity_status' =>
-          next.copyWith(showActivityStatus: value as bool),
-        'allow_profile_photo_use' =>
-          next.copyWith(allowProfilePhotoUse: value as bool),
+        'profile_visibility' => next.copyWith(
+          profileVisibility: value as String,
+        ),
+        'messaging_permission' => next.copyWith(
+          messagingPermission: value as String,
+        ),
+        'show_activity_status' => next.copyWith(
+          showActivityStatus: value as bool,
+        ),
+        'allow_profile_photo_use' => next.copyWith(
+          allowProfilePhotoUse: value as bool,
+        ),
         'two_factor_enabled' => next.copyWith(twoFactorEnabled: value as bool),
         _ => next,
       };
@@ -344,6 +362,8 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
 }
 
 final studentSettingsControllerProvider =
-    StateNotifierProvider<StudentSettingsController, StudentSettingsState>((ref) {
-  return StudentSettingsController(ref.watch(settingsRepositoryProvider));
-});
+    StateNotifierProvider<StudentSettingsController, StudentSettingsState>((
+      ref,
+    ) {
+      return StudentSettingsController(ref.watch(settingsRepositoryProvider));
+    });

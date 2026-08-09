@@ -14,11 +14,11 @@ import 'package:rshd/features/auth/presentation/widgets/password_strength_indica
 
 class OfflineAuthRepository extends AuthRepository {
   OfflineAuthRepository()
-      : super(
-          apiClient: ApiClient(secureStorage: SecureStorageService()),
-          secureStorage: SecureStorageService(),
-          deviceService: DeviceService(secureStorage: SecureStorageService()),
-        );
+    : super(
+        apiClient: ApiClient(secureStorage: SecureStorageService()),
+        secureStorage: SecureStorageService(),
+        deviceService: DeviceService(secureStorage: SecureStorageService()),
+      );
 
   @override
   Future<void> requestPasswordReset({required String email}) async {
@@ -30,11 +30,7 @@ void main() {
   group('ForgotPasswordScreen', () {
     testWidgets('shows validation for empty and invalid email', (tester) async {
       await tester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp(
-            home: ForgotPasswordScreen(),
-          ),
-        ),
+        ProviderScope(child: MaterialApp(home: ForgotPasswordScreen())),
       );
       await tester.pumpAndSettle();
 
@@ -54,7 +50,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
-            home: PasswordResetVerificationScreen(email: 'student@rshdacademy.com'),
+            home: PasswordResetVerificationScreen(
+              email: 'student@rshdacademy.com',
+            ),
           ),
         ),
       );
@@ -113,7 +111,9 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      final controller = container.read(passwordResetControllerProvider.notifier);
+      final controller = container.read(
+        passwordResetControllerProvider.notifier,
+      );
       final success = await controller.requestReset('student@rshdacademy.com');
 
       expect(success, isFalse);

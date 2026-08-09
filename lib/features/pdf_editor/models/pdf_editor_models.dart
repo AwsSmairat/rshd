@@ -82,18 +82,18 @@ class PdfEditorAnnotation {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'type': type.name,
-        'pageNumber': pageNumber,
-        'x': x,
-        'y': y,
-        'width': width,
-        'height': height,
-        'rotation': rotation,
-        'created_at': createdAt?.toIso8601String(),
-        'updated_at': updatedAt?.toIso8601String(),
-        ...data,
-      };
+    'id': id,
+    'type': type.name,
+    'pageNumber': pageNumber,
+    'x': x,
+    'y': y,
+    'width': width,
+    'height': height,
+    'rotation': rotation,
+    'created_at': createdAt?.toIso8601String(),
+    'updated_at': updatedAt?.toIso8601String(),
+    ...data,
+  };
 
   factory PdfEditorAnnotation.fromJson(Map<String, dynamic> json) {
     return PdfEditorAnnotation(
@@ -154,17 +154,17 @@ class PdfEditorAnnotation {
 /// V2 annotation document with normalized page coordinates.
 class PdfAnnotationDocumentV2 {
   PdfAnnotationDocumentV2([Map<String, dynamic>? json])
-      : _root = _normalize(json);
+    : _root = _normalize(json);
 
   final Map<String, dynamic> _root;
 
   static const int currentVersion = 2;
 
   static Map<String, dynamic> empty({int? documentId}) => {
-        'version': currentVersion,
-        if (documentId != null) 'document_id': documentId,
-        'pages': <String, dynamic>{},
-      };
+    'version': currentVersion,
+    'document_id': ?documentId,
+    'pages': <String, dynamic>{},
+  };
 
   static Map<String, dynamic> _normalize(Map<String, dynamic>? json) {
     if (json == null || json.isEmpty) {
@@ -208,9 +208,10 @@ class PdfAnnotationDocumentV2 {
 
     return raw
         .whereType<Map>()
-        .map((item) => PdfEditorAnnotation.fromJson(
-              Map<String, dynamic>.from(item),
-            ))
+        .map(
+          (item) =>
+              PdfEditorAnnotation.fromJson(Map<String, dynamic>.from(item)),
+        )
         .toList();
   }
 
@@ -283,10 +284,10 @@ class PdfAnnotationDocumentV2 {
   }
 
   static Map<String, dynamic> _emptyPage() => {
-        'page_width': 595.0,
-        'page_height': 842.0,
-        'annotations': <dynamic>[],
-      };
+    'page_width': 595.0,
+    'page_height': 842.0,
+    'annotations': <dynamic>[],
+  };
 
   static String newId() {
     final random = Random.secure();
@@ -360,7 +361,8 @@ class PdfAnnotationDocumentV2 {
           'y': _asDouble(note['y']) / ph,
           'text': note['text'] ?? '',
           'created_at':
-              note['created_at']?.toString() ?? DateTime.now().toIso8601String(),
+              note['created_at']?.toString() ??
+              DateTime.now().toIso8601String(),
         });
       }
 
@@ -379,20 +381,25 @@ class PdfAnnotationDocumentV2 {
   ) {
     final value = page[key];
     if (value is! List) return [];
-    return value.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
+    return value
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
   }
 
   static List<NormalizedPoint> _legacyPointsToNormalized(dynamic raw) {
     if (raw is! List) return [];
-    final points = raw.whereType<Map>().map(
-      (entry) => NormalizedPoint.fromJson(Map<String, dynamic>.from(entry)),
-    ).toList();
+    final points = raw
+        .whereType<Map>()
+        .map(
+          (entry) => NormalizedPoint.fromJson(Map<String, dynamic>.from(entry)),
+        )
+        .toList();
     if (points.isEmpty) return [];
 
     final maxCoord = points.fold<double>(
       0,
-      (currentMax, point) =>
-          math.max(currentMax, math.max(point.nx, point.ny)),
+      (currentMax, point) => math.max(currentMax, math.max(point.nx, point.ny)),
     );
 
     if (maxCoord <= 1.5) return points;

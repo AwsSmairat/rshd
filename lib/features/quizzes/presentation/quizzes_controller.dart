@@ -57,13 +57,7 @@ class QuizDetailsState {
   }
 }
 
-enum QuizAttemptStatus {
-  loading,
-  loaded,
-  submitting,
-  submitted,
-  error,
-}
+enum QuizAttemptStatus { loading, loaded, submitting, submitted, error }
 
 class QuizAttemptState {
   const QuizAttemptState({
@@ -98,8 +92,7 @@ class QuizAttemptState {
 
   bool get isLastQuestion {
     final questions = quiz?.questions ?? [];
-    return questions.isNotEmpty &&
-        currentQuestionIndex >= questions.length - 1;
+    return questions.isNotEmpty && currentQuestionIndex >= questions.length - 1;
   }
 
   bool get allQuestionsAnswered {
@@ -205,10 +198,7 @@ class QuizzesListController extends StateNotifier<QuizzesListState> {
       return;
     }
 
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final quizzes = await _repository.getQuizzes();
@@ -265,17 +255,11 @@ class QuizDetailsController extends StateNotifier<QuizDetailsState> {
 
   Future<void> load(int quizId, {QuizModel? cached}) async {
     if (cached != null) {
-      state = QuizDetailsState(
-        status: FeatureLoadStatus.loaded,
-        quiz: cached,
-      );
+      state = QuizDetailsState(status: FeatureLoadStatus.loaded, quiz: cached);
       return;
     }
 
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final quiz = await _repository.findQuizById(quizId);
@@ -287,10 +271,7 @@ class QuizDetailsController extends StateNotifier<QuizDetailsState> {
         return;
       }
 
-      state = QuizDetailsState(
-        status: FeatureLoadStatus.loaded,
-        quiz: quiz,
-      );
+      state = QuizDetailsState(status: FeatureLoadStatus.loaded, quiz: quiz);
     } on ApiException catch (error) {
       state = QuizDetailsState(
         status: FeatureLoadStatus.error,
@@ -307,16 +288,13 @@ class QuizDetailsController extends StateNotifier<QuizDetailsState> {
 
 class QuizAttemptController extends StateNotifier<QuizAttemptState> {
   QuizAttemptController(this._repository, this.quizId)
-      : super(const QuizAttemptState());
+    : super(const QuizAttemptState());
 
   final QuizzesRepository _repository;
   final int quizId;
 
   Future<bool> start() async {
-    state = state.copyWith(
-      status: QuizAttemptStatus.loading,
-      clearError: true,
-    );
+    state = state.copyWith(status: QuizAttemptStatus.loading, clearError: true);
 
     try {
       final result = await _repository.startQuiz(quizId);
@@ -326,8 +304,9 @@ class QuizAttemptController extends StateNotifier<QuizAttemptState> {
         status: QuizAttemptStatus.loaded,
         attemptId: result.attemptId,
         quiz: result.quiz,
-        remainingSeconds:
-            duration != null && duration > 0 ? duration * 60 : null,
+        remainingSeconds: duration != null && duration > 0
+            ? duration * 60
+            : null,
       );
       return true;
     } on ApiException catch (error) {
@@ -430,15 +409,18 @@ class QuizAttemptController extends StateNotifier<QuizAttemptState> {
 
 final quizzesListControllerProvider =
     StateNotifierProvider<QuizzesListController, QuizzesListState>((ref) {
-  return QuizzesListController(ref.watch(quizzesRepositoryProvider));
-});
+      return QuizzesListController(ref.watch(quizzesRepositoryProvider));
+    });
 
 final quizDetailsControllerProvider = StateNotifierProvider.autoDispose
     .family<QuizDetailsController, QuizDetailsState, int>((ref, quizId) {
-  return QuizDetailsController(ref.watch(quizzesRepositoryProvider));
-});
+      return QuizDetailsController(ref.watch(quizzesRepositoryProvider));
+    });
 
 final quizAttemptControllerProvider = StateNotifierProvider.autoDispose
     .family<QuizAttemptController, QuizAttemptState, int>((ref, quizId) {
-  return QuizAttemptController(ref.watch(quizzesRepositoryProvider), quizId);
-});
+      return QuizAttemptController(
+        ref.watch(quizzesRepositoryProvider),
+        quizId,
+      );
+    });

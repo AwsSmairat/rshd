@@ -116,10 +116,7 @@ class DashboardSummaryGrid extends StatelessWidget {
           children: [
             for (var i = 0; i < cards.length; i++) ...[
               Expanded(
-                child: SizedBox(
-                  height: _cardHeight,
-                  child: cards[i],
-                ),
+                child: SizedBox(height: _cardHeight, child: cards[i]),
               ),
               if (i != cards.length - 1) const SizedBox(width: 12),
             ],
@@ -135,11 +132,7 @@ class DashboardSummaryGrid extends StatelessWidget {
         child: Row(
           children: [
             for (var i = 0; i < cards.length; i++) ...[
-              SizedBox(
-                width: _cardWidth,
-                height: _cardHeight,
-                child: cards[i],
-              ),
+              SizedBox(width: _cardWidth, height: _cardHeight, child: cards[i]),
               if (i != cards.length - 1) const SizedBox(width: 12),
             ],
           ],

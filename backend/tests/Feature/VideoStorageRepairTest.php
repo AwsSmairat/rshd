@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AccessStatus;
 use App\Enums\ContentStatus;
+use App\Enums\PaymentStatus;
 use App\Enums\SubjectCategory;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
@@ -208,8 +210,8 @@ class VideoStorageRepairTest extends TestCase
         SubjectStudent::query()->create([
             'subject_id' => $subjectId,
             'student_id' => $student->id,
-            'payment_status' => \App\Enums\PaymentStatus::Paid,
-            'access_status' => \App\Enums\AccessStatus::Active,
+            'payment_status' => PaymentStatus::Paid,
+            'access_status' => AccessStatus::Active,
         ]);
     }
 }

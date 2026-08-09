@@ -15,9 +15,6 @@ class AssignmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LiquidGlassAssignmentCard(
-      assignment: assignment,
-      onTap: onTap,
-    );
+    return LiquidGlassAssignmentCard(assignment: assignment, onTap: onTap);
   }
 }

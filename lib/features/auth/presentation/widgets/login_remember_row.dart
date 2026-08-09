@@ -64,8 +64,7 @@ class LoginRememberRow extends StatelessWidget {
                   width: 24,
                   child: Checkbox(
                     value: rememberMe,
-                    onChanged: (value) =>
-                        onRememberMeChanged(value ?? false),
+                    onChanged: (value) => onRememberMeChanged(value ?? false),
                     activeColor: AppColors.secondary,
                     checkColor: AppColors.white,
                     side: BorderSide(

@@ -36,8 +36,7 @@ class SubjectModel {
   bool get isEnrollmentPending => enrollmentStatus == 'pending';
   bool get canRequestPurchase => enrollmentStatus == 'none';
 
-  bool get hasCoverImage =>
-      coverImage != null && coverImage!.trim().isNotEmpty;
+  bool get hasCoverImage => coverImage != null && coverImage!.trim().isNotEmpty;
 
   String? get resolvedCoverImageUrl {
     final value = coverImage?.trim();
@@ -104,7 +103,8 @@ class SubjectModel {
       status: json['status']?.toString() ?? 'active',
       price: json['price']?.toString(),
       enrollmentStatus: json['enrollment_status']?.toString() ?? 'none',
-      progressPercent: _asDouble(json['progress_percent']) ??
+      progressPercent:
+          _asDouble(json['progress_percent']) ??
           (_enrollmentIsActive(json['enrollment_status']) ? 0 : null),
       instructor: instructor,
       createdAt: json['created_at']?.toString(),
@@ -128,12 +128,7 @@ class SubjectModel {
     'general': 'مواد عامة',
   };
 
-  static const departmentOrder = [
-    'medicine',
-    'it',
-    'engineering',
-    'general',
-  ];
+  static const departmentOrder = ['medicine', 'it', 'engineering', 'general'];
 
   String get departmentSectionTitle =>
       departmentSectionTitles[category] ?? categoryLabel;

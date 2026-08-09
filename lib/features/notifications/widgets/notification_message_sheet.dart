@@ -26,10 +26,12 @@ class _NotificationMessageSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final isReply = notification.effectiveType == 'instructor_reply';
-    final senderName = notification.data['instructor_name']?.toString() ??
+    final senderName =
+        notification.data['instructor_name']?.toString() ??
         notification.data['student_name']?.toString() ??
         _extractNameFromTitle(notification.title);
-    final subjectTitle = notification.data['subject_title']?.toString() ??
+    final subjectTitle =
+        notification.data['subject_title']?.toString() ??
         _extractSubjectFromTitle(notification.title);
     final message = notification.body?.trim().isNotEmpty == true
         ? notification.body!.trim()
@@ -118,10 +120,7 @@ class _NotificationMessageSheet extends StatelessWidget {
               ),
               child: Text(
                 message,
-                style: AppTextStyles.body.copyWith(
-                  fontSize: 15,
-                  height: 1.7,
-                ),
+                style: AppTextStyles.body.copyWith(fontSize: 15, height: 1.7),
                 textAlign: TextAlign.right,
               ),
             ),

@@ -6,10 +6,11 @@ import '../constants/storage_keys.dart';
 
 class SecureStorageService {
   SecureStorageService({FlutterSecureStorage? storage})
-      : _storage = storage ??
-            const FlutterSecureStorage(
-              aOptions: AndroidOptions(encryptedSharedPreferences: true),
-            );
+    : _storage =
+          storage ??
+          const FlutterSecureStorage(
+            aOptions: AndroidOptions(encryptedSharedPreferences: true),
+          );
 
   final FlutterSecureStorage _storage;
 
@@ -31,10 +32,7 @@ class SecureStorageService {
   }
 
   Future<void> saveUser(Map<String, dynamic> user) {
-    return _storage.write(
-      key: StorageKeys.userJson,
-      value: jsonEncode(user),
-    );
+    return _storage.write(key: StorageKeys.userJson, value: jsonEncode(user));
   }
 
   Future<Map<String, dynamic>?> getUser() async {
@@ -64,28 +62,21 @@ class SecureStorageService {
     return value == 'true';
   }
 
-  Future<({String email, String password})?> getRememberedCredentials() async {
+  /// Returns remembered email only. Passwords must never be persisted.
+  Future<String?> getRememberedEmail() async {
     if (!await isRememberMeEnabled()) {
       return null;
     }
 
     final email = await _storage.read(key: StorageKeys.rememberedEmail);
-    final password = await _storage.read(key: StorageKeys.rememberedPassword);
-    if (email == null ||
-        email.isEmpty ||
-        password == null ||
-        password.isEmpty) {
+    if (email == null || email.isEmpty) {
       return null;
     }
 
-    return (email: email, password: password);
+    return email;
   }
 
-  Future<void> saveRememberMe({
-    required bool enabled,
-    String? email,
-    String? password,
-  }) async {
+  Future<void> saveRememberMe({required bool enabled, String? email}) async {
     if (!enabled) {
       await clearRememberMe();
       return;
@@ -93,15 +84,21 @@ class SecureStorageService {
 
     await _storage.write(key: StorageKeys.rememberMeEnabled, value: 'true');
     await _storage.write(key: StorageKeys.rememberedEmail, value: email ?? '');
-    await _storage.write(
-      key: StorageKeys.rememberedPassword,
-      value: password ?? '',
-    );
+    await _purgeLegacyRememberedPassword();
   }
 
   Future<void> clearRememberMe() async {
     await _storage.delete(key: StorageKeys.rememberMeEnabled);
     await _storage.delete(key: StorageKeys.rememberedEmail);
+    await _purgeLegacyRememberedPassword();
+  }
+
+  /// Removes legacy password keys from older app versions without reading values.
+  Future<void> purgeLegacyRememberedPassword() async {
+    await _purgeLegacyRememberedPassword();
+  }
+
+  Future<void> _purgeLegacyRememberedPassword() async {
     await _storage.delete(key: StorageKeys.rememberedPassword);
   }
 
@@ -110,7 +107,10 @@ class SecureStorageService {
     required String resetToken,
   }) async {
     await _storage.write(key: StorageKeys.passwordResetEmail, value: email);
-    await _storage.write(key: StorageKeys.passwordResetToken, value: resetToken);
+    await _storage.write(
+      key: StorageKeys.passwordResetToken,
+      value: resetToken,
+    );
   }
 
   Future<({String email, String resetToken})?> getPasswordResetSession() async {

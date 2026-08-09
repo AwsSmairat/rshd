@@ -4,7 +4,9 @@ import 'package:rshd/features/pdf_editor/models/annotation_enums.dart';
 import 'package:rshd/features/pdf_editor/widgets/pdf_editor_toolbar.dart';
 
 void main() {
-  testWidgets('toolbar shows primary tools and expands secondary row', (tester) async {
+  testWidgets('toolbar shows primary tools and expands secondary row', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(

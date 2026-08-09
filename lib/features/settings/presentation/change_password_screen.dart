@@ -58,12 +58,13 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       return;
     }
 
-    final success =
-        await ref.read(studentSettingsControllerProvider.notifier).updatePassword(
-              currentPassword: _currentController.text,
-              password: _passwordController.text,
-              confirmation: _confirmController.text,
-            );
+    final success = await ref
+        .read(studentSettingsControllerProvider.notifier)
+        .updatePassword(
+          currentPassword: _currentController.text,
+          password: _passwordController.text,
+          confirmation: _confirmController.text,
+        );
 
     if (success && mounted) {
       Navigator.pop(context);

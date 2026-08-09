@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 
 /// Responsive layout breakpoints tuned for iPhone and all iPad sizes.
 class AppLayoutMetrics {
-  const AppLayoutMetrics._({
-    required this.size,
-    required this.padding,
-  });
+  const AppLayoutMetrics._({required this.size, required this.padding});
 
   factory AppLayoutMetrics.of(BuildContext context) {
     return AppLayoutMetrics._(
@@ -71,10 +68,7 @@ class AppLayoutMetrics {
     return math.max(horizontalPadding, (width - contentMaxWidth) / 2);
   }
 
-  EdgeInsets pagePadding({
-    double top = 8,
-    double bottom = 32,
-  }) {
+  EdgeInsets pagePadding({double top = 8, double bottom = 32}) {
     return EdgeInsets.fromLTRB(
       outerHorizontalInset,
       top,
@@ -83,9 +77,7 @@ class AppLayoutMetrics {
     );
   }
 
-  EdgeInsets sectionPadding({
-    double vertical = 0,
-  }) {
+  EdgeInsets sectionPadding({double vertical = 0}) {
     return EdgeInsets.fromLTRB(
       outerHorizontalInset,
       vertical,
@@ -97,10 +89,10 @@ class AppLayoutMetrics {
   double get sectionSpacing => isExtraLargeTablet
       ? 20
       : isLargeTablet
-          ? 16
-          : isTablet
-              ? 14
-              : 12;
+      ? 16
+      : isTablet
+      ? 14
+      : 12;
 
   int get quickActionColumns => 4;
 
@@ -169,8 +161,8 @@ class AppLayoutMetrics {
   int get subjectGridColumns => isExtraLargeTablet
       ? 3
       : isLargeTablet
-          ? 2
-          : 1;
+      ? 2
+      : 1;
 
   bool get useDepartmentRow => isTablet;
 
@@ -181,18 +173,19 @@ class AppLayoutMetrics {
   double get headerTitleFontSize => isExtraLargeTablet
       ? 30
       : isLargeTablet
-          ? 28
-          : isTablet
-              ? 26
-              : 26;
+      ? 28
+      : isTablet
+      ? 26
+      : 26;
 
   double get pageHeaderTitleFontSize => isExtraLargeTablet
       ? 24
       : isLargeTablet
-          ? 22
-          : 20;
+      ? 22
+      : 20;
 
   double get sectionTitleFontSize => isTablet ? 20 : 18;
 
-  double get dialogMaxWidth => isTablet ? math.min(520, contentMaxWidth) : width - 48;
+  double get dialogMaxWidth =>
+      isTablet ? math.min(520, contentMaxWidth) : width - 48;
 }

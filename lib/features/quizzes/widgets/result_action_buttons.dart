@@ -26,10 +26,7 @@ class QuizActionButton extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             gradient: const LinearGradient(
-              colors: [
-                AppColors.primary,
-                AppColors.secondaryNavy,
-              ],
+              colors: [AppColors.primary, AppColors.secondaryNavy],
             ),
             boxShadow: [
               BoxShadow(
@@ -88,10 +85,7 @@ class QuizActionButton extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
           ],
         ),
@@ -125,10 +119,7 @@ class ResultActionButtons extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        QuizActionButton(
-          label: primaryLabel,
-          onPressed: onPrimary,
-        ),
+        QuizActionButton(label: primaryLabel, onPressed: onPrimary),
         if (secondaryLabel != null && onSecondary != null) ...[
           const SizedBox(height: 12),
           QuizActionButton(

@@ -9,11 +9,7 @@ import 'screen_protection_service.dart';
 
 /// Enables native + Flutter screen protection for the subtree lifecycle.
 class ProtectedContentScope extends ConsumerStatefulWidget {
-  const ProtectedContentScope({
-    super.key,
-    required this.child,
-    this.scopeId,
-  });
+  const ProtectedContentScope({super.key, required this.child, this.scopeId});
 
   final Widget child;
 
@@ -55,8 +51,7 @@ class _ProtectedContentScopeState extends ConsumerState<ProtectedContentScope> {
   Future<void> _acquire() async {
     if (!mounted || _acquired) return;
     _acquired = true;
-    final service =
-        _service ?? ref.read(screenProtectionServiceProvider)!;
+    final service = _service ?? ref.read(screenProtectionServiceProvider)!;
     await service.acquire(_scopeId);
     if (mounted) {
       setState(() {});
@@ -66,20 +61,16 @@ class _ProtectedContentScopeState extends ConsumerState<ProtectedContentScope> {
   @override
   Widget build(BuildContext context) {
     final shouldHide = ref.watch(
-      screenProtectionServiceProvider.select((service) => service.shouldHideContent),
+      screenProtectionServiceProvider.select(
+        (service) => service.shouldHideContent,
+      ),
     );
 
     return Stack(
       fit: StackFit.expand,
       children: [
-        Offstage(
-          offstage: shouldHide,
-          child: widget.child,
-        ),
-        if (shouldHide)
-          const Positioned.fill(
-            child: ProtectedContentOverlay(),
-          ),
+        Offstage(offstage: shouldHide, child: widget.child),
+        if (shouldHide) const Positioned.fill(child: ProtectedContentOverlay()),
       ],
     );
   }
@@ -99,7 +90,9 @@ class ProtectedMediaGate extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final blocked = ref.watch(
-      screenProtectionServiceProvider.select((service) => service.shouldHideContent),
+      screenProtectionServiceProvider.select(
+        (service) => service.shouldHideContent,
+      ),
     );
 
     if (blocked) {

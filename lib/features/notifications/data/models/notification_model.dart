@@ -48,7 +48,8 @@ class NotificationModel {
       return type;
     }
 
-    if (inReplyToId != null || (instructorId != null && title.startsWith('رد من'))) {
+    if (inReplyToId != null ||
+        (instructorId != null && title.startsWith('رد من'))) {
       return 'instructor_reply';
     }
 

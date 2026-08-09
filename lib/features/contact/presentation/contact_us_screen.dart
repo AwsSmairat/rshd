@@ -180,7 +180,8 @@ class _ContactUsScreenState extends ConsumerState<ContactUsScreen> {
                                 icon: channel.icon,
                                 iconColor: channel.iconColor,
                                 isEnabled: channel.isEnabled,
-                                onTap: channel.isEnabled && channel.onTap != null
+                                onTap:
+                                    channel.isEnabled && channel.onTap != null
                                     ? () => channel.onTap!(context)
                                     : null,
                               ),

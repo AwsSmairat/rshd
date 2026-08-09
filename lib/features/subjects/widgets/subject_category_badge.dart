@@ -8,10 +8,7 @@ import '../data/models/subject_model.dart';
 import 'subject_grouping_helper.dart';
 
 class SubjectCategoryBadge extends StatelessWidget {
-  const SubjectCategoryBadge({
-    super.key,
-    required this.subject,
-  });
+  const SubjectCategoryBadge({super.key, required this.subject});
 
   final SubjectModel subject;
 
@@ -30,7 +27,8 @@ class SubjectCategoryBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = subject.categoryLabel.isNotEmpty &&
+    final label =
+        subject.categoryLabel.isNotEmpty &&
             subject.categoryLabel != subject.category
         ? subject.categoryLabel
         : _fallbackLabel();
@@ -51,9 +49,7 @@ class SubjectCategoryBadge extends StatelessWidget {
               ],
             ),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.52),
-            ),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.52)),
           ),
           child: Text(
             label,

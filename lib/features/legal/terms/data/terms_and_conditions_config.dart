@@ -19,8 +19,7 @@ class TermsAndConditionsConfig {
   /// الحد الأقصى للأجهزة — يُفضّل مزامنته مع إعدادات المنصة.
   static const int maximumAllowedDevices = 1;
 
-  static const String refundRequestPeriod =
-      'حسب السياسة المعتمدة من الإدارة';
+  static const String refundRequestPeriod = 'حسب السياسة المعتمدة من الإدارة';
   static const String refundProcessingPeriod =
       'حسب طريقة الدفع والسياسة المعتمدة';
 
@@ -31,6 +30,5 @@ class TermsAndConditionsConfig {
   static const String companyCountry = '';
 
   static const String supportEmailSubject = 'استفسار بخصوص شروط RSHD';
-  static const String reportViolationSubject =
-      'إبلاغ عن مخالفة — منصة RSHD';
+  static const String reportViolationSubject = 'إبلاغ عن مخالفة — منصة RSHD';
 }

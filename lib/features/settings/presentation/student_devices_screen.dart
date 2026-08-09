@@ -26,32 +26,43 @@ class StudentDevicesScreen extends ConsumerWidget {
           : ListView.separated(
               padding: const EdgeInsets.all(20),
               itemCount: devices.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final device = devices[index];
-                return _DeviceTile(device: device, onRevoke: () async {
-                  final ok = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('إلغاء الجهاز'),
-                      content: Text('هل تريد تسجيل الخروج من "${device.deviceName ?? device.platform ?? 'جهاز'}"؟'),
-                      actions: [
-                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
-                        TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('تأكيد')),
-                      ],
-                    ),
-                  );
-                  if (ok == true) {
-                    final success = await ref
-                        .read(studentSettingsControllerProvider.notifier)
-                        .revokeDevice(device.id);
-                    if (context.mounted) {
-                      if (success) {
-                        Navigator.pop(context);
+                return _DeviceTile(
+                  device: device,
+                  onRevoke: () async {
+                    final ok = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('إلغاء الجهاز'),
+                        content: Text(
+                          'هل تريد تسجيل الخروج من "${device.deviceName ?? device.platform ?? 'جهاز'}"؟',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('إلغاء'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('تأكيد'),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (ok == true) {
+                      final success = await ref
+                          .read(studentSettingsControllerProvider.notifier)
+                          .revokeDevice(device.id);
+                      if (context.mounted) {
+                        if (success) {
+                          Navigator.pop(context);
+                        }
                       }
                     }
-                  }
-                });
+                  },
+                );
               },
             ),
     );
@@ -68,7 +79,9 @@ class _DeviceTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final lastLogin = device.lastLoginAt;
     final formatted = lastLogin != null
-        ? DateFormat('yyyy/MM/dd HH:mm').format(DateTime.parse(lastLogin).toLocal())
+        ? DateFormat(
+            'yyyy/MM/dd HH:mm',
+          ).format(DateTime.parse(lastLogin).toLocal())
         : '—';
 
     return Container(
@@ -86,27 +99,50 @@ class _DeviceTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   device.deviceName ?? device.platform ?? 'جهاز',
-                  style: AppTextStyles.subtitle.copyWith(fontWeight: FontWeight.w700),
+                  style: AppTextStyles.subtitle.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               if (device.isActive)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.accent.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text('نشط', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                  child: const Text(
+                    'نشط',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+                  ),
                 ),
             ],
           ),
           const SizedBox(height: 6),
-          Text('النظام: ${device.platform ?? '—'}', style: AppTextStyles.body.copyWith(fontSize: 13, color: AppColors.textMuted)),
-          Text('آخر نشاط: $formatted', style: AppTextStyles.body.copyWith(fontSize: 13, color: AppColors.textMuted)),
+          Text(
+            'النظام: ${device.platform ?? '—'}',
+            style: AppTextStyles.body.copyWith(
+              fontSize: 13,
+              color: AppColors.textMuted,
+            ),
+          ),
+          Text(
+            'آخر نشاط: $formatted',
+            style: AppTextStyles.body.copyWith(
+              fontSize: 13,
+              color: AppColors.textMuted,
+            ),
+          ),
           const SizedBox(height: 10),
           Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: TextButton(onPressed: onRevoke, child: const Text('إلغاء الجهاز')),
+            child: TextButton(
+              onPressed: onRevoke,
+              child: const Text('إلغاء الجهاز'),
+            ),
           ),
         ],
       ),

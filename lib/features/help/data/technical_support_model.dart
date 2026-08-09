@@ -67,10 +67,7 @@ class SupportMessageModel {
 }
 
 class SupportConversationModel {
-  const SupportConversationModel({
-    this.ticket,
-    this.messages = const [],
-  });
+  const SupportConversationModel({this.ticket, this.messages = const []});
 
   final SupportTicketModel? ticket;
   final List<SupportMessageModel> messages;
@@ -87,11 +84,13 @@ class SupportConversationModel {
           : null,
       messages: messagesJson is List
           ? messagesJson
-              .whereType<Map>()
-              .map((item) => SupportMessageModel.fromJson(
+                .whereType<Map>()
+                .map(
+                  (item) => SupportMessageModel.fromJson(
                     Map<String, dynamic>.from(item),
-                  ))
-              .toList()
+                  ),
+                )
+                .toList()
           : const [],
     );
   }

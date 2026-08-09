@@ -34,7 +34,10 @@ void main() {
       expect(channels.mailtoUri?.path, 'new@example.com');
       expect(channels.websiteUri?.toString(), 'https://rshdacademy.com');
       expect(channels.youtubeUri?.toString(), 'https://youtube.com/@rshd');
-      expect(channels.linkedinUri?.toString(), 'https://linkedin.com/company/rshd');
+      expect(
+        channels.linkedinUri?.toString(),
+        'https://linkedin.com/company/rshd',
+      );
     });
 
     test('fromJson keeps empty values without fallback', () {

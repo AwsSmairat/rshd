@@ -14,7 +14,11 @@ import '../data/privacy_policy_config.dart';
 import '../data/privacy_policy_model.dart';
 import 'privacy_policy_controller.dart';
 import '../widgets/privacy_policy_contact_card.dart'
-    show DeleteAccountButton, PrivacyContactInfo, launchPrivacyEmail, resolvePrivacyContactInfo;
+    show
+        DeleteAccountButton,
+        PrivacyContactInfo,
+        launchPrivacyEmail,
+        resolvePrivacyContactInfo;
 import '../widgets/privacy_policy_footer.dart';
 import '../widgets/privacy_policy_header.dart';
 import '../widgets/privacy_policy_intro_card.dart';
@@ -84,18 +88,20 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: switch (state.status) {
-        PrivacyPolicyLoadStatus.initial ||
-        PrivacyPolicyLoadStatus.loading =>
+        PrivacyPolicyLoadStatus.initial || PrivacyPolicyLoadStatus.loading =>
           const LoadingWidget(message: 'جاري تحميل سياسة الخصوصية...'),
-        PrivacyPolicyLoadStatus.error =>
-          ErrorView(
-            message: state.errorMessage ?? 'تعذر تحميل سياسة الخصوصية',
-            onRetry: () =>
-                ref.read(privacyPolicyControllerProvider.notifier).load(refresh: true),
-          ),
+        PrivacyPolicyLoadStatus.error => ErrorView(
+          message: state.errorMessage ?? 'تعذر تحميل سياسة الخصوصية',
+          onRetry: () => ref
+              .read(privacyPolicyControllerProvider.notifier)
+              .load(refresh: true),
+        ),
         PrivacyPolicyLoadStatus.loaded ||
-        PrivacyPolicyLoadStatus.offline =>
-          _buildContent(state, contact, platformSettings?.platformName ?? 'RSHD'),
+        PrivacyPolicyLoadStatus.offline => _buildContent(
+          state,
+          contact,
+          platformSettings?.platformName ?? 'RSHD',
+        ),
       },
     );
   }
@@ -111,13 +117,17 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
       (s) => s.id == 'introduction',
       orElse: () => document.sections.first,
     );
-    final bodySections = document.sections.where((s) => s.id != 'introduction').toList();
-    final accordionSections =
-        bodySections.where((s) => s.id != 'contact').toList();
+    final bodySections = document.sections
+        .where((s) => s.id != 'introduction')
+        .toList();
+    final accordionSections = bodySections
+        .where((s) => s.id != 'contact')
+        .toList();
 
     return RefreshIndicator(
-      onRefresh: () =>
-          ref.read(privacyPolicyControllerProvider.notifier).load(refresh: true),
+      onRefresh: () => ref
+          .read(privacyPolicyControllerProvider.notifier)
+          .load(refresh: true),
       color: AppColors.secondary,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),

@@ -16,15 +16,13 @@ import 'widgets/luxury_text_field.dart';
 import 'widgets/password_strength_indicator.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
-  const ResetPasswordScreen({
-    super.key,
-    required this.email,
-  });
+  const ResetPasswordScreen({super.key, required this.email});
 
   final String email;
 
   @override
-  ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  ConsumerState<ResetPasswordScreen> createState() =>
+      _ResetPasswordScreenState();
 }
 
 class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
@@ -43,12 +41,15 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   }
 
   Future<void> _loadResetToken() async {
-    final session =
-        await ref.read(secureStorageProvider).getPasswordResetSession();
+    final session = await ref
+        .read(secureStorageProvider)
+        .getPasswordResetSession();
     if (!mounted) return;
     if (session == null || session.email != widget.email.trim().toLowerCase()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('انتهت جلسة الاستعادة. يرجى البدء من جديد.')),
+        const SnackBar(
+          content: Text('انتهت جلسة الاستعادة. يرجى البدء من جديد.'),
+        ),
       );
       context.go(AppRoutes.forgotPassword);
       return;
@@ -66,7 +67,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   Future<void> _submit() async {
     if (_resetToken == null || !_formKey.currentState!.validate()) return;
 
-    final success = await ref.read(passwordResetControllerProvider.notifier).resetPassword(
+    final success = await ref
+        .read(passwordResetControllerProvider.notifier)
+        .resetPassword(
           email: widget.email,
           resetToken: _resetToken!,
           password: _passwordController.text,
@@ -75,11 +78,13 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
     if (!mounted || !success) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('تم تغيير كلمة المرور بنجاح')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('تم تغيير كلمة المرور بنجاح')));
 
-    context.go('${AppRoutes.login}?email=${Uri.encodeComponent(widget.email.trim())}');
+    context.go(
+      '${AppRoutes.login}?email=${Uri.encodeComponent(widget.email.trim())}',
+    );
   }
 
   @override
@@ -113,7 +118,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 SizedBox(height: metrics.fieldSpacing * 0.5),
                 Text(
                   'اختر كلمة مرور قوية لحسابك (8 أحرف على الأقل، حرف كبير، ورقم).',
-                  style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.textMuted,
+                  ),
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: metrics.sectionSpacing),
@@ -125,7 +132,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   errorText: state.fieldErrors['password'],
                   trailing: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                     ),
                     onPressed: () =>
                         setState(() => _obscurePassword = !_obscurePassword),
@@ -178,7 +187,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 GoldGradientButton(
                   label: 'تغيير كلمة المرور',
                   isLoading: state.isLoading || _resetToken == null,
-                  onPressed: state.isLoading || _resetToken == null ? null : _submit,
+                  onPressed: state.isLoading || _resetToken == null
+                      ? null
+                      : _submit,
                 ),
               ],
             ),

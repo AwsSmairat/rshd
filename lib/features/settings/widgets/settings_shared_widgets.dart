@@ -69,7 +69,11 @@ class _SettingsSectionCardState extends State<SettingsSectionCard> {
                       padding: const EdgeInsets.symmetric(vertical: 2),
                       child: Row(
                         children: [
-                          Icon(widget.icon, color: AppColors.darkGold, size: 20),
+                          Icon(
+                            widget.icon,
+                            color: AppColors.darkGold,
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -86,7 +90,9 @@ class _SettingsSectionCardState extends State<SettingsSectionCard> {
                             duration: const Duration(milliseconds: 200),
                             child: Icon(
                               Icons.expand_more,
-                              color: AppColors.textMuted.withValues(alpha: 0.85),
+                              color: AppColors.textMuted.withValues(
+                                alpha: 0.85,
+                              ),
                               size: 22,
                             ),
                           ),
@@ -110,10 +116,7 @@ class _SettingsSectionCardState extends State<SettingsSectionCard> {
             firstChild: const SizedBox.shrink(),
             secondChild: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 8),
-                widget.child,
-              ],
+              children: [const SizedBox(height: 8), widget.child],
             ),
           ),
         ],

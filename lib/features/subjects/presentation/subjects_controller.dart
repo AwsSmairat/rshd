@@ -2,19 +2,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../../core/network/async_load_guard.dart';
+import '../../../core/security/sensitive_data_redactor.dart';
 import '../data/models/lesson_file_model.dart';
 import '../data/models/lesson_model.dart';
 import '../data/models/subject_model.dart';
 import '../data/models/video_model.dart';
 import '../data/subjects_repository.dart';
 
-enum FeatureLoadStatus {
-  initial,
-  loading,
-  loaded,
-  empty,
-  error,
-}
+enum FeatureLoadStatus { initial, loading, loaded, empty, error }
 
 class SubjectsListState {
   const SubjectsListState({
@@ -95,7 +91,12 @@ String mapSubjectsError(ApiException error) {
   return mapContentError(error, subjectContext: true);
 }
 
-String mapContentError(ApiException error, {bool subjectContext = false, bool fileContext = false, bool videoContext = false}) {
+String mapContentError(
+  ApiException error, {
+  bool subjectContext = false,
+  bool fileContext = false,
+  bool videoContext = false,
+}) {
   if (error.isForbidden) {
     if (videoContext) {
       return 'انتهت صلاحية الوصول إلى هذه المادة أو لا تملك صلاحية مشاهدة هذا الفيديو.';
@@ -130,10 +131,7 @@ class SubjectsListController extends StateNotifier<SubjectsListState> {
       return;
     }
 
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final subjects = (category != null && category.isNotEmpty)
@@ -175,12 +173,14 @@ class SubjectsListController extends StateNotifier<SubjectsListState> {
       return;
     }
 
-    final subjects = state.subjects.map((subject) {
-      if (subject.id != subjectId) {
-        return subject;
-      }
-      return subject.copyWith(enrollmentStatus: enrollmentStatus);
-    }).toList(growable: false);
+    final subjects = state.subjects
+        .map((subject) {
+          if (subject.id != subjectId) {
+            return subject;
+          }
+          return subject.copyWith(enrollmentStatus: enrollmentStatus);
+        })
+        .toList(growable: false);
 
     state = state.copyWith(
       status: subjects.isEmpty
@@ -196,13 +196,15 @@ class SubjectsListController extends StateNotifier<SubjectsListState> {
       return;
     }
 
-    final subjects = state.subjects.map((entry) {
-      if (entry.id != subject.id) {
-        return entry;
-      }
+    final subjects = state.subjects
+        .map((entry) {
+          if (entry.id != subject.id) {
+            return entry;
+          }
 
-      return entry.copyWith(progressPercent: subject.progressPercent);
-    }).toList(growable: false);
+          return entry.copyWith(progressPercent: subject.progressPercent);
+        })
+        .toList(growable: false);
 
     state = state.copyWith(subjects: subjects);
   }
@@ -243,7 +245,8 @@ class SubjectDetailsState {
 }
 
 class SubjectDetailsController extends StateNotifier<SubjectDetailsState> {
-  SubjectDetailsController(this._repository) : super(const SubjectDetailsState());
+  SubjectDetailsController(this._repository)
+    : super(const SubjectDetailsState());
 
   final SubjectsRepository _repository;
 
@@ -268,10 +271,7 @@ class SubjectDetailsController extends StateNotifier<SubjectDetailsState> {
       return;
     }
 
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final subject = await _repository.findSubjectById(subjectId);
@@ -315,10 +315,7 @@ class SubjectLessonsController extends StateNotifier<LessonsListState> {
       return;
     }
 
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final lessons = await _repository.getSubjectLessons(subjectId);
@@ -342,29 +339,38 @@ class SubjectLessonsController extends StateNotifier<LessonsListState> {
   }
 }
 
-class LessonDetailsController extends StateNotifier<LessonDetailsState> {
+class LessonDetailsController extends StateNotifier<LessonDetailsState>
+    with AsyncLoadGuard {
   LessonDetailsController(this._repository) : super(const LessonDetailsState());
 
   final SubjectsRepository _repository;
 
   Future<void> load(int lessonId) async {
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    final generation = beginLoad();
+
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final lesson = await _repository.getLessonDetails(lessonId);
+      if (!isCurrentLoad(generation)) {
+        return;
+      }
       state = LessonDetailsState(
         status: FeatureLoadStatus.loaded,
         lesson: lesson,
       );
     } on ApiException catch (error) {
+      if (!isCurrentLoad(generation)) {
+        return;
+      }
       state = LessonDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: mapContentError(error),
       );
     } catch (_) {
+      if (!isCurrentLoad(generation)) {
+        return;
+      }
       state = const LessonDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -375,23 +381,26 @@ class LessonDetailsController extends StateNotifier<LessonDetailsState> {
 
 final subjectsListControllerProvider =
     StateNotifierProvider<SubjectsListController, SubjectsListState>((ref) {
-  return SubjectsListController(ref.watch(subjectsRepositoryProvider));
-});
+      return SubjectsListController(ref.watch(subjectsRepositoryProvider));
+    });
 
 final subjectDetailsControllerProvider = StateNotifierProvider.autoDispose
-    .family<SubjectDetailsController, SubjectDetailsState, int>((ref, subjectId) {
-  return SubjectDetailsController(ref.watch(subjectsRepositoryProvider));
-});
+    .family<SubjectDetailsController, SubjectDetailsState, int>((
+      ref,
+      subjectId,
+    ) {
+      return SubjectDetailsController(ref.watch(subjectsRepositoryProvider));
+    });
 
 final subjectLessonsControllerProvider = StateNotifierProvider.autoDispose
     .family<SubjectLessonsController, LessonsListState, int>((ref, subjectId) {
-  return SubjectLessonsController(ref.watch(subjectsRepositoryProvider));
-});
+      return SubjectLessonsController(ref.watch(subjectsRepositoryProvider));
+    });
 
 final lessonDetailsControllerProvider = StateNotifierProvider.autoDispose
     .family<LessonDetailsController, LessonDetailsState, int>((ref, lessonId) {
-  return LessonDetailsController(ref.watch(subjectsRepositoryProvider));
-});
+      return LessonDetailsController(ref.watch(subjectsRepositoryProvider));
+    });
 
 class VideoDetailsState {
   const VideoDetailsState({
@@ -464,10 +473,7 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
 
     try {
       final video = await _repository.getVideoDetails(videoId);
-      state = VideoDetailsState(
-        status: FeatureLoadStatus.loaded,
-        video: video,
-      );
+      state = VideoDetailsState(status: FeatureLoadStatus.loaded, video: video);
     } on ApiException catch (error) {
       state = VideoDetailsState(
         status: FeatureLoadStatus.error,
@@ -493,8 +499,8 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
 
     final completionPercentage = durationSeconds > 0
         ? ((currentPositionSeconds / durationSeconds) * 100)
-            .clamp(0, 100)
-            .round()
+              .clamp(0, 100)
+              .round()
         : 0;
 
     try {
@@ -512,17 +518,22 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
       }
 
       state = state.copyWith(
-        progressMessage:
-            showSuccessMessage ? 'تم حفظ تقدم المشاهدة' : state.progressMessage,
+        progressMessage: showSuccessMessage
+            ? 'تم حفظ تقدم المشاهدة'
+            : state.progressMessage,
         video: currentVideo.copyWith(progress: progress),
       );
     } on ApiException catch (error) {
       if (kDebugMode) {
-        debugPrint('Video progress sync failed: ${error.message}');
+        debugPrint(
+          'Video progress sync failed: ${SensitiveDataRedactor.redactString(error.message)}',
+        );
       }
     } catch (error) {
       if (kDebugMode) {
-        debugPrint('Video progress sync failed: $error');
+        debugPrint(
+          'Video progress sync failed: ${SensitiveDataRedactor.redactString(error.toString())}',
+        );
       }
     }
   }
@@ -545,12 +556,16 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
           errorMessage: mapContentError(error, videoContext: true),
         );
       } else if (kDebugMode) {
-        debugPrint('Video playback refresh failed: ${error.message}');
+        debugPrint(
+          'Video playback refresh failed: ${SensitiveDataRedactor.redactString(error.message)}',
+        );
       }
       return null;
     } catch (error) {
       if (kDebugMode) {
-        debugPrint('Video playback refresh failed: $error');
+        debugPrint(
+          'Video playback refresh failed: ${SensitiveDataRedactor.redactString(error.toString())}',
+        );
       }
       return null;
     }
@@ -563,17 +578,11 @@ class FileDetailsController extends StateNotifier<FileDetailsState> {
   final SubjectsRepository _repository;
 
   Future<void> load(int fileId) async {
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final file = await _repository.getFileDetails(fileId);
-      state = FileDetailsState(
-        status: FeatureLoadStatus.loaded,
-        file: file,
-      );
+      state = FileDetailsState(status: FeatureLoadStatus.loaded, file: file);
     } on ApiException catch (error) {
       state = FileDetailsState(
         status: FeatureLoadStatus.error,
@@ -590,10 +599,10 @@ class FileDetailsController extends StateNotifier<FileDetailsState> {
 
 final videoDetailsControllerProvider = StateNotifierProvider.autoDispose
     .family<VideoDetailsController, VideoDetailsState, int>((ref, videoId) {
-  return VideoDetailsController(ref.watch(subjectsRepositoryProvider));
-});
+      return VideoDetailsController(ref.watch(subjectsRepositoryProvider));
+    });
 
 final fileDetailsControllerProvider = StateNotifierProvider.autoDispose
     .family<FileDetailsController, FileDetailsState, int>((ref, fileId) {
-  return FileDetailsController(ref.watch(subjectsRepositoryProvider));
-});
+      return FileDetailsController(ref.watch(subjectsRepositoryProvider));
+    });

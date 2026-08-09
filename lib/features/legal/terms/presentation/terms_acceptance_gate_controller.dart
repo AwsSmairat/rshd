@@ -36,7 +36,7 @@ class TermsAcceptanceGateState {
 class TermsAcceptanceGateController
     extends StateNotifier<TermsAcceptanceGateState> {
   TermsAcceptanceGateController(this._repository)
-      : super(const TermsAcceptanceGateState());
+    : super(const TermsAcceptanceGateState());
 
   final TermsAndConditionsRepository _repository;
 
@@ -90,24 +90,27 @@ class TermsAcceptanceGateController
   }
 }
 
-final termsAcceptanceGateProvider = StateNotifierProvider<
-    TermsAcceptanceGateController, TermsAcceptanceGateState>((ref) {
-  final controller = TermsAcceptanceGateController(
-    ref.watch(termsAndConditionsRepositoryProvider),
-  );
+final termsAcceptanceGateProvider =
+    StateNotifierProvider<
+      TermsAcceptanceGateController,
+      TermsAcceptanceGateState
+    >((ref) {
+      final controller = TermsAcceptanceGateController(
+        ref.watch(termsAndConditionsRepositoryProvider),
+      );
 
-  ref.listen(authControllerProvider, (previous, next) {
-    if (next.status == AuthStatus.authenticated &&
-        previous?.status != AuthStatus.authenticated) {
-      controller.refresh();
-    } else if (next.status == AuthStatus.unauthenticated) {
-      controller.reset();
-    }
-  });
+      ref.listen(authControllerProvider, (previous, next) {
+        if (next.status == AuthStatus.authenticated &&
+            previous?.status != AuthStatus.authenticated) {
+          controller.refresh();
+        } else if (next.status == AuthStatus.unauthenticated) {
+          controller.reset();
+        }
+      });
 
-  if (ref.read(authControllerProvider).status == AuthStatus.authenticated) {
-    Future.microtask(controller.refresh);
-  }
+      if (ref.read(authControllerProvider).status == AuthStatus.authenticated) {
+        Future.microtask(controller.refresh);
+      }
 
-  return controller;
-});
+      return controller;
+    });

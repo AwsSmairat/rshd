@@ -21,34 +21,25 @@ class ContactSettings {
 
   static const String whatsappNumber = '962799532264';
 
-  static const String whatsappMessage =
-      'مرحبًا، لدي استفسار بخصوص منصة RSHD.';
+  static const String whatsappMessage = 'مرحبًا، لدي استفسار بخصوص منصة RSHD.';
 
-  static String get instagramHandle =>
-      instagramUsername.replaceFirst('@', '');
+  static String get instagramHandle => instagramUsername.replaceFirst('@', '');
 
   static Uri get mailtoUri => Uri(
-        scheme: 'mailto',
-        path: supportEmail,
-        queryParameters: {'subject': emailSubject},
-      );
+    scheme: 'mailto',
+    path: supportEmail,
+    queryParameters: {'subject': emailSubject},
+  );
 
-  static Uri get telUri => Uri(
-        scheme: 'tel',
-        path: phoneInternational,
-      );
+  static Uri get telUri => Uri(scheme: 'tel', path: phoneInternational);
 
-  static Uri get whatsappUri => Uri.https(
-        'wa.me',
-        whatsappNumber,
-        {'text': whatsappMessage},
-      );
+  static Uri get whatsappUri =>
+      Uri.https('wa.me', whatsappNumber, {'text': whatsappMessage});
 
   static Uri get instagramWebUri => Uri.parse(instagramUrl);
 
-  static Uri get instagramAppUri => Uri.parse(
-        'instagram://user?username=$instagramHandle',
-      );
+  static Uri get instagramAppUri =>
+      Uri.parse('instagram://user?username=$instagramHandle');
 
   static Uri get facebookUri => Uri.parse(facebookUrl);
 }

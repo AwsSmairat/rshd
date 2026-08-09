@@ -4,10 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
 class PrivacyPolicyIntroCard extends StatelessWidget {
-  const PrivacyPolicyIntroCard({
-    super.key,
-    required this.introText,
-  });
+  const PrivacyPolicyIntroCard({super.key, required this.introText});
 
   final String introText;
 

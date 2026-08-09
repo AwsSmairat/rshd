@@ -17,6 +17,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class LessonFileResource extends Resource
 {
@@ -253,7 +254,7 @@ class LessonFileResource extends Resource
         }
 
         if (blank($data['file_url'] ?? null) && blank($data['file_path'] ?? null)) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'file_path' => 'ارفع ملفاً أو أدخل رابطاً خارجياً.',
             ]);
         }

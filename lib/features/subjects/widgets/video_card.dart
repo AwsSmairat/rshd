@@ -6,11 +6,7 @@ import '../../../core/widgets/liquid_glass_surface.dart';
 import '../data/models/video_model.dart';
 
 class VideoCard extends StatelessWidget {
-  const VideoCard({
-    super.key,
-    required this.video,
-    required this.onTap,
-  });
+  const VideoCard({super.key, required this.video, required this.onTap});
 
   final VideoModel video;
   final VoidCallback onTap;
@@ -61,15 +57,9 @@ class VideoCard extends StatelessWidget {
                   runSpacing: 4,
                   children: [
                     if (video.isFree)
-                      _Badge(
-                        label: 'مجاني',
-                        color: AppColors.secondary,
-                      ),
+                      _Badge(label: 'مجاني', color: AppColors.secondary),
                     if (locked)
-                      _Badge(
-                        label: 'مقفل',
-                        color: AppColors.textMuted,
-                      )
+                      _Badge(label: 'مقفل', color: AppColors.textMuted)
                     else
                       _Badge(
                         label: video.statusLabel,

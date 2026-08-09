@@ -226,7 +226,7 @@ class AppleAuthService
 
     private function encodeAsn1Integer(string $value): string
     {
-        if (ord($value[0]) > 0x7f) {
+        if (ord($value[0]) > 0x7F) {
             $value = "\x00".$value;
         }
 

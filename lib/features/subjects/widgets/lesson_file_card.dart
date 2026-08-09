@@ -6,11 +6,7 @@ import '../../../core/widgets/liquid_glass_surface.dart';
 import '../data/models/lesson_file_model.dart';
 
 class LessonFileCard extends StatelessWidget {
-  const LessonFileCard({
-    super.key,
-    required this.file,
-    required this.onTap,
-  });
+  const LessonFileCard({super.key, required this.file, required this.onTap});
 
   final LessonFileModel file;
   final VoidCallback onTap;

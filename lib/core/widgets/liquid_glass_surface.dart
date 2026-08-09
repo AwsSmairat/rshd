@@ -43,10 +43,7 @@ class LiquidGlassSurface extends StatelessWidget {
     Widget surface = ClipRRect(
       borderRadius: resolvedRadius,
       child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: blurSigma,
-          sigmaY: blurSigma,
-        ),
+        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
         child: Container(
           width: width,
           height: height,
@@ -86,10 +83,12 @@ class LiquidGlassSurface extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: resolvedRadius,
-          splashColor: (highlightColor ?? AppColors.accent)
-              .withValues(alpha: 0.12),
-          highlightColor: (highlightColor ?? AppColors.accent)
-              .withValues(alpha: 0.06),
+          splashColor: (highlightColor ?? AppColors.accent).withValues(
+            alpha: 0.12,
+          ),
+          highlightColor: (highlightColor ?? AppColors.accent).withValues(
+            alpha: 0.06,
+          ),
           child: surface,
         ),
       );

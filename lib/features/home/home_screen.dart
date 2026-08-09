@@ -37,18 +37,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _loadDashboard({bool refresh = false}) {
     final userName = ref.read(authControllerProvider).user?.name;
-    ref.read(homeControllerProvider.notifier).load(
-          refresh: refresh,
-          fallbackStudentName: userName,
-        );
+    ref
+        .read(homeControllerProvider.notifier)
+        .load(refresh: refresh, fallbackStudentName: userName);
   }
 
   Future<void> _refresh() {
     final userName = ref.read(authControllerProvider).user?.name;
-    return ref.read(homeControllerProvider.notifier).load(
-          refresh: true,
-          fallbackStudentName: userName,
-        );
+    return ref
+        .read(homeControllerProvider.notifier)
+        .load(refresh: true, fallbackStudentName: userName);
   }
 
   void _handleUnauthorized(String? message) {
@@ -66,9 +64,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _handleUnauthorized(next.errorMessage);
     });
 
-    return Scaffold(
-      body: _buildBody(state),
-    );
+    return Scaffold(body: _buildBody(state));
   }
 
   Widget _buildBody(HomeState state) {
@@ -80,10 +76,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     final dashboard = state.dashboard;
-    final isLoading = state.status == HomeLoadStatus.initial ||
+    final isLoading =
+        state.status == HomeLoadStatus.initial ||
         state.status == HomeLoadStatus.loading;
     final isRefreshing = state.status == HomeLoadStatus.refreshing;
-    final userName = dashboard?.studentName ??
+    final userName =
+        dashboard?.studentName ??
         ref.watch(authControllerProvider).user?.name ??
         'طالب RSHD';
 
@@ -122,7 +120,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           const SliverToBoxAdapter(child: QuickActionGrid()),
-          if (dashboard != null && dashboard.continueLearningSubjects.isNotEmpty) ...[
+          if (dashboard != null &&
+              dashboard.continueLearningSubjects.isNotEmpty) ...[
             SliverToBoxAdapter(child: SizedBox(height: sectionGap)),
             SliverToBoxAdapter(
               child: ContinueLearningSection(
@@ -152,9 +151,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           SliverToBoxAdapter(
-            child: SizedBox(
-              height: MediaQuery.paddingOf(context).bottom + 24,
-            ),
+            child: SizedBox(height: MediaQuery.paddingOf(context).bottom + 24),
           ),
         ],
       ),

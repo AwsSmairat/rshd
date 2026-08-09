@@ -19,10 +19,7 @@ class PrivacyPolicySectionData {
 }
 
 class PrivacyPolicySubsection {
-  const PrivacyPolicySubsection({
-    required this.title,
-    required this.items,
-  });
+  const PrivacyPolicySubsection({required this.title, required this.items});
 
   final String title;
   final List<String> items;

@@ -51,7 +51,7 @@ class VideoStorageAuditTest extends TestCase
             'subject_id' => $subject->id,
             'title' => 'Lesson',
             'order' => 1,
-            'status' => \App\Enums\ContentStatus::Active,
+            'status' => ContentStatus::Active,
         ]);
 
         $localVideo = Video::query()->create([

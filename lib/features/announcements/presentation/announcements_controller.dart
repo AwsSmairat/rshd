@@ -68,9 +68,10 @@ String mapAnnouncementsError(ApiException error) {
   return error.message.isNotEmpty ? error.message : 'تعذر تحميل الإعلانات';
 }
 
-class AnnouncementsListController extends StateNotifier<AnnouncementsListState> {
+class AnnouncementsListController
+    extends StateNotifier<AnnouncementsListState> {
   AnnouncementsListController(this._repository)
-      : super(const AnnouncementsListState());
+    : super(const AnnouncementsListState());
 
   final AnnouncementsRepository _repository;
 
@@ -79,10 +80,7 @@ class AnnouncementsListController extends StateNotifier<AnnouncementsListState> 
       return;
     }
 
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final announcements = await _repository.getAnnouncements();
@@ -118,7 +116,7 @@ class AnnouncementsListController extends StateNotifier<AnnouncementsListState> 
 class AnnouncementDetailsController
     extends StateNotifier<AnnouncementDetailsState> {
   AnnouncementDetailsController(this._repository)
-      : super(const AnnouncementDetailsState());
+    : super(const AnnouncementDetailsState());
 
   final AnnouncementsRepository _repository;
 
@@ -138,10 +136,7 @@ class AnnouncementDetailsController
       return;
     }
 
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final announcement = await _repository.findById(announcementId);
@@ -172,17 +167,20 @@ class AnnouncementDetailsController
 }
 
 final announcementsListControllerProvider =
-    StateNotifierProvider<AnnouncementsListController, AnnouncementsListState>(
-        (ref) {
-  return AnnouncementsListController(
-    ref.watch(announcementsRepositoryProvider),
-  );
-});
+    StateNotifierProvider<AnnouncementsListController, AnnouncementsListState>((
+      ref,
+    ) {
+      return AnnouncementsListController(
+        ref.watch(announcementsRepositoryProvider),
+      );
+    });
 
 final announcementDetailsControllerProvider = StateNotifierProvider.autoDispose
-    .family<AnnouncementDetailsController, AnnouncementDetailsState, int>(
-        (ref, announcementId) {
-  return AnnouncementDetailsController(
-    ref.watch(announcementsRepositoryProvider),
-  );
-});
+    .family<AnnouncementDetailsController, AnnouncementDetailsState, int>((
+      ref,
+      announcementId,
+    ) {
+      return AnnouncementDetailsController(
+        ref.watch(announcementsRepositoryProvider),
+      );
+    });

@@ -51,10 +51,7 @@ class AssignmentFilePickerCard extends StatelessWidget {
           if (selectedFile == null)
             _EmptyFileBox()
           else
-            _SelectedFileBox(
-              file: selectedFile!,
-              onRemove: onRemoveFile,
-            ),
+            _SelectedFileBox(file: selectedFile!, onRemove: onRemoveFile),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -105,9 +102,7 @@ class _EmptyFileBox extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'لم يتم اختيار ملف بعد',
-            style: AppTextStyles.body.copyWith(
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
           ),
         ],
       ),
@@ -116,10 +111,7 @@ class _EmptyFileBox extends StatelessWidget {
 }
 
 class _SelectedFileBox extends StatelessWidget {
-  const _SelectedFileBox({
-    required this.file,
-    required this.onRemove,
-  });
+  const _SelectedFileBox({required this.file, required this.onRemove});
 
   final PlatformFile file;
   final VoidCallback onRemove;

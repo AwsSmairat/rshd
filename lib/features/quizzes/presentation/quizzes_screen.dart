@@ -56,12 +56,8 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            const SliverToBoxAdapter(
-              child: QuizzesHeader(),
-            ),
-            ResponsiveSliverContent(
-              sliver: _buildContent(state),
-            ),
+            const SliverToBoxAdapter(child: QuizzesHeader()),
+            ResponsiveSliverContent(sliver: _buildContent(state)),
           ],
         ),
       ),
@@ -78,9 +74,7 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
       case FeatureLoadStatus.empty:
         return const SliverFillRemaining(
           hasScrollBody: false,
-          child: Center(
-            child: QuizzesEmptyState(),
-          ),
+          child: Center(child: QuizzesEmptyState()),
         );
       case FeatureLoadStatus.error:
         return SliverFillRemaining(
@@ -95,21 +89,18 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
         );
       case FeatureLoadStatus.loaded:
         return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final quiz = state.quizzes[index];
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: index == state.quizzes.length - 1 ? 0 : 16,
-                ),
-                child: QuizCard(
-                  quiz: quiz,
-                  onTap: () => context.push(AppRoutes.quizDetails(quiz.id)),
-                ),
-              );
-            },
-            childCount: state.quizzes.length,
-          ),
+          delegate: SliverChildBuilderDelegate((context, index) {
+            final quiz = state.quizzes[index];
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: index == state.quizzes.length - 1 ? 0 : 16,
+              ),
+              child: QuizCard(
+                quiz: quiz,
+                onTap: () => context.push(AppRoutes.quizDetails(quiz.id)),
+              ),
+            );
+          }, childCount: state.quizzes.length),
         );
     }
   }

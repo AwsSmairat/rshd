@@ -3,8 +3,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/router/app_router.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/responsive_content.dart';
-import '../widgets/luxury_quiz_header.dart';
+import '../../subjects/widgets/subjects_header.dart';
 import '../widgets/quiz_result_summary_card.dart';
 import '../widgets/quiz_score_helper.dart';
 import '../widgets/quiz_submission_success_card.dart';
@@ -33,50 +34,54 @@ class QuizResultScreen extends StatelessWidget {
     final scoreDisplay = QuizScoreHelper.formatScore(parsedScore);
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: CustomScrollView(
-        slivers: [
-          const SliverToBoxAdapter(
-            child: LuxuryQuizHeader(
-              title: 'نتيجة الاختبار',
-              watermarkIcon: Icons.emoji_events_outlined,
-            ),
+      backgroundColor: AppColors.background,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SubjectsHeader(
+            title: 'نتيجة الاختبار',
+            backgroundIcon: Icons.emoji_events_outlined,
           ),
-          ResponsiveSliverContent(
-            padding: AppLayoutMetrics.of(context).pagePadding(
-              top: 8,
-              bottom: 28,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  QuizSubmissionSuccessCard(quizTitle: quizTitle),
-                  const SizedBox(height: 16),
-                  QuizResultSummaryCard(
-                    score: parsedScore,
-                    title: 'نتيجتك',
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
+                ResponsiveSliverContent(
+                  padding: AppLayoutMetrics.of(
+                    context,
+                  ).pagePadding(top: 8, bottom: 28),
+                  sliver: SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        QuizSubmissionSuccessCard(quizTitle: quizTitle),
+                        const SizedBox(height: 16),
+                        QuizResultSummaryCard(
+                          score: parsedScore,
+                          title: 'نتيجتك',
+                        ),
+                        const SizedBox(height: 16),
+                        QuizStatsGrid(
+                          submittedAt: submittedAt,
+                          questionsCount: questionsCount,
+                          scoreDisplay: scoreDisplay,
+                          finishTimeLabel: 'وقت التسليم',
+                          finishDateLabel: 'تاريخ التسليم',
+                        ),
+                        const SizedBox(height: 24),
+                        ResultActionButtons(
+                          primaryLabel: 'العودة للاختبارات',
+                          onPrimary: () => context.go(AppRoutes.quizzes),
+                          secondaryLabel: 'بدء الاختبار مرة أخرى',
+                          onSecondary: () =>
+                              context.push(AppRoutes.quizAttempt(quizId)),
+                          tertiaryLabel: 'الصفحة الرئيسية',
+                          onTertiary: () => context.go(AppRoutes.home),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  QuizStatsGrid(
-                    submittedAt: submittedAt,
-                    questionsCount: questionsCount,
-                    scoreDisplay: scoreDisplay,
-                    finishTimeLabel: 'وقت التسليم',
-                    finishDateLabel: 'تاريخ التسليم',
-                  ),
-                  const SizedBox(height: 24),
-                  ResultActionButtons(
-                    primaryLabel: 'العودة للاختبارات',
-                    onPrimary: () => context.go(AppRoutes.quizzes),
-                    secondaryLabel: 'بدء الاختبار مرة أخرى',
-                    onSecondary: () =>
-                        context.push(AppRoutes.quizAttempt(quizId)),
-                    tertiaryLabel: 'الصفحة الرئيسية',
-                    onTertiary: () => context.go(AppRoutes.home),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],

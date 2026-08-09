@@ -28,23 +28,26 @@ void main() {
       );
     });
 
-    test('acquire enables secure flag once and release disables at zero', () async {
-      expect(fakePlatform.secureEnabled, isFalse);
+    test(
+      'acquire enables secure flag once and release disables at zero',
+      () async {
+        expect(fakePlatform.secureEnabled, isFalse);
 
-      await service.acquire('video:1');
-      expect(fakePlatform.secureEnabled, isTrue);
-      expect(service.isProtectionActive, isTrue);
+        await service.acquire('video:1');
+        expect(fakePlatform.secureEnabled, isTrue);
+        expect(service.isProtectionActive, isTrue);
 
-      await service.acquire('pdf:2');
-      expect(fakePlatform.secureEnabled, isTrue);
+        await service.acquire('pdf:2');
+        expect(fakePlatform.secureEnabled, isTrue);
 
-      await service.release('video:1');
-      expect(fakePlatform.secureEnabled, isTrue);
+        await service.release('video:1');
+        expect(fakePlatform.secureEnabled, isTrue);
 
-      await service.release('pdf:2');
-      expect(fakePlatform.secureEnabled, isFalse);
-      expect(service.isProtectionActive, isFalse);
-    });
+        await service.release('pdf:2');
+        expect(fakePlatform.secureEnabled, isFalse);
+        expect(service.isProtectionActive, isFalse);
+      },
+    );
 
     test('capture started hides protected content while active', () async {
       await service.acquire('video:1');
@@ -65,15 +68,18 @@ void main() {
       expect(service.isScreenCaptured, isFalse);
     });
 
-    test('privacy overlay appears on inactive lifecycle when protected', () async {
-      await service.acquire('pdf:1');
+    test(
+      'privacy overlay appears on inactive lifecycle when protected',
+      () async {
+        await service.acquire('pdf:1');
 
-      service.didChangeAppLifecycleState(AppLifecycleState.inactive);
-      expect(service.shouldHideContent, isTrue);
+        service.didChangeAppLifecycleState(AppLifecycleState.inactive);
+        expect(service.shouldHideContent, isTrue);
 
-      service.clearPrivacyOverlayForResume();
-      expect(service.shouldHideContent, isFalse);
-    });
+        service.clearPrivacyOverlayForResume();
+        expect(service.shouldHideContent, isFalse);
+      },
+    );
   });
 
   group('ProtectedContentScope', () {
@@ -120,7 +126,9 @@ void main() {
       expect(find.text('المحتوى محمي'), findsOneWidget);
     });
 
-    testWidgets('nested scopes keep protection until all released', (tester) async {
+    testWidgets('nested scopes keep protection until all released', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -147,9 +155,7 @@ void main() {
   group('ProtectedContentOverlay', () {
     testWidgets('renders Arabic protection copy', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: ProtectedContentOverlay(),
-        ),
+        const MaterialApp(home: ProtectedContentOverlay()),
       );
 
       expect(find.text('المحتوى محمي'), findsOneWidget);

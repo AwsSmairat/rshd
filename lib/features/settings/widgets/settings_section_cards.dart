@@ -41,7 +41,10 @@ class ProfilePhotoCard extends StatelessWidget {
               ),
               if (profile.avatarUrl != null)
                 ListTile(
-                  leading: const Icon(Icons.delete_outline, color: Color(0xFF991B1B)),
+                  leading: const Icon(
+                    Icons.delete_outline,
+                    color: Color(0xFF991B1B),
+                  ),
                   title: const Text('حذف الصورة'),
                   onTap: () {
                     Navigator.pop(context);
@@ -96,7 +99,11 @@ class ProfilePhotoCard extends StatelessWidget {
                     color: AppColors.darkGold,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.photo_camera_outlined, color: Colors.white, size: 16),
+                  child: const Icon(
+                    Icons.photo_camera_outlined,
+                    color: Colors.white,
+                    size: 16,
+                  ),
                 ),
               ),
               if (isUploading)
@@ -107,7 +114,10 @@ class ProfilePhotoCard extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: const Center(
-                      child: CircularProgressIndicator(color: AppColors.accent, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        color: AppColors.accent,
+                        strokeWidth: 2,
+                      ),
                     ),
                   ),
                 ),
@@ -129,7 +139,9 @@ class ProfilePhotoCard extends StatelessWidget {
               foregroundColor: AppColors.darkGold,
               side: const BorderSide(color: AppColors.darkGold),
               minimumSize: const Size(double.infinity, 44),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: const Text('تغيير الصورة'),
           ),
@@ -161,25 +173,59 @@ class PersonalInformationCard extends StatelessWidget {
     return SettingsSectionCard(
       title: 'المعلومات الشخصية',
       icon: Icons.person_outline,
-      trailing: TextButton(
-        onPressed: onEdit,
-        child: const Text('تعديل'),
-      ),
+      trailing: TextButton(onPressed: onEdit, child: const Text('تعديل')),
       child: Column(
         children: [
-          ProfileDetailRow(dense: true, icon: Icons.badge_outlined, label: 'الاسم الكامل', value: profile.name),
-          ProfileDetailRow(dense: true, icon: Icons.email_outlined, label: 'البريد الإلكتروني', value: profile.email),
-          ProfileDetailRow(dense: true, icon: Icons.phone_outlined, label: 'رقم الهاتف', value: profile.phone ?? '—'),
-          ProfileDetailRow(dense: true, icon: Icons.cake_outlined, label: 'تاريخ الميلاد', value: _formatDate(profile.birthDate)),
-          ProfileDetailRow(dense: true, icon: Icons.wc_outlined, label: 'الجنس', value: profile.genderLabel),
-          ProfileDetailRow(dense: true, icon: Icons.flag_outlined, label: 'الدولة', value: profile.country ?? '—'),
-          ProfileDetailRow(dense: true, icon: Icons.numbers_outlined, label: 'الرقم التعريفي', value: profile.studentNumber ?? '—'),
+          ProfileDetailRow(
+            dense: true,
+            icon: Icons.badge_outlined,
+            label: 'الاسم الكامل',
+            value: profile.name,
+          ),
+          ProfileDetailRow(
+            dense: true,
+            icon: Icons.email_outlined,
+            label: 'البريد الإلكتروني',
+            value: profile.email,
+          ),
+          ProfileDetailRow(
+            dense: true,
+            icon: Icons.phone_outlined,
+            label: 'رقم الهاتف',
+            value: profile.phone ?? '—',
+          ),
+          ProfileDetailRow(
+            dense: true,
+            icon: Icons.cake_outlined,
+            label: 'تاريخ الميلاد',
+            value: _formatDate(profile.birthDate),
+          ),
+          ProfileDetailRow(
+            dense: true,
+            icon: Icons.wc_outlined,
+            label: 'الجنس',
+            value: profile.genderLabel,
+          ),
+          ProfileDetailRow(
+            dense: true,
+            icon: Icons.flag_outlined,
+            label: 'الدولة',
+            value: profile.country ?? '—',
+          ),
+          ProfileDetailRow(
+            dense: true,
+            icon: Icons.numbers_outlined,
+            label: 'الرقم التعريفي',
+            value: profile.studentNumber ?? '—',
+          ),
           ProfileDetailRow(
             dense: true,
             icon: Icons.verified_user_outlined,
             label: 'حالة الحساب',
             value: profile.statusLabel,
-            valueColor: profile.status == 'active' ? const Color(0xFF166534) : const Color(0xFF991B1B),
+            valueColor: profile.status == 'active'
+                ? const Color(0xFF166534)
+                : const Color(0xFF991B1B),
             showDivider: false,
           ),
         ],
@@ -238,7 +284,10 @@ class SecuritySettingsCard extends StatelessWidget {
               padding: const EdgeInsets.only(top: 4, bottom: 4),
               child: Text(
                 'آخر تحديث لكلمة المرور: ${profile.passwordSetAt!.split('T').first.replaceAll('-', '/')}',
-                style: AppTextStyles.body.copyWith(fontSize: 12, color: AppColors.textMuted),
+                style: AppTextStyles.body.copyWith(
+                  fontSize: 12,
+                  color: AppColors.textMuted,
+                ),
               ),
             ),
         ],
@@ -397,23 +446,23 @@ class AppPreferencesCard extends StatelessWidget {
   }
 
   String _themeLabel(String theme) => switch (theme) {
-        'dark' => 'الوضع الداكن',
-        'system' => 'حسب النظام',
-        _ => 'الوضع الفاتح',
-      };
+    'dark' => 'الوضع الداكن',
+    'system' => 'حسب النظام',
+    _ => 'الوضع الفاتح',
+  };
 
   String _fontLabel(String size) => switch (size) {
-        'small' => 'صغير',
-        'large' => 'كبير',
-        _ => 'متوسط',
-      };
+    'small' => 'صغير',
+    'large' => 'كبير',
+    _ => 'متوسط',
+  };
 
   String _qualityLabel(String quality) => switch (quality) {
-        'low' => 'منخفضة',
-        'medium' => 'متوسطة',
-        'high' => 'عالية',
-        _ => 'تلقائية',
-      };
+    'low' => 'منخفضة',
+    'medium' => 'متوسطة',
+    'high' => 'عالية',
+    _ => 'تلقائية',
+  };
 }
 
 class NotificationSettingsCard extends StatelessWidget {
@@ -435,20 +484,68 @@ class NotificationSettingsCard extends StatelessWidget {
     return SettingsSectionCard(
       title: 'الإشعارات',
       icon: Icons.notifications_outlined,
-      trailing: TextButton(onPressed: onToggleAll, child: Text(_allEnabled ? 'تعطيل الكل' : 'تفعيل الكل')),
+      trailing: TextButton(
+        onPressed: onToggleAll,
+        child: Text(_allEnabled ? 'تعطيل الكل' : 'تفعيل الكل'),
+      ),
       child: Column(
         children: [
-          SettingsSwitchTile(label: 'إشعارات الدروس الجديدة', value: preferences.notifyLessons, onChanged: (v) => onChanged('notify_lessons', v)),
-          SettingsSwitchTile(label: 'إشعارات الواجبات', value: preferences.notifyAssignments, onChanged: (v) => onChanged('notify_assignments', v)),
-          SettingsSwitchTile(label: 'تذكير موعد تسليم الواجب', value: preferences.notifyAssignmentReminders, onChanged: (v) => onChanged('notify_assignment_reminders', v)),
-          SettingsSwitchTile(label: 'إشعارات الاختبارات', value: preferences.notifyQuizzes, onChanged: (v) => onChanged('notify_quizzes', v)),
-          SettingsSwitchTile(label: 'تذكير موعد الاختبار', value: preferences.notifyQuizReminders, onChanged: (v) => onChanged('notify_quiz_reminders', v)),
-          SettingsSwitchTile(label: 'إشعارات الدرجات', value: preferences.notifyGrades, onChanged: (v) => onChanged('notify_grades', v)),
-          SettingsSwitchTile(label: 'إشعارات الرسائل', value: preferences.notifyMessages, onChanged: (v) => onChanged('notify_messages', v)),
-          SettingsSwitchTile(label: 'إشعارات الإعلانات', value: preferences.notifyAnnouncements, onChanged: (v) => onChanged('notify_announcements', v)),
-          SettingsSwitchTile(label: 'تحديثات المنصة', value: preferences.notifyPlatformUpdates, onChanged: (v) => onChanged('notify_platform_updates', v)),
-          SettingsSwitchTile(label: 'الصوت', value: preferences.notificationSound, onChanged: (v) => onChanged('notification_sound', v)),
-          SettingsSwitchTile(label: 'الاهتزاز', value: preferences.notificationVibration, onChanged: (v) => onChanged('notification_vibration', v), showDivider: false),
+          SettingsSwitchTile(
+            label: 'إشعارات الدروس الجديدة',
+            value: preferences.notifyLessons,
+            onChanged: (v) => onChanged('notify_lessons', v),
+          ),
+          SettingsSwitchTile(
+            label: 'إشعارات الواجبات',
+            value: preferences.notifyAssignments,
+            onChanged: (v) => onChanged('notify_assignments', v),
+          ),
+          SettingsSwitchTile(
+            label: 'تذكير موعد تسليم الواجب',
+            value: preferences.notifyAssignmentReminders,
+            onChanged: (v) => onChanged('notify_assignment_reminders', v),
+          ),
+          SettingsSwitchTile(
+            label: 'إشعارات الاختبارات',
+            value: preferences.notifyQuizzes,
+            onChanged: (v) => onChanged('notify_quizzes', v),
+          ),
+          SettingsSwitchTile(
+            label: 'تذكير موعد الاختبار',
+            value: preferences.notifyQuizReminders,
+            onChanged: (v) => onChanged('notify_quiz_reminders', v),
+          ),
+          SettingsSwitchTile(
+            label: 'إشعارات الدرجات',
+            value: preferences.notifyGrades,
+            onChanged: (v) => onChanged('notify_grades', v),
+          ),
+          SettingsSwitchTile(
+            label: 'إشعارات الرسائل',
+            value: preferences.notifyMessages,
+            onChanged: (v) => onChanged('notify_messages', v),
+          ),
+          SettingsSwitchTile(
+            label: 'إشعارات الإعلانات',
+            value: preferences.notifyAnnouncements,
+            onChanged: (v) => onChanged('notify_announcements', v),
+          ),
+          SettingsSwitchTile(
+            label: 'تحديثات المنصة',
+            value: preferences.notifyPlatformUpdates,
+            onChanged: (v) => onChanged('notify_platform_updates', v),
+          ),
+          SettingsSwitchTile(
+            label: 'الصوت',
+            value: preferences.notificationSound,
+            onChanged: (v) => onChanged('notification_sound', v),
+          ),
+          SettingsSwitchTile(
+            label: 'الاهتزاز',
+            value: preferences.notificationVibration,
+            onChanged: (v) => onChanged('notification_vibration', v),
+            showDivider: false,
+          ),
         ],
       ),
     );
@@ -516,24 +613,33 @@ class PrivacySettingsCard extends StatelessWidget {
             value: _messagingLabel(preferences.messagingPermission),
             onTap: () => _pickMessagingPermission(context),
           ),
-          SettingsSwitchTile(label: 'إظهار حالة النشاط', value: preferences.showActivityStatus, onChanged: (v) => onChanged('show_activity_status', v)),
-          SettingsSwitchTile(label: 'السماح باستخدام الصورة الشخصية', value: preferences.allowProfilePhotoUse, onChanged: (v) => onChanged('allow_profile_photo_use', v), showDivider: false),
+          SettingsSwitchTile(
+            label: 'إظهار حالة النشاط',
+            value: preferences.showActivityStatus,
+            onChanged: (v) => onChanged('show_activity_status', v),
+          ),
+          SettingsSwitchTile(
+            label: 'السماح باستخدام الصورة الشخصية',
+            value: preferences.allowProfilePhotoUse,
+            onChanged: (v) => onChanged('allow_profile_photo_use', v),
+            showDivider: false,
+          ),
         ],
       ),
     );
   }
 
   String _visibilityLabel(String value) => switch (value) {
-        'everyone' => 'الجميع',
-        'private' => 'خاص',
-        _ => 'المدرسون فقط',
-      };
+    'everyone' => 'الجميع',
+    'private' => 'خاص',
+    _ => 'المدرسون فقط',
+  };
 
   String _messagingLabel(String value) => switch (value) {
-        'everyone' => 'الجميع',
-        'nobody' => 'لا أحد',
-        _ => 'المدرسون فقط',
-      };
+    'everyone' => 'الجميع',
+    'nobody' => 'لا أحد',
+    _ => 'المدرسون فقط',
+  };
 }
 
 bool _allNotificationsEnabled(StudentPreferencesModel prefs) =>
@@ -608,11 +714,7 @@ class SupportLegalCard extends StatelessWidget {
 }
 
 class _SupportChip extends StatelessWidget {
-  const _SupportChip({
-    required this.icon,
-    required this.label,
-    this.onTap,
-  });
+  const _SupportChip({required this.icon, required this.label, this.onTap});
 
   final IconData icon;
   final String label;
@@ -654,7 +756,11 @@ class _SupportChip extends StatelessWidget {
 }
 
 class SettingsLogoutButton extends StatelessWidget {
-  const SettingsLogoutButton({super.key, required this.onPressed, this.isLoading = false});
+  const SettingsLogoutButton({
+    super.key,
+    required this.onPressed,
+    this.isLoading = false,
+  });
 
   final VoidCallback? onPressed;
   final bool isLoading;
@@ -669,10 +775,19 @@ class SettingsLogoutButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF991B1B),
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
         icon: isLoading
-            ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
             : const Icon(Icons.logout_rounded),
         label: Text(isLoading ? 'جارٍ تسجيل الخروج...' : 'تسجيل خروج'),
       ),

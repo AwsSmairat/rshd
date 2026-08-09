@@ -101,15 +101,10 @@ class SettingsRepository {
     _ensureSuccess(response);
   }
 
-  Future<void> deleteAccount({
-    required String password,
-  }) async {
+  Future<void> deleteAccount({required String password}) async {
     final response = await _apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.studentDeleteAccount,
-      data: {
-        'password': password,
-        'confirmation': 'حذف',
-      },
+      data: {'password': password, 'confirmation': 'حذف'},
     );
     _ensureSuccess(response);
   }

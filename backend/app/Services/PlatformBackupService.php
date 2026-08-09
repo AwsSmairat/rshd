@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
@@ -88,7 +89,7 @@ class PlatformBackupService
         }
 
         $frequency = $this->settings->stringValue('backup_frequency', 'daily', 'backup');
-        $last = \Illuminate\Support\Carbon::parse($lastRun);
+        $last = Carbon::parse($lastRun);
 
         return match ($frequency) {
             'weekly' => $last->lte(now()->subWeek()),

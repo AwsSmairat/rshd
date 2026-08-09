@@ -37,10 +37,7 @@ class HelpCenterRepository {
   }) async {
     final response = await _client.post<Map<String, dynamic>>(
       ApiEndpoints.studentHelpMessages,
-      data: {
-        'subject_id': subjectId,
-        'message': message.trim(),
-      },
+      data: {'subject_id': subjectId, 'message': message.trim()},
     );
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(

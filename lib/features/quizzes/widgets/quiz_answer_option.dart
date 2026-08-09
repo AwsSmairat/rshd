@@ -53,8 +53,9 @@ class QuizAnswerOption extends StatelessWidget {
                   child: Text(
                     answerText,
                     style: AppTextStyles.body.copyWith(
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
                     ),
                   ),
                 ),

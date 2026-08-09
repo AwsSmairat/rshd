@@ -77,10 +77,7 @@ class LiquidGlassQuizCard extends StatelessWidget {
                 if (quiz.subjectTitle != null &&
                     quiz.subjectTitle!.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  _MetaRow(
-                    icon: icon,
-                    text: quiz.subjectTitle!,
-                  ),
+                  _MetaRow(icon: icon, text: quiz.subjectTitle!),
                 ],
                 if (quiz.lessonTitle != null &&
                     quiz.lessonTitle!.isNotEmpty) ...[
@@ -118,10 +115,7 @@ class LiquidGlassQuizCard extends StatelessWidget {
 }
 
 class _MetaRow extends StatelessWidget {
-  const _MetaRow({
-    required this.icon,
-    required this.text,
-  });
+  const _MetaRow({required this.icon, required this.text});
 
   final IconData icon;
   final String text;
@@ -130,11 +124,7 @@ class _MetaRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 14,
-          color: AppColors.darkGold,
-        ),
+        Icon(icon, size: 14, color: AppColors.darkGold),
         const SizedBox(width: 6),
         Expanded(
           child: Text(
@@ -168,9 +158,7 @@ class _QuizStatsBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.textMuted.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.45),
-        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.45)),
       ),
       child: Wrap(
         spacing: 14,
@@ -193,10 +181,7 @@ class _QuizStatsBar extends StatelessWidget {
 }
 
 class _StatChip extends StatelessWidget {
-  const _StatChip({
-    required this.icon,
-    required this.label,
-  });
+  const _StatChip({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
@@ -206,11 +191,7 @@ class _StatChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 13,
-          color: AppColors.darkGold,
-        ),
+        Icon(icon, size: 13, color: AppColors.darkGold),
         const SizedBox(width: 4),
         Text(
           label,

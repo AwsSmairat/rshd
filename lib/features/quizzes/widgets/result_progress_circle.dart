@@ -63,10 +63,7 @@ class ResultProgressCircle extends StatelessWidget {
 }
 
 class _ResultRingPainter extends CustomPainter {
-  _ResultRingPainter({
-    required this.progress,
-    required this.strokeWidth,
-  });
+  _ResultRingPainter({required this.progress, required this.strokeWidth});
 
   final double progress;
   final double strokeWidth;
@@ -87,11 +84,7 @@ class _ResultRingPainter extends CustomPainter {
       ..shader = SweepGradient(
         startAngle: startAngle,
         endAngle: startAngle + (2 * math.pi * progress),
-        colors: const [
-          AppColors.accent,
-          AppColors.darkGold,
-          AppColors.accent,
-        ],
+        colors: const [AppColors.accent, AppColors.darkGold, AppColors.accent],
       ).createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth

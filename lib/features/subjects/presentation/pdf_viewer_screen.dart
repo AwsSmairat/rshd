@@ -1,6 +1,3 @@
-import 'dart:typed_data';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +13,7 @@ import '../../pdf_editor/models/pdf_editor_models.dart';
 import '../../pdf_editor/services/pdf_export_service.dart';
 import '../../pdf_editor/services/pdf_share_service.dart';
 import '../../pdf_editor/services/pdf_viewer_source_loader.dart';
+import '../../auth/presentation/auth_controller.dart';
 import '../data/subjects_repository.dart';
 import '../../pdf_editor/widgets/pdf_annotation_overlay_host.dart';
 import '../../pdf_editor/widgets/pdf_editor_toolbar.dart';
@@ -44,7 +42,14 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
   final PdfViewerController _pdfController = PdfViewerController();
   final PdfExportService _exportService = PdfExportService();
   final PdfShareService _shareService = PdfShareService();
-  final PdfViewerSourceLoader _sourceLoader = PdfViewerSourceLoader();
+
+  PdfViewerSourceLoader _sourceLoader() {
+    final userId = ref.read(authControllerProvider).user?.id;
+    return PdfViewerSourceLoader(
+      userId: userId,
+      repository: ref.read(subjectsRepositoryProvider),
+    );
+  }
 
   bool _isLoading = true;
   bool _hasError = false;
@@ -74,7 +79,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     });
 
     try {
-      final bytes = await _sourceLoader.load(
+      final bytes = await _sourceLoader().load(
         fileId: widget.fileId,
         repository: ref.read(subjectsRepositoryProvider),
       );
@@ -104,125 +109,150 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
-      ref.read(pdfEditorControllerProvider(widget.fileId).notifier).flushOnBackground();
+      ref
+          .read(pdfEditorControllerProvider(widget.fileId).notifier)
+          .flushOnBackground();
     }
   }
 
   PdfEditorController get _editor =>
       ref.read(pdfEditorControllerProvider(widget.fileId).notifier);
 
-  PdfEditorState get _state => ref.watch(pdfEditorControllerProvider(widget.fileId));
+  PdfEditorState get _state =>
+      ref.watch(pdfEditorControllerProvider(widget.fileId));
 
   void _showSnackBar(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _showNoteDialog(double x, double y) async {
     final controller = TextEditingController();
-    final text = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('إضافة ملاحظة'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLines: 4,
-          textDirection: TextDirection.rtl,
-          decoration: const InputDecoration(hintText: 'اكتب ملاحظتك هنا'),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('حفظ'),
+    try {
+      final text = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('إضافة ملاحظة'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            maxLines: 4,
+            textDirection: TextDirection.rtl,
+            decoration: const InputDecoration(hintText: 'اكتب ملاحظتك هنا'),
           ),
-        ],
-      ),
-    );
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('إلغاء'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, controller.text),
+              child: const Text('حفظ'),
+            ),
+          ],
+        ),
+      );
 
-    if (text == null || text.trim().isEmpty || !mounted) return;
-    _editor.addNote(
-      pageNumber: _state.currentPage,
-      x: x,
-      y: y,
-      text: text,
-    );
+      if (text == null || text.trim().isEmpty || !mounted) return;
+      _editor.addNote(pageNumber: _state.currentPage, x: x, y: y, text: text);
+    } finally {
+      controller.dispose();
+    }
   }
 
   Future<void> _showTextDialog(double x, double y) async {
     final controller = TextEditingController();
-    final text = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('إضافة نص'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLines: 3,
-          textDirection: TextDirection.rtl,
-          decoration: const InputDecoration(hintText: 'اكتب النص'),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('إضافة'),
+    try {
+      final text = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('إضافة نص'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            maxLines: 3,
+            textDirection: TextDirection.rtl,
+            decoration: const InputDecoration(hintText: 'اكتب النص'),
           ),
-        ],
-      ),
-    );
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('إلغاء'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, controller.text),
+              child: const Text('إضافة'),
+            ),
+          ],
+        ),
+      );
 
-    if (text == null || text.trim().isEmpty || !mounted) return;
-    _editor.addTextBox(
-      pageNumber: _state.currentPage,
-      x: x,
-      y: y,
-      text: text,
-      color: _state.textSettings.color,
-      fontSize: _state.textSettings.fontSize,
-    );
+      if (text == null || text.trim().isEmpty || !mounted) return;
+      _editor.addTextBox(
+        pageNumber: _state.currentPage,
+        x: x,
+        y: y,
+        text: text,
+        color: _state.textSettings.color,
+        fontSize: _state.textSettings.fontSize,
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   Future<void> _showTextEditDialog(PdfEditorAnnotation annotation) async {
-    final controller =
-        TextEditingController(text: annotation.data['text']?.toString() ?? '');
-    final text = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('تعديل النص'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLines: 3,
-          textDirection: TextDirection.rtl,
+    final controller = TextEditingController(
+      text: annotation.data['text']?.toString() ?? '',
+    );
+    try {
+      final text = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('تعديل النص'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            maxLines: 3,
+            textDirection: TextDirection.rtl,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                _editor.deleteAnnotation(annotation.id, annotation.pageNumber);
+                _editor.selectAnnotation(null);
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'حذف',
+                style: TextStyle(color: AppColors.error),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('إلغاء'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, controller.text),
+              child: const Text('حفظ'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _editor.deleteAnnotation(annotation.id, annotation.pageNumber);
-              _editor.selectAnnotation(null);
-              Navigator.pop(context);
-            },
-            child: const Text('حذف', style: TextStyle(color: AppColors.error)),
-          ),
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('حفظ'),
-          ),
-        ],
-      ),
-    );
+      );
 
-    if (text == null || text.trim().isEmpty || !mounted) return;
-    _editor.updateTextBox(
-      id: annotation.id,
-      pageNumber: annotation.pageNumber,
-      text: text,
-      color: _state.textSettings.color,
-      fontSize: _state.textSettings.fontSize,
-    );
+      if (text == null || text.trim().isEmpty || !mounted) return;
+      _editor.updateTextBox(
+        id: annotation.id,
+        pageNumber: annotation.pageNumber,
+        text: text,
+        color: _state.textSettings.color,
+        fontSize: _state.textSettings.fontSize,
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   void _showSelectionActions(PdfEditorAnnotation annotation) {
@@ -256,7 +286,10 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                   },
                 ),
               ListTile(
-                leading: const Icon(Icons.delete_outline, color: AppColors.error),
+                leading: const Icon(
+                  Icons.delete_outline,
+                  color: AppColors.error,
+                ),
                 title: const Text('حذف'),
                 onTap: () {
                   _editor.deleteSelectedAnnotation();
@@ -271,7 +304,9 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
   }
 
   void _showExistingNote(PdfEditorAnnotation note) {
-    final controller = TextEditingController(text: note.data['text']?.toString() ?? '');
+    final controller = TextEditingController(
+      text: note.data['text']?.toString() ?? '',
+    );
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -289,7 +324,10 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
             },
             child: const Text('حذف', style: TextStyle(color: AppColors.error)),
           ),
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('إغلاق')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إغلاق'),
+          ),
           FilledButton(
             onPressed: () {
               _editor.updateNoteText(note.id, note.pageNumber, controller.text);
@@ -299,7 +337,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
           ),
         ],
       ),
-    );
+    ).whenComplete(controller.dispose);
   }
 
   Future<void> _handleSave() async {
@@ -321,8 +359,14 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               : 'سيتم تصدير نسخة PDF تحتوي على التعليقات المدمجة.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('متابعة')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('إلغاء'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('متابعة'),
+          ),
         ],
       ),
     );
@@ -341,7 +385,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
           builder: (context, progress, _) {
             return ValueListenableBuilder<String>(
               valueListenable: messageNotifier,
-              builder: (context, message, __) {
+              builder: (context, message, child) {
                 return AlertDialog(
                   title: const Text('تصدير PDF'),
                   content: Column(
@@ -426,13 +470,21 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('تعذر التصدير'),
-        content: const Text('حدث خطأ أثناء إنشاء ملف PDF. يمكنك المحاولة مرة أخرى.'),
+        content: const Text(
+          'حدث خطأ أثناء إنشاء ملف PDF. يمكنك المحاولة مرة أخرى.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('إغلاق')),
-          FilledButton(onPressed: () {
-            Navigator.pop(context);
-            onRetry();
-          }, child: const Text('إعادة المحاولة')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إغلاق'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onRetry();
+            },
+            child: const Text('إعادة المحاولة'),
+          ),
         ],
       ),
     );
@@ -531,7 +583,9 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
   }
 
   void _openSearch() {
-    _showSnackBar('البحث متاح للملفات التي تحتوي على نص قابل للاستخراج — قريباً');
+    _showSnackBar(
+      'البحث متاح للملفات التي تحتوي على نص قابل للاستخراج — قريباً',
+    );
   }
 
   void _handleToolSelected(PdfEditorTool tool) {
@@ -593,7 +647,9 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               children: [
                 Text(
                   'اختر الشكل',
-                  style: AppTextStyles.subtitle.copyWith(color: AppColors.primary),
+                  style: AppTextStyles.subtitle.copyWith(
+                    color: AppColors.primary,
+                  ),
                   textAlign: TextAlign.right,
                 ),
                 const SizedBox(height: 12),
@@ -649,7 +705,9 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
   @override
   Widget build(BuildContext context) {
     ref.listen(pdfEditorControllerProvider(widget.fileId), (prev, next) {
-      if (next.loadFailed && prev?.loadFailed != true && next.errorMessage != null) {
+      if (next.loadFailed &&
+          prev?.loadFailed != true &&
+          next.errorMessage != null) {
         _showSnackBar(next.errorMessage!);
       }
       if (next.errorMessage != null &&
@@ -659,7 +717,8 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
       }
     });
 
-    final isTabletLandscape = MediaQuery.sizeOf(context).shortestSide >= 600 &&
+    final isTabletLandscape =
+        MediaQuery.sizeOf(context).shortestSide >= 600 &&
         MediaQuery.orientationOf(context) == Orientation.landscape;
 
     return CallbackShortcuts(
@@ -670,15 +729,22 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
         const SingleActivator(LogicalKeyboardKey.keyZ, meta: true): () {
           if (_editor.canUndo) _editor.undo();
         },
-        const SingleActivator(LogicalKeyboardKey.keyZ, shift: true, control: true):
-            () {
+        const SingleActivator(
+          LogicalKeyboardKey.keyZ,
+          shift: true,
+          control: true,
+        ): () {
           if (_editor.canRedo) _editor.redo();
         },
-        const SingleActivator(LogicalKeyboardKey.keyZ, shift: true, meta: true):
-            () {
+        const SingleActivator(
+          LogicalKeyboardKey.keyZ,
+          shift: true,
+          meta: true,
+        ): () {
           if (_editor.canRedo) _editor.redo();
         },
-        const SingleActivator(LogicalKeyboardKey.keyS, control: true): _handleSave,
+        const SingleActivator(LogicalKeyboardKey.keyS, control: true):
+            _handleSave,
         const SingleActivator(LogicalKeyboardKey.keyS, meta: true): _handleSave,
       },
       child: Focus(
@@ -740,43 +806,44 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
             IgnorePointer(
               ignoring: !isViewTool,
               child: SfPdfViewer.memory(
-              _pdfBytes!,
-              controller: _pdfController,
-              pageLayoutMode: PdfPageLayoutMode.single,
-              scrollDirection: PdfScrollDirection.vertical,
-              canShowScrollHead: false,
-              canShowScrollStatus: false,
-              canShowPaginationDialog: false,
-              enableDoubleTapZooming: true,
-              enableTextSelection: isViewTool,
-              canShowTextSelectionMenu: false,
-              canShowHyperlinkDialog: false,
-              onDocumentLoaded: (details) => _handleDocumentLoaded(details),
-              onDocumentLoadFailed: (_) {
-                if (!mounted) return;
-                setState(() {
-                  _isLoading = false;
-                  _hasError = true;
-                  _loadErrorMessage = 'تعذر فتح ملف PDF، يرجى المحاولة لاحقاً';
-                });
-              },
-              onPageChanged: (details) {
-                _editor.setCurrentPage(details.newPageNumber);
-                final pageSize = _pageSizes[details.newPageNumber];
-                if (pageSize != null) {
-                  _pdfPageSize = pageSize;
-                  _editor.registerPageSize(
-                    details.newPageNumber,
-                    pageSize.width,
-                    pageSize.height,
-                  );
-                  setState(() {});
-                }
-              },
-              onZoomLevelChanged: (details) {
-                _editor.setZoomLevel(details.newZoomLevel);
-              },
-            ),
+                _pdfBytes!,
+                controller: _pdfController,
+                pageLayoutMode: PdfPageLayoutMode.single,
+                scrollDirection: PdfScrollDirection.vertical,
+                canShowScrollHead: false,
+                canShowScrollStatus: false,
+                canShowPaginationDialog: false,
+                enableDoubleTapZooming: true,
+                enableTextSelection: isViewTool,
+                canShowTextSelectionMenu: false,
+                canShowHyperlinkDialog: false,
+                onDocumentLoaded: (details) => _handleDocumentLoaded(details),
+                onDocumentLoadFailed: (_) {
+                  if (!mounted) return;
+                  setState(() {
+                    _isLoading = false;
+                    _hasError = true;
+                    _loadErrorMessage =
+                        'تعذر فتح ملف PDF، يرجى المحاولة لاحقاً';
+                  });
+                },
+                onPageChanged: (details) {
+                  _editor.setCurrentPage(details.newPageNumber);
+                  final pageSize = _pageSizes[details.newPageNumber];
+                  if (pageSize != null) {
+                    _pdfPageSize = pageSize;
+                    _editor.registerPageSize(
+                      details.newPageNumber,
+                      pageSize.width,
+                      pageSize.height,
+                    );
+                    setState(() {});
+                  }
+                },
+                onZoomLevelChanged: (details) {
+                  _editor.setZoomLevel(details.newZoomLevel);
+                },
+              ),
             ),
             if (!_isLoading && _viewportSize != Size.zero)
               PdfAnnotationOverlayHost(
@@ -854,8 +921,9 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                 onSelectAnnotation: (id) {
                   _editor.selectAnnotation(id);
                   if (id != null && _state.currentTool == PdfEditorTool.lasso) {
-                    final annotation = _state.currentPageAnnotations
-                        .firstWhere((item) => item.id == id);
+                    final annotation = _state.currentPageAnnotations.firstWhere(
+                      (item) => item.id == id,
+                    );
                     if (annotation.type != AnnotationType.text &&
                         annotation.type != AnnotationType.note) {
                       _showSelectionActions(annotation);
@@ -874,7 +942,8 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                 onBatchEnd: _editor.endBatch,
                 onTextAnnotationTap: _showTextEditDialog,
               ),
-            if (_isLoading) const LoadingWidget(message: 'جاري تحميل ملف PDF...'),
+            if (_isLoading)
+              const LoadingWidget(message: 'جاري تحميل ملف PDF...'),
             if (MediaQuery.sizeOf(context).shortestSide >= 600 &&
                 MediaQuery.orientationOf(context) == Orientation.landscape)
               PdfEditorToolbar(

@@ -5,10 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/liquid_glass_surface.dart';
 
 class LuxuryLoginCard extends StatelessWidget {
-  const LuxuryLoginCard({
-    super.key,
-    required this.child,
-  });
+  const LuxuryLoginCard({super.key, required this.child});
 
   final Widget child;
 
@@ -137,9 +134,7 @@ class LoginFooter extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Divider(
-                  color: AppColors.accent.withValues(alpha: 0.35),
-                ),
+                child: Divider(color: AppColors.accent.withValues(alpha: 0.35)),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -153,9 +148,7 @@ class LoginFooter extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Divider(
-                  color: AppColors.accent.withValues(alpha: 0.35),
-                ),
+                child: Divider(color: AppColors.accent.withValues(alpha: 0.35)),
               ),
             ],
           ),

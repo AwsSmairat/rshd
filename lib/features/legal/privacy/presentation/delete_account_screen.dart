@@ -38,16 +38,16 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     }
 
     if (_confirmationController.text.trim() != 'حذف') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('اكتب «حذف» للتأكيد')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('اكتب «حذف» للتأكيد')));
       return;
     }
 
     if (_passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('كلمة المرور مطلوبة')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('كلمة المرور مطلوبة')));
       return;
     }
 
@@ -132,16 +132,14 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
           const SizedBox(height: 20),
           CheckboxListTile(
             value: _acknowledged,
-            onChanged: (value) => setState(() => _acknowledged = value ?? false),
+            onChanged: (value) =>
+                setState(() => _acknowledged = value ?? false),
             title: const Text('أفهم أن حذف الحساب قد يكون نهائياً'),
             controlAffinity: ListTileControlAffinity.leading,
             contentPadding: EdgeInsets.zero,
           ),
           const SizedBox(height: 8),
-          AppTextField(
-            controller: _confirmationController,
-            label: 'اكتب: حذف',
-          ),
+          AppTextField(controller: _confirmationController, label: 'اكتب: حذف'),
           const SizedBox(height: 16),
           AppTextField(
             controller: _passwordController,

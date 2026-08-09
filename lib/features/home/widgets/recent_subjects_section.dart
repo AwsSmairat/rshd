@@ -12,10 +12,7 @@ import 'course_progress_card.dart';
 import 'home_section_header.dart';
 
 class RecentSubjectsSection extends StatelessWidget {
-  const RecentSubjectsSection({
-    super.key,
-    required this.subjects,
-  });
+  const RecentSubjectsSection({super.key, required this.subjects});
 
   final List<SubjectModel> subjects;
 
@@ -49,7 +46,7 @@ class RecentSubjectsSection extends StatelessWidget {
                 const spacing = 12.0;
                 final tileWidth =
                     (constraints.maxWidth - (spacing * (columns - 1))) /
-                        columns;
+                    columns;
 
                 return Wrap(
                   spacing: spacing,

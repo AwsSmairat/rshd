@@ -6,17 +6,18 @@
  */
 
 use App\Enums\UserRole;
+use App\Enums\UserStatus;
 use App\Models\Assignment;
 use App\Models\LessonFile;
 use App\Models\User;
 use App\Models\Video;
 use App\Services\InstructorInvitationService;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 require __DIR__.'/../vendor/autoload.php';
 $app = require __DIR__.'/../bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->make(Kernel::class)->bootstrap();
 
 $base = getenv('BASE_URL') ?: 'http://127.0.0.1:8770';
 $passed = 0;
@@ -198,7 +199,7 @@ $testInstructor = User::create([
     'name' => 'Pending Instructor',
     'email' => 'pending'.time().'@rshdacademy.com',
     'role' => UserRole::Instructor,
-    'status' => \App\Enums\UserStatus::Active,
+    'status' => UserStatus::Active,
     'password' => null,
 ]);
 $plain = $service->createInvitation($testInstructor);
@@ -215,7 +216,7 @@ $noPass = User::create([
     'name' => 'No Pass',
     'email' => 'nopass'.time().'@rshdacademy.com',
     'role' => UserRole::Instructor,
-    'status' => \App\Enums\UserStatus::Active,
+    'status' => UserStatus::Active,
     'password' => null,
     'password_set_at' => null,
 ]);

@@ -26,14 +26,14 @@ class PlatformSettings {
     return PlatformSettings(
       platformName: data['platform_name']?.toString() ?? 'RSHD',
       maintenanceMode: data['maintenance_mode'] == true,
-      maintenanceMessage: data['maintenance_message']?.toString() ??
+      maintenanceMessage:
+          data['maintenance_message']?.toString() ??
           'الموقع حالياً تحت الصيانة، يرجى المحاولة لاحقاً.',
-      studentRegistrationEnabled:
-          data['student_registration_enabled'] != false,
+      studentRegistrationEnabled: data['student_registration_enabled'] != false,
       paymentInstructions: data['payment_instructions']?.toString() ?? '',
       assignmentMaxFileSizeMb:
           int.tryParse(data['assignment_max_file_size']?.toString() ?? '') ??
-              10,
+          10,
       assignmentAllowedFileTypes: types is List
           ? types.map((e) => e.toString()).toList()
           : const ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'zip'],
@@ -67,7 +67,15 @@ class PlatformSettings {
     studentRegistrationEnabled: true,
     paymentInstructions: '',
     assignmentMaxFileSizeMb: 10,
-    assignmentAllowedFileTypes: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'zip'],
+    assignmentAllowedFileTypes: [
+      'pdf',
+      'doc',
+      'docx',
+      'jpg',
+      'jpeg',
+      'png',
+      'zip',
+    ],
     currencySymbol: 'د.أ',
     allowQuizRetake: true,
     supportEmail: 'admin@rshdacademy.com',

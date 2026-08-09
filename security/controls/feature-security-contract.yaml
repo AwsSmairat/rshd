@@ -1,0 +1,327 @@
+# RSHD Feature Security Contracts
+# Each contract defines expected controls for a sensitive feature/endpoint.
+
+version: 1
+project: RSHD
+last_updated: 2026-08-10
+
+contracts:
+  - id: AUTH-LOGIN
+    feature: Student login
+    route: POST /api/v1/login
+    method: POST
+    authentication_required: false
+    authorization_policy: none
+    allowed_roles: [anonymous]
+    enrollment_required: false
+    input_validation: LoginRequest
+    rate_limit: auth-login + api-guest baseline
+    idor_protection: n/a
+    output_minimization: token + user resource
+    secrets_exposed: false
+    signed_url_ttl: n/a
+    failure_mode: fail-closed on lockout
+    audit_event: login attempts logged
+    sensitive_logging_prohibited: [password, token]
+    required_security_tests: [PasswordResetTest indirect, ApiRateLimitTest]
+    threats: [spoofing, tampering, denial_of_service]
+
+  - id: AUTH-REGISTER
+    feature: Student registration
+    route: POST /api/v1/register
+    method: POST
+    authentication_required: false
+    authorization_policy: platform setting student_registration_enabled
+    input_validation: RegisterRequest
+    rate_limit: register + api-guest baseline
+    failure_mode: fail-closed
+    required_security_tests: [RegisterSecurityTest, ApiRateLimitTest]
+    threats: [denial_of_service, elevation_of_privilege]
+
+  - id: AUTH-OAUTH-GOOGLE
+    feature: Google OAuth
+    route: POST /api/v1/auth/google
+    method: POST
+    authentication_required: false
+    input_validation: GoogleAuthRequest
+    required_security_tests: [AuthOAuthTest]
+    threats: [spoofing, elevation_of_privilege]
+
+  - id: AUTH-OAUTH-APPLE
+    feature: Apple Sign In
+    route: POST /api/v1/auth/apple
+    method: POST
+    authentication_required: false
+    input_validation: AppleAuthRequest
+    required_security_tests: [AuthOAuthTest]
+    threats: [spoofing]
+
+  - id: AUTH-LOGOUT
+    feature: Logout / token revocation
+    route: POST /api/v1/logout
+    method: POST
+    authentication_required: true
+    authorization_policy: sanctum token owner
+    failure_mode: fail-closed
+    required_security_tests: [LogoutSecurityTest]
+    threats: [repudiation]
+
+  - id: AUTH-ME
+    feature: Current user profile
+    route: GET /api/v1/me
+    method: GET
+    authentication_required: true
+    output_minimization: UserResource allowlist
+    required_security_tests: [MeSecurityTest]
+    threats: [information_disclosure]
+
+  - id: AUTH-PASSWORD-RESET
+    feature: Password reset flow
+    route: POST /api/v1/password/*
+    method: POST
+    authentication_required: false
+    rate_limit: StudentPasswordResetService IP+email limits
+    replay_protection: OTP single-use + expiry
+    required_security_tests: [PasswordResetTest]
+    threats: [spoofing, tampering, denial_of_service]
+
+  - id: AUTH-EMAIL-VERIFY
+    feature: Email verification OTP
+    route: POST /api/v1/email/*
+    method: POST
+    authentication_required: false
+    rate_limit: StudentEmailVerificationService cooldown
+    required_security_tests: [EmailVerificationSecurityTest]
+    threats: [denial_of_service, tampering]
+
+  - id: VIDEO-PLAYBACK
+    feature: Signed video playback URL
+    route: GET /api/v1/videos/{video}/playback
+    method: GET
+    authentication_required: true
+    authorization_policy: VideoPolicy.view + EnrollmentService
+    enrollment_required: true
+    enrollment_expiry_checked: true
+    signed_url_ttl: BunnyCdnTokenSigner / VideoPlaybackService
+    secrets_exposed: false
+    permanent_url_prohibited: true
+    failure_mode: fail-closed
+    offline_implications: client refreshes before TTL
+    required_security_tests: [VideoPlaybackTest, BunnyStreamTest]
+    threats: [information_disclosure, elevation_of_privilege]
+
+  - id: VIDEO-STREAM
+    feature: Video stream proxy/token gate
+    route: GET /api/v1/videos/{video}/stream
+    method: GET
+    authentication_required: token query param validated in controller
+    authorization_policy: VideoStreamService
+    signed_url_ttl: short-lived stream token
+    required_security_tests: [VideoPlaybackTest]
+    threats: [information_disclosure, tampering]
+
+  - id: VIDEO-PROGRESS
+    feature: Playback progress update
+    route: POST /api/v1/videos/{video}/progress
+    method: POST
+    authentication_required: true
+    authorization_policy: VideoPolicy.updateProgress
+    enrollment_required: true
+    input_validation: UpdateVideoProgressRequest + ProgressService clamp
+    idor_protection: video ID policy-bound
+    rate_limit: video-progress
+    required_security_tests: [VideoPlaybackTest, VideoProgressAbuseTest]
+    threats: [tampering, repudiation]
+
+  - id: FILE-SHOW
+    feature: Lesson file metadata
+    route: GET /api/v1/files/{file}
+    method: GET
+    authentication_required: true
+    authorization_policy: LessonFilePolicy.view
+    enrollment_required: true
+    output_minimization: no permanent file_url for Bunny files
+    required_security_tests: [LessonFileDownloadTest, LessonFileSerializationTest]
+    threats: [information_disclosure, bola]
+
+  - id: FILE-DOWNLOAD
+    feature: Signed file download URL
+    route: GET /api/v1/files/{file}/download
+    method: GET
+    authentication_required: true
+    authorization_policy: LessonFilePolicy.view
+    signed_url_ttl: BunnyFilesCdnTokenSigner
+    permanent_url_prohibited: true
+    failure_mode: fail-closed if Bunny misconfigured
+    required_security_tests: [LessonFileDownloadTest]
+    threats: [information_disclosure, bola]
+
+  - id: FILE-STREAM
+    feature: Signed local/Bunny stream
+    route: GET /api/v1/files/{file}/stream
+    method: GET
+    middleware: [signed]
+    authentication_required: signed URL
+    required_security_tests: [LessonFileDownloadTest]
+    threats: [information_disclosure]
+
+  - id: FILE-ANNOTATIONS-GET
+    feature: Read PDF annotations
+    route: GET /api/v1/files/{file}/annotations
+    method: GET
+    authentication_required: true
+    authorization_policy: LessonFilePolicy.view
+    idor_protection: file ID + student ownership
+    required_security_tests: [AnnotationAuthorizationTest]
+    threats: [information_disclosure, bola]
+
+  - id: FILE-ANNOTATIONS-POST
+    feature: Save PDF annotations
+    route: POST /api/v1/files/{file}/annotations
+    method: POST
+    authentication_required: true
+    authorization_policy: LessonFilePolicy.annotate
+    input_validation: StoreAnnotationRequest
+    race_condition_risk: concurrent saves — partial
+    rate_limit: annotations
+    required_security_tests: [AnnotationAuthorizationTest]
+    threats: [tampering, bola, denial_of_service]
+
+  - id: LESSON-SHOW
+    feature: Lesson detail
+    route: GET /api/v1/lessons/{lesson}
+    method: GET
+    authentication_required: true
+    authorization_policy: LessonPolicy.view
+    enrollment_required: true
+    idor_protection: lesson ID policy
+    required_security_tests: [VideoPlaybackTest indirect]
+    threats: [elevation_of_privilege]
+
+  - id: SUBJECT-LESSONS
+    feature: Subject lesson list
+    route: GET /api/v1/subjects/{subject}/lessons
+    method: GET
+    authentication_required: true
+    authorization_policy: LessonPolicy.viewAny + subject access
+    required_security_tests: [SubjectLessonsAuthorizationTest]
+    threats: [information_disclosure]
+
+  - id: QUIZ-START
+    feature: Start quiz attempt
+    route: POST /api/v1/quizzes/{quiz}/start
+    method: POST
+    authentication_required: true
+    authorization_policy: QuizPolicy.start
+    enrollment_required: true
+    required_security_tests: [QuizStartAuthorizationTest, QuizSubmitAuthorizationTest]
+    threats: [elevation_of_privilege, tampering]
+
+  - id: QUIZ-SUBMIT
+    feature: Submit quiz answers
+    route: POST /api/v1/quizzes/{quiz}/submit
+    method: POST
+    authentication_required: true
+    authorization_policy: QuizPolicy.submit
+    input_validation: SubmitQuizRequest
+    required_security_tests: [QuizSubmitAuthorizationTest]
+    threats: [tampering, repudiation]
+
+  - id: ASSIGNMENT-SUBMIT
+    feature: Assignment submission with file
+    route: POST /api/v1/assignments/{assignment}/submit
+    method: POST
+    authentication_required: true
+    authorization_policy: AssignmentPolicy.submit
+    file_upload_validation: SubmitAssignmentRequest
+    mime_validation: mimetypes allowlist + blocked extensions
+    rate_limit: assignment-upload
+    storage_visibility: private local disk
+    required_security_tests: [AssignmentUploadSecurityTest]
+    threats: [tampering, denial_of_service]
+
+  - id: WEBHOOK-BUNNY-STREAM
+    feature: Bunny Stream webhook
+    route: POST /api/v1/webhooks/bunny/stream
+    method: POST
+    authentication_required: HMAC signature
+    replay_protection: signature validation
+    required_security_tests: [BunnyStreamTest]
+    threats: [spoofing, tampering]
+
+  - id: STUDENT-DELETE-ACCOUNT
+    feature: Account deletion
+    route: POST /api/v1/student/account/delete
+    method: POST
+    authentication_required: true
+    input_validation: DeleteStudentAccountRequest password confirm
+    audit_event: recommended
+    required_security_tests: [StudentDeleteAccountSecurityTest]
+    threats: [repudiation, elevation_of_privilege]
+
+  - id: STUDENT-PASSWORD-UPDATE
+    feature: Change password
+    route: PATCH /api/v1/student/password
+    method: PATCH
+    authentication_required: true
+    input_validation: UpdateStudentPasswordRequest
+    session_invalidation: current token remains valid; other sessions not revoked by design
+    required_security_tests: [StudentPasswordUpdateSecurityTest]
+    threats: [elevation_of_privilege]
+
+  - id: FLUTTER-SCREEN-PROTECTION
+    feature: Protected content screen capture policy
+    route: Flutter protected routes
+    authentication_required: true
+    android: FLAG_SECURE via ScreenProtectionService
+    ios: capture detection + overlay (no screenshot block)
+    required_security_tests: [screen_protection_test.dart, protected_routes_policy_test.dart]
+    threats: [information_disclosure]
+
+  - id: FLUTTER-PDF-CACHE
+    feature: Offline PDF cache
+    route: local pdf_cache/
+    authentication_required: n/a local
+    offline_implications: app-private pdf_cache/{userId}; cleared on logout/account switch
+    screen_protection: required on viewer route
+    required_security_tests: [pdf_cache_security_test.dart, mobile_security_test.dart]
+    threats: [information_disclosure]
+
+  - id: FLUTTER-REMEMBER-ME
+    feature: Remember me credential storage
+    route: login screen
+    storage: flutter_secure_storage
+    risk: password no longer persisted (email only)
+    required_security_tests: [remember_me_security_test.dart]
+    threats: [information_disclosure]
+
+  - id: MOBILE-RELEASE-ENV
+    feature: Production release environment guard
+    route: Flutter startup / AppConfig
+    authentication_required: n/a
+    failure_mode: fail-closed in release without API_BASE_URL HTTPS
+    required_security_tests: [mobile_security_test.dart]
+    threats: [information_disclosure, elevation_of_privilege]
+
+  - id: MOBILE-EXTERNAL-URL
+    feature: External URL and WebView navigation policy
+    route: url_launcher + Bunny embed WebView
+    authentication_required: n/a
+    input_validation: SafeExternalUrl + SafeUrlLauncher allowlist
+    required_security_tests: [mobile_security_test.dart]
+    threats: [tampering, elevation_of_privilege]
+
+  - id: FILAMENT-ADMIN
+    feature: Filament admin panel
+    route: /admin/*
+    authentication_required: true
+    authorization_policy: Filament role middleware + policies
+    csrf: enabled
+    required_security_tests: [FilamentInstructorScopeTest]
+    threats: [elevation_of_privilege, tampering]
+
+coverage_summary:
+  total_contracts: 30
+  sensitive_api_endpoints: 55
+  contracts_with_automated_tests: 30
+  coverage_gaps: 0

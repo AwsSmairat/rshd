@@ -117,7 +117,9 @@ class _NavItem extends StatelessWidget {
               Icon(
                 icon,
                 size: 22,
-                color: isActive ? AppColors.accent : AppColors.white.withValues(alpha: 0.75),
+                color: isActive
+                    ? AppColors.accent
+                    : AppColors.white.withValues(alpha: 0.75),
               ),
               const SizedBox(height: 4),
               Text(
@@ -125,7 +127,9 @@ class _NavItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
-                  color: isActive ? AppColors.accent : AppColors.white.withValues(alpha: 0.75),
+                  color: isActive
+                      ? AppColors.accent
+                      : AppColors.white.withValues(alpha: 0.75),
                 ),
               ),
             ],
@@ -137,10 +141,7 @@ class _NavItem extends StatelessWidget {
 }
 
 class _HomeNavItem extends StatelessWidget {
-  const _HomeNavItem({
-    required this.isActive,
-    required this.onTap,
-  });
+  const _HomeNavItem({required this.isActive, required this.onTap});
 
   final bool isActive;
   final VoidCallback onTap;
@@ -189,7 +190,9 @@ class _HomeNavItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: isActive ? AppColors.accent : AppColors.white.withValues(alpha: 0.85),
+                  color: isActive
+                      ? AppColors.accent
+                      : AppColors.white.withValues(alpha: 0.85),
                 ),
               ),
             ],

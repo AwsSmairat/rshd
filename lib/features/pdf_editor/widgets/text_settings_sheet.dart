@@ -96,7 +96,9 @@ class _TextSettingsSheetState extends State<TextSettingsSheet> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: selected ? AppColors.accent : Colors.transparent,
+                          color: selected
+                              ? AppColors.accent
+                              : Colors.transparent,
                           width: 2,
                         ),
                       ),
@@ -117,7 +119,8 @@ class _TextSettingsSheetState extends State<TextSettingsSheet> {
               runSpacing: 8,
               alignment: WrapAlignment.end,
               children: TextSettingsSheet.fontSizes.map((preset) {
-                final selected = (_settings.fontSize - preset.$2).abs() < 0.0005;
+                final selected =
+                    (_settings.fontSize - preset.$2).abs() < 0.0005;
                 return ChoiceChip(
                   label: Text(preset.$1),
                   selected: selected,
@@ -143,10 +146,7 @@ void showTextSettingsSheet(
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (context) {
-      return TextSettingsSheet(
-        settings: settings,
-        onChanged: onChanged,
-      );
+      return TextSettingsSheet(settings: settings, onChanged: onChanged);
     },
   );
 }

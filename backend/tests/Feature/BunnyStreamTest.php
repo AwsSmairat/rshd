@@ -17,17 +17,21 @@ use App\Models\SubjectStudent;
 use App\Models\User;
 use App\Models\Video;
 use App\Services\Bunny\BunnyCdnTokenSigner;
+use App\Services\Bunny\BunnyStreamConfigValidator;
 use App\Services\Bunny\BunnyStreamService;
 use App\Services\Bunny\BunnyStreamStatusMapper;
 use App\Services\Bunny\BunnyStreamWebhookService;
 use App\Services\Video\BunnyStreamVideoProvider;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -247,7 +251,7 @@ class BunnyStreamTest extends TestCase
         $rawBody = '{"Status":3}';
 
         $validSignature = $this->signBunnyStreamWebhookBody($rawBody);
-        $request = \Illuminate\Http\Request::create('/webhooks/bunny/stream', 'POST', [], [], [], [
+        $request = Request::create('/webhooks/bunny/stream', 'POST', [], [], [], [
             'HTTP_X-BunnyStream-Signature-Version' => 'v1',
             'HTTP_X-BunnyStream-Signature-Algorithm' => 'hmac-sha256',
             'HTTP_X-BunnyStream-Signature' => $validSignature,
@@ -264,7 +268,7 @@ class BunnyStreamTest extends TestCase
         $this->createBunnyVideo('bunny-guid-log');
 
         $loggedMessages = [];
-        \Illuminate\Support\Facades\Log::listen(function ($message) use (&$loggedMessages): void {
+        Log::listen(function ($message) use (&$loggedMessages): void {
             $loggedMessages[] = is_string($message->message)
                 ? $message->message
                 : json_encode($message->message, JSON_THROW_ON_ERROR);
@@ -328,7 +332,7 @@ class BunnyStreamTest extends TestCase
             ->once()
             ->with('bunny.stream.token_key_looks_like_hostname', \Mockery::type('array'));
 
-        \App\Services\Bunny\BunnyStreamConfigValidator::warnIfMisconfigured();
+        BunnyStreamConfigValidator::warnIfMisconfigured();
     }
 
     public function test_migrate_to_bunny_command_queues_eligible_videos(): void
@@ -456,7 +460,7 @@ class BunnyStreamTest extends TestCase
     /**
      * @return array{0: User, 1: Video}
      */
-    protected function createBunnyVideoScenario(?\Illuminate\Support\Carbon $expiresAt = null): array
+    protected function createBunnyVideoScenario(?Carbon $expiresAt = null): array
     {
         $student = $this->createStudent();
         $subject = $this->createSubject();
@@ -537,7 +541,7 @@ class BunnyStreamTest extends TestCase
     /**
      * @param  array<string, string>  $headers
      */
-    protected function postBunnyStreamWebhook(string $rawBody, array $headers = []): \Illuminate\Testing\TestResponse
+    protected function postBunnyStreamWebhook(string $rawBody, array $headers = []): TestResponse
     {
         $defaults = [
             'CONTENT_TYPE' => 'application/json',

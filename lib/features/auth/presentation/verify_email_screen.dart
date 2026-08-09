@@ -16,10 +16,7 @@ import 'widgets/luxury_login_card.dart';
 import 'widgets/otp_input_row.dart';
 
 class VerifyEmailScreen extends ConsumerStatefulWidget {
-  const VerifyEmailScreen({
-    super.key,
-    required this.email,
-  });
+  const VerifyEmailScreen({super.key, required this.email});
 
   final String email;
 
@@ -71,10 +68,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       return;
     }
 
-    final success = await ref.read(authControllerProvider.notifier).verifyEmail(
-          email: widget.email,
-          code: _code,
-        );
+    final success = await ref
+        .read(authControllerProvider.notifier)
+        .verifyEmail(email: widget.email, code: _code);
 
     if (success && mounted) {
       context.go(AppRoutes.home);
@@ -102,9 +98,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       _otpKey.currentState?.clear();
       setState(() => _code = '');
       _startResendTimer();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إرسال رمز جديد')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تم إرسال رمز جديد')));
     }
   }
 
@@ -217,7 +213,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
               ),
               SizedBox(height: metrics.fieldSpacing),
               TextButton(
-                onPressed: (_secondsRemaining > 0 || _isResending) ? null : _resend,
+                onPressed: (_secondsRemaining > 0 || _isResending)
+                    ? null
+                    : _resend,
                 child: Text(
                   _secondsRemaining > 0
                       ? 'إعادة الإرسال بعد $_secondsRemaining ث'

@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
 class LiquidGlassBackground extends StatelessWidget {
-  const LiquidGlassBackground({
-    super.key,
-    required this.child,
-  });
+  const LiquidGlassBackground({super.key, required this.child});
 
   final Widget child;
 
@@ -20,11 +17,7 @@ class LiquidGlassBackground extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFF6F1E7),
-                Color(0xFFEDE4D4),
-                Color(0xFFE8EEF6),
-              ],
+              colors: [Color(0xFFF6F1E7), Color(0xFFEDE4D4), Color(0xFFE8EEF6)],
               stops: [0.0, 0.42, 1.0],
             ),
           ),
@@ -68,10 +61,7 @@ class LiquidGlassBackground extends StatelessWidget {
 }
 
 class _GlassBlob extends StatelessWidget {
-  const _GlassBlob({
-    required this.size,
-    required this.color,
-  });
+  const _GlassBlob({required this.size, required this.color});
 
   final double size;
   final Color color;
@@ -83,12 +73,7 @@ class _GlassBlob extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            color,
-            color.withValues(alpha: 0),
-          ],
-        ),
+        gradient: RadialGradient(colors: [color, color.withValues(alpha: 0)]),
       ),
     );
   }

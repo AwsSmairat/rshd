@@ -23,15 +23,16 @@ class PlatformSettingsRepository {
   }
 }
 
-final platformSettingsRepositoryProvider =
-    Provider<PlatformSettingsRepository>((ref) {
-  return PlatformSettingsRepository(ref.watch(apiClientProvider));
-});
+final platformSettingsRepositoryProvider = Provider<PlatformSettingsRepository>(
+  (ref) {
+    return PlatformSettingsRepository(ref.watch(apiClientProvider));
+  },
+);
 
 final platformSettingsProvider =
     AsyncNotifierProvider<PlatformSettingsController, PlatformSettings>(
-  PlatformSettingsController.new,
-);
+      PlatformSettingsController.new,
+    );
 
 class PlatformSettingsController extends AsyncNotifier<PlatformSettings> {
   @override

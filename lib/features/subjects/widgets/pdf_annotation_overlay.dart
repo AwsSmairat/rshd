@@ -49,8 +49,9 @@ class _PdfAnnotationOverlayState extends State<PdfAnnotationOverlay> {
             child: CustomPaint(
               painter: PdfAnnotationPainter(
                 pageData: widget.pageData,
-                currentStroke:
-                    _currentStroke.isEmpty ? null : List.of(_currentStroke),
+                currentStroke: _currentStroke.isEmpty
+                    ? null
+                    : List.of(_currentStroke),
                 previewHighlight: _previewHighlight,
               ),
               child: const SizedBox.expand(),
@@ -114,7 +115,8 @@ class _PdfAnnotationOverlayState extends State<PdfAnnotationOverlay> {
       return;
     }
 
-    if (widget.tool == PdfAnnotationTool.highlighter && _highlightStart != null) {
+    if (widget.tool == PdfAnnotationTool.highlighter &&
+        _highlightStart != null) {
       final start = _highlightStart!;
       final current = details.localPosition;
       setState(() {
@@ -131,7 +133,8 @@ class _PdfAnnotationOverlayState extends State<PdfAnnotationOverlay> {
       widget.onDrawingComplete(points);
     }
 
-    if (widget.tool == PdfAnnotationTool.highlighter && _previewHighlight != null) {
+    if (widget.tool == PdfAnnotationTool.highlighter &&
+        _previewHighlight != null) {
       final rect = _normalizeRect(_previewHighlight!);
       widget.onHighlightComplete(rect);
     }

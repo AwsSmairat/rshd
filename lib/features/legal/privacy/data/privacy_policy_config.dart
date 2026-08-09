@@ -28,8 +28,7 @@ class PrivacyPolicyConfig {
   static const String accountDeletionProcessingDays = '30';
 
   /// عنوان رسالة البريد عند التواصل بخصوص الخصوصية.
-  static const String privacyEmailSubject =
-      'استفسار بخصوص خصوصية حساب RSHD';
+  static const String privacyEmailSubject = 'استفسار بخصوص خصوصية حساب RSHD';
 
   /// عنوان رسالة البريد عند الإبلاغ عن مشكلة.
   static const String reportIssueEmailSubject =

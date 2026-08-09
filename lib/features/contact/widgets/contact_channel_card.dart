@@ -74,9 +74,7 @@ class ContactChannelCard extends StatelessWidget {
                     style: AppTextStyles.body.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: disabled
-                          ? AppColors.textMuted
-                          : AppColors.primary,
+                      color: disabled ? AppColors.textMuted : AppColors.primary,
                       height: 1.35,
                     ),
                   ),

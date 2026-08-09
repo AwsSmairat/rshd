@@ -2,18 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-typedef VideoProgressSyncCallback = Future<void> Function({
-  required int currentPositionSeconds,
-  required int durationSeconds,
-  bool showSuccessMessage,
-});
+import '../../../core/security/sensitive_data_redactor.dart';
+
+typedef VideoProgressSyncCallback =
+    Future<void> Function({
+      required int currentPositionSeconds,
+      required int durationSeconds,
+      bool showSuccessMessage,
+    });
 
 /// Sends video watch progress every 15 seconds and once on dispose.
 class VideoProgressTracker {
-  VideoProgressTracker({
-    required this.durationSeconds,
-    required this.onSync,
-  });
+  VideoProgressTracker({required this.durationSeconds, required this.onSync});
 
   final int durationSeconds;
   final VideoProgressSyncCallback onSync;
@@ -57,10 +57,7 @@ class VideoProgressTracker {
   }
 
   Future<void> flush({bool showSuccessMessage = false}) async {
-    await _sendProgress(
-      showSuccessMessage: showSuccessMessage,
-      force: true,
-    );
+    await _sendProgress(showSuccessMessage: showSuccessMessage, force: true);
   }
 
   Future<void> _sendProgress({
@@ -87,7 +84,9 @@ class VideoProgressTracker {
       );
     } catch (error, stackTrace) {
       if (kDebugMode) {
-        debugPrint('VideoProgressTracker sync failed: $error');
+        debugPrint(
+          'VideoProgressTracker sync failed: ${SensitiveDataRedactor.redactString(error.toString())}',
+        );
         debugPrint('$stackTrace');
       }
     }

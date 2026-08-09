@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../../core/network/async_load_guard.dart';
 import '../../subjects/presentation/subjects_controller.dart';
 import '../data/grades_repository.dart';
 import '../data/models/grade_model.dart';
@@ -102,10 +103,7 @@ class GradesListController extends StateNotifier<GradesListState> {
       return;
     }
 
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final grades = await _repository.getGrades();
@@ -138,7 +136,8 @@ class GradesListController extends StateNotifier<GradesListState> {
   }
 }
 
-class GradeDetailsController extends StateNotifier<GradeDetailsState> {
+class GradeDetailsController extends StateNotifier<GradeDetailsState>
+    with AsyncLoadGuard {
   GradeDetailsController(this._repository) : super(const GradeDetailsState());
 
   final GradesRepository _repository;
@@ -152,13 +151,16 @@ class GradeDetailsController extends StateNotifier<GradeDetailsState> {
       return;
     }
 
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    final generation = beginLoad();
+
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final grade = await _repository.findGradeById(gradeId);
+      if (!isCurrentLoad(generation)) {
+        return;
+      }
+
       if (grade == null) {
         state = const GradeDetailsState(
           status: FeatureLoadStatus.error,
@@ -167,16 +169,19 @@ class GradeDetailsController extends StateNotifier<GradeDetailsState> {
         return;
       }
 
-      state = GradeDetailsState(
-        status: FeatureLoadStatus.loaded,
-        grade: grade,
-      );
+      state = GradeDetailsState(status: FeatureLoadStatus.loaded, grade: grade);
     } on ApiException catch (error) {
+      if (!isCurrentLoad(generation)) {
+        return;
+      }
       state = GradeDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: mapGradesError(error),
       );
     } catch (_) {
+      if (!isCurrentLoad(generation)) {
+        return;
+      }
       state = const GradeDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -187,10 +192,10 @@ class GradeDetailsController extends StateNotifier<GradeDetailsState> {
 
 final gradesListControllerProvider =
     StateNotifierProvider<GradesListController, GradesListState>((ref) {
-  return GradesListController(ref.watch(gradesRepositoryProvider));
-});
+      return GradesListController(ref.watch(gradesRepositoryProvider));
+    });
 
 final gradeDetailsControllerProvider = StateNotifierProvider.autoDispose
     .family<GradeDetailsController, GradeDetailsState, int>((ref, gradeId) {
-  return GradeDetailsController(ref.watch(gradesRepositoryProvider));
-});
+      return GradeDetailsController(ref.watch(gradesRepositoryProvider));
+    });

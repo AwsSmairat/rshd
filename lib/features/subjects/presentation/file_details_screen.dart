@@ -14,10 +14,7 @@ import '../data/models/lesson_file_model.dart';
 import 'subjects_controller.dart';
 
 class FileDetailsScreen extends ConsumerStatefulWidget {
-  const FileDetailsScreen({
-    super.key,
-    required this.fileId,
-  });
+  const FileDetailsScreen({super.key, required this.fileId});
 
   final int fileId;
 
@@ -50,9 +47,7 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
   void _openPdfViewer(LessonFileModel file) {
     context.push(
       AppRoutes.filePdfViewer(file.id),
-      extra: {
-        'title': file.title,
-      },
+      extra: {'title': file.title},
     );
   }
 
@@ -197,20 +192,14 @@ class _FileDetailsHero extends StatelessWidget {
         title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          fontWeight: FontWeight.w700,
-          fontSize: 16,
-        ),
+        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
       ),
       flexibleSpace: DecoratedBox(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.centerRight,
             end: Alignment.centerLeft,
-            colors: [
-              AppColors.primary,
-              AppColors.secondaryNavy,
-            ],
+            colors: [AppColors.primary, AppColors.secondaryNavy],
           ),
         ),
       ),
@@ -279,25 +268,20 @@ class _FilePreviewCard extends StatelessWidget {
                     width: 1.2,
                   ),
                 ),
-                child: Icon(
-                  file.fileIcon,
-                  size: 42,
-                  color: _accentColor,
-                ),
+                child: Icon(file.fileIcon, size: 42, color: _accentColor),
               ),
               const SizedBox(height: 16),
               Text(
                 file.title,
                 textAlign: TextAlign.center,
-                style: AppTextStyles.title.copyWith(
-                  fontSize: 20,
-                  height: 1.35,
-                ),
+                style: AppTextStyles.title.copyWith(fontSize: 20, height: 1.35),
               ),
               const SizedBox(height: 10),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: _accentColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(999),
@@ -351,7 +335,9 @@ class _FileMetaSection extends StatelessWidget {
                 : Icons.check_circle_outline_rounded,
             label: 'الحالة',
             value: file.isLocked ? 'مقفل' : 'متاح',
-            valueColor: file.isLocked ? AppColors.textMuted : AppColors.secondary,
+            valueColor: file.isLocked
+                ? AppColors.textMuted
+                : AppColors.secondary,
           ),
         ),
       ],
@@ -473,9 +459,13 @@ class _FileStatusCard extends StatelessWidget {
               label: const Text('تحديث'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primary,
-                side: BorderSide(color: AppColors.primary.withValues(alpha: 0.18)),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                side: BorderSide(
+                  color: AppColors.primary.withValues(alpha: 0.18),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 10,
+                ),
               ),
             ),
           ],
@@ -504,10 +494,7 @@ class _PrimaryActionButton extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.centerRight,
           end: Alignment.centerLeft,
-          colors: [
-            AppColors.primary,
-            AppColors.secondaryNavy,
-          ],
+          colors: [AppColors.primary, AppColors.secondaryNavy],
         ),
         boxShadow: [
           BoxShadow(
@@ -529,10 +516,7 @@ class _PrimaryActionButton extends StatelessWidget {
               children: [
                 Icon(icon, color: AppColors.white, size: 22),
                 const SizedBox(width: 10),
-                Text(
-                  label,
-                  style: AppTextStyles.button.copyWith(fontSize: 15),
-                ),
+                Text(label, style: AppTextStyles.button.copyWith(fontSize: 15)),
               ],
             ),
           ),
@@ -543,10 +527,7 @@ class _PrimaryActionButton extends StatelessWidget {
 }
 
 class _InfoNote extends StatelessWidget {
-  const _InfoNote({
-    required this.icon,
-    required this.text,
-  });
+  const _InfoNote({required this.icon, required this.text});
 
   final IconData icon;
   final String text;

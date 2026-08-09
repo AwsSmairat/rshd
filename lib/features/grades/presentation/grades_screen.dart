@@ -61,9 +61,7 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             const SliverToBoxAdapter(child: GradesHeader()),
-            ResponsiveSliverContent(
-              sliver: _buildContent(state),
-            ),
+            ResponsiveSliverContent(sliver: _buildContent(state)),
           ],
         ),
       ),
@@ -98,37 +96,34 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
         );
       case FeatureLoadStatus.loaded:
         return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              if (index == 0) {
-                return GradesSummaryCard(state: state);
-              }
-              if (index == 1) {
-                return Padding(
-                  padding: const EdgeInsets.only(top: 20, bottom: 12),
-                  child: Text(
-                    'سجل الدرجات',
-                    style: AppTextStyles.subtitle.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                );
-              }
-
-              final grade = state.grades[index - 2];
-              final isLast = index == state.grades.length + 1;
-
+          delegate: SliverChildBuilderDelegate((context, index) {
+            if (index == 0) {
+              return GradesSummaryCard(state: state);
+            }
+            if (index == 1) {
               return Padding(
-                padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
-                child: GradeCard(
-                  grade: grade,
-                  onTap: () => context.push(AppRoutes.gradeDetails(grade.id)),
+                padding: const EdgeInsets.only(top: 20, bottom: 12),
+                child: Text(
+                  'سجل الدرجات',
+                  style: AppTextStyles.subtitle.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               );
-            },
-            childCount: state.grades.length + 2,
-          ),
+            }
+
+            final grade = state.grades[index - 2];
+            final isLast = index == state.grades.length + 1;
+
+            return Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
+              child: GradeCard(
+                grade: grade,
+                onTap: () => context.push(AppRoutes.gradeDetails(grade.id)),
+              ),
+            );
+          }, childCount: state.grades.length + 2),
         );
     }
   }

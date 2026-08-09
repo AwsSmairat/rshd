@@ -9,15 +9,13 @@ import 'models/assignment_model.dart';
 import 'models/assignment_submission_model.dart';
 
 class AssignmentsRepository {
-  AssignmentsRepository({required ApiClient apiClient}) : _apiClient = apiClient;
+  AssignmentsRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 
   Future<List<AssignmentModel>> getAssignments() async {
-    return _fetchList(
-      ApiEndpoints.assignments,
-      AssignmentModel.fromJson,
-    );
+    return _fetchList(ApiEndpoints.assignments, AssignmentModel.fromJson);
   }
 
   Future<AssignmentModel> getAssignmentDetails(int assignmentId) async {
@@ -28,10 +26,7 @@ class AssignmentsRepository {
       }
     }
 
-    throw ApiException(
-      message: 'الواجب غير موجود',
-      statusCode: 404,
-    );
+    throw ApiException(message: 'الواجب غير موجود', statusCode: 404);
   }
 
   Future<AssignmentSubmissionModel> submitAssignment({
@@ -51,10 +46,7 @@ class AssignmentsRepository {
       formData.files.add(
         MapEntry(
           'file',
-          await MultipartFile.fromFile(
-            filePath,
-            filename: fileName,
-          ),
+          await MultipartFile.fromFile(filePath, filename: fileName),
         ),
       );
     }

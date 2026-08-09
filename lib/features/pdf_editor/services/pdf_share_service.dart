@@ -18,13 +18,7 @@ class PdfShareService {
         : 'annotated.pdf';
 
     await Share.shareXFiles(
-      [
-        XFile(
-          file.path,
-          mimeType: 'application/pdf',
-          name: fileName,
-        ),
-      ],
+      [XFile(file.path, mimeType: 'application/pdf', name: fileName)],
       subject: subject,
       text: text ?? 'ملف PDF مع التعليقات',
     );

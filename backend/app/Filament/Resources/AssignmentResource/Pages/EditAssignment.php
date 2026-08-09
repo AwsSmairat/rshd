@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\AssignmentResource\Pages;
 
 use App\Filament\Resources\AssignmentResource;
+use App\Models\Assignment;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -23,7 +24,7 @@ class EditAssignment extends EditRecord
      */
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        /** @var \App\Models\Assignment $record */
+        /** @var Assignment $record */
         $record = $this->record;
 
         return AssignmentResource::prepareAttachmentData($data, $record);

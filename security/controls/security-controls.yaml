@@ -1,0 +1,50 @@
+# RSHD Security Controls Catalog
+
+version: 1
+
+prevent:
+  - id: CTRL-POLICY-ENROLLMENT
+    description: Laravel policies delegate to EnrollmentService via ChecksSubjectAccess
+    locations: [app/Policies/*, app/Services/EnrollmentService.php]
+
+  - id: CTRL-SIGNED-MEDIA
+    description: Bunny CDN token signing for video playback and file download
+    locations: [app/Services/Bunny/*, app/Services/VideoPlaybackService.php, app/Services/LessonFileDownloadService.php]
+
+  - id: CTRL-FAIL-SECURE-BUNNY
+    description: Boot-time validation; missing Bunny config blocks protected delivery
+    locations: [app/Providers/AppServiceProvider.php, tests/Feature/LessonFileDownloadTest.php]
+
+  - id: CTRL-SCREEN-PROTECTION
+    description: Flutter ProtectedContentScope + native FLAG_SECURE / iOS capture overlay
+    locations: [lib/core/security/*, android MainActivity, ios ScreenProtectionPlugin]
+
+  - id: CTRL-SECURE-TOKEN-STORAGE
+    description: Sanctum token in flutter_secure_storage only
+    locations: [lib/core/storage/secure_storage_service.dart]
+
+detect:
+  - id: CTRL-STORAGE-AUDIT
+    description: Audit commands for Bunny orphan/public exposure
+    locations: [app/Services/LessonFiles/LessonFileBunnyStorageAuditService.php, tests/Feature/LessonFileStorageAuditTest.php]
+
+  - id: CTRL-SEMGREP-SAST
+    description: Custom Semgrep rules RSHD-LARAVEL-* / RSHD-FLUTTER-*
+    locations: [security/semgrep/]
+
+  - id: CTRL-SECURITY-EVENT-LOGGER
+    description: Debug-only local security events without sensitive data
+    locations: [lib/core/security/security_event_logger.dart]
+
+respond:
+  - id: CTRL-LOGIN-LOCKOUT
+    description: LoginThrottleService account lockout
+    locations: [app/Services/LoginThrottleService.php]
+
+  - id: CTRL-TOKEN-REVOKE
+    description: Logout + logout-all-devices + password reset token revocation
+    locations: [app/Services/StudentPasswordResetService.php, StudentSettingsController]
+
+  - id: CTRL-MAINTENANCE-GATE
+    description: CheckPlatformMaintenance middleware
+    locations: [app/Http/Middleware/CheckPlatformMaintenance.php]

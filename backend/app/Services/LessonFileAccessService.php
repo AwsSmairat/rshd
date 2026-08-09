@@ -6,6 +6,7 @@ use App\Enums\LessonFileStorageStatus;
 use App\Enums\UserStatus;
 use App\Models\LessonFile;
 use App\Models\User;
+use App\Services\Bunny\BunnyFilesCdnTokenSigner;
 
 /**
  * Download access for lesson files mirrors video playback priority without free-preview.
@@ -51,7 +52,7 @@ class LessonFileAccessService
                 return false;
             }
 
-            return app(\App\Services\Bunny\BunnyFilesCdnTokenSigner::class)->isConfigured();
+            return app(BunnyFilesCdnTokenSigner::class)->isConfigured();
         }
 
         return filled($lessonFile->file_path) || filled($lessonFile->file_url);

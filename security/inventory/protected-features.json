@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-08-10T00:00:00+03:00",
+  "source": "manual discovery + app_router.dart",
+  "total_routes": 31,
+  "protected_content_routes": 6,
+  "routes": [
+    {"path": "/subjects/:id", "scope": "subject", "screen_protection": true},
+    {"path": "/lessons/:id", "scope": "lesson", "screen_protection": true},
+    {"path": "/videos/:id", "scope": "video", "screen_protection": true},
+    {"path": "/files/:id", "scope": "file", "screen_protection": true},
+    {"path": "/files/:id/pdf", "scope": "pdf", "screen_protection": true},
+    {"path": "/quizzes/:id/attempt", "scope": "quiz_attempt", "screen_protection": true}
+  ],
+  "sensitive_services": [
+    "lib/core/network/api_client.dart",
+    "lib/core/storage/secure_storage_service.dart",
+    "lib/features/auth/data/auth_repository.dart",
+    "lib/features/pdf_editor/services/pdf_cache_service.dart",
+    "lib/features/pdf_editor/services/pdf_share_service.dart",
+    "lib/features/pdf_editor/services/pdf_export_service.dart",
+    "lib/core/security/screen_protection_service.dart",
+    "lib/features/subjects/services/video_progress_tracker.dart"
+  ],
+  "repositories": 14,
+  "test_files": 17,
+  "secure_storage": "flutter_secure_storage (no SharedPreferences)",
+  "local_caches": ["pdf_cache/", "pdf_annotations/", "legal documents"]
+}

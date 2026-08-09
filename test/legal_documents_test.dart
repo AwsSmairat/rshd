@@ -11,25 +11,22 @@ import 'package:rshd/features/legal/terms/data/terms_and_conditions_model.dart';
 void main() {
   group('LegalDocumentParser', () {
     test('parses privacy policy sections from API payload', () {
-      final document = LegalDocumentParser.parsePrivacyPolicy(
-        {
-          'title': 'سياسة الخصوصية',
-          'subtitle': 'وصف',
-          'version': '1.0',
-          'last_updated': '2026-07-31T10:00:00.000000Z',
-          'sections': [
-            {
-              'id': 'introduction',
-              'title': 'مقدمة',
-              'icon': 'info_outline',
-              'paragraphs': ['نص'],
-              'bullet_points': ['نقطة'],
-              'subsections': [],
-            },
-          ],
-        },
-        source: PrivacyPolicySource.remote,
-      );
+      final document = LegalDocumentParser.parsePrivacyPolicy({
+        'title': 'سياسة الخصوصية',
+        'subtitle': 'وصف',
+        'version': '1.0',
+        'last_updated': '2026-07-31T10:00:00.000000Z',
+        'sections': [
+          {
+            'id': 'introduction',
+            'title': 'مقدمة',
+            'icon': 'info_outline',
+            'paragraphs': ['نص'],
+            'bullet_points': ['نقطة'],
+            'subsections': [],
+          },
+        ],
+      }, source: PrivacyPolicySource.remote);
 
       expect(document.title, 'سياسة الخصوصية');
       expect(document.version, '1.0');

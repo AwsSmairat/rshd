@@ -48,12 +48,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     if (!notification.isRead) {
       final success = await controller.markAsRead(notificationId);
       if (!success && mounted) {
-        final error =
-            ref.read(notificationsListControllerProvider).errorMessage;
+        final error = ref
+            .read(notificationsListControllerProvider)
+            .errorMessage;
         if (error != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(error)));
         }
       }
     }

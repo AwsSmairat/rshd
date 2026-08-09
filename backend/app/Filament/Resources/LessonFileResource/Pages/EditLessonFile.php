@@ -6,6 +6,7 @@ use App\Enums\FileType;
 use App\Enums\LessonFileStorageStatus;
 use App\Filament\Resources\LessonFileResource;
 use App\Jobs\UploadLessonFileToBunnyJob;
+use App\Models\LessonFile;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -26,7 +27,7 @@ class EditLessonFile extends EditRecord
      */
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        /** @var \App\Models\LessonFile $record */
+        /** @var LessonFile $record */
         $record = $this->record;
 
         return LessonFileResource::prepareFileData($data, $record);

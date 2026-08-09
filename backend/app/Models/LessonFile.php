@@ -52,28 +52,9 @@ class LessonFile extends Model
 
     public function resolvedFileUrl(): ?string
     {
-        if ($this->requiresSignedDownload()) {
-            return null;
-        }
-
-        if ($this->file_path) {
-            if ($this->localSourceDiskName() !== 'public') {
-                return null;
-            }
-
-            return url(Storage::disk('public')->url($this->file_path));
-        }
-
-        if ($this->file_url === null || $this->file_url === '') {
-            return null;
-        }
-
-        if (str_starts_with($this->file_url, 'http://') ||
-            str_starts_with($this->file_url, 'https://')) {
-            return $this->file_url;
-        }
-
-        return url(Storage::disk('public')->url($this->file_url));
+        // Protected lesson files must never expose permanent public URLs.
+        // Delivery is via LessonFileDownloadService signed Bunny/local stream URLs.
+        return null;
     }
 
     public function isBunnyStored(): bool

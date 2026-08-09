@@ -35,7 +35,8 @@ class TechnicalSupportState {
 }
 
 class TechnicalSupportController extends StateNotifier<TechnicalSupportState> {
-  TechnicalSupportController(this._repository) : super(const TechnicalSupportState());
+  TechnicalSupportController(this._repository)
+    : super(const TechnicalSupportState());
 
   final TechnicalSupportRepository _repository;
 
@@ -98,7 +99,10 @@ class TechnicalSupportController extends StateNotifier<TechnicalSupportState> {
 }
 
 final technicalSupportControllerProvider =
-    StateNotifierProvider<TechnicalSupportController, TechnicalSupportState>(
-        (ref) {
-  return TechnicalSupportController(ref.watch(technicalSupportRepositoryProvider));
-});
+    StateNotifierProvider<TechnicalSupportController, TechnicalSupportState>((
+      ref,
+    ) {
+      return TechnicalSupportController(
+        ref.watch(technicalSupportRepositoryProvider),
+      );
+    });

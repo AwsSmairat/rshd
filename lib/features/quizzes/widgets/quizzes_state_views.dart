@@ -91,7 +91,11 @@ class QuizzesLoadingSkeleton extends StatelessWidget {
                       const SizedBox(height: 8),
                       _SkeletonBox(width: 150, height: 12),
                       const SizedBox(height: 10),
-                      _SkeletonBox(width: double.infinity, height: 28, radius: 999),
+                      _SkeletonBox(
+                        width: double.infinity,
+                        height: 28,
+                        radius: 999,
+                      ),
                       const SizedBox(height: 10),
                       _SkeletonBox(width: 88, height: 24, radius: 20),
                     ],
@@ -129,11 +133,7 @@ class QuizzesErrorState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.error_outline,
-            color: AppColors.error,
-            size: 36,
-          ),
+          const Icon(Icons.error_outline, color: AppColors.error, size: 36),
           const SizedBox(height: 12),
           Text(
             message,

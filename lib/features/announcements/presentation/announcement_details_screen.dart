@@ -43,14 +43,16 @@ class _AnnouncementDetailsScreenState
   }
 
   void _loadDetails() {
-    final cached = widget.initialAnnouncement ??
+    final cached =
+        widget.initialAnnouncement ??
         ref
             .read(announcementsListControllerProvider.notifier)
             .findById(widget.announcementId);
 
     ref
-        .read(announcementDetailsControllerProvider(widget.announcementId)
-            .notifier)
+        .read(
+          announcementDetailsControllerProvider(widget.announcementId).notifier,
+        )
         .load(widget.announcementId, cached: cached);
   }
 
@@ -63,15 +65,16 @@ class _AnnouncementDetailsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final state =
-        ref.watch(announcementDetailsControllerProvider(widget.announcementId));
-
-    ref.listen(
+    final state = ref.watch(
       announcementDetailsControllerProvider(widget.announcementId),
-      (previous, next) {
-        _handleUnauthorized(next.errorMessage);
-      },
     );
+
+    ref.listen(announcementDetailsControllerProvider(widget.announcementId), (
+      previous,
+      next,
+    ) {
+      _handleUnauthorized(next.errorMessage);
+    });
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F1E7),
@@ -86,9 +89,7 @@ class _AnnouncementDetailsScreenState
         return Column(
           children: const [
             SubjectsHeader(title: 'تفاصيل الإعلان'),
-            Expanded(
-              child: LoadingWidget(message: 'جاري تحميل الإعلان...'),
-            ),
+            Expanded(child: LoadingWidget(message: 'جاري تحميل الإعلان...')),
           ],
         );
       case FeatureLoadStatus.error:
@@ -126,10 +127,9 @@ class _AnnouncementDetailsScreenState
               child: SubjectsHeader(title: 'تفاصيل الإعلان'),
             ),
             ResponsiveSliverContent(
-              padding: AppLayoutMetrics.of(context).pagePadding(
-                top: 8,
-                bottom: 32,
-              ),
+              padding: AppLayoutMetrics.of(
+                context,
+              ).pagePadding(top: 8, bottom: 32),
               sliver: SliverToBoxAdapter(
                 child: Container(
                   width: double.infinity,
@@ -238,10 +238,7 @@ class _AnnouncementDetailsScreenState
 }
 
 class _InfoRow extends StatelessWidget {
-  const _InfoRow({
-    required this.label,
-    required this.value,
-  });
+  const _InfoRow({required this.label, required this.value});
 
   final String label;
   final String value;

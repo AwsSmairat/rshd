@@ -5,10 +5,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../data/models/quiz_model.dart';
 
 class QuizStatusBadge extends StatelessWidget {
-  const QuizStatusBadge({
-    super.key,
-    required this.quiz,
-  });
+  const QuizStatusBadge({super.key, required this.quiz});
 
   final QuizModel quiz;
 
@@ -25,11 +22,7 @@ class QuizStatusBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            style.icon,
-            size: 14,
-            color: style.foreground,
-          ),
+          Icon(style.icon, size: 14, color: style.foreground),
           const SizedBox(width: 5),
           Text(
             style.label,

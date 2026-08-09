@@ -4,11 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 
-enum UpcomingTaskType {
-  assignment,
-  quiz,
-  lecture,
-}
+enum UpcomingTaskType { assignment, quiz, lecture }
 
 class UpcomingTaskItem {
   const UpcomingTaskItem({
@@ -27,11 +23,7 @@ class UpcomingTaskItem {
 }
 
 class UpcomingTaskCard extends StatelessWidget {
-  const UpcomingTaskCard({
-    super.key,
-    required this.task,
-    required this.isLast,
-  });
+  const UpcomingTaskCard({super.key, required this.task, required this.isLast});
 
   final UpcomingTaskItem task;
   final bool isLast;
@@ -104,24 +96,24 @@ class UpcomingTaskCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Column(
-                    children: [
-                      Text(
-                        _dayLabel(),
-                        style: AppTextStyles.title.copyWith(
-                          fontSize: 18,
-                          color: AppColors.primary,
+                      children: [
+                        Text(
+                          _dayLabel(),
+                          style: AppTextStyles.title.copyWith(
+                            fontSize: 18,
+                            color: AppColors.primary,
+                          ),
                         ),
-                      ),
-                      Text(
-                        _monthLabel(),
-                        style: AppTextStyles.body.copyWith(
-                          fontSize: 10,
-                          color: AppColors.textMuted,
+                        Text(
+                          _monthLabel(),
+                          style: AppTextStyles.body.copyWith(
+                            fontSize: 10,
+                            color: AppColors.textMuted,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
                 ),
                 if (!isLast)
                   Expanded(
@@ -191,11 +183,7 @@ class UpcomingTaskCard extends StatelessWidget {
                           color: Colors.white.withValues(alpha: 0.45),
                         ),
                       ),
-                      child: Icon(
-                        _icon,
-                        color: AppColors.primary,
-                        size: 20,
-                      ),
+                      child: Icon(_icon, color: AppColors.primary, size: 20),
                     ),
                   ],
                 ),

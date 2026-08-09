@@ -19,12 +19,13 @@ import 'security_event_logger.dart';
 ///   lifecycle while protection is active (iOS relies on this; Android uses
 ///   `FLAG_SECURE` for recent-apps preview when supported by the OS).
 /// - **Physical external camera recording**: Cannot be prevented on any platform.
-class ScreenProtectionService extends ChangeNotifier with WidgetsBindingObserver {
+class ScreenProtectionService extends ChangeNotifier
+    with WidgetsBindingObserver {
   ScreenProtectionService({
     ScreenProtectionPlatform? platform,
     SecurityEventLogger? securityLogger,
-  })  : _platform = platform ?? ScreenProtectionPlatform.instance,
-        _securityLogger = securityLogger ?? const SecurityEventLogger() {
+  }) : _platform = platform ?? ScreenProtectionPlatform.instance,
+       _securityLogger = securityLogger ?? const SecurityEventLogger() {
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -136,9 +137,7 @@ class ScreenProtectionService extends ChangeNotifier with WidgetsBindingObserver
 
 /// Testing helper to reset singleton platform between tests.
 class FakeScreenProtectionPlatform implements ScreenProtectionPlatform {
-  FakeScreenProtectionPlatform({
-    this.captured = false,
-  });
+  FakeScreenProtectionPlatform({this.captured = false});
 
   bool secureEnabled = false;
   bool captured;

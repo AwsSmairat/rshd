@@ -9,7 +9,10 @@ class QuizAnswerModel {
   final int questionId;
   final String answerText;
 
-  factory QuizAnswerModel.fromJson(Map<String, dynamic> json, {int? questionId}) {
+  factory QuizAnswerModel.fromJson(
+    Map<String, dynamic> json, {
+    int? questionId,
+  }) {
     return QuizAnswerModel(
       id: _asInt(json['id']),
       questionId: _asInt(json['question_id'] ?? questionId),

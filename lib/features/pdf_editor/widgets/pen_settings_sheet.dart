@@ -155,14 +155,8 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
             if (widget.tool == PdfEditorTool.eraser) ...[
               SegmentedButton<EraserMode>(
                 segments: const [
-                  ButtonSegment(
-                    value: EraserMode.whole,
-                    label: Text('عنصر'),
-                  ),
-                  ButtonSegment(
-                    value: EraserMode.partial,
-                    label: Text('جزء'),
-                  ),
+                  ButtonSegment(value: EraserMode.whole, label: Text('عنصر')),
+                  ButtonSegment(value: EraserMode.partial, label: Text('جزء')),
                 ],
                 selected: {_eraserMode},
                 onSelectionChanged: (values) {
@@ -190,11 +184,11 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
   }
 
   String get _title => switch (widget.tool) {
-        PdfEditorTool.pen => 'إعدادات القلم',
-        PdfEditorTool.highlighter => 'إعدادات التظليل',
-        PdfEditorTool.eraser => 'إعدادات الممحاة',
-        _ => 'إعدادات الأداة',
-      };
+    PdfEditorTool.pen => 'إعدادات القلم',
+    PdfEditorTool.highlighter => 'إعدادات التظليل',
+    PdfEditorTool.eraser => 'إعدادات الممحاة',
+    _ => 'إعدادات الأداة',
+  };
 
   Color get _currentColor => widget.tool == PdfEditorTool.highlighter
       ? _highlighterSettings.color
@@ -223,8 +217,9 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
   void _updateStrokeWidth(double value) {
     setState(() {
       if (widget.tool == PdfEditorTool.highlighter) {
-        _highlighterSettings =
-            _highlighterSettings.copyWith(strokeWidth: value);
+        _highlighterSettings = _highlighterSettings.copyWith(
+          strokeWidth: value,
+        );
         widget.onHighlighterChanged(_highlighterSettings);
       } else {
         _penSettings = _penSettings.copyWith(strokeWidth: value);
@@ -282,10 +277,7 @@ class _ColorRow extends StatelessWidget {
                 ),
               ),
               child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               ),
             ),
           ),

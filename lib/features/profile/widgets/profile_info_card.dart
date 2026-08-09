@@ -8,10 +8,7 @@ import '../data/models/profile_model.dart';
 import 'profile_detail_row.dart';
 
 class ProfileInfoCard extends StatelessWidget {
-  const ProfileInfoCard({
-    super.key,
-    required this.profile,
-  });
+  const ProfileInfoCard({super.key, required this.profile});
 
   final ProfileModel profile;
 

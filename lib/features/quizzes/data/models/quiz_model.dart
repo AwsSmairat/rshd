@@ -89,7 +89,8 @@ class QuizModel {
       status: json['status']?.toString() ?? 'active',
       subjectTitle: subjectTitle,
       lessonTitle: lessonTitle,
-      questionsCount: _asNullableInt(json['questions_count']) ??
+      questionsCount:
+          _asNullableInt(json['questions_count']) ??
           (questions.isNotEmpty ? questions.length : null),
       latestAttempt: latestAttempt,
       questions: questions,
@@ -145,10 +146,7 @@ class QuizModel {
 }
 
 class QuizStartResult {
-  const QuizStartResult({
-    required this.attemptId,
-    required this.quiz,
-  });
+  const QuizStartResult({required this.attemptId, required this.quiz});
 
   final int attemptId;
   final QuizModel quiz;

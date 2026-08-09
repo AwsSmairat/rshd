@@ -59,13 +59,16 @@ class OtpInputRowState extends State<OtpInputRow> {
         builder: (context, constraints) {
           const gap = 5.0;
           final cellWidth =
-              (constraints.maxWidth - gap * (widget.length - 1)) / widget.length;
+              (constraints.maxWidth - gap * (widget.length - 1)) /
+              widget.length;
           final fontSize = cellWidth < 40 ? 18.0 : 22.0;
 
           return Row(
             children: List.generate(widget.length, (index) {
               return Padding(
-                padding: EdgeInsetsDirectional.only(start: index == 0 ? 0 : gap),
+                padding: EdgeInsetsDirectional.only(
+                  start: index == 0 ? 0 : gap,
+                ),
                 child: SizedBox(
                   width: cellWidth,
                   height: 52,
@@ -80,8 +83,9 @@ class OtpInputRowState extends State<OtpInputRow> {
                     obscureText: false,
                     autocorrect: false,
                     enableSuggestions: false,
-                    autofillHints:
-                        index == 0 ? const [AutofillHints.oneTimeCode] : null,
+                    autofillHints: index == 0
+                        ? const [AutofillHints.oneTimeCode]
+                        : null,
                     maxLength: 1,
                     style: TextStyle(
                       fontSize: fontSize,
@@ -144,7 +148,7 @@ class OtpInputRowState extends State<OtpInputRow> {
     for (var i = 0; i < widget.length; i++) {
       _controllers[i].text = i < digits.length ? digits[i] : '';
     }
-    final code = this.value;
+    final code = value;
     widget.onChanged?.call(code);
     if (code.length == widget.length) {
       widget.onCompleted(code);

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
 
 class AssignmentSubmission extends Model
 {
@@ -38,20 +37,12 @@ class AssignmentSubmission extends Model
 
     public function resolvedFileUrl(): ?string
     {
-        if ($this->file_path) {
-            return url(Storage::disk('public')->url($this->file_path));
-        }
+        return null;
+    }
 
-        if ($this->file_url === null || $this->file_url === '') {
-            return null;
-        }
-
-        if (str_starts_with($this->file_url, 'http://') ||
-            str_starts_with($this->file_url, 'https://')) {
-            return $this->file_url;
-        }
-
-        return url(Storage::disk('public')->url($this->file_url));
+    public function hasAttachedFile(): bool
+    {
+        return filled($this->file_path);
     }
 
     /**

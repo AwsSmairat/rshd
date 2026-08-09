@@ -74,9 +74,7 @@ class _LessonCardState extends State<LessonCard>
   void _openFile(BuildContext context, int fileId, {required bool locked}) {
     if (locked) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('الملف مقفل. فعّل المادة لفتحه.'),
-        ),
+        const SnackBar(content: Text('الملف مقفل. فعّل المادة لفتحه.')),
       );
       return;
     }
@@ -94,7 +92,8 @@ class _LessonCardState extends State<LessonCard>
   @override
   Widget build(BuildContext context) {
     final lesson = widget.lesson;
-    final hasContent = lesson.videos.isNotEmpty ||
+    final hasContent =
+        lesson.videos.isNotEmpty ||
         lesson.files.isNotEmpty ||
         lesson.assignments.isNotEmpty ||
         lesson.quizzes.isNotEmpty;
@@ -113,8 +112,9 @@ class _LessonCardState extends State<LessonCard>
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundColor:
-                        AppColors.secondary.withValues(alpha: 0.15),
+                    backgroundColor: AppColors.secondary.withValues(
+                      alpha: 0.15,
+                    ),
                     child: Text(
                       '${widget.displayOrder}',
                       style: AppTextStyles.body.copyWith(
@@ -159,8 +159,10 @@ class _LessonCardState extends State<LessonCard>
                     ),
                   ),
                   RotationTransition(
-                    turns: Tween<double>(begin: 0, end: 0.5)
-                        .animate(_chevronController),
+                    turns: Tween<double>(
+                      begin: 0,
+                      end: 0.5,
+                    ).animate(_chevronController),
                     child: Icon(
                       Icons.keyboard_arrow_down_rounded,
                       color: AppColors.primary.withValues(alpha: 0.7),
@@ -225,9 +227,9 @@ class _ExpandedBody extends StatelessWidget {
   final LessonModel lesson;
   final bool hasContent;
   final void Function(BuildContext context, int videoId, {required bool locked})
-      onVideoTap;
+  onVideoTap;
   final void Function(BuildContext context, int fileId, {required bool locked})
-      onFileTap;
+  onFileTap;
   final void Function(BuildContext context, int assignmentId) onAssignmentTap;
   final void Function(BuildContext context, int quizId) onQuizTap;
 
@@ -238,10 +240,7 @@ class _ExpandedBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Divider(
-            height: 1,
-            color: AppColors.primary.withValues(alpha: 0.08),
-          ),
+          Divider(height: 1, color: AppColors.primary.withValues(alpha: 0.08)),
           const SizedBox(height: 12),
           if (!hasContent)
             Text(
@@ -264,11 +263,8 @@ class _ExpandedBody extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: VideoCard(
                     video: video,
-                    onTap: () => onVideoTap(
-                      context,
-                      video.id,
-                      locked: video.isLocked,
-                    ),
+                    onTap: () =>
+                        onVideoTap(context, video.id, locked: video.isLocked),
                   ),
                 ),
               ),
@@ -289,11 +285,8 @@ class _ExpandedBody extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: LessonFileCard(
                     file: file,
-                    onTap: () => onFileTap(
-                      context,
-                      file.id,
-                      locked: file.isLocked,
-                    ),
+                    onTap: () =>
+                        onFileTap(context, file.id, locked: file.isLocked),
                   ),
                 ),
               ),

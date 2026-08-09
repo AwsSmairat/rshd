@@ -21,10 +21,7 @@ import '../widgets/luxury_assignment_header.dart';
 import 'assignments_controller.dart';
 
 class SubmitAssignmentScreen extends ConsumerStatefulWidget {
-  const SubmitAssignmentScreen({
-    super.key,
-    required this.assignmentId,
-  });
+  const SubmitAssignmentScreen({super.key, required this.assignmentId});
 
   final int assignmentId;
 
@@ -33,7 +30,8 @@ class SubmitAssignmentScreen extends ConsumerStatefulWidget {
       _SubmitAssignmentScreenState();
 }
 
-class _SubmitAssignmentScreenState extends ConsumerState<SubmitAssignmentScreen> {
+class _SubmitAssignmentScreenState
+    extends ConsumerState<SubmitAssignmentScreen> {
   final _answerController = TextEditingController();
   PlatformFile? _selectedFile;
 
@@ -45,7 +43,9 @@ class _SubmitAssignmentScreenState extends ConsumerState<SubmitAssignmentScreen>
           .read(assignmentsListControllerProvider.notifier)
           .findById(widget.assignmentId);
       ref
-          .read(assignmentDetailsControllerProvider(widget.assignmentId).notifier)
+          .read(
+            assignmentDetailsControllerProvider(widget.assignmentId).notifier,
+          )
           .load(widget.assignmentId, cached: cached);
     });
   }
@@ -76,9 +76,9 @@ class _SubmitAssignmentScreenState extends ConsumerState<SubmitAssignmentScreen>
 
     if (validationError != null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(validationError)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(validationError)));
       }
       return;
     }
@@ -105,9 +105,9 @@ class _SubmitAssignmentScreenState extends ConsumerState<SubmitAssignmentScreen>
         size: _selectedFile!.size,
       );
       if (validationError != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(validationError)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(validationError)));
         return;
       }
     }
@@ -130,9 +130,9 @@ class _SubmitAssignmentScreenState extends ConsumerState<SubmitAssignmentScreen>
         .findById(widget.assignmentId);
 
     if (cached != null) {
-      ref.read(assignmentsListControllerProvider.notifier).upsertAssignment(
-            cached.copyWith(submission: submission),
-          );
+      ref
+          .read(assignmentsListControllerProvider.notifier)
+          .upsertAssignment(cached.copyWith(submission: submission));
     }
 
     ref
@@ -147,9 +147,9 @@ class _SubmitAssignmentScreenState extends ConsumerState<SubmitAssignmentScreen>
               .copyWith(submission: submission),
         );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('تم تسليم الواجب بنجاح')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('تم تسليم الواجب بنجاح')));
 
     context.pop();
   }
@@ -173,18 +173,18 @@ class _SubmitAssignmentScreenState extends ConsumerState<SubmitAssignmentScreen>
     final isSubmitting =
         submitState.status == AssignmentSubmitStatus.submitting;
 
-    ref.listen(
-      assignmentSubmitControllerProvider(widget.assignmentId),
-      (previous, next) {
-        _handleUnauthorized(next.errorMessage);
-        if (next.status == AssignmentSubmitStatus.error &&
-            next.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(next.errorMessage!)),
-          );
-        }
-      },
-    );
+    ref.listen(assignmentSubmitControllerProvider(widget.assignmentId), (
+      previous,
+      next,
+    ) {
+      _handleUnauthorized(next.errorMessage);
+      if (next.status == AssignmentSubmitStatus.error &&
+          next.errorMessage != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
+      }
+    });
 
     Widget content;
     if (detailsState.status == FeatureLoadStatus.loading ||
@@ -199,7 +199,9 @@ class _SubmitAssignmentScreenState extends ConsumerState<SubmitAssignmentScreen>
               .findById(widget.assignmentId);
           ref
               .read(
-                assignmentDetailsControllerProvider(widget.assignmentId).notifier,
+                assignmentDetailsControllerProvider(
+                  widget.assignmentId,
+                ).notifier,
               )
               .load(widget.assignmentId, cached: cached);
         },
@@ -279,10 +281,9 @@ class _SubmitAssignmentScreenState extends ConsumerState<SubmitAssignmentScreen>
             child: LuxuryAssignmentHeader(title: 'تسليم الواجب'),
           ),
           ResponsiveSliverContent(
-            padding: AppLayoutMetrics.of(context).pagePadding(
-              top: 8,
-              bottom: 28,
-            ),
+            padding: AppLayoutMetrics.of(
+              context,
+            ).pagePadding(top: 8, bottom: 28),
             sliver: SliverToBoxAdapter(child: content),
           ),
         ],

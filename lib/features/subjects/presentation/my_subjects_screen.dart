@@ -47,10 +47,9 @@ class _MySubjectsScreenState extends ConsumerState<MySubjectsScreen> {
   }
 
   Future<void> _load({bool refresh = false}) {
-    return ref.read(subjectsListControllerProvider.notifier).load(
-          refresh: refresh,
-          category: widget.category,
-        );
+    return ref
+        .read(subjectsListControllerProvider.notifier)
+        .load(refresh: refresh, category: widget.category);
   }
 
   Future<void> _refresh() => _load(refresh: true);
@@ -92,7 +91,9 @@ class _MySubjectsScreenState extends ConsumerState<MySubjectsScreen> {
       return;
     }
     messenger.showSnackBar(
-      const SnackBar(content: Text('تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.')),
+      const SnackBar(
+        content: Text('تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.'),
+      ),
     );
   }
 
@@ -118,12 +119,8 @@ class _MySubjectsScreenState extends ConsumerState<MySubjectsScreen> {
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          SliverToBoxAdapter(
-            child: SubjectsHeader(title: _screenTitle),
-          ),
-          ResponsiveSliverContent(
-            sliver: _buildContent(state),
-          ),
+          SliverToBoxAdapter(child: SubjectsHeader(title: _screenTitle)),
+          ResponsiveSliverContent(sliver: _buildContent(state)),
         ],
       ),
     );
@@ -181,65 +178,60 @@ class _MySubjectsScreenState extends ConsumerState<MySubjectsScreen> {
 
         if (_isCatalogMode) {
           return SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final subject = subjects[index];
-                return Padding(
-                  padding: EdgeInsets.only(
-                    bottom: index == subjects.length - 1 ? 0 : 16,
-                  ),
-                  child: LuxurySubjectCard(
-                    subject: subject,
-                    onTap: () => _openSubject(subject),
-                    onRequestPurchase: subject.canRequestPurchase
-                        ? () => _requestPurchase(subject)
-                        : null,
-                    isRequesting: _requestingSubjectId == subject.id,
-                  ),
-                );
-              },
-              childCount: subjects.length,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final subject = subjects[index];
+              return Padding(
+                padding: EdgeInsets.only(
+                  bottom: index == subjects.length - 1 ? 0 : 16,
+                ),
+                child: LuxurySubjectCard(
+                  subject: subject,
+                  onTap: () => _openSubject(subject),
+                  onRequestPurchase: subject.canRequestPurchase
+                      ? () => _requestPurchase(subject)
+                      : null,
+                  isRequesting: _requestingSubjectId == subject.id,
+                ),
+              );
+            }, childCount: subjects.length),
           );
         }
 
         final sections = SubjectGroupingHelper.groupSubjects(subjects);
 
         return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final section = sections[index];
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: index == sections.length - 1 ? 0 : 24,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SubjectSectionHeader(
-                      title: section.title,
-                      categoryKey: section.categoryKey,
-                    ),
-                    const SizedBox(height: 14),
-                    ...List.generate(section.subjects.length, (subjectIndex) {
-                      final subject = section.subjects[subjectIndex];
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          bottom:
-                              subjectIndex == section.subjects.length - 1 ? 0 : 16,
-                        ),
-                        child: SubjectCard(
-                          subject: subject,
-                          onTap: () => _openSubject(subject),
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-              );
-            },
-            childCount: sections.length,
-          ),
+          delegate: SliverChildBuilderDelegate((context, index) {
+            final section = sections[index];
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: index == sections.length - 1 ? 0 : 24,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SubjectSectionHeader(
+                    title: section.title,
+                    categoryKey: section.categoryKey,
+                  ),
+                  const SizedBox(height: 14),
+                  ...List.generate(section.subjects.length, (subjectIndex) {
+                    final subject = section.subjects[subjectIndex];
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: subjectIndex == section.subjects.length - 1
+                            ? 0
+                            : 16,
+                      ),
+                      child: SubjectCard(
+                        subject: subject,
+                        onTap: () => _openSubject(subject),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            );
+          }, childCount: sections.length),
         );
     }
   }

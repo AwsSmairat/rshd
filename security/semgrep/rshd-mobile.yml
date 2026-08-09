@@ -1,0 +1,94 @@
+rules:
+  - id: rshd-mobile-001-insecure-token-storage
+    message: "RSHD-MOBILE-001: Auth token/password in SharedPreferences."
+    severity: ERROR
+    languages: [dart]
+    pattern: SharedPreferences
+
+  - id: rshd-mobile-002-tls-bypass
+    message: "RSHD-MOBILE-002: TLS certificate verification bypass."
+    severity: ERROR
+    languages: [dart]
+    pattern: badCertificateCallback
+
+  - id: rshd-mobile-003-hardcoded-bunny-secret
+    message: "RSHD-MOBILE-003: Possible Bunny secret in mobile source."
+    severity: ERROR
+    languages: [dart]
+    pattern-regex: (?i)(bunny.*(api_key|token_key|storage_password)|BUNNY_.*(KEY|PASSWORD))
+
+  - id: rshd-mobile-004-signed-url-persisted
+    message: "RSHD-MOBILE-004: Possible signed CDN URL persisted to storage."
+    severity: WARNING
+    languages: [dart]
+    pattern-either:
+      - pattern: $STORAGE.write(key: $K, value: $V)
+      - pattern: $STORAGE.setString($K, $V)
+    metavariable-regex:
+      metavariable: $V
+      regex: (?i).*(token=|expires=|bunny|signed)
+
+  - id: rshd-mobile-005-auth-header-logged
+    message: "RSHD-MOBILE-005: Authorization header or token may be logged."
+    severity: ERROR
+    languages: [dart]
+    pattern-either:
+      - pattern: LogInterceptor(...)
+      - pattern-regex: (print|debugPrint|log)\(.*Authorization
+
+  - id: rshd-mobile-006-unprotected-route
+    message: "RSHD-MOBILE-006: Protected content route may lack ProtectedContentScope."
+    severity: INFO
+    languages: [dart]
+    paths:
+      include:
+        - lib/core/router/app_router.dart
+    pattern-regex: GoRoute\([^)]*path:\s*['\"]/(videos|files|lessons|subjects|quizzes)
+
+  - id: rshd-mobile-009-external-storage-cache
+    message: "RSHD-MOBILE-009: Protected cache path uses external/public storage."
+    severity: ERROR
+    languages: [dart]
+    pattern-either:
+      - pattern: getExternalStorageDirectory()
+      - pattern: getDownloadsDirectory()
+
+  - id: rshd-mobile-010-webview-unsafe
+    message: "RSHD-MOBILE-010: WebView JavaScript without navigation guard."
+    severity: WARNING
+    languages: [dart]
+    pattern: |
+      WebViewController(...)
+      ...
+      setJavaScriptMode(JavaScriptMode.unrestricted)
+    pattern-not-inside: |
+      onNavigationRequest: ...
+
+    message: "RSHD-MOBILE-007: Hardcoded cleartext HTTP API in release path."
+    severity: WARNING
+    languages: [dart]
+    pattern-regex: http://(127\.0\.0\.1|10\.0\.2\.2|localhost)
+
+  - id: rshd-mobile-008-unsafe-url-scheme
+    message: "RSHD-MOBILE-008: Direct launchUrl without SafeUrlLauncher."
+    severity: INFO
+    languages: [dart]
+    pattern: launchUrl($URI)
+    paths:
+      exclude:
+        - lib/core/security/safe_url_launcher.dart
+        - lib/features/contact/contact_launcher.dart
+
+  - id: rshd-mobile-011-clipboard-sensitive
+    message: "RSHD-MOBILE-011: Clipboard may expose sensitive data."
+    severity: WARNING
+    languages: [dart]
+    pattern-either:
+      - pattern: Clipboard.setData(...)
+      - pattern: ClipboardData(...)
+
+  - id: rshd-mobile-012-release-debug-bypass
+    message: "RSHD-MOBILE-012: Debug security bypass reachable without kDebugMode guard."
+    severity: WARNING
+    languages: [dart]
+    pattern-regex: enableNetworkLogs\s*=>\s*true

@@ -29,11 +29,7 @@ class QuizStatItem extends StatelessWidget {
               shape: BoxShape.circle,
               color: AppColors.accent.withValues(alpha: 0.14),
             ),
-            child: Icon(
-              icon,
-              size: 18,
-              color: AppColors.darkGold,
-            ),
+            child: Icon(icon, size: 18, color: AppColors.darkGold),
           ),
           const SizedBox(height: 10),
           Text(

@@ -1,0 +1,188 @@
+{
+  "generated_at": "2026-08-10T12:00:00+03:00",
+  "phase": 3,
+  "note": "No actual secret values stored in this file.",
+  "items": [
+    {
+      "type": "sanctum_auth_token",
+      "where": "flutter_secure_storage (Android encryptedSharedPreferences / iOS Keychain)",
+      "why": "Authenticated API access",
+      "retention": "Until logout, account deletion, or 401 session invalidation",
+      "encrypted": true,
+      "app_private": true,
+      "cleared_on_logout": true,
+      "cleared_on_account_switch": true,
+      "os_backup": false,
+      "visible_in_logs": false,
+      "visible_in_screenshots": false,
+      "clipboard_exposure": false
+    },
+    {
+      "type": "user_profile_json",
+      "where": "flutter_secure_storage key user_json",
+      "why": "Offline display of current user without /me round-trip",
+      "retention": "Session lifetime",
+      "encrypted": true,
+      "app_private": true,
+      "cleared_on_logout": true,
+      "cleared_on_account_switch": true,
+      "os_backup": false,
+      "visible_in_logs": false,
+      "visible_in_screenshots": false,
+      "clipboard_exposure": false
+    },
+    {
+      "type": "remembered_email",
+      "where": "flutter_secure_storage",
+      "why": "Remember-me UX on login screen",
+      "retention": "Until user disables remember-me or clears app data",
+      "encrypted": true,
+      "app_private": true,
+      "cleared_on_logout": false,
+      "cleared_on_account_switch": "N/A single-slot remember-me",
+      "os_backup": false,
+      "visible_in_logs": false,
+      "visible_in_screenshots": false,
+      "clipboard_exposure": false
+    },
+    {
+      "type": "password",
+      "where": "NOT PERSISTED — memory only during login",
+      "why": "Authentication input only",
+      "retention": "None",
+      "encrypted": "N/A",
+      "app_private": true,
+      "cleared_on_logout": true,
+      "cleared_on_account_switch": true,
+      "legacy_key_purged": "remembered_password removed on startup",
+      "os_backup": false,
+      "visible_in_logs": false,
+      "visible_in_screenshots": false,
+      "clipboard_exposure": false
+    },
+    {
+      "type": "password_reset_session",
+      "where": "flutter_secure_storage",
+      "why": "Multi-step password reset flow",
+      "retention": "Until reset completes or expires",
+      "encrypted": true,
+      "app_private": true,
+      "cleared_on_logout": true,
+      "os_backup": false,
+      "visible_in_logs": false,
+      "clipboard_exposure": false
+    },
+    {
+      "type": "device_session_id",
+      "where": "flutter_secure_storage",
+      "why": "Stable device identifier for API/device tracking",
+      "retention": "Persistent per install",
+      "encrypted": true,
+      "app_private": true,
+      "cleared_on_logout": false,
+      "os_backup": false,
+      "visible_in_logs": false,
+      "clipboard_exposure": false
+    },
+    {
+      "type": "cached_pdf_files",
+      "where": "ApplicationDocumentsDirectory/pdf_cache/{userId}/",
+      "why": "Offline PDF viewing for enrolled content",
+      "retention": "Until logout, account switch, or manual cache clear",
+      "encrypted": false,
+      "app_private": true,
+      "cleared_on_logout": true,
+      "cleared_on_account_switch": true,
+      "os_backup": false,
+      "android_backup_excluded": true,
+      "visible_in_logs": false,
+      "visible_in_screenshots": "Protected by FLAG_SECURE / iOS overlay",
+      "clipboard_exposure": false
+    },
+    {
+      "type": "pdf_annotations",
+      "where": "ApplicationDocumentsDirectory/pdf_annotations/{userId}/",
+      "why": "Local annotation draft before server sync",
+      "retention": "Until sync, logout, or account switch",
+      "encrypted": false,
+      "app_private": true,
+      "cleared_on_logout": true,
+      "cleared_on_account_switch": true,
+      "os_backup": false,
+      "android_backup_excluded": true,
+      "visible_in_screenshots": "Protected on PDF editor route"
+    },
+    {
+      "type": "exported_pdf_user_output",
+      "where": "User-chosen export/share destination (system share sheet)",
+      "why": "User-initiated export — not internal cache",
+      "retention": "User-controlled",
+      "encrypted": "User/OS dependent",
+      "app_private": false,
+      "cleared_on_logout": false,
+      "note": "Product behavior: do not auto-delete user exports"
+    },
+    {
+      "type": "bunny_signed_urls",
+      "where": "Memory only during video/PDF fetch",
+      "why": "Short-lived CDN access from Laravel",
+      "retention": "Not persisted to disk",
+      "encrypted": "N/A in-memory",
+      "visible_in_logs": false,
+      "clipboard_exposure": false
+    },
+    {
+      "type": "video_playback_metadata",
+      "where": "In-memory controllers + server sync",
+      "why": "Progress tracking and resume",
+      "retention": "Session + server authoritative state",
+      "encrypted": false,
+      "app_private": true,
+      "cleared_on_logout": true,
+      "visible_in_logs": "Errors redacted via SensitiveDataRedactor"
+    },
+    {
+      "type": "notification_content",
+      "where": "In-app notification list from API",
+      "why": "User alerts",
+      "retention": "Until dismissed or refresh",
+      "encrypted": false,
+      "app_private": true,
+      "push_payload_review": "MANUAL_REVIEW",
+      "visible_in_screenshots": "Standard OS notification preview"
+    },
+    {
+      "type": "api_errors",
+      "where": "Transient in UI state / debugPrint (debug only)",
+      "why": "User feedback and dev diagnostics",
+      "retention": "Transient",
+      "encrypted": false,
+      "visible_in_logs": "Redacted in network layer; stack traces debug-only",
+      "user_facing_stack_traces": false
+    },
+    {
+      "type": "theme_locale_preferences",
+      "where": "Provider/in-memory or harmless prefs",
+      "why": "UX preferences",
+      "retention": "Persistent",
+      "encrypted": false,
+      "app_private": true,
+      "sensitivity": "non-secret"
+    },
+    {
+      "type": "legal_documents_cache",
+      "where": "App documents (terms/privacy fetched HTML)",
+      "why": "Offline legal display",
+      "retention": "Until refresh",
+      "encrypted": false,
+      "app_private": true,
+      "sensitivity": "public content"
+    }
+  ],
+  "storage_audit": {
+    "shared_preferences_secrets": 0,
+    "hive_usage": false,
+    "sqlite_usage": false,
+    "secure_storage_keys": ["auth_token", "user_json", "remembered_email", "password_reset_token", "password_reset_email", "device_id"]
+  }
+}

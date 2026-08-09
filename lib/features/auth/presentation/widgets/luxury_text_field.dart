@@ -26,8 +26,10 @@ class LuxuryTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final String? Function(String?)? validator;
   final String? errorText;
+
   /// Leading icon at the start of the field (right side in RTL).
   final IconData? icon;
+
   /// Optional trailing widget (left side in RTL), e.g. password visibility toggle.
   final Widget? trailing;
 
@@ -60,10 +62,7 @@ class LuxuryTextField extends StatelessWidget {
           textInputAction: textInputAction,
           validator: validator,
           textAlign: TextAlign.right,
-          style: TextStyle(
-            color: AppColors.text,
-            fontSize: fieldSize,
-          ),
+          style: TextStyle(color: AppColors.text, fontSize: fieldSize),
           decoration: InputDecoration(
             hintText: hintText,
             errorText: errorText,
@@ -85,10 +84,7 @@ class LuxuryTextField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(
-                color: AppColors.accent,
-                width: 1.5,
-              ),
+              borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
@@ -124,11 +120,7 @@ class _FieldIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsetsDirectional.only(start: 12, end: 4),
-      child: Icon(
-        icon,
-        color: AppColors.accent,
-        size: 22,
-      ),
+      child: Icon(icon, color: AppColors.accent, size: 22),
     );
   }
 }

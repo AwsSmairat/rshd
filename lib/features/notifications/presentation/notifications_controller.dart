@@ -53,14 +53,13 @@ String mapMarkAsReadError(ApiException error) {
   if (error.statusCode == null && error.message.contains('اتصال')) {
     return 'تعذر الاتصال بالسيرفر';
   }
-  return error.message.isNotEmpty
-      ? error.message
-      : 'تعذر تحديث حالة الإشعار';
+  return error.message.isNotEmpty ? error.message : 'تعذر تحديث حالة الإشعار';
 }
 
-class NotificationsListController extends StateNotifier<NotificationsListState> {
+class NotificationsListController
+    extends StateNotifier<NotificationsListState> {
   NotificationsListController(this._repository)
-      : super(const NotificationsListState());
+    : super(const NotificationsListState());
 
   final NotificationsRepository _repository;
 
@@ -69,10 +68,7 @@ class NotificationsListController extends StateNotifier<NotificationsListState> 
       return;
     }
 
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final notifications = await _repository.getNotifications();
@@ -109,9 +105,8 @@ class NotificationsListController extends StateNotifier<NotificationsListState> 
       final updated = await _repository.markAsRead(notificationId);
       final updatedList = state.notifications
           .map(
-            (notification) => notification.id == notificationId
-                ? updated
-                : notification,
+            (notification) =>
+                notification.id == notificationId ? updated : notification,
           )
           .toList();
 
@@ -126,18 +121,14 @@ class NotificationsListController extends StateNotifier<NotificationsListState> 
       state = state.copyWith(errorMessage: mapMarkAsReadError(error));
       return false;
     } catch (_) {
-      state = state.copyWith(
-        errorMessage: 'تعذر تحديث حالة الإشعار',
-      );
+      state = state.copyWith(errorMessage: 'تعذر تحديث حالة الإشعار');
       return false;
     }
   }
 
   void updateNotification(NotificationModel notification) {
     final updatedList = state.notifications
-        .map(
-          (item) => item.id == notification.id ? notification : item,
-        )
+        .map((item) => item.id == notification.id ? notification : item)
         .toList();
 
     state = state.copyWith(notifications: updatedList);
@@ -145,7 +136,10 @@ class NotificationsListController extends StateNotifier<NotificationsListState> 
 }
 
 final notificationsListControllerProvider =
-    StateNotifierProvider<NotificationsListController, NotificationsListState>(
-        (ref) {
-  return NotificationsListController(ref.watch(notificationsRepositoryProvider));
-});
+    StateNotifierProvider<NotificationsListController, NotificationsListState>((
+      ref,
+    ) {
+      return NotificationsListController(
+        ref.watch(notificationsRepositoryProvider),
+      );
+    });

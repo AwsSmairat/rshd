@@ -26,9 +26,9 @@ class QuizStatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final attemptSubmittedAt =
-        submittedAt ?? quiz?.latestAttempt?.submittedAt;
-    final count = questionsCount ??
+    final attemptSubmittedAt = submittedAt ?? quiz?.latestAttempt?.submittedAt;
+    final count =
+        questionsCount ??
         quiz?.questionsCount ??
         quiz?.latestAttempt?.questionsCount;
 
@@ -36,14 +36,15 @@ class QuizStatsGrid extends StatelessWidget {
       _StatData(
         icon: Icons.format_list_numbered_rounded,
         label: 'عدد الأسئلة',
-        value: count != null ? '$count أسئلة' : '—',
+        value: count != null ? _formatQuestionsCount(count) : '—',
       ),
       _StatData(
         icon: scoreDisplay != null
             ? Icons.grade_outlined
             : Icons.schedule_outlined,
         label: scoreDisplay != null ? 'الدرجة' : 'مدة الاختبار',
-        value: scoreDisplay ??
+        value:
+            scoreDisplay ??
             (quiz?.durationMinutes != null
                 ? '${quiz!.durationMinutes} دقيقة'
                 : '—'),
@@ -72,13 +73,24 @@ class QuizStatsGrid extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: _buildCell(context, stats[0], showRightBorder: true, showBottomBorder: true)),
-              Expanded(child: _buildCell(context, stats[1], showBottomBorder: true)),
+              Expanded(
+                child: _buildCell(
+                  context,
+                  stats[0],
+                  showRightBorder: true,
+                  showBottomBorder: true,
+                ),
+              ),
+              Expanded(
+                child: _buildCell(context, stats[1], showBottomBorder: true),
+              ),
             ],
           ),
           Row(
             children: [
-              Expanded(child: _buildCell(context, stats[2], showRightBorder: true)),
+              Expanded(
+                child: _buildCell(context, stats[2], showRightBorder: true),
+              ),
               Expanded(child: _buildCell(context, stats[3])),
             ],
           ),
@@ -123,4 +135,14 @@ class _StatData {
   final IconData icon;
   final String label;
   final String value;
+}
+
+String _formatQuestionsCount(int count) {
+  if (count == 1) {
+    return '1 سؤال';
+  }
+  if (count == 2) {
+    return '2 سؤالان';
+  }
+  return '$count أسئلة';
 }

@@ -1,0 +1,97 @@
+# RSHD Composer Advisory Exceptions
+# Each entry requires justification, evidence, and expiration.
+# CI must fail when an exception is expired or missing required fields.
+
+version: 1
+last_reviewed: 2026-08-10
+review_policy: |
+  Re-evaluate before approved_until. No major Laravel upgrade in Phase 2.
+  Safe patch/minor updates preferred over permanent exceptions.
+
+exceptions:
+  - advisory_id: PKSA-mdq4-51ck-6kdq
+    cve: CVE-2026-48019
+    ghsa: GHSA-5vg9-5847-vvmq
+    package: laravel/framework
+    installed_version: "11.54.0"
+    affected_versions: ">=12.0.0,<12.60.0|>=13.0.0,<13.10.0 (also affects 9/10/11 per advisory)"
+    patched_versions: "12.60.0+, 13.10.0+"
+    dependency_type: direct
+    classification: TEMPORARY_EXCEPTION_REQUIRED
+    reason: |
+      CRLF injection in Laravel default email validation rule. RSHD runs Laravel 11.x;
+      patched releases are 12.60+ / 13.10+ only — no 11.x backport available.
+    evidence: |
+      Register/login/password reset use email validation. API uses normalized emails;
+      Filament admin is trusted staff. Student-facing email fields validated before mail send.
+    mitigation: |
+      Strict email validation on API (RegisterRequest, LoginRequest). No user-controlled
+      email headers in outbound mail templates. Plan Laravel 12 upgrade separately.
+    exploitability_in_rshd: low
+    vulnerable_code_path_used: partial
+    code_paths:
+      - App\Http\Requests\Api\V1\RegisterRequest (email rule)
+      - App\Http\Requests\Api\V1\LoginRequest
+      - Password reset / email verification requests
+    update_available: false
+    breaking_update_required: true
+    approved_until: 2026-12-31
+    review_required: true
+
+  - advisory_id: PKSA-m5cs-t1y6-qpcs
+    cve: null
+    ghsa: GHSA-crmm-hgp2-wgrp
+    package: laravel/framework
+    installed_version: "11.54.0"
+    affected_versions: "<12.61.1|>=13.0.0,<13.12.0"
+    patched_versions: "12.61.1+, 13.12.0+"
+    dependency_type: direct
+    classification: NOT_AFFECTED
+    reason: |
+      Temporary signed URL path confusion. RSHD API uses Sanctum bearer tokens and
+      Bunny CDN signed URLs — not Laravel temporary signed routes for protected content.
+    evidence: |
+      Grep: no URL::temporarySignedRoute for lesson/video/file delivery in app/.
+      File/video access uses BunnyFilesCdnTokenSigner / VideoPlaybackService.
+    mitigation: |
+      Protected media never uses Laravel temporary signed routes. Continue Bunny short-lived tokens.
+    exploitability_in_rshd: none
+    vulnerable_code_path_used: false
+    code_paths: []
+    update_available: false
+    breaking_update_required: true
+    approved_until: 2026-12-31
+    review_required: true
+
+  - advisory_id: PKSA-3r5d-mb8f-1qw9
+    cve: null
+    ghsa: GHSA-5vg9-5847-vvmq
+    package: laravel/framework
+    installed_version: "11.54.0"
+    affected_versions: "<12.60.0|>=13.0.0,<=13.9.0"
+    patched_versions: "12.60.0+, 13.10.0+"
+    dependency_type: direct
+    classification: TEMPORARY_EXCEPTION_REQUIRED
+    reason: |
+      Duplicate advisory entry for CRLF email validation issue on Laravel 11.x (same root cause as PKSA-mdq4-51ck-6kdq).
+    evidence: |
+      Same validation surfaces as PKSA-mdq4-51ck-6kdq — API registration/auth email rules.
+    mitigation: |
+      Same as PKSA-mdq4-51ck-6kdq — strict API email validation; plan Laravel 12 upgrade separately.
+    exploitability_in_rshd: low
+    vulnerable_code_path_used: partial
+    code_paths:
+      - API registration and auth email validation
+    update_available: false
+    breaking_update_required: true
+    approved_until: 2026-12-31
+    review_required: true
+
+composer_audit:
+  ignored_in_composer_json:
+    - PKSA-m5cs-t1y6-qpcs
+    - PKSA-3r5d-mb8f-1qw9
+    - PKSA-mdq4-51ck-6kdq
+  policy: |
+    composer audit must pass for all non-documented advisories.
+    Exceptions must exist in this file with approved_until >= today.

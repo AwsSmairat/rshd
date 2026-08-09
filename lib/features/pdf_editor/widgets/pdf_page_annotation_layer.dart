@@ -51,11 +51,11 @@ class PdfPageAnnotationLayer extends StatefulWidget {
   final String? selectedAnnotationId;
   final int pageNumber;
   final void Function(List<NormalizedPoint> points, AnnotationType type)
-      onInkComplete;
+  onInkComplete;
   final void Function(double x, double y, double width, double height)
-      onHighlightComplete;
+  onHighlightComplete;
   final void Function(double x, double y, double width, double height)
-      onShapeComplete;
+  onShapeComplete;
   final void Function(double x, double y) onNoteTap;
   final void Function(double x, double y) onTextTap;
   final void Function(NormalizedPoint point) onErase;
@@ -88,68 +88,69 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
           Positioned.fromRect(
             rect: widget.metrics.pageRect,
             child: RepaintBoundary(
-            child: CustomPaint(
-              painter: ShapeAnnotationPainter(
-                annotations: widget.annotations,
-                metrics: widget.metrics,
-                previewRect: _previewRect,
-                previewShape: widget.shapeTool,
-                previewColor: widget.penSettings.color,
-                selectedId: widget.selectedAnnotationId,
+              child: CustomPaint(
+                painter: ShapeAnnotationPainter(
+                  annotations: widget.annotations,
+                  metrics: widget.metrics,
+                  previewRect: _previewRect,
+                  previewShape: widget.shapeTool,
+                  previewColor: widget.penSettings.color,
+                  selectedId: widget.selectedAnnotationId,
+                ),
+                foregroundPainter: InkAnnotationPainter(
+                  annotations: widget.annotations,
+                  metrics: widget.metrics,
+                  currentStroke: _currentStroke.isEmpty
+                      ? null
+                      : List.of(_currentStroke),
+                  currentColor: _activeColor,
+                  currentStrokeWidth: _activeStrokeWidth,
+                  currentOpacity: _activeOpacity,
+                  selectedId: widget.selectedAnnotationId,
+                ),
+                child: const SizedBox.expand(),
               ),
-              foregroundPainter: InkAnnotationPainter(
-                annotations: widget.annotations,
-                metrics: widget.metrics,
-                currentStroke:
-                    _currentStroke.isEmpty ? null : List.of(_currentStroke),
-                currentColor: _activeColor,
-                currentStrokeWidth: _activeStrokeWidth,
-                currentOpacity: _activeOpacity,
-                selectedId: widget.selectedAnnotationId,
-              ),
-              child: const SizedBox.expand(),
             ),
           ),
-        ),
-        if (widget.tool != PdfEditorTool.view)
-          Listener(
-            behavior: HitTestBehavior.translucent,
-            onPointerDown: _onPointerDown,
-            onPointerMove: _onPointerMove,
-            onPointerUp: _onPointerUp,
-            onPointerCancel: _onPointerCancel,
-            child: GestureDetector(
+          if (widget.tool != PdfEditorTool.view)
+            Listener(
               behavior: HitTestBehavior.translucent,
-              onTapUp: _handleTapUp,
-              child: const SizedBox.expand(),
+              onPointerDown: _onPointerDown,
+              onPointerMove: _onPointerMove,
+              onPointerUp: _onPointerUp,
+              onPointerCancel: _onPointerCancel,
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTapUp: _handleTapUp,
+                child: const SizedBox.expand(),
+              ),
             ),
-          ),
-        ..._buildNoteMarkers(),
-        ..._buildTextBoxes(),
+          ..._buildNoteMarkers(),
+          ..._buildTextBoxes(),
         ],
       ),
     );
   }
 
   Color get _activeColor => switch (widget.tool) {
-        PdfEditorTool.highlighter => widget.highlighterSettings.color,
-        _ => widget.penSettings.color,
-      };
+    PdfEditorTool.highlighter => widget.highlighterSettings.color,
+    _ => widget.penSettings.color,
+  };
 
   double get _activeStrokeWidth => switch (widget.tool) {
-        PdfEditorTool.highlighter => widget.metrics.normalizedStrokeWidth(
-            widget.highlighterSettings.strokeWidth,
-          ),
-        PdfEditorTool.pen => widget.metrics.normalizedStrokeWidth(
-            widget.penSettings.strokeWidth,
-          ),
-        _ => 3,
-      };
+    PdfEditorTool.highlighter => widget.metrics.normalizedStrokeWidth(
+      widget.highlighterSettings.strokeWidth,
+    ),
+    PdfEditorTool.pen => widget.metrics.normalizedStrokeWidth(
+      widget.penSettings.strokeWidth,
+    ),
+    _ => 3,
+  };
 
   double get _activeOpacity => switch (widget.tool) {
-        PdfEditorTool.highlighter => widget.highlighterSettings.opacity,
-        _ => widget.penSettings.opacity,
-      };
+    PdfEditorTool.highlighter => widget.highlighterSettings.opacity,
+    _ => widget.penSettings.opacity,
+  };
 
   bool _allowPointer(PointerEvent event) {
     if (widget.tool == PdfEditorTool.view) return false;
@@ -238,12 +239,7 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
     if (widget.tool == PdfEditorTool.shapes) {
       setState(() {
         _dragStart = pageLocal;
-        _previewRect = Rect.fromLTWH(
-          pageLocal.dx,
-          pageLocal.dy,
-          0,
-          0,
-        );
+        _previewRect = Rect.fromLTWH(pageLocal.dx, pageLocal.dy, 0, 0);
       });
     }
   }
@@ -258,8 +254,9 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
       final normalized = _viewportToNormalized(event.localPosition);
       final deltaX = normalized.nx - _moveStartNormalized!.dx;
       final deltaY = normalized.ny - _moveStartNormalized!.dy;
-      final annotation = widget.annotations
-          .firstWhere((item) => item.id == _movingAnnotationId);
+      final annotation = widget.annotations.firstWhere(
+        (item) => item.id == _movingAnnotationId,
+      );
       widget.onMoveAnnotation(
         _movingAnnotationId!,
         (annotation.x + deltaX).clamp(0.0, 1.0),
@@ -392,86 +389,96 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
     return widget.annotations
         .where((item) => item.type == AnnotationType.note)
         .map((note) {
-      final screen = widget.metrics.normalizedToScreen(
-        NormalizedPoint(note.x, note.y),
-      );
-      final selected = widget.selectedAnnotationId == note.id;
-      return Positioned(
-        left: screen.dx - 14,
-        top: screen.dy - 14,
-        child: GestureDetector(
-          onTap: () {
-            if (widget.tool == PdfEditorTool.lasso) {
-              widget.onSelectAnnotation(note.id);
-            }
-            widget.onNoteMarkerTap(note);
-          },
-          child: Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: const Color(0xFF0B1F3A),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: selected ? const Color(0xFFD6B56D) : const Color(0xFFD6B56D),
-                width: selected ? 3 : 2,
+          final screen = widget.metrics.normalizedToScreen(
+            NormalizedPoint(note.x, note.y),
+          );
+          final selected = widget.selectedAnnotationId == note.id;
+          return Positioned(
+            left: screen.dx - 14,
+            top: screen.dy - 14,
+            child: GestureDetector(
+              onTap: () {
+                if (widget.tool == PdfEditorTool.lasso) {
+                  widget.onSelectAnnotation(note.id);
+                }
+                widget.onNoteMarkerTap(note);
+              },
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0B1F3A),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: selected
+                        ? const Color(0xFFD6B56D)
+                        : const Color(0xFFD6B56D),
+                    width: selected ? 3 : 2,
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.sticky_note_2,
+                  color: Colors.white,
+                  size: 14,
+                ),
               ),
             ),
-            alignment: Alignment.center,
-            child: const Icon(Icons.sticky_note_2, color: Colors.white, size: 14),
-          ),
-        ),
-      );
-    }).toList();
+          );
+        })
+        .toList();
   }
 
   List<Widget> _buildTextBoxes() {
     return widget.annotations
         .where((item) => item.type == AnnotationType.text)
         .map((textBox) {
-      final rect = widget.metrics.normalizedRectToScreen(
-        x: textBox.x,
-        y: textBox.y,
-        width: textBox.width,
-        height: textBox.height,
-      );
-      final selected = widget.selectedAnnotationId == textBox.id;
-      final directionName = textBox.data['text_direction']?.toString();
-      final textDirection = directionName == 'ltr'
-          ? TextDirection.ltr
-          : TextDirection.rtl;
+          final rect = widget.metrics.normalizedRectToScreen(
+            x: textBox.x,
+            y: textBox.y,
+            width: textBox.width,
+            height: textBox.height,
+          );
+          final selected = widget.selectedAnnotationId == textBox.id;
+          final directionName = textBox.data['text_direction']?.toString();
+          final textDirection = directionName == 'ltr'
+              ? TextDirection.ltr
+              : TextDirection.rtl;
 
-      return Positioned.fromRect(
-        rect: rect,
-        child: IgnorePointer(
-          child: DecoratedBox(
-            decoration: selected
-                ? BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFFD6B56D),
-                      width: 1.5,
+          return Positioned.fromRect(
+            rect: rect,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: selected
+                    ? BoxDecoration(
+                        border: Border.all(
+                          color: const Color(0xFFD6B56D),
+                          width: 1.5,
+                        ),
+                        borderRadius: BorderRadius.circular(4),
+                      )
+                    : const BoxDecoration(),
+                child: Padding(
+                  padding: const EdgeInsets.all(2),
+                  child: Text(
+                    textBox.data['text']?.toString() ?? '',
+                    textAlign: TextAlign.right,
+                    textDirection: textDirection,
+                    style: TextStyle(
+                      color: _parseColor(textBox.data['color']?.toString()),
+                      fontSize:
+                          widget.metrics.displaySize.width *
+                          (textBox.data['font_size'] as num? ?? 0.025)
+                              .toDouble(),
+                      fontWeight: FontWeight.w500,
                     ),
-                    borderRadius: BorderRadius.circular(4),
-                  )
-                : const BoxDecoration(),
-            child: Padding(
-              padding: const EdgeInsets.all(2),
-              child: Text(
-                textBox.data['text']?.toString() ?? '',
-                textAlign: TextAlign.right,
-                textDirection: textDirection,
-                style: TextStyle(
-                  color: _parseColor(textBox.data['color']?.toString()),
-                  fontSize: widget.metrics.displaySize.width *
-                      (textBox.data['font_size'] as num? ?? 0.025).toDouble(),
-                  fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      );
-    }).toList();
+          );
+        })
+        .toList();
   }
 
   Color _parseColor(String? value) {

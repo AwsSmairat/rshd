@@ -24,12 +24,7 @@ class SubjectGroupingHelper {
     'general': 'مواد أخرى',
   };
 
-  static const _order = [
-    'medicine',
-    'it',
-    'engineering',
-    'general',
-  ];
+  static const _order = ['medicine', 'it', 'engineering', 'general'];
 
   static const _medicineKeywords = [
     'طب',
@@ -66,8 +61,8 @@ class SubjectGroupingHelper {
       return backendCategory;
     }
 
-    final searchableText =
-        '${subject.title} ${subject.description ?? ''}'.toLowerCase();
+    final searchableText = '${subject.title} ${subject.description ?? ''}'
+        .toLowerCase();
 
     if (_containsAny(searchableText, _medicineKeywords)) {
       return 'medicine';

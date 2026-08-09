@@ -37,8 +37,9 @@ class TermsAndConditionsState {
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       isOfflineFallback: isOfflineFallback ?? this.isOfflineFallback,
       isAccepting: isAccepting ?? this.isAccepting,
-      acceptanceMessage:
-          clearMessage ? null : (acceptanceMessage ?? this.acceptanceMessage),
+      acceptanceMessage: clearMessage
+          ? null
+          : (acceptanceMessage ?? this.acceptanceMessage),
     );
   }
 }
@@ -46,7 +47,7 @@ class TermsAndConditionsState {
 class TermsAndConditionsController
     extends StateNotifier<TermsAndConditionsState> {
   TermsAndConditionsController(this._repository)
-      : super(const TermsAndConditionsState());
+    : super(const TermsAndConditionsState());
 
   final TermsAndConditionsRepository _repository;
 
@@ -91,7 +92,11 @@ class TermsAndConditionsController
       return false;
     }
 
-    state = state.copyWith(isAccepting: true, clearError: true, clearMessage: true);
+    state = state.copyWith(
+      isAccepting: true,
+      clearError: true,
+      clearMessage: true,
+    );
 
     try {
       await _repository.acceptTerms();
@@ -119,9 +124,12 @@ class TermsAndConditionsController
   }
 }
 
-final termsAndConditionsControllerProvider = StateNotifierProvider<
-    TermsAndConditionsController, TermsAndConditionsState>((ref) {
-  return TermsAndConditionsController(
-    ref.watch(termsAndConditionsRepositoryProvider),
-  );
-});
+final termsAndConditionsControllerProvider =
+    StateNotifierProvider<
+      TermsAndConditionsController,
+      TermsAndConditionsState
+    >((ref) {
+      return TermsAndConditionsController(
+        ref.watch(termsAndConditionsRepositoryProvider),
+      );
+    });

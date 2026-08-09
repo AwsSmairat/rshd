@@ -37,13 +37,11 @@ class PdfAnnotationModel {
 /// TODO: Improve page coordinate mapping for multi-page PDF.
 class PdfAnnotationDocument {
   PdfAnnotationDocument([Map<String, dynamic>? json])
-      : _root = _normalize(json);
+    : _root = _normalize(json);
 
   final Map<String, dynamic> _root;
 
-  static Map<String, dynamic> empty() => {
-        'pages': <String, dynamic>{},
-      };
+  static Map<String, dynamic> empty() => {'pages': <String, dynamic>{}};
 
   static Map<String, dynamic> _normalize(Map<String, dynamic>? json) {
     if (json == null || json.isEmpty) {
@@ -60,8 +58,9 @@ class PdfAnnotationDocument {
   Map<String, dynamic> toJson() => Map<String, dynamic>.from(_root);
 
   Map<String, dynamic> pageData(int pageNumber) {
-    final pages = _root.putIfAbsent('pages', () => <String, dynamic>{})
-        as Map<String, dynamic>;
+    final pages =
+        _root.putIfAbsent('pages', () => <String, dynamic>{})
+            as Map<String, dynamic>;
     final key = '$pageNumber';
 
     if (!pages.containsKey(key) || pages[key] is! Map) {
@@ -72,8 +71,9 @@ class PdfAnnotationDocument {
   }
 
   void setPageData(int pageNumber, Map<String, dynamic> data) {
-    final pages = _root.putIfAbsent('pages', () => <String, dynamic>{})
-        as Map<String, dynamic>;
+    final pages =
+        _root.putIfAbsent('pages', () => <String, dynamic>{})
+            as Map<String, dynamic>;
     pages['$pageNumber'] = data;
   }
 
@@ -92,14 +92,17 @@ class PdfAnnotationDocument {
   }
 
   static Map<String, dynamic> _emptyPage() => {
-        'notes': <dynamic>[],
-        'drawings': <dynamic>[],
-        'highlights': <dynamic>[],
-      };
+    'notes': <dynamic>[],
+    'drawings': <dynamic>[],
+    'highlights': <dynamic>[],
+  };
 
   static String newId() => DateTime.now().microsecondsSinceEpoch.toString();
 
-  static List<Map<String, dynamic>> listOf(Map<String, dynamic>? page, String key) {
+  static List<Map<String, dynamic>> listOf(
+    Map<String, dynamic>? page,
+    String key,
+  ) {
     final value = page?[key];
     if (value is! List) {
       return [];

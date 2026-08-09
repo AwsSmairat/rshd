@@ -1,5 +1,5 @@
 import 'dart:typed_data';
-import 'dart:ui';
+import 'dart:ui' show Rect;
 
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
@@ -22,7 +22,7 @@ Future<Uint8List> createTestPdfBytes({int pageCount = 1}) async {
 Map<String, dynamic> emptyAnnotationDocument({int? documentId}) {
   return {
     'version': 2,
-    if (documentId != null) 'document_id': documentId,
+    'document_id': ?documentId,
     'pages': <String, dynamic>{},
   };
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\LessonResource;
 use App\Models\Lesson;
 use App\Models\Subject;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -44,7 +45,7 @@ class LessonController extends Controller
     /**
      * @return array<string, mixed>
      */
-    private function lessonRelationsFor(?\App\Models\User $user): array
+    private function lessonRelationsFor(?User $user): array
     {
         $relations = [
             'videos',

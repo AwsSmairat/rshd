@@ -74,10 +74,7 @@ class PdfEditorHeader extends StatelessWidget implements PreferredSizeWidget {
                   ],
                 ),
               ),
-              _SaveStatusChip(
-                status: saveStatus,
-                onRetry: onRetrySave,
-              ),
+              _SaveStatusChip(status: saveStatus, onRetry: onRetrySave),
               IconButton(
                 tooltip: 'بحث',
                 onPressed: onSearch,
@@ -113,12 +110,27 @@ class _SaveStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, color, icon) = switch (status) {
-      PdfSaveStatus.saved => ('تم الحفظ', AppColors.secondary, Icons.check_circle_outline),
+      PdfSaveStatus.saved => (
+        'تم الحفظ',
+        AppColors.secondary,
+        Icons.check_circle_outline,
+      ),
       PdfSaveStatus.saving => ('جارٍ الحفظ...', AppColors.accent, Icons.sync),
-      PdfSaveStatus.unsaved => ('تعديلات غير محفوظة', AppColors.darkGold, Icons.edit_note),
-      PdfSaveStatus.failed => ('فشل الحفظ', AppColors.error, Icons.error_outline),
-      PdfSaveStatus.offlinePending =>
-        ('سيتم المزامنة', AppColors.textMuted, Icons.cloud_upload_outlined),
+      PdfSaveStatus.unsaved => (
+        'تعديلات غير محفوظة',
+        AppColors.darkGold,
+        Icons.edit_note,
+      ),
+      PdfSaveStatus.failed => (
+        'فشل الحفظ',
+        AppColors.error,
+        Icons.error_outline,
+      ),
+      PdfSaveStatus.offlinePending => (
+        'سيتم المزامنة',
+        AppColors.textMuted,
+        Icons.cloud_upload_outlined,
+      ),
     };
 
     return InkWell(
@@ -218,9 +230,7 @@ class PdfEditorToolbar extends StatelessWidget {
         bottom: !isTabletLandscape,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: isTabletLandscape
-              ? _buildTabletLayout()
-              : _buildPhoneLayout(),
+          child: isTabletLandscape ? _buildTabletLayout() : _buildPhoneLayout(),
         ),
       ),
     );
@@ -369,15 +379,14 @@ class _ToolButton extends StatelessWidget {
     final iconColor = !enabled
         ? AppColors.textMuted.withValues(alpha: 0.5)
         : selected
-            ? AppColors.accent
-            : AppColors.primary;
+        ? AppColors.accent
+        : AppColors.primary;
     final labelColor = !enabled
         ? AppColors.textMuted.withValues(alpha: 0.5)
         : selected
-            ? AppColors.primary
-            : AppColors.secondary;
-    final borderColor =
-        selected ? AppColors.primary : const Color(0xFFD1D5DB);
+        ? AppColors.primary
+        : AppColors.secondary;
+    final borderColor = selected ? AppColors.primary : const Color(0xFFD1D5DB);
     final backgroundColor = selected
         ? AppColors.accent.withValues(alpha: 0.18)
         : AppColors.cardWhite;
@@ -403,10 +412,7 @@ class _ToolButton extends StatelessWidget {
               decoration: BoxDecoration(
                 color: backgroundColor,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: borderColor,
-                  width: selected ? 2 : 1,
-                ),
+                border: Border.all(color: borderColor, width: selected ? 2 : 1),
                 boxShadow: selected
                     ? [
                         BoxShadow(

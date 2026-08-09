@@ -158,13 +158,15 @@ class LuxurySubjectCard extends StatelessWidget {
                           SizedBox(
                             width: double.infinity,
                             child: FilledButton(
-                              onPressed:
-                                  isRequesting ? null : onRequestPurchase,
+                              onPressed: isRequesting
+                                  ? null
+                                  : onRequestPurchase,
                               style: FilledButton.styleFrom(
                                 backgroundColor: AppColors.accent,
                                 foregroundColor: AppColors.primary,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -192,10 +194,7 @@ class LuxurySubjectCard extends StatelessWidget {
 }
 
 class _OverlayChip extends StatelessWidget {
-  const _OverlayChip({
-    required this.label,
-    this.emphasize = false,
-  });
+  const _OverlayChip({required this.label, this.emphasize = false});
 
   final String label;
   final bool emphasize;
@@ -213,9 +212,7 @@ class _OverlayChip extends StatelessWidget {
                 ? AppColors.accent.withValues(alpha: 0.28)
                 : Colors.white.withValues(alpha: 0.18),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.28),
-            ),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
           ),
           child: Text(
             label,
@@ -232,10 +229,7 @@ class _OverlayChip extends StatelessWidget {
 }
 
 class _FallbackCover extends StatelessWidget {
-  const _FallbackCover({
-    required this.accent,
-    required this.subject,
-  });
+  const _FallbackCover({required this.accent, required this.subject});
 
   final Color accent;
   final SubjectModel subject;
@@ -247,10 +241,7 @@ class _FallbackCover extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            accent,
-            AppColors.primary,
-          ],
+          colors: [accent, AppColors.primary],
         ),
       ),
       child: Center(

@@ -7,6 +7,7 @@ use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Models\SupportTicket;
 use App\Models\User;
+use App\Services\TechnicalSupportService;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -57,7 +58,7 @@ class TechnicalSupportTest extends TestCase
         ])->assertOk();
 
         $ticket = SupportTicket::query()->firstOrFail();
-        $service = app(\App\Services\TechnicalSupportService::class);
+        $service = app(TechnicalSupportService::class);
 
         $this->assertCount(1, $service->pendingTicketsForAdmins());
         $this->assertCount(0, $service->activeTicketsForAdmin($adminOne));
@@ -74,7 +75,7 @@ class TechnicalSupportTest extends TestCase
     {
         $student = $this->createStudent();
         $admin = $this->createAdmin();
-        $service = app(\App\Services\TechnicalSupportService::class);
+        $service = app(TechnicalSupportService::class);
 
         Sanctum::actingAs($student);
         $this->postJson('/api/v1/student/support/messages', [

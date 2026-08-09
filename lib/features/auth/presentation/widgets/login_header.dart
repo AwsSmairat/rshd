@@ -46,11 +46,7 @@ class LoginHeader extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF091729),
-              AppColors.primary,
-              AppColors.secondary,
-            ],
+            colors: [Color(0xFF091729), AppColors.primary, AppColors.secondary],
           ),
         ),
         child: Stack(

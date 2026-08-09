@@ -8,10 +8,7 @@ import 'quiz_icon_helper.dart';
 import 'quiz_icon_panel.dart';
 
 class LiquidGlassQuizInfoCard extends StatelessWidget {
-  const LiquidGlassQuizInfoCard({
-    super.key,
-    required this.quiz,
-  });
+  const LiquidGlassQuizInfoCard({super.key, required this.quiz});
 
   final QuizModel quiz;
 
@@ -78,10 +75,7 @@ class LiquidGlassQuizInfoCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          SizedBox(
-            width: 72,
-            child: QuizIconPanel(icon: icon),
-          ),
+          SizedBox(width: 72, child: QuizIconPanel(icon: icon)),
         ],
       ),
     );

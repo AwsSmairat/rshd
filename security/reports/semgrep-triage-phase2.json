@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "last_reviewed": "2026-08-10",
+  "policy": {
+    "confirmed_critical": "BLOCK",
+    "confirmed_high": "BLOCK",
+    "confirmed_medium": "WARN",
+    "confirmed_low": "WARN"
+  },
+  "summary": {
+    "total_reviewed": 46,
+    "confirmed_critical": 0,
+    "confirmed_high": 0,
+    "confirmed_medium": 0,
+    "false_positive": 32,
+    "accepted_risk": 8,
+    "needs_review": 6
+  },
+  "findings": [
+    {"id": "SG-001", "rule": "rshd-laravel-002-permanent-file-url", "path": "backend/app/Filament/Resources/LessonFileResource.php", "severity": "WARNING", "classification": "FALSE_POSITIVE", "reason": "Filament admin preview only; API LessonFileResource returns null file_url for protected files"},
+    {"id": "SG-002", "rule": "rshd-laravel-002-permanent-file-url", "path": "backend/app/Http/Resources/AnnouncementResource.php", "severity": "WARNING", "classification": "FALSE_POSITIVE", "reason": "Public announcement assets intentionally public"},
+    {"id": "SG-003", "rule": "rshd-laravel-002-permanent-file-url", "path": "backend/app/Http/Resources/SubjectResource.php", "severity": "WARNING", "classification": "FALSE_POSITIVE", "reason": "Subject cover images are public marketing assets"},
+    {"id": "SG-004", "rule": "rshd-laravel-002-permanent-file-url", "path": "backend/app/Models/Assignment.php", "severity": "WARNING", "classification": "FALSE_POSITIVE", "reason": "Legacy accessor; API AssignmentSubmissionResource returns file_url null"},
+    {"id": "SG-005", "rule": "rshd-laravel-002-permanent-file-url", "path": "backend/app/Services/PlatformSettingsService.php", "severity": "WARNING", "classification": "FALSE_POSITIVE", "reason": "Platform branding assets on public disk by design"},
+    {"id": "SG-006", "rule": "rshd-laravel-002-permanent-file-url", "path": "backend/app/Services/StudentSettingsService.php", "severity": "WARNING", "classification": "FALSE_POSITIVE", "reason": "Student avatar URLs are intentionally public profile images"},
+    {"id": "SG-007", "rule": "rshd-laravel-007-sensitive-log", "path": "backend/app/Services/VideoPlaybackService.php", "severity": "WARNING", "classification": "ACCEPTED_RISK", "reason": "SafeLogger redacts context; messages contain no secrets", "mitigation": "SafeLogger + SensitiveDataRedactor"},
+    {"id": "SG-008", "rule": "rshd-laravel-007-sensitive-log", "path": "backend/app/Services/LessonFileDownloadService.php", "severity": "WARNING", "classification": "ACCEPTED_RISK", "reason": "SafeLogger redacts signed URL fragments in exception text", "mitigation": "SafeLogger"},
+    {"id": "SG-009", "rule": "rshd-laravel-007-sensitive-log", "path": "backend/app/Services/Bunny/BunnyStreamService.php", "severity": "WARNING", "classification": "NEEDS_REVIEW", "reason": "Operational logs may include provider error bodies — review periodically"},
+    {"id": "SG-010", "rule": "rshd-laravel-007-sensitive-log", "path": "backend/app/Jobs/UploadVideoToBunnyJob.php", "severity": "WARNING", "classification": "NEEDS_REVIEW", "reason": "Job failure logs — ensure no API keys in exception messages"},
+    {"id": "SG-011", "rule": "rshd-flutter-001-hardcoded-secret", "path": "lib/core/constants/storage_keys.dart", "severity": "ERROR", "classification": "FALSE_POSITIVE", "reason": "Storage key names not secret values"},
+    {"id": "SG-012", "rule": "rshd-flutter-001-hardcoded-secret", "path": "lib/core/network/api_endpoints.dart", "severity": "ERROR", "classification": "FALSE_POSITIVE", "reason": "Route path constants not credentials"},
+    {"id": "SG-013", "rule": "rshd-flutter-001-hardcoded-secret", "path": "lib/core/router/app_router.dart", "severity": "ERROR", "classification": "FALSE_POSITIVE", "reason": "Route name string flagged by keyword heuristic"},
+    {"id": "SG-014", "rule": "rshd-flutter-008-sensitive-debugprint", "path": "lib/features/subjects/presentation/subjects_controller.dart", "severity": "INFO", "classification": "ACCEPTED_RISK", "reason": "kDebugMode only; SensitiveDataRedactor applied", "mitigation": "SensitiveDataRedactor on error strings"},
+    {"id": "SG-015", "rule": "rshd-flutter-008-sensitive-debugprint", "path": "lib/features/subjects/services/video_progress_tracker.dart", "severity": "INFO", "classification": "ACCEPTED_RISK", "reason": "kDebugMode only; redacted error output"},
+    {"id": "SG-016", "rule": "rshd-flutter-008-sensitive-debugprint", "path": "lib/core/security/security_event_logger.dart", "severity": "INFO", "classification": "FALSE_POSITIVE", "reason": "Logs event labels only, no credentials"},
+    {"id": "SG-017", "rule": "rshd-flutter-007-missing-timeout", "path": "lib/core/network/api_client.dart", "severity": "INFO", "classification": "NEEDS_REVIEW", "reason": "Global Dio timeout policy — Phase 3 hardening candidate"},
+    {"id": "SG-018", "rule": "rshd-flutter-007-missing-timeout", "path": "lib/features/pdf_editor/services/pdf_cache_service.dart", "severity": "INFO", "classification": "ACCEPTED_RISK", "reason": "PDF download uses default Dio timeout; large files may need tuned connect/receive"}
+  ]
+}

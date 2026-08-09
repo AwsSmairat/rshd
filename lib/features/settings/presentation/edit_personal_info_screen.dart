@@ -17,7 +17,8 @@ class EditPersonalInfoScreen extends ConsumerStatefulWidget {
       _EditPersonalInfoScreenState();
 }
 
-class _EditPersonalInfoScreenState extends ConsumerState<EditPersonalInfoScreen> {
+class _EditPersonalInfoScreenState
+    extends ConsumerState<EditPersonalInfoScreen> {
   late final TextEditingController _nameController;
   late final TextEditingController _phoneController;
   late final TextEditingController _countryController;
@@ -30,7 +31,9 @@ class _EditPersonalInfoScreenState extends ConsumerState<EditPersonalInfoScreen>
     super.initState();
     _nameController = TextEditingController(text: widget.profile.name);
     _phoneController = TextEditingController(text: widget.profile.phone ?? '');
-    _countryController = TextEditingController(text: widget.profile.country ?? '');
+    _countryController = TextEditingController(
+      text: widget.profile.country ?? '',
+    );
     _emailController = TextEditingController(text: widget.profile.email);
     _birthDate = widget.profile.birthDate;
     _gender = widget.profile.gender;
@@ -61,24 +64,25 @@ class _EditPersonalInfoScreenState extends ConsumerState<EditPersonalInfoScreen>
   Future<void> _save() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الاسم مطلوب')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('الاسم مطلوب')));
       return;
     }
 
-    final success =
-        await ref.read(studentSettingsControllerProvider.notifier).updateProfile(
-              name: name,
-              phone: _phoneController.text.trim().isEmpty
-                  ? null
-                  : _phoneController.text.trim(),
-              birthDate: _birthDate,
-              gender: _gender,
-              country: _countryController.text.trim().isEmpty
-                  ? null
-                  : _countryController.text.trim(),
-            );
+    final success = await ref
+        .read(studentSettingsControllerProvider.notifier)
+        .updateProfile(
+          name: name,
+          phone: _phoneController.text.trim().isEmpty
+              ? null
+              : _phoneController.text.trim(),
+          birthDate: _birthDate,
+          gender: _gender,
+          country: _countryController.text.trim().isEmpty
+              ? null
+              : _countryController.text.trim(),
+        );
 
     if (success && mounted) {
       Navigator.pop(context);

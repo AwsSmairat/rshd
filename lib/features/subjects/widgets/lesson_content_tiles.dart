@@ -81,11 +81,7 @@ class LessonAssignmentTile extends StatelessWidget {
 }
 
 class LessonQuizTile extends StatelessWidget {
-  const LessonQuizTile({
-    super.key,
-    required this.quiz,
-    required this.onTap,
-  });
+  const LessonQuizTile({super.key, required this.quiz, required this.onTap});
 
   final QuizModel quiz;
   final VoidCallback onTap;
@@ -104,10 +100,7 @@ class LessonQuizTile extends StatelessWidget {
           CircleAvatar(
             radius: 20,
             backgroundColor: AppColors.primary.withValues(alpha: 0.12),
-            child: const Icon(
-              Icons.quiz_outlined,
-              color: AppColors.primary,
-            ),
+            child: const Icon(Icons.quiz_outlined, color: AppColors.primary),
           ),
           const SizedBox(width: 12),
           Expanded(

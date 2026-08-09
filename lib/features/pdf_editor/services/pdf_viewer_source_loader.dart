@@ -7,8 +7,9 @@ class PdfViewerSourceLoader {
   PdfViewerSourceLoader({
     PdfCacheService? cacheService,
     SubjectsRepository? repository,
-  })  : _cacheService = cacheService ?? PdfCacheService(),
-        _repository = repository;
+    int? userId,
+  }) : _cacheService = cacheService ?? PdfCacheService(userId: userId),
+       _repository = repository;
 
   final PdfCacheService _cacheService;
   final SubjectsRepository? _repository;
@@ -24,7 +25,9 @@ class PdfViewerSourceLoader {
     }
 
     if (!allowNetwork) {
-      throw Exception('الملف غير متوفر بدون اتصال. افتح الملف مرة واحدة أونلاين أولاً.');
+      throw Exception(
+        'الملف غير متوفر بدون اتصال. افتح الملف مرة واحدة أونلاين أولاً.',
+      );
     }
 
     final repo = repository ?? _repository;

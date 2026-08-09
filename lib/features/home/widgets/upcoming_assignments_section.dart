@@ -35,7 +35,9 @@ class UpcomingAssignmentsSection extends StatelessWidget {
       );
     }
 
-    for (final quiz in quizzes.where((item) => item.isActive && !item.isCompleted)) {
+    for (final quiz in quizzes.where(
+      (item) => item.isActive && !item.isCompleted,
+    )) {
       tasks.add(
         UpcomingTaskItem(
           type: UpcomingTaskType.quiz,

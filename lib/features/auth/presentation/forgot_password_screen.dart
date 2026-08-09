@@ -30,7 +30,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   @override
   void initState() {
     super.initState();
-    _emailController = TextEditingController(text: widget.initialEmail?.trim() ?? '');
+    _emailController = TextEditingController(
+      text: widget.initialEmail?.trim() ?? '',
+    );
   }
 
   @override
@@ -84,7 +86,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 SizedBox(height: metrics.fieldSpacing * 0.5),
                 Text(
                   'أدخل بريدك الإلكتروني وسنساعدك في استعادة الوصول إلى حسابك.',
-                  style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.textMuted,
+                  ),
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: metrics.sectionSpacing),

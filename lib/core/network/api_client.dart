@@ -6,20 +6,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/app_config.dart';
 import '../storage/secure_storage_service.dart';
 import 'api_exception.dart';
+import 'redacted_log_interceptor.dart';
 
 typedef TokenReader = Future<String?> Function();
 
 class ApiClient {
-  ApiClient({
-    required SecureStorageService secureStorage,
-    Dio? dio,
-  }) : _secureStorage = secureStorage {
-    _dio = dio ??
+  ApiClient({required SecureStorageService secureStorage, Dio? dio})
+    : _secureStorage = secureStorage {
+    _dio =
+        dio ??
         Dio(
           BaseOptions(
             baseUrl: AppConfig.baseUrl,
             connectTimeout: AppConfig.connectTimeout,
             receiveTimeout: AppConfig.receiveTimeout,
+            sendTimeout: AppConfig.sendTimeout,
             headers: const {
               'Accept': 'application/json',
               'Content-Type': 'application/json',
@@ -28,20 +29,11 @@ class ApiClient {
         );
 
     _dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: _onRequest,
-        onError: _onError,
-      ),
+      InterceptorsWrapper(onRequest: _onRequest, onError: _onError),
     );
 
     if (AppConfig.enableNetworkLogs) {
-      _dio.interceptors.add(
-        LogInterceptor(
-          requestBody: true,
-          responseBody: true,
-          error: true,
-        ),
-      );
+      _dio.interceptors.add(RedactedLogInterceptor());
     }
   }
 
@@ -75,30 +67,19 @@ class ApiClient {
     return _request(() => _dio.get<T>(path, queryParameters: queryParameters));
   }
 
-  Future<Response<T>> post<T>(
-    String path, {
-    dynamic data,
-  }) {
+  Future<Response<T>> post<T>(String path, {dynamic data}) {
     return _request(() => _dio.post<T>(path, data: data));
   }
 
-  Future<Response<T>> patch<T>(
-    String path, {
-    dynamic data,
-  }) {
+  Future<Response<T>> patch<T>(String path, {dynamic data}) {
     return _request(() => _dio.patch<T>(path, data: data));
   }
 
-  Future<Response<T>> delete<T>(
-    String path, {
-    dynamic data,
-  }) {
+  Future<Response<T>> delete<T>(String path, {dynamic data}) {
     return _request(() => _dio.delete<T>(path, data: data));
   }
 
-  Future<Response<T>> _request<T>(
-    Future<Response<T>> Function() call,
-  ) async {
+  Future<Response<T>> _request<T>(Future<Response<T>> Function() call) async {
     try {
       return await call();
     } on DioException catch (error) {
@@ -124,7 +105,8 @@ class ApiClient {
     }
 
     if (payload != null) {
-      final message = payload['message']?.toString() ??
+      final message =
+          payload['message']?.toString() ??
           _defaultMessageForStatus(statusCode);
 
       return ApiException(

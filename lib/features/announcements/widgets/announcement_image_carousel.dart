@@ -113,9 +113,7 @@ class _AnnouncementImageCarouselState extends State<AnnouncementImageCarousel> {
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: AppColors.accent.withValues(alpha: 0.35),
-          ),
+          border: Border.all(color: AppColors.accent.withValues(alpha: 0.35)),
           boxShadow: [
             BoxShadow(
               color: AppColors.primary.withValues(alpha: 0.08),
@@ -142,8 +140,8 @@ class _AnnouncementImageCarouselState extends State<AnnouncementImageCarousel> {
                     );
                   }
                   return _CarouselSlide(
-                    announcement: widget.announcements[
-                        index - (_hasLeadingAsset ? 1 : 0)],
+                    announcement: widget
+                        .announcements[index - (_hasLeadingAsset ? 1 : 0)],
                   );
                 },
               ),
@@ -152,9 +150,7 @@ class _AnnouncementImageCarouselState extends State<AnnouncementImageCarousel> {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  child: _CarouselOverlay(
-                    announcement: currentAnnouncement,
-                  ),
+                  child: _CarouselOverlay(announcement: currentAnnouncement),
                 ),
               if (slideCount > 1)
                 Positioned(

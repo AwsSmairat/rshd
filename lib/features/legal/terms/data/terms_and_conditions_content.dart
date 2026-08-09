@@ -38,15 +38,42 @@ class TermsAndConditionsContent {
       title: 'تعريفات أساسية',
       icon: Icons.menu_book_outlined,
       subsections: [
-        TermsSubsection(title: 'المنصة', items: ['نظام RSHD التعليمي ولوحة الإدارة والخدمات المرتبطة به.']),
-        TermsSubsection(title: 'التطبيق', items: ['تطبيق الطالب أو أي تطبيق رسمي تابع للمنصة.']),
-        TermsSubsection(title: 'المستخدم', items: ['أي شخص ينشئ حسابًا أو يستخدم الخدمة.']),
-        TermsSubsection(title: 'الطالب', items: ['مستخدم مسجل للتعلم والوصول إلى المواد.']),
-        TermsSubsection(title: 'المدرس', items: ['مستخدم مخول برفع المحتوى وإدارة الطلاب ضمن صلاحياته.']),
-        TermsSubsection(title: 'الحساب', items: ['هوية المستخدم الإلكترونية وبيانات الدخول.']),
-        TermsSubsection(title: 'المحتوى التعليمي', items: ['الدروس والفيديوهات والملفات والواجبات والاختبارات.']),
-        TermsSubsection(title: 'الاشتراك', items: ['الوصول المفعّل لمادة أو خدمة مدفوعة أو معتمدة.']),
-        TermsSubsection(title: 'الخدمات الخارجية', items: ['Google Sign-In وApple Sign-In وخدمات الاستضافة والبريد.']),
+        TermsSubsection(
+          title: 'المنصة',
+          items: ['نظام RSHD التعليمي ولوحة الإدارة والخدمات المرتبطة به.'],
+        ),
+        TermsSubsection(
+          title: 'التطبيق',
+          items: ['تطبيق الطالب أو أي تطبيق رسمي تابع للمنصة.'],
+        ),
+        TermsSubsection(
+          title: 'المستخدم',
+          items: ['أي شخص ينشئ حسابًا أو يستخدم الخدمة.'],
+        ),
+        TermsSubsection(
+          title: 'الطالب',
+          items: ['مستخدم مسجل للتعلم والوصول إلى المواد.'],
+        ),
+        TermsSubsection(
+          title: 'المدرس',
+          items: ['مستخدم مخول برفع المحتوى وإدارة الطلاب ضمن صلاحياته.'],
+        ),
+        TermsSubsection(
+          title: 'الحساب',
+          items: ['هوية المستخدم الإلكترونية وبيانات الدخول.'],
+        ),
+        TermsSubsection(
+          title: 'المحتوى التعليمي',
+          items: ['الدروس والفيديوهات والملفات والواجبات والاختبارات.'],
+        ),
+        TermsSubsection(
+          title: 'الاشتراك',
+          items: ['الوصول المفعّل لمادة أو خدمة مدفوعة أو معتمدة.'],
+        ),
+        TermsSubsection(
+          title: 'الخدمات الخارجية',
+          items: ['Google Sign-In وApple Sign-In وخدمات الاستضافة والبريد.'],
+        ),
       ],
     ),
     TermsSectionData(
@@ -96,7 +123,10 @@ class TermsAndConditionsContent {
       id: 'educational_services',
       title: 'الخدمات التعليمية',
       icon: Icons.school_outlined,
-      paragraphs: ['قد توفر المنصة:', 'قد يختلف توفر المحتوى حسب الاشتراك والمؤسسة والمادة والمدرس ونوع الحساب.'],
+      paragraphs: [
+        'قد توفر المنصة:',
+        'قد يختلف توفر المحتوى حسب الاشتراك والمؤسسة والمادة والمدرس ونوع الحساب.',
+      ],
       bulletPoints: [
         'مواد ودورات تعليمية.',
         'فيديوهات وملفات PDF.',
@@ -388,7 +418,9 @@ class TermsAndConditionsContent {
       id: 'contact',
       title: 'التواصل معنا',
       icon: Icons.mail_outline,
-      paragraphs: ['للاستفسارات أو الإبلاغ عن مخالفة، راجع بطاقة التواصل في أسفل الصفحة.'],
+      paragraphs: [
+        'للاستفسارات أو الإبلاغ عن مخالفة، راجع بطاقة التواصل في أسفل الصفحة.',
+      ],
     ),
   ];
 }

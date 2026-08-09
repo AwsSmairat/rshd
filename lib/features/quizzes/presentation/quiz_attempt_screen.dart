@@ -16,10 +16,7 @@ import '../widgets/quiz_question_card.dart';
 import 'quizzes_controller.dart';
 
 class QuizAttemptScreen extends ConsumerStatefulWidget {
-  const QuizAttemptScreen({
-    super.key,
-    required this.quizId,
-  });
+  const QuizAttemptScreen({super.key, required this.quizId});
 
   final int quizId;
 
@@ -53,8 +50,9 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      final controller =
-          ref.read(quizAttemptControllerProvider(widget.quizId).notifier);
+      final controller = ref.read(
+        quizAttemptControllerProvider(widget.quizId).notifier,
+      );
       final state = ref.read(quizAttemptControllerProvider(widget.quizId));
       final remaining = state.remainingSeconds;
 
@@ -126,16 +124,14 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
     _timer?.cancel();
 
     final quiz = state.quiz;
-    ref.read(quizzesListControllerProvider.notifier).upsertQuiz(
-          (ref.read(quizzesListControllerProvider.notifier).findById(
-                    widget.quizId,
-                  ) ??
+    ref
+        .read(quizzesListControllerProvider.notifier)
+        .upsertQuiz(
+          (ref
+                      .read(quizzesListControllerProvider.notifier)
+                      .findById(widget.quizId) ??
                   quiz ??
-                  QuizModel(
-                    id: widget.quizId,
-                    subjectId: 0,
-                    title: '',
-                  ))
+                  QuizModel(id: widget.quizId, subjectId: 0, title: ''))
               .copyWith(latestAttempt: result),
         );
 
@@ -143,7 +139,8 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
       AppRoutes.quizResult(widget.quizId),
       extra: {
         'score': result.score ?? '0',
-        'questionsCount': result.questionsCount ??
+        'questionsCount':
+            result.questionsCount ??
             quiz?.questions.length ??
             quiz?.questionsCount ??
             0,
@@ -169,17 +166,18 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(quizAttemptControllerProvider(widget.quizId));
-    final controller =
-        ref.read(quizAttemptControllerProvider(widget.quizId).notifier);
+    final controller = ref.read(
+      quizAttemptControllerProvider(widget.quizId).notifier,
+    );
 
     ref.listen(quizAttemptControllerProvider(widget.quizId), (previous, next) {
       _handleUnauthorized(next.errorMessage);
       if (next.status == QuizAttemptStatus.error &&
           next.errorMessage != null &&
           next.status != QuizAttemptStatus.submitting) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.errorMessage!)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
       }
     });
 
@@ -268,8 +266,8 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: isSubmitting ||
-                                state.currentQuestionIndex <= 0
+                        onPressed:
+                            isSubmitting || state.currentQuestionIndex <= 0
                             ? null
                             : controller.goToPreviousQuestion,
                         child: const Text('السابق'),

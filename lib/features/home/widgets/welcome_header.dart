@@ -179,9 +179,7 @@ class _HeaderIconButton extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(
-          color: AppColors.white.withValues(alpha: 0.18),
-        ),
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.18)),
       ),
       child: IconButton(
         tooltip: tooltip,

@@ -3,12 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_exception.dart';
 import '../data/auth_repository.dart';
 
-enum PasswordResetStatus {
-  initial,
-  loading,
-  success,
-  error,
-}
+enum PasswordResetStatus { initial, loading, success, error }
 
 class PasswordResetState {
   const PasswordResetState({
@@ -45,8 +40,9 @@ class PasswordResetState {
       resetToken: resetToken ?? this.resetToken,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       fieldErrors: fieldErrors ?? this.fieldErrors,
-      successMessage:
-          clearSuccess ? null : (successMessage ?? this.successMessage),
+      successMessage: clearSuccess
+          ? null
+          : (successMessage ?? this.successMessage),
     );
   }
 }
@@ -89,10 +85,7 @@ class PasswordResetController extends StateNotifier<PasswordResetState> {
     }
   }
 
-  Future<bool> verifyCode({
-    required String email,
-    required String code,
-  }) async {
+  Future<bool> verifyCode({required String email, required String code}) async {
     state = state.copyWith(
       status: PasswordResetStatus.loading,
       email: email.trim().toLowerCase(),
@@ -187,7 +180,11 @@ class PasswordResetController extends StateNotifier<PasswordResetState> {
   }
 
   void clearMessages() {
-    state = state.copyWith(clearError: true, clearSuccess: true, fieldErrors: {});
+    state = state.copyWith(
+      clearError: true,
+      clearSuccess: true,
+      fieldErrors: {},
+    );
   }
 
   String _mapError(ApiException error) {
@@ -225,6 +222,7 @@ class PasswordResetController extends StateNotifier<PasswordResetState> {
 }
 
 final passwordResetControllerProvider =
-    StateNotifierProvider.autoDispose<PasswordResetController, PasswordResetState>(
-  (ref) => PasswordResetController(ref.watch(authRepositoryProvider)),
-);
+    StateNotifierProvider.autoDispose<
+      PasswordResetController,
+      PasswordResetState
+    >((ref) => PasswordResetController(ref.watch(authRepositoryProvider)));

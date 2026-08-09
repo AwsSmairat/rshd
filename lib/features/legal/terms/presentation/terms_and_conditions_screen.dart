@@ -25,7 +25,8 @@ class TermsAndConditionsPage extends ConsumerStatefulWidget {
       _TermsAndConditionsPageState();
 }
 
-class _TermsAndConditionsPageState extends ConsumerState<TermsAndConditionsPage> {
+class _TermsAndConditionsPageState
+    extends ConsumerState<TermsAndConditionsPage> {
   final Set<String> _expandedIds = {};
   bool _acceptChecked = false;
 
@@ -65,7 +66,8 @@ class _TermsAndConditionsPageState extends ConsumerState<TermsAndConditionsPage>
     final platform = ref.watch(platformSettingsProvider).valueOrNull;
 
     ref.listen(termsAndConditionsControllerProvider, (prev, next) {
-      if (next.errorMessage != null && next.errorMessage != prev?.errorMessage) {
+      if (next.errorMessage != null &&
+          next.errorMessage != prev?.errorMessage) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!),
@@ -75,9 +77,9 @@ class _TermsAndConditionsPageState extends ConsumerState<TermsAndConditionsPage>
       }
       if (next.acceptanceMessage != null &&
           next.acceptanceMessage != prev?.acceptanceMessage) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.acceptanceMessage!)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.acceptanceMessage!)));
       }
     });
 
@@ -87,13 +89,17 @@ class _TermsAndConditionsPageState extends ConsumerState<TermsAndConditionsPage>
         TermsLoadStatus.initial || TermsLoadStatus.loading =>
           const LoadingWidget(message: 'جاري تحميل الشروط والأحكام...'),
         TermsLoadStatus.error => ErrorView(
-            message: state.errorMessage ?? 'تعذر تحميل الشروط',
-            onRetry: () => ref
-                .read(termsAndConditionsControllerProvider.notifier)
-                .load(refresh: true),
-          ),
-        TermsLoadStatus.loaded || TermsLoadStatus.offline =>
-          _buildContent(state, platform?.platformName ?? 'RSHD', platform?.supportEmail, platform?.supportPhone),
+          message: state.errorMessage ?? 'تعذر تحميل الشروط',
+          onRetry: () => ref
+              .read(termsAndConditionsControllerProvider.notifier)
+              .load(refresh: true),
+        ),
+        TermsLoadStatus.loaded || TermsLoadStatus.offline => _buildContent(
+          state,
+          platform?.platformName ?? 'RSHD',
+          platform?.supportEmail,
+          platform?.supportPhone,
+        ),
       },
     );
   }
@@ -110,13 +116,15 @@ class _TermsAndConditionsPageState extends ConsumerState<TermsAndConditionsPage>
       platformSupportEmail: supportEmail,
       platformSupportPhone: supportPhone,
     );
-    final accordionSections =
-        doc.sections.where((s) => s.id != 'contact').toList();
+    final accordionSections = doc.sections
+        .where((s) => s.id != 'contact')
+        .toList();
     final progress = _readProgress(accordionSections);
 
     return RefreshIndicator(
-      onRefresh: () =>
-          ref.read(termsAndConditionsControllerProvider.notifier).load(refresh: true),
+      onRefresh: () => ref
+          .read(termsAndConditionsControllerProvider.notifier)
+          .load(refresh: true),
       color: AppColors.secondary,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -151,7 +159,8 @@ class _TermsAndConditionsPageState extends ConsumerState<TermsAndConditionsPage>
                     TermsAcceptanceCard(
                       checked: _acceptChecked,
                       isLoading: state.isAccepting,
-                      onCheckedChanged: (v) => setState(() => _acceptChecked = v),
+                      onCheckedChanged: (v) =>
+                          setState(() => _acceptChecked = v),
                       onAccept: () async {
                         if (!_acceptChecked) return;
                         final ok = await ref
@@ -175,7 +184,8 @@ class _TermsAndConditionsPageState extends ConsumerState<TermsAndConditionsPage>
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
                           child: OutlinedButton.icon(
-                            onPressed: () => context.push(AppRoutes.privacyPolicy),
+                            onPressed: () =>
+                                context.push(AppRoutes.privacyPolicy),
                             icon: const Icon(Icons.privacy_tip_outlined),
                             label: const Text('فتح سياسة الخصوصية'),
                             style: OutlinedButton.styleFrom(
@@ -190,9 +200,12 @@ class _TermsAndConditionsPageState extends ConsumerState<TermsAndConditionsPage>
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
                           child: OutlinedButton.icon(
-                            onPressed: () => context.push(AppRoutes.deleteAccount),
-                            icon: const Icon(Icons.delete_outline,
-                                color: Color(0xFF991B1B)),
+                            onPressed: () =>
+                                context.push(AppRoutes.deleteAccount),
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: Color(0xFF991B1B),
+                            ),
                             label: const Text(
                               'طلب حذف الحساب',
                               style: TextStyle(color: Color(0xFF991B1B)),
@@ -242,7 +255,8 @@ class _TermsAndConditionsPageState extends ConsumerState<TermsAndConditionsPage>
                     version: doc.version,
                     lastUpdated: doc.lastUpdated,
                     onPrivacy: () => context.push(AppRoutes.privacyPolicy),
-                    onDeleteAccount: () => context.push(AppRoutes.deleteAccount),
+                    onDeleteAccount: () =>
+                        context.push(AppRoutes.deleteAccount),
                   ),
                 ],
               ),
@@ -329,7 +343,11 @@ class _OfflineBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.cloud_off_outlined, color: AppColors.darkGold, size: 20),
+          const Icon(
+            Icons.cloud_off_outlined,
+            color: AppColors.darkGold,
+            size: 20,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

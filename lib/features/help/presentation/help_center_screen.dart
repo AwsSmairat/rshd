@@ -43,37 +43,39 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
         FeatureLoadStatus.initial || FeatureLoadStatus.loading =>
           const LoadingWidget(message: 'جاري تحميل مركز المساعدة...'),
         FeatureLoadStatus.error => ErrorView(
-            message: state.errorMessage ?? 'تعذر تحميل مركز المساعدة',
-            onRetry: () =>
-                ref.read(helpCenterControllerProvider.notifier).load(refresh: true),
-          ),
+          message: state.errorMessage ?? 'تعذر تحميل مركز المساعدة',
+          onRetry: () => ref
+              .read(helpCenterControllerProvider.notifier)
+              .load(refresh: true),
+        ),
         FeatureLoadStatus.empty || FeatureLoadStatus.loaded => RefreshIndicator(
-            onRefresh: () =>
-                ref.read(helpCenterControllerProvider.notifier).load(refresh: true),
-            color: AppColors.secondary,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                const SliverToBoxAdapter(
-                  child: SubjectsHeader(
-                    title: 'مركز المساعدة',
-                    backgroundIcon: Icons.help_center_outlined,
-                  ),
+          onRefresh: () => ref
+              .read(helpCenterControllerProvider.notifier)
+              .load(refresh: true),
+          color: AppColors.secondary,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              const SliverToBoxAdapter(
+                child: SubjectsHeader(
+                  title: 'مركز المساعدة',
+                  backgroundIcon: Icons.help_center_outlined,
                 ),
-                SliverToBoxAdapter(
-                  child: ResponsiveContent(
-                    padding: EdgeInsets.fromLTRB(
-                      metrics.outerHorizontalInset,
-                      12,
-                      metrics.outerHorizontalInset,
-                      MediaQuery.paddingOf(context).bottom + 24,
-                    ),
-                    child: _buildContent(state),
+              ),
+              SliverToBoxAdapter(
+                child: ResponsiveContent(
+                  padding: EdgeInsets.fromLTRB(
+                    metrics.outerHorizontalInset,
+                    12,
+                    metrics.outerHorizontalInset,
+                    MediaQuery.paddingOf(context).bottom + 24,
                   ),
+                  child: _buildContent(state),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
       },
     );
   }

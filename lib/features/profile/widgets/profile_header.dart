@@ -7,11 +7,7 @@ import '../../../core/widgets/responsive_content.dart';
 import '../../auth/presentation/widgets/login_header.dart';
 
 class ProfileHeader extends StatelessWidget {
-  const ProfileHeader({
-    super.key,
-    required this.name,
-    required this.onBack,
-  });
+  const ProfileHeader({super.key, required this.name, required this.onBack});
 
   final String name;
   final VoidCallback onBack;
@@ -102,10 +98,7 @@ class ProfileHeader extends StatelessWidget {
                         height: 78,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.accent,
-                            width: 2,
-                          ),
+                          border: Border.all(color: AppColors.accent, width: 2),
                           color: AppColors.primary.withValues(alpha: 0.35),
                         ),
                         child: const Icon(
@@ -135,7 +128,9 @@ class ProfileHeader extends StatelessWidget {
                                 vertical: 5,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.darkGold.withValues(alpha: 0.85),
+                                color: AppColors.darkGold.withValues(
+                                  alpha: 0.85,
+                                ),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
@@ -144,7 +139,9 @@ class ProfileHeader extends StatelessWidget {
                                   Icon(
                                     Icons.school_outlined,
                                     size: 14,
-                                    color: AppColors.white.withValues(alpha: 0.95),
+                                    color: AppColors.white.withValues(
+                                      alpha: 0.95,
+                                    ),
                                   ),
                                   const SizedBox(width: 4),
                                   Text(

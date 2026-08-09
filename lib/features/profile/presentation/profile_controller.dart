@@ -37,9 +37,7 @@ String mapProfileError(ApiException error) {
   if (error.statusCode == null && error.message.contains('اتصال')) {
     return 'تعذر الاتصال بالسيرفر';
   }
-  return error.message.isNotEmpty
-      ? error.message
-      : 'تعذر تحميل الملف الشخصي';
+  return error.message.isNotEmpty ? error.message : 'تعذر تحميل الملف الشخصي';
 }
 
 class ProfileController extends StateNotifier<ProfileState> {
@@ -52,17 +50,11 @@ class ProfileController extends StateNotifier<ProfileState> {
       return;
     }
 
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final profile = await _repository.getProfile();
-      state = ProfileState(
-        status: FeatureLoadStatus.loaded,
-        profile: profile,
-      );
+      state = ProfileState(status: FeatureLoadStatus.loaded, profile: profile);
     } on ApiException catch (error) {
       state = ProfileState(
         status: FeatureLoadStatus.error,
@@ -79,5 +71,5 @@ class ProfileController extends StateNotifier<ProfileState> {
 
 final profileControllerProvider =
     StateNotifierProvider<ProfileController, ProfileState>((ref) {
-  return ProfileController(ref.watch(profileRepositoryProvider));
-});
+      return ProfileController(ref.watch(profileRepositoryProvider));
+    });

@@ -5,14 +5,12 @@ import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/network/api_response.dart';
+import '../../../../core/security/protected_content_cache.dart';
 import '../../../../core/storage/secure_storage_service.dart';
 import 'models/user_model.dart';
 
 class LoginOutcome {
-  const LoginOutcome._({
-    this.session,
-    this.verificationEmail,
-  });
+  const LoginOutcome._({this.session, this.verificationEmail});
 
   final AuthSession? session;
   final String? verificationEmail;
@@ -29,10 +27,7 @@ class LoginOutcome {
 }
 
 class RegisterOutcome {
-  const RegisterOutcome._({
-    this.session,
-    this.verificationEmail,
-  });
+  const RegisterOutcome._({this.session, this.verificationEmail});
 
   final AuthSession? session;
   final String? verificationEmail;
@@ -53,9 +48,9 @@ class AuthRepository {
     required ApiClient apiClient,
     required SecureStorageService secureStorage,
     required DeviceService deviceService,
-  })  : _apiClient = apiClient,
-        _secureStorage = secureStorage,
-        _deviceService = deviceService;
+  }) : _apiClient = apiClient,
+       _secureStorage = secureStorage,
+       _deviceService = deviceService;
 
   final ApiClient _apiClient;
   final SecureStorageService _secureStorage;
@@ -70,11 +65,7 @@ class AuthRepository {
     try {
       final response = await _apiClient.post<Map<String, dynamic>>(
         ApiEndpoints.login,
-        data: {
-          'email': email,
-          'password': password,
-          ...devicePayload,
-        },
+        data: {'email': email, 'password': password, ...devicePayload},
       );
 
       final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -94,9 +85,7 @@ class AuthRepository {
       return LoginOutcome.success(session);
     } on ApiException catch (error) {
       if (error.requiresEmailVerification) {
-        return LoginOutcome.requiresVerification(
-          error.responseEmail ?? email,
-        );
+        return LoginOutcome.requiresVerification(error.responseEmail ?? email);
       }
       rethrow;
     }
@@ -165,11 +154,7 @@ class AuthRepository {
 
     final response = await _apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.verifyEmail,
-      data: {
-        'email': email,
-        'code': code,
-        ...devicePayload,
-      },
+      data: {'email': email, 'code': code, ...devicePayload},
     );
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -235,10 +220,7 @@ class AuthRepository {
   }) async {
     final response = await _apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.passwordVerify,
-      data: {
-        'email': email.trim().toLowerCase(),
-        'code': code.trim(),
-      },
+      data: {'email': email.trim().toLowerCase(), 'code': code.trim()},
     );
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
@@ -327,12 +309,15 @@ class AuthRepository {
     } catch (_) {
       // Always clear local session even if remote logout fails.
     } finally {
+      await ProtectedContentCache.clearAll();
       await _secureStorage.clearAll();
     }
   }
 
   Future<UserModel> me() async {
-    final response = await _apiClient.get<Map<String, dynamic>>(ApiEndpoints.me);
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      ApiEndpoints.me,
+    );
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
       Map<String, dynamic>.from(response.data as Map),
@@ -361,6 +346,9 @@ class AuthRepository {
   }
 
   Future<bool> hasToken() => _secureStorage.hasToken();
+
+  Future<void> purgeLegacyRememberedPassword() =>
+      _secureStorage.purgeLegacyRememberedPassword();
 
   AuthSession _parseSession(Map<String, dynamic> data) {
     final token = data['token']?.toString();

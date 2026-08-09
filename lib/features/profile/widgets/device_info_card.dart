@@ -9,10 +9,7 @@ import 'linked_device_notice.dart';
 import 'profile_detail_row.dart';
 
 class DeviceInfoCard extends StatelessWidget {
-  const DeviceInfoCard({
-    super.key,
-    required this.device,
-  });
+  const DeviceInfoCard({super.key, required this.device});
 
   final DeviceModel? device;
 

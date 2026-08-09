@@ -49,15 +49,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     final storage = ref.read(secureStorageProvider);
-    final credentials = await storage.getRememberedCredentials();
-    if (!mounted || credentials == null) {
+    final email = await storage.getRememberedEmail();
+    if (!mounted || email == null) {
       return;
     }
 
     setState(() {
       _rememberMe = true;
-      _emailController.text = credentials.email;
-      _passwordController.text = credentials.password;
+      _emailController.text = email;
     });
   }
 
@@ -66,7 +65,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     await storage.saveRememberMe(
       enabled: _rememberMe,
       email: _emailController.text.trim(),
-      password: _passwordController.text,
     );
   }
 
@@ -82,7 +80,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
-    final result = await ref.read(authControllerProvider.notifier).login(
+    final result = await ref
+        .read(authControllerProvider.notifier)
+        .login(
           email: _emailController.text,
           password: _passwordController.text,
         );
@@ -99,7 +99,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         }
         context.go(AppRoutes.home);
       case LoginFlowResult.requiresEmailVerification:
-        final email = ref.read(authControllerProvider).pendingVerificationEmail ??
+        final email =
+            ref.read(authControllerProvider).pendingVerificationEmail ??
             _emailController.text.trim();
         context.go(
           '${AppRoutes.verifyEmail}?email=${Uri.encodeComponent(email)}',

@@ -126,11 +126,7 @@ class AssignmentsErrorState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.error_outline,
-            color: AppColors.error,
-            size: 36,
-          ),
+          const Icon(Icons.error_outline, color: AppColors.error, size: 36),
           const SizedBox(height: 12),
           Text(
             message,

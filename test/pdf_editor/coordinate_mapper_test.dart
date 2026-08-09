@@ -34,14 +34,8 @@ void main() {
         scrollOffset: const Offset(10, 20),
       );
 
-      expect(
-        scrolled.pageTopLeft.dx,
-        closeTo(base.pageTopLeft.dx - 20, 0.001),
-      );
-      expect(
-        scrolled.pageTopLeft.dy,
-        closeTo(base.pageTopLeft.dy - 40, 0.001),
-      );
+      expect(scrolled.pageTopLeft.dx, closeTo(base.pageTopLeft.dx - 20, 0.001));
+      expect(scrolled.pageTopLeft.dy, closeTo(base.pageTopLeft.dy - 40, 0.001));
     });
 
     test('ignores scroll offset at zoom 1', () {
@@ -76,8 +70,10 @@ void main() {
       final baseScreen = base.normalizedToScreen(point);
       final zoomedScreen = zoomed.normalizedToScreen(point);
 
-      expect(zoomedScreen.dx - zoomed.pageTopLeft.dx,
-          closeTo(2 * (baseScreen.dx - base.pageTopLeft.dx), 0.5));
+      expect(
+        zoomedScreen.dx - zoomed.pageTopLeft.dx,
+        closeTo(2 * (baseScreen.dx - base.pageTopLeft.dx), 0.5),
+      );
       expect(zoomed.screenToNormalized(zoomedScreen).nx, closeTo(0.25, 0.001));
     });
 

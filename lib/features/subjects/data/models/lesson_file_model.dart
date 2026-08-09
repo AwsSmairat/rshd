@@ -26,7 +26,8 @@ class LessonFileModel {
   final String? updatedAt;
 
   bool get canOpen =>
-      !isLocked && (requiresSignedDownload || (fileUrl?.trim().isNotEmpty ?? false));
+      !isLocked &&
+      (requiresSignedDownload || (fileUrl?.trim().isNotEmpty ?? false));
 
   factory LessonFileModel.fromJson(Map<String, dynamic> json) {
     return LessonFileModel(
@@ -37,7 +38,8 @@ class LessonFileModel {
       fileUrl: json['file_url']?.toString(),
       fileSize: _asInt(json['file_size']),
       isLocked: json['is_locked'] == true || json['is_locked'] == 1,
-      requiresSignedDownload: json['requires_signed_download'] == true ||
+      requiresSignedDownload:
+          json['requires_signed_download'] == true ||
           json['requires_signed_download'] == 1,
       createdAt: json['created_at']?.toString(),
       updatedAt: json['updated_at']?.toString(),

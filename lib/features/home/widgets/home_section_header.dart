@@ -5,11 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
 class HomeSectionHeader extends StatelessWidget {
-  const HomeSectionHeader({
-    super.key,
-    required this.title,
-    this.onViewAll,
-  });
+  const HomeSectionHeader({super.key, required this.title, this.onViewAll});
 
   final String title;
   final VoidCallback? onViewAll;
@@ -54,10 +50,7 @@ class HomeSectionHeader extends StatelessWidget {
             ),
             child: const Text(
               'عرض الكل >',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
             ),
           ),
       ],

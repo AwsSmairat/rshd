@@ -5,6 +5,7 @@ namespace App\Filament\Resources\VideoResource\Pages;
 use App\Enums\VideoStatus;
 use App\Filament\Resources\VideoResource;
 use App\Jobs\UploadVideoToBunnyJob;
+use App\Models\Video;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -25,7 +26,7 @@ class EditVideo extends EditRecord
      */
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        /** @var \App\Models\Video $record */
+        /** @var Video $record */
         $record = $this->record;
 
         return VideoResource::prepareVideoData($data, $record);

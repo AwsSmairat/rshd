@@ -111,7 +111,9 @@ extension on PrivacyPolicyDocument {
   }
 }
 
-final privacyPolicyRepositoryProvider = Provider<PrivacyPolicyRepository>((ref) {
+final privacyPolicyRepositoryProvider = Provider<PrivacyPolicyRepository>((
+  ref,
+) {
   return PrivacyPolicyRepository(
     ref.watch(apiClientProvider),
     LegalLocalCache(),

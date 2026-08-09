@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/platform/platform_settings_controller.dart';
 import '../../core/router/app_router.dart';
+import '../../core/startup/startup_coordinator.dart';
 import '../../core/theme/app_colors.dart';
-import '../auth/presentation/auth_controller.dart';
-import '../home/home_controller.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -18,6 +16,9 @@ class SplashScreen extends ConsumerStatefulWidget {
 class _SplashScreenState extends ConsumerState<SplashScreen>
     with TickerProviderStateMixin {
   static const _letters = ['R', 'S', 'H', 'D'];
+  static const _introDuration = Duration(milliseconds: 1200);
+  static const _zoomDuration = Duration(milliseconds: 420);
+  static const _navigateAtZoomProgress = 0.78;
 
   late final AnimationController _introController;
   late final AnimationController _zoomController;
@@ -25,10 +26,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   late final List<CurvedAnimation> _letterAnimations;
   late final CurvedAnimation _zoomCurve;
 
-  String? _destinationRoute;
   bool _zoomStarted = false;
   bool _navigated = false;
-  bool _homePreloadStarted = false;
 
   @override
   void initState() {
@@ -36,18 +35,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(splashAnimationCompletedProvider.notifier).state = false;
-      _bootstrapApp();
+      ref
+          .read(startupCoordinatorProvider.notifier)
+          .ensureAuthBootstrapStarted();
     });
 
     _introController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: _introDuration,
     );
 
-    _zoomController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 620),
-    );
+    _zoomController = AnimationController(vsync: this, duration: _zoomDuration);
 
     _letterAnimations = List.generate(_letters.length, (index) {
       final start = index * 0.2;
@@ -64,6 +62,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     _introController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
+        ref.read(startupCoordinatorProvider.notifier).markAnimationFinished();
         _maybeStartZoom();
       }
     });
@@ -79,33 +78,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     _introController.forward();
   }
 
-  void _bootstrapApp() {
-    final settingsState = ref.read(platformSettingsProvider);
-
-    void startAuthIfReady() {
-      final settings = ref.read(platformSettingsProvider).value;
-      if (settings?.maintenanceMode != true) {
-        ref.read(authControllerProvider.notifier).bootstrap();
-        return;
-      }
-
-      if (_introController.isCompleted) {
-        _maybeStartZoom();
-      }
-    }
-
-    if (settingsState.hasValue) {
-      startAuthIfReady();
-      return;
-    }
-
-    ref.read(platformSettingsProvider.future).then((_) {
-      if (mounted) {
-        startAuthIfReady();
-      }
-    });
-  }
-
   @override
   void dispose() {
     _zoomController.removeListener(_onZoomProgress);
@@ -114,95 +86,85 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     super.dispose();
   }
 
-  String? _resolveDestinationRoute(AuthState authState) {
-    final platformSettings = ref.read(platformSettingsProvider).value;
-    if (platformSettings?.maintenanceMode == true) {
-      return AppRoutes.maintenance;
-    }
-
-    switch (authState.status) {
-      case AuthStatus.authenticated:
-        final user = authState.user;
-        if (user != null && !user.isStudent) {
-          return AppRoutes.login;
-        }
-        if (user != null && !user.isEmailVerified) {
-          return '${AppRoutes.verifyEmail}?email=${Uri.encodeComponent(user.email)}';
-        }
-        return AppRoutes.home;
-      case AuthStatus.unauthenticated:
-      case AuthStatus.error:
-        final pendingEmail = authState.pendingVerificationEmail;
-        if (pendingEmail != null) {
-          return '${AppRoutes.verifyEmail}?email=${Uri.encodeComponent(pendingEmail)}';
-        }
-        return AppRoutes.login;
-      case AuthStatus.initial:
-      case AuthStatus.loading:
-      case AuthStatus.authenticating:
-        return null;
-    }
-  }
-
-  void _preloadHomeIfNeeded(AuthState authState) {
-    final route = _resolveDestinationRoute(authState);
-    if (route != AppRoutes.home || _homePreloadStarted) {
-      return;
-    }
-
-    _homePreloadStarted = true;
-    ref.read(homeControllerProvider.notifier).load(
-          fallbackStudentName: authState.user?.name,
-        );
-  }
-
   void _maybeStartZoom() {
     if (_zoomStarted || !mounted || !_introController.isCompleted) {
       return;
     }
 
-    final platformState = ref.read(platformSettingsProvider);
-    if (platformState.isLoading) {
+    final startup = ref.read(startupCoordinatorProvider);
+    if (!startup.startupDecisionReady || startup.destinationRoute == null) {
       return;
     }
-
-    final authState = ref.read(authControllerProvider);
-    final route = _resolveDestinationRoute(authState);
-    if (route == null) {
-      return;
-    }
-
-    _preloadHomeIfNeeded(authState);
 
     setState(() {
-      _destinationRoute = route;
       _zoomStarted = true;
     });
     _zoomController.forward(from: 0);
   }
 
   void _onZoomProgress() {
-    if (!_zoomStarted || _navigated || _destinationRoute == null) {
+    if (!_zoomStarted || _navigated) {
       return;
     }
 
-    if (_zoomController.value >= 0.82) {
+    if (_zoomController.value >= _navigateAtZoomProgress) {
       _finishSplash();
     }
   }
 
   void _finishSplash() {
-    final route = _destinationRoute;
-    if (route == null || !mounted || _navigated) {
+    if (!mounted || _navigated) {
+      return;
+    }
+
+    final startup = ref.read(startupCoordinatorProvider);
+    final route = startup.destinationRoute;
+    if (route == null || !startup.animationFinished) {
       return;
     }
 
     _navigated = true;
+    ref
+        .read(startupCoordinatorProvider.notifier)
+        .markNavigationRequested(route);
     ref.read(splashAnimationCompletedProvider.notifier).state = true;
 
-    setState(() {});
-
     context.go(route);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref
+            .read(startupCoordinatorProvider.notifier)
+            .markDestinationFirstFrame();
+      }
+    });
+  }
+
+  void _tryNavigateWhenReady() {
+    if (_navigated) {
+      return;
+    }
+
+    final startup = ref.read(startupCoordinatorProvider);
+
+    if (!startup.animationFinished) {
+      if (_introController.isCompleted) {
+        ref.read(startupCoordinatorProvider.notifier).markAnimationFinished();
+      } else {
+        return;
+      }
+    }
+
+    if (!startup.startupDecisionReady) {
+      return;
+    }
+
+    if (_zoomStarted) {
+      _finishSplash();
+      return;
+    }
+
+    _maybeStartZoom();
   }
 
   Widget _buildLetter(int index) {
@@ -244,16 +206,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       );
     }
 
-    ref.listen(authControllerProvider, (previous, next) {
-      _preloadHomeIfNeeded(next);
-      _maybeStartZoom();
+    ref.listen(startupCoordinatorProvider, (previous, next) {
+      _tryNavigateWhenReady();
     });
 
-    ref.listen(platformSettingsProvider, (previous, next) {
-      if (next.hasValue) {
-        _maybeStartZoom();
-      }
-    });
+    final startup = ref.watch(startupCoordinatorProvider);
+    final waitingForAuth =
+        _introController.isCompleted && !startup.startupDecisionReady;
 
     final size = MediaQuery.sizeOf(context);
     final targetScale = (size.longestSide / 55).clamp(12.0, 20.0);
@@ -270,10 +229,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           final wordOpacity = zoom < 0.55
               ? 1.0
               : (1.0 - (zoom - 0.55) / 0.27).clamp(0.0, 1.0);
-          final holdProgress =
-              ((_introController.value - 0.8) / 0.2).clamp(0.0, 1.0);
-          final waitingForAuth =
-              _introController.isCompleted && !_zoomStarted;
+          final holdProgress = ((_introController.value - 0.8) / 0.2).clamp(
+            0.0,
+            1.0,
+          );
 
           return ClipRect(
             child: Stack(

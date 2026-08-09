@@ -5,8 +5,8 @@ namespace App\Services;
 use App\Models\LessonFile;
 use App\Models\User;
 use App\Services\Bunny\BunnyFilesCdnTokenSigner;
+use App\Support\SafeLogger;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use RuntimeException;
@@ -51,7 +51,7 @@ class LessonFileDownloadService
         $path = (string) $lessonFile->file_path;
 
         if ($path === '' || ! Storage::disk($diskName)->exists($path)) {
-            Log::warning('lesson_file.download.local_missing', [
+            SafeLogger::warning('lesson_file.download.local_missing', [
                 'file_id' => $lessonFile->id,
                 'disk' => $diskName,
                 'path' => $path,
@@ -79,7 +79,7 @@ class LessonFileDownloadService
     protected function generateBunnySignedUrl(LessonFile $lessonFile): ?array
     {
         if (! config('files.signed_download', true) || ! $this->signer->isConfigured()) {
-            Log::warning('lesson_file.download.bunny_not_configured', [
+            SafeLogger::warning('lesson_file.download.bunny_not_configured', [
                 'file_id' => $lessonFile->id,
             ]);
 
@@ -93,7 +93,7 @@ class LessonFileDownloadService
         try {
             $signedUrl = $this->signer->signCdnPath($externalPath, $expiresAt);
         } catch (RuntimeException $exception) {
-            Log::warning('lesson_file.download.sign_failed', [
+            SafeLogger::warning('lesson_file.download.sign_failed', [
                 'file_id' => $lessonFile->id,
                 'reason' => $exception->getMessage(),
             ]);

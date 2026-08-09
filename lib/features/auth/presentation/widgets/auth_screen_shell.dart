@@ -41,10 +41,7 @@ class AuthScreenShell extends StatelessWidget {
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          body,
-                          if (footer != null) footer!,
-                        ],
+                        children: [body, ?footer],
                       ),
                     ),
                   ),

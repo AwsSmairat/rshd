@@ -4,10 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
 class GradeTypeBadge extends StatelessWidget {
-  const GradeTypeBadge({
-    super.key,
-    required this.sourceType,
-  });
+  const GradeTypeBadge({super.key, required this.sourceType});
 
   final String sourceType;
 
@@ -68,10 +65,7 @@ class GradeTypeBadge extends StatelessWidget {
 }
 
 class _BadgeColors {
-  const _BadgeColors({
-    required this.background,
-    required this.foreground,
-  });
+  const _BadgeColors({required this.background, required this.foreground});
 
   final Color background;
   final Color foreground;

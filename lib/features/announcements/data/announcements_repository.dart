@@ -7,7 +7,8 @@ import '../../../core/network/api_response.dart';
 import 'models/announcement_model.dart';
 
 class AnnouncementsRepository {
-  AnnouncementsRepository({required ApiClient apiClient}) : _apiClient = apiClient;
+  AnnouncementsRepository({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 
@@ -35,7 +36,9 @@ class AnnouncementsRepository {
 
     return rawList
         .whereType<Map>()
-        .map((item) => AnnouncementModel.fromJson(Map<String, dynamic>.from(item)))
+        .map(
+          (item) => AnnouncementModel.fromJson(Map<String, dynamic>.from(item)),
+        )
         .toList();
   }
 
@@ -50,6 +53,8 @@ class AnnouncementsRepository {
   }
 }
 
-final announcementsRepositoryProvider = Provider<AnnouncementsRepository>((ref) {
+final announcementsRepositoryProvider = Provider<AnnouncementsRepository>((
+  ref,
+) {
   return AnnouncementsRepository(apiClient: ref.watch(apiClientProvider));
 });

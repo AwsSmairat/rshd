@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\UserStatus;
 use App\Models\StudentDevice;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -197,7 +198,7 @@ class StudentSettingsService
         $this->deviceService->resetStudentDevices($user);
 
         $user->update([
-            'status' => \App\Enums\UserStatus::Blocked,
+            'status' => UserStatus::Blocked,
             'email' => 'deleted_'.$user->id.'_'.time().'@deleted.local',
         ]);
     }

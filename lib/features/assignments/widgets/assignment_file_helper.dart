@@ -46,10 +46,7 @@ class AssignmentFileHelper {
     return '${(bytes / (1024 * 1024)).toStringAsFixed(2)} MB';
   }
 
-  static IconData iconFor({
-    String? mimeType,
-    String? fileName,
-  }) {
+  static IconData iconFor({String? mimeType, String? fileName}) {
     final mime = mimeType?.toLowerCase() ?? '';
     final ext = _extension(fileName);
 

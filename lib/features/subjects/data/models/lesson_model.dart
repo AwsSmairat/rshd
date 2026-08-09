@@ -48,34 +48,40 @@ class LessonModel {
 
     final videos = videosJson is List
         ? videosJson
-            .whereType<Map>()
-            .map((item) => VideoModel.fromJson(Map<String, dynamic>.from(item)))
-            .toList()
+              .whereType<Map>()
+              .map(
+                (item) => VideoModel.fromJson(Map<String, dynamic>.from(item)),
+              )
+              .toList()
         : const <VideoModel>[];
 
     final files = filesJson is List
         ? filesJson
-            .whereType<Map>()
-            .map(
-              (item) => LessonFileModel.fromJson(Map<String, dynamic>.from(item)),
-            )
-            .toList()
+              .whereType<Map>()
+              .map(
+                (item) =>
+                    LessonFileModel.fromJson(Map<String, dynamic>.from(item)),
+              )
+              .toList()
         : const <LessonFileModel>[];
 
     final assignments = assignmentsJson is List
         ? assignmentsJson
-            .whereType<Map>()
-            .map(
-              (item) => AssignmentModel.fromJson(Map<String, dynamic>.from(item)),
-            )
-            .toList()
+              .whereType<Map>()
+              .map(
+                (item) =>
+                    AssignmentModel.fromJson(Map<String, dynamic>.from(item)),
+              )
+              .toList()
         : const <AssignmentModel>[];
 
     final quizzes = quizzesJson is List
         ? quizzesJson
-            .whereType<Map>()
-            .map((item) => QuizModel.fromJson(Map<String, dynamic>.from(item)))
-            .toList()
+              .whereType<Map>()
+              .map(
+                (item) => QuizModel.fromJson(Map<String, dynamic>.from(item)),
+              )
+              .toList()
         : const <QuizModel>[];
 
     return LessonModel(
@@ -92,13 +98,13 @@ class LessonModel {
       videosCount: videos.isNotEmpty
           ? videos.length
           : _asInt(json['videos_count']),
-      filesCount:
-          files.isNotEmpty ? files.length : _asInt(json['files_count']),
+      filesCount: files.isNotEmpty ? files.length : _asInt(json['files_count']),
       assignmentsCount: assignments.isNotEmpty
           ? assignments.length
           : _asInt(json['assignments_count']),
-      quizzesCount:
-          quizzes.isNotEmpty ? quizzes.length : _asInt(json['quizzes_count']),
+      quizzesCount: quizzes.isNotEmpty
+          ? quizzes.length
+          : _asInt(json['quizzes_count']),
       createdAt: json['created_at']?.toString(),
       updatedAt: json['updated_at']?.toString(),
     );

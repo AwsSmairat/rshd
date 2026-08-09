@@ -285,7 +285,8 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final compact = constraints.hasBoundedHeight && constraints.maxHeight < 220;
+        final compact =
+            constraints.hasBoundedHeight && constraints.maxHeight < 220;
 
         return Container(
           width: double.infinity,
@@ -315,7 +316,11 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
                   color: AppColors.error.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, size: compact ? 20 : 24, color: AppColors.error),
+                child: Icon(
+                  icon,
+                  size: compact ? 20 : 24,
+                  color: AppColors.error,
+                ),
               ),
               SizedBox(height: compact ? 6 : 8),
               Text(
@@ -349,7 +354,9 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : Icon(Icons.refresh_rounded, size: compact ? 15 : 17),
-                  label: Text(_isRefreshing ? 'جاري التحديث...' : 'إعادة المحاولة'),
+                  label: Text(
+                    _isRefreshing ? 'جاري التحديث...' : 'إعادة المحاولة',
+                  ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.secondary,
                     side: BorderSide(
@@ -380,10 +387,7 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
           gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
-            colors: [
-              AppColors.primary,
-              AppColors.secondaryNavy,
-            ],
+            colors: [AppColors.primary, AppColors.secondaryNavy],
           ),
         ),
         alignment: Alignment.center,

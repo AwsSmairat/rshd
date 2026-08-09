@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\LessonResource\Pages;
 
 use App\Filament\Resources\LessonResource;
+use App\Models\Lesson;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -23,7 +24,7 @@ class EditLesson extends EditRecord
      */
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        /** @var \App\Models\Lesson $record */
+        /** @var Lesson $record */
         $record = $this->record;
 
         $subjectId = (int) ($data['subject_id'] ?? $record->subject_id);

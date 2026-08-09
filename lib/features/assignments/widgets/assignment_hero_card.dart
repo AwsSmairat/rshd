@@ -10,10 +10,7 @@ import 'assignment_icon_panel.dart';
 import 'submission_status_badge.dart';
 
 class AssignmentHeroCard extends StatelessWidget {
-  const AssignmentHeroCard({
-    super.key,
-    required this.assignment,
-  });
+  const AssignmentHeroCard({super.key, required this.assignment});
 
   final AssignmentModel assignment;
 
@@ -71,10 +68,7 @@ class AssignmentHeroCard extends StatelessWidget {
 }
 
 class AssignmentInfoGrid extends StatelessWidget {
-  const AssignmentInfoGrid({
-    super.key,
-    required this.assignment,
-  });
+  const AssignmentInfoGrid({super.key, required this.assignment});
 
   final AssignmentModel assignment;
 
@@ -83,8 +77,8 @@ class AssignmentInfoGrid extends StatelessWidget {
     final submissionStatus = assignment.isSubmitted
         ? 'تم التسليم'
         : assignment.isOverdue
-            ? 'منتهي'
-            : 'لم يتم التسليم';
+        ? 'منتهي'
+        : 'لم يتم التسليم';
 
     final stats = [
       _GridItem(
@@ -109,8 +103,8 @@ class AssignmentInfoGrid extends StatelessWidget {
         valueColor: assignment.isSubmitted
             ? const Color(0xFF15803D)
             : assignment.isOverdue
-                ? const Color(0xFF991B1B)
-                : AppColors.darkGold,
+            ? const Color(0xFF991B1B)
+            : AppColors.darkGold,
       ),
     ];
 
@@ -126,7 +120,11 @@ class AssignmentInfoGrid extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
             child: Row(
               children: [
-                Icon(Icons.schedule_outlined, size: 18, color: AppColors.darkGold),
+                Icon(
+                  Icons.schedule_outlined,
+                  size: 18,
+                  color: AppColors.darkGold,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'معلومات الواجب',
@@ -141,7 +139,9 @@ class AssignmentInfoGrid extends StatelessWidget {
           ),
           Row(
             children: [
-              Expanded(child: _buildCell(stats[0], showRight: true, showBottom: true)),
+              Expanded(
+                child: _buildCell(stats[0], showRight: true, showBottom: true),
+              ),
               Expanded(child: _buildCell(stats[1], showBottom: true)),
             ],
           ),

@@ -92,60 +92,60 @@ class _TechnicalSupportScreenState
         FeatureLoadStatus.initial || FeatureLoadStatus.loading =>
           const LoadingWidget(message: 'جاري تحميل الدعم الفني...'),
         FeatureLoadStatus.error => ErrorView(
-            message: state.errorMessage ?? 'تعذر تحميل الدعم الفني',
-            onRetry: () => ref
-                .read(technicalSupportControllerProvider.notifier)
-                .load(refresh: true),
-          ),
+          message: state.errorMessage ?? 'تعذر تحميل الدعم الفني',
+          onRetry: () => ref
+              .read(technicalSupportControllerProvider.notifier)
+              .load(refresh: true),
+        ),
         FeatureLoadStatus.empty || FeatureLoadStatus.loaded => Column(
-            children: [
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () => ref
-                      .read(technicalSupportControllerProvider.notifier)
-                      .load(refresh: true),
-                  color: AppColors.secondary,
-                  child: CustomScrollView(
-                    controller: _scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      const SliverToBoxAdapter(
-                        child: SubjectsHeader(
-                          title: 'الدعم الفني',
-                          backgroundIcon: Icons.support_agent_outlined,
-                        ),
+          children: [
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () => ref
+                    .read(technicalSupportControllerProvider.notifier)
+                    .load(refresh: true),
+                color: AppColors.secondary,
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
+                    const SliverToBoxAdapter(
+                      child: SubjectsHeader(
+                        title: 'الدعم الفني',
+                        backgroundIcon: Icons.support_agent_outlined,
                       ),
-                      SliverToBoxAdapter(
-                        child: ResponsiveContent(
-                          padding: EdgeInsets.fromLTRB(
-                            metrics.outerHorizontalInset,
-                            12,
-                            metrics.outerHorizontalInset,
-                            12,
-                          ),
-                          child: _buildStatusBanner(state.conversation),
+                    ),
+                    SliverToBoxAdapter(
+                      child: ResponsiveContent(
+                        padding: EdgeInsets.fromLTRB(
+                          metrics.outerHorizontalInset,
+                          12,
+                          metrics.outerHorizontalInset,
+                          12,
                         ),
+                        child: _buildStatusBanner(state.conversation),
                       ),
-                      SliverToBoxAdapter(
-                        child: ResponsiveContent(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: metrics.outerHorizontalInset,
-                          ),
-                          child: _buildMessages(state.conversation),
+                    ),
+                    SliverToBoxAdapter(
+                      child: ResponsiveContent(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: metrics.outerHorizontalInset,
                         ),
+                        child: _buildMessages(state.conversation),
                       ),
-                      SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: MediaQuery.paddingOf(context).bottom + 8,
-                        ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: MediaQuery.paddingOf(context).bottom + 8,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              _buildComposer(state),
-            ],
-          ),
+            ),
+            _buildComposer(state),
+          ],
+        ),
       },
     );
   }
@@ -174,9 +174,10 @@ class _TechnicalSupportScreenState
 
     final statusText = switch (ticket.status) {
       'pending' => 'طلبك بانتظار قبول أحد المسؤولين',
-      'active' => ticket.assignedAdminName != null
-          ? 'يتابع محادثتك: ${ticket.assignedAdminName}'
-          : 'محادثة جارية مع الدعم الفني',
+      'active' =>
+        ticket.assignedAdminName != null
+            ? 'يتابع محادثتك: ${ticket.assignedAdminName}'
+            : 'محادثة جارية مع الدعم الفني',
       'closed' => 'تم إنهاء هذه المحادثة — يمكنك بدء محادثة جديدة',
       _ => ticket.statusLabel,
     };
@@ -224,9 +225,7 @@ class _TechnicalSupportScreenState
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
-    return Column(
-      children: messages.map(_buildMessageBubble).toList(),
-    );
+    return Column(children: messages.map(_buildMessageBubble).toList());
   }
 
   Widget _buildMessageBubble(SupportMessageModel message) {

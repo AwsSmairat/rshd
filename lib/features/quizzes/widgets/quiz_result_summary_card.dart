@@ -29,10 +29,7 @@ class QuizResultSummaryCard extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppColors.primary,
-            AppColors.secondaryNavy,
-          ],
+          colors: [AppColors.primary, AppColors.secondaryNavy],
         ),
         border: Border.all(
           color: AppColors.accent.withValues(alpha: 0.55),

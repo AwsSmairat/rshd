@@ -31,30 +31,83 @@ class AuthLayoutMetrics {
     return isLargeTablet ? 48 : 32;
   }
 
-  double get cardHorizontalPadding => isLargeTablet ? 12 : isTablet ? 8 : 20;
+  double get cardHorizontalPadding => isLargeTablet
+      ? 12
+      : isTablet
+      ? 8
+      : 20;
 
-  double get cardInnerPadding => isLargeTablet ? 32 : isTablet ? 26 : 22;
+  double get cardInnerPadding => isLargeTablet
+      ? 32
+      : isTablet
+      ? 26
+      : 22;
 
-  double get cardVerticalPadding => isLargeTablet ? 28 : isTablet ? 24 : 24;
+  double get cardVerticalPadding => isLargeTablet
+      ? 28
+      : isTablet
+      ? 24
+      : 24;
 
-  double get headerLogoHeight => isLargeTablet ? 160 : isTablet ? 140 : 120;
+  double get headerLogoHeight => isLargeTablet
+      ? 160
+      : isTablet
+      ? 140
+      : 120;
 
   double get headerTopPadding =>
-      padding.top + (isLargeTablet ? 28 : isTablet ? 24 : 20);
+      padding.top +
+      (isLargeTablet
+          ? 28
+          : isTablet
+          ? 24
+          : 20);
 
-  double get headerBottomPadding => isLargeTablet ? 58 : isTablet ? 50 : 44;
+  double get headerBottomPadding => isLargeTablet
+      ? 58
+      : isTablet
+      ? 50
+      : 44;
 
-  double get headerIconSize => isLargeTablet ? 128 : isTablet ? 118 : 110;
+  double get headerIconSize => isLargeTablet
+      ? 128
+      : isTablet
+      ? 118
+      : 110;
 
-  double get headerBadgeSize => isLargeTablet ? 88 : isTablet ? 80 : 72;
+  double get headerBadgeSize => isLargeTablet
+      ? 88
+      : isTablet
+      ? 80
+      : 72;
 
-  double get titleFontSize => isLargeTablet ? 26 : isTablet ? 24 : 22;
+  double get titleFontSize => isLargeTablet
+      ? 26
+      : isTablet
+      ? 24
+      : 22;
 
-  double get subtitleFontSize => isLargeTablet ? 15 : isTablet ? 14 : 13;
+  double get subtitleFontSize => isLargeTablet
+      ? 15
+      : isTablet
+      ? 14
+      : 13;
 
-  double get bottomSpacing => isLargeTablet ? 28 : isTablet ? 22 : 16;
+  double get bottomSpacing => isLargeTablet
+      ? 28
+      : isTablet
+      ? 22
+      : 16;
 
-  double get sectionSpacing => isLargeTablet ? 28 : isTablet ? 24 : 22;
+  double get sectionSpacing => isLargeTablet
+      ? 28
+      : isTablet
+      ? 24
+      : 22;
 
-  double get fieldSpacing => isLargeTablet ? 20 : isTablet ? 18 : 16;
+  double get fieldSpacing => isLargeTablet
+      ? 20
+      : isTablet
+      ? 18
+      : 16;
 }

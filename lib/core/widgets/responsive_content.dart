@@ -4,11 +4,7 @@ import '../layout/app_layout_metrics.dart';
 
 /// Centers page content and applies responsive horizontal padding.
 class ResponsiveContent extends StatelessWidget {
-  const ResponsiveContent({
-    super.key,
-    required this.child,
-    this.padding,
-  });
+  const ResponsiveContent({super.key, required this.child, this.padding});
 
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -16,7 +12,8 @@ class ResponsiveContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final metrics = AppLayoutMetrics.of(context);
-    final resolvedPadding = padding ??
+    final resolvedPadding =
+        padding ??
         EdgeInsets.symmetric(horizontal: metrics.outerHorizontalInset);
 
     return Padding(
@@ -46,8 +43,7 @@ class ResponsiveSliverContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final metrics = AppLayoutMetrics.of(context);
-    final resolvedPadding =
-        padding ?? metrics.pagePadding(top: 8, bottom: 32);
+    final resolvedPadding = padding ?? metrics.pagePadding(top: 8, bottom: 32);
 
     return SliverPadding(
       padding: resolvedPadding,
@@ -61,11 +57,7 @@ class ResponsiveSliverContent extends StatelessWidget {
 
 /// Keeps decorative headers full width while constraining their inner content.
 class ResponsiveHeaderContent extends StatelessWidget {
-  const ResponsiveHeaderContent({
-    super.key,
-    required this.child,
-    this.padding,
-  });
+  const ResponsiveHeaderContent({super.key, required this.child, this.padding});
 
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -79,7 +71,8 @@ class ResponsiveHeaderContent extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: metrics.contentMaxWidth),
         child: Padding(
-          padding: padding ??
+          padding:
+              padding ??
               EdgeInsets.symmetric(horizontal: metrics.horizontalPadding),
           child: child,
         ),

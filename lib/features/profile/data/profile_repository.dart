@@ -12,7 +12,9 @@ class ProfileRepository {
   final ApiClient _apiClient;
 
   Future<ProfileModel> getProfile() async {
-    final response = await _apiClient.get<Map<String, dynamic>>(ApiEndpoints.me);
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      ApiEndpoints.me,
+    );
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(
       Map<String, dynamic>.from(response.data as Map),

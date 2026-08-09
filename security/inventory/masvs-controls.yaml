@@ -1,0 +1,215 @@
+# RSHD MASVS Mobile Controls Inventory — Phase 3
+version: 1
+last_reviewed: 2026-08-10
+references:
+  - OWASP MASVS
+  - OWASP MASTG
+  - Android security guidance
+  - Apple platform security
+
+summary:
+  reviewed: 33
+  pass: 22
+  partial: 5
+  fail: 0
+  not_applicable: 5
+  manual_review: 1
+
+controls:
+  - id: MASVS-STORAGE-1
+    category: MASVS-STORAGE
+    title: Auth tokens in secure storage
+    status: PASS
+    evidence: flutter_secure_storage with Android encryptedSharedPreferences; no SharedPreferences for secrets
+
+  - id: MASVS-STORAGE-2
+    category: MASVS-STORAGE
+    title: PDF/annotation offline cache app-private
+    status: PARTIAL
+    evidence: ApplicationDocumentsDirectory/pdf_cache/{userId}; no encryption-at-rest (V1 documented)
+
+  - id: MASVS-STORAGE-3
+    category: MASVS-STORAGE
+    title: Logout clears protected caches
+    status: PASS
+    evidence: ProtectedContentCache.clearAll on logout; pdf_cache_security_test.dart
+
+  - id: MASVS-STORAGE-4
+    category: MASVS-STORAGE
+    title: Cross-account cache isolation
+    status: PASS
+    evidence: User-scoped paths + onUserChanged; pdf_cache_security_test.dart
+
+  - id: MASVS-STORAGE-5
+    category: MASVS-STORAGE
+    title: Android backup excludes protected data
+    status: PASS
+    evidence: backup_rules.xml + data_extraction_rules.xml exclude pdf_cache and related dirs
+
+  - id: MASVS-STORAGE-6
+    category: MASVS-STORAGE
+    title: iOS file protection on cache files
+    status: PARTIAL
+    evidence: App sandbox only; NSFileProtection not applied per-file in Dart layer — MANUAL_REVIEW for device backup
+
+  - id: MASVS-CRYPTO-1
+    category: MASVS-CRYPTO
+    title: No custom crypto for PDF cache
+    status: NOT_APPLICABLE
+    evidence: Platform sandbox chosen over app-level encryption (documented in PdfCacheService)
+
+  - id: MASVS-AUTH-1
+    category: MASVS-AUTH
+    title: No password persistence
+    status: PASS
+    evidence: remember_me_security_test.dart; legacy key purged
+
+  - id: MASVS-AUTH-2
+    category: MASVS-AUTH
+    title: Session invalidation on logout
+    status: PASS
+    evidence: auth_repository logout clears secure storage + protected caches
+
+  - id: MASVS-AUTH-3
+    category: MASVS-AUTH
+    title: 401 handling clears session
+    status: PASS
+    evidence: auth_controller bootstrap/me catches ApiException and logs out
+
+  - id: MASVS-NETWORK-1
+    category: MASVS-NETWORK
+    title: HTTPS required in release
+    status: PASS
+    evidence: ReleaseEnvironmentGuard + AppConfig API_BASE_URL; mobile_security_test.dart
+
+  - id: MASVS-NETWORK-2
+    category: MASVS-NETWORK
+    title: Cleartext HTTP dev-only
+    status: PASS
+    evidence: Android usesCleartextTraffic debug manifest overlay only; release manifest omits cleartext
+
+  - id: MASVS-NETWORK-3
+    category: MASVS-NETWORK
+    title: Certificate pinning
+    status: NOT_APPLICABLE
+    evidence: NOT IMPLEMENTED BY DESIGN — rotation/Bunny CDN operational risk documented
+
+  - id: MASVS-NETWORK-4
+    category: MASVS-NETWORK
+    title: Dio timeouts configured
+    status: PASS
+    evidence: api_client + pdf_cache_service use AppConfig timeouts
+
+  - id: MASVS-NETWORK-5
+    category: MASVS-NETWORK
+    title: No TLS bypass
+    status: PASS
+    evidence: No badCertificateCallback in codebase
+
+  - id: MASVS-PLATFORM-1
+    category: MASVS-PLATFORM
+    title: Android FLAG_SECURE on protected screens
+    status: PASS
+    evidence: MainActivity.kt + ScreenProtectionService; screen_protection_test.dart
+
+  - id: MASVS-PLATFORM-2
+    category: MASVS-PLATFORM
+    title: iOS capture detection + overlay
+    status: PASS
+    evidence: ScreenProtectionPlugin.swift + ProtectedContentOverlay; MANUAL_REVIEW for device
+
+  - id: MASVS-PLATFORM-3
+    category: MASVS-PLATFORM
+    title: iOS screenshot prevention claim
+    status: NOT_APPLICABLE
+    evidence: Documented platform limitation in ScreenProtectionService
+
+  - id: MASVS-PLATFORM-4
+    category: MASVS-PLATFORM
+    title: App switcher privacy overlay
+    status: PASS
+    evidence: ScreenProtectionService lifecycle inactive/resumed overlay
+
+  - id: MASVS-PLATFORM-5
+    category: MASVS-PLATFORM
+    title: Android permissions least privilege
+    status: PASS
+    evidence: INTERNET only in AndroidManifest.xml
+
+  - id: MASVS-PLATFORM-6
+    category: MASVS-PLATFORM
+    title: Exported Android components
+    status: PASS
+    evidence: MainActivity exported=true for launcher only; no deep-link intent filters
+
+  - id: MASVS-CODE-1
+    category: MASVS-CODE
+    title: No secrets in mobile binary source
+    status: PASS
+    evidence: Semgrep mobile rules; OAuth client IDs public by design
+
+  - id: MASVS-CODE-2
+    category: MASVS-CODE
+    title: Release obfuscation configured
+    status: PARTIAL
+    evidence: Documented --obfuscate recommendation; not enforced in CI — not treated as security boundary
+
+  - id: MASVS-RESILIENCE-1
+    category: MASVS-RESILIENCE
+    title: Deep link authorization bypass
+    status: NOT_APPLICABLE
+    evidence: No OS deep links for content; GoRouter in-app only
+
+  - id: MASVS-RESILIENCE-2
+    category: MASVS-RESILIENCE
+    title: External URL scheme validation
+    status: PASS
+    evidence: SafeExternalUrl + SafeUrlLauncher; mobile_security_test.dart
+
+  - id: MASVS-RESILIENCE-3
+    category: MASVS-RESILIENCE
+    title: WebView navigation allowlist
+    status: PASS
+    evidence: webview_bootstrap onNavigationRequest + Bunny host allowlist
+
+  - id: MASVS-RESILIENCE-4
+    category: MASVS-RESILIENCE
+    title: Root/jailbreak detection
+    status: PARTIAL
+    evidence: Deferred by design — backend authorization remains source of truth
+
+  - id: MASVS-RESILIENCE-5
+    category: MASVS-RESILIENCE
+    title: Play Integrity / App Attest
+    status: PARTIAL
+    evidence: Deferred — threat-model item only
+
+  - id: MASVS-PRIVACY-1
+    category: MASVS-PRIVACY
+    title: Clipboard sensitive data
+    status: PASS
+    evidence: No Clipboard usage in lib/
+
+  - id: MASVS-PRIVACY-2
+    category: MASVS-PRIVACY
+    title: Notification payload minimization
+    status: MANUAL_REVIEW
+    evidence: In-app notifications; push payload review deferred
+
+  - id: MASVS-PRIVACY-3
+    category: MASVS-PRIVACY
+    title: Sensitive debug logging redaction
+    status: PASS
+    evidence: RedactedLogInterceptor + SensitiveDataRedactor
+
+  - id: MASVS-PRIVACY-4
+    category: MASVS-PRIVACY
+    title: iOS UIFileSharingEnabled
+    status: PASS
+    evidence: Not set in Info.plist — internal cache not exposed via Files app
+
+  - id: MASVS-PRIVACY-5
+    category: MASVS-PRIVACY
+    title: Biometrics
+    status: NOT_APPLICABLE
+    evidence: No biometric unlock in V1

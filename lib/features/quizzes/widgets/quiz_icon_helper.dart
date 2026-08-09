@@ -6,18 +6,10 @@ class QuizIconHelper {
   /// Default quizzes branding icon (avoids the question-mark look of [Icons.quiz_outlined]).
   static const IconData sectionIcon = Icons.edit_note_rounded;
 
-  static IconData iconFor({
-    required String title,
-    String? subjectTitle,
-  }) {
+  static IconData iconFor({required String title, String? subjectTitle}) {
     final haystack = _normalize('$title ${subjectTitle ?? ''}');
 
-    if (_matches(haystack, const [
-      'تشريح',
-      'anatomy',
-      'طب',
-      'medicine',
-    ])) {
+    if (_matches(haystack, const ['تشريح', 'anatomy', 'طب', 'medicine'])) {
       return Icons.menu_book_outlined;
     }
 
@@ -42,29 +34,15 @@ class QuizIconHelper {
       return Icons.code_rounded;
     }
 
-    if (_matches(haystack, const [
-      'widget',
-      'widgets',
-      'واجهات',
-      'ui',
-    ])) {
+    if (_matches(haystack, const ['widget', 'widgets', 'واجهات', 'ui'])) {
       return Icons.dashboard_customize_outlined;
     }
 
-    if (_matches(haystack, const [
-      'sql',
-      'database',
-      'قواعد بيانات',
-      'db',
-    ])) {
+    if (_matches(haystack, const ['sql', 'database', 'قواعد بيانات', 'db'])) {
       return Icons.storage_outlined;
     }
 
-    if (_matches(haystack, const [
-      'أمن',
-      'security',
-      'cyber',
-    ])) {
+    if (_matches(haystack, const ['أمن', 'security', 'cyber'])) {
       return Icons.security_outlined;
     }
 

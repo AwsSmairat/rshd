@@ -1,0 +1,129 @@
+# RSHD Authorization Matrix
+# ALLOW / DENY expectations per actor × resource action
+# Automated test column references existing or SECURITY_COVERAGE_GAP
+
+version: 1
+last_updated: 2026-08-10
+
+roles:
+  - anonymous
+  - student-active-enrolled
+  - student-not-enrolled
+  - student-expired-enrollment
+  - student-other-course
+  - student-blocked
+  - instructor-own-subject
+  - instructor-other-subject
+  - admin
+  - sanctum-token-revoked
+
+resources:
+  video_playback:
+    endpoint: GET /api/v1/videos/{video}/playback
+    matrix:
+      anonymous: DENY
+      student-active-enrolled: ALLOW
+      student-not-enrolled: DENY
+      student-expired-enrollment: DENY
+      student-other-course: DENY
+      student-blocked: DENY
+      instructor-own-subject: ALLOW
+      instructor-other-subject: DENY
+      admin: ALLOW
+    automated_test: VideoPlaybackTest
+
+  video_playback_idor:
+    endpoint: GET /api/v1/videos/{video}/playback
+    abuse: change video ID to another course
+    matrix:
+      student-active-enrolled-own: ALLOW
+      student-active-enrolled-other-course: DENY
+    automated_test: VideoPlaybackTest
+
+  file_download:
+    endpoint: GET /api/v1/files/{file}/download
+    matrix:
+      anonymous: DENY
+      student-active-enrolled: ALLOW
+      student-not-enrolled: DENY
+      student-expired-enrollment: DENY
+      student-other-course: DENY
+      student-blocked: DENY
+    automated_test: LessonFileDownloadTest
+
+  file_download_idor:
+    endpoint: GET /api/v1/files/{file}/download
+    abuse: change fileId to another student's file
+    matrix:
+      student-own-enrolled-file: ALLOW
+      student-other-file: DENY
+    automated_test: LessonFileDownloadTest
+
+  file_annotations:
+    endpoint: POST /api/v1/files/{file}/annotations
+    abuse: annotate file outside enrollment
+    matrix:
+      student-active-enrolled: ALLOW
+      student-other-course: DENY
+    automated_test: AnnotationAuthorizationTest
+
+  lesson_show:
+    endpoint: GET /api/v1/lessons/{lesson}
+    abuse: change lessonId
+    matrix:
+      student-enrolled-subject: ALLOW
+      student-other-subject: DENY
+    automated_test: VideoPlaybackTest indirect
+
+  quiz_submit:
+    endpoint: POST /api/v1/quizzes/{quiz}/submit
+    matrix:
+      student-enrolled: ALLOW
+      student-not-enrolled: DENY
+    automated_test: QuizSubmitAuthorizationTest
+
+  grades_index:
+    endpoint: GET /api/v1/grades
+    matrix:
+      student-active: ALLOW own grades only
+      student-view-other: DENY
+    automated_test: GradesAuthorizationTest
+
+  profile_update:
+    endpoint: PATCH /api/v1/student/profile
+    matrix:
+      student-self: ALLOW
+      student-other: DENY
+    automated_test: ProfileUpdateAuthorizationTest
+
+  device_revoke:
+    endpoint: DELETE /api/v1/student/devices/{device}
+    abuse: revoke another user's device ID
+    matrix:
+      own-device: ALLOW
+      other-device: DENY
+    automated_test: DeviceRevokeAuthorizationTest
+
+  notification_read:
+    endpoint: POST /api/v1/notifications/{notification}/read
+    abuse: mark another user's notification
+    matrix:
+      own-notification: ALLOW
+      other-notification: DENY
+    automated_test: NotificationAuthorizationTest
+
+nested_resource_mismatch_cases:
+  - description: file belongs to lesson in subject A; student enrolled in subject B only
+    expected: DENY
+    test: LessonFileDownloadTest
+  - description: video progress for video outside enrollment
+    expected: DENY
+    test: VideoProgressAbuseTest
+  - description: annotation POST with valid fileId but wrong student session
+    expected: DENY
+    test: AnnotationAuthorizationTest
+
+coverage:
+  matrix_entries: 11
+  entries_with_automated_test: 11
+  authorization_test_coverage_percent: 100

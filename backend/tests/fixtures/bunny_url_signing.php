@@ -4,7 +4,6 @@
  * Official Bunny CDN url_signing.php (BunnyWay/BunnyCDN.TokenAuthentication).
  * Used only to validate BunnyCdnTokenSigner parity in unit tests.
  */
-
 function sign_bcdn_url(
     string $url,
     string $security_key,

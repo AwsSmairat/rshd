@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
@@ -59,11 +57,11 @@ class PdfAnnotationOverlayHost extends StatefulWidget {
   final String? selectedAnnotationId;
   final int pageNumber;
   final void Function(List<NormalizedPoint> points, AnnotationType type)
-      onInkComplete;
+  onInkComplete;
   final void Function(double x, double y, double width, double height)
-      onHighlightComplete;
+  onHighlightComplete;
   final void Function(double x, double y, double width, double height)
-      onShapeComplete;
+  onShapeComplete;
   final void Function(double x, double y) onNoteTap;
   final void Function(double x, double y) onTextTap;
   final void Function(NormalizedPoint point) onErase;

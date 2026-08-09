@@ -20,10 +20,12 @@ class PdfPageLayoutMetrics {
     bool fitToWidth = true,
   }) {
     final fitted = fitToWidth
-        ? BoxConstraints.tightFor(width: viewportSize.width)
-            .constrainSizeAndAttemptToPreserveAspectRatio(pdfPageSize)
-        : BoxConstraints.tightFor(height: viewportSize.height)
-            .constrainSizeAndAttemptToPreserveAspectRatio(pdfPageSize);
+        ? BoxConstraints.tightFor(
+            width: viewportSize.width,
+          ).constrainSizeAndAttemptToPreserveAspectRatio(pdfPageSize)
+        : BoxConstraints.tightFor(
+            height: viewportSize.height,
+          ).constrainSizeAndAttemptToPreserveAspectRatio(pdfPageSize);
     return PdfPageLayoutMetrics(
       displayPageSize: fitted,
       viewportSize: viewportSize,
@@ -39,9 +41,9 @@ class PdfPageLayoutMetrics {
   final Offset scrollOffset;
 
   Size get displaySize => Size(
-        displayPageSize.width * zoomLevel,
-        displayPageSize.height * zoomLevel,
-      );
+    displayPageSize.width * zoomLevel,
+    displayPageSize.height * zoomLevel,
+  );
 
   /// Top-left of the visible page in viewport coordinates.
   Offset get pageTopLeft {
@@ -73,10 +75,7 @@ class PdfPageLayoutMetrics {
 
   Offset normalizedToScreen(NormalizedPoint point) {
     return pageTopLeft +
-        Offset(
-          point.nx * displaySize.width,
-          point.ny * displaySize.height,
-        );
+        Offset(point.nx * displaySize.width, point.ny * displaySize.height);
   }
 
   Rect normalizedRectToScreen({

@@ -8,7 +8,7 @@ import '../../pdf_editor/models/pdf_editor_models.dart';
 // Legacy document helper kept for older widgets.
 class PdfAnnotationDocument {
   PdfAnnotationDocument([Map<String, dynamic>? json])
-      : _v2 = PdfAnnotationDocumentV2(json);
+    : _v2 = PdfAnnotationDocumentV2(json);
 
   final PdfAnnotationDocumentV2 _v2;
 
@@ -21,33 +21,39 @@ class PdfAnnotationDocument {
     return {
       'notes': annotations
           .where((a) => a.type == AnnotationType.note)
-          .map((a) => {
-                'id': a.id,
-                'text': a.data['text'],
-                'x': a.x,
-                'y': a.y,
-                'created_at': a.createdAt?.toIso8601String(),
-              })
+          .map(
+            (a) => {
+              'id': a.id,
+              'text': a.data['text'],
+              'x': a.x,
+              'y': a.y,
+              'created_at': a.createdAt?.toIso8601String(),
+            },
+          )
           .toList(),
       'drawings': annotations
           .where((a) => a.type == AnnotationType.ink)
-          .map((a) => {
-                'id': a.id,
-                'points': a.data['points'],
-                'color': a.data['color'],
-                'stroke_width': a.data['stroke_width'],
-              })
+          .map(
+            (a) => {
+              'id': a.id,
+              'points': a.data['points'],
+              'color': a.data['color'],
+              'stroke_width': a.data['stroke_width'],
+            },
+          )
           .toList(),
       'highlights': annotations
           .where((a) => a.type == AnnotationType.highlighter)
-          .map((a) => {
-                'id': a.id,
-                'x': a.x,
-                'y': a.y,
-                'width': a.width,
-                'height': a.height,
-                'color': a.data['color'],
-              })
+          .map(
+            (a) => {
+              'id': a.id,
+              'x': a.x,
+              'y': a.y,
+              'width': a.width,
+              'height': a.height,
+              'color': a.data['color'],
+            },
+          )
           .toList(),
     };
   }
@@ -63,6 +69,9 @@ class PdfAnnotationDocument {
     if (page == null) return [];
     final value = page[key];
     if (value is! List) return [];
-    return value.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
+    return value
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
   }
 }

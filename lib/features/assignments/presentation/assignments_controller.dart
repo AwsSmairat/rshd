@@ -56,12 +56,7 @@ class AssignmentDetailsState {
   }
 }
 
-enum AssignmentSubmitStatus {
-  initial,
-  submitting,
-  success,
-  error,
-}
+enum AssignmentSubmitStatus { initial, submitting, success, error }
 
 class AssignmentSubmitState {
   const AssignmentSubmitState({
@@ -121,7 +116,8 @@ String mapAssignmentSubmitError(ApiException error) {
 }
 
 class AssignmentsListController extends StateNotifier<AssignmentsListState> {
-  AssignmentsListController(this._repository) : super(const AssignmentsListState());
+  AssignmentsListController(this._repository)
+    : super(const AssignmentsListState());
 
   final AssignmentsRepository _repository;
 
@@ -130,10 +126,7 @@ class AssignmentsListController extends StateNotifier<AssignmentsListState> {
       return;
     }
 
-    state = state.copyWith(
-      status: FeatureLoadStatus.loading,
-      clearError: true,
-    );
+    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
 
     try {
       final assignments = await _repository.getAssignments();
@@ -183,8 +176,10 @@ class AssignmentsListController extends StateNotifier<AssignmentsListState> {
   }
 }
 
-class AssignmentDetailsController extends StateNotifier<AssignmentDetailsState> {
-  AssignmentDetailsController(this._repository) : super(const AssignmentDetailsState());
+class AssignmentDetailsController
+    extends StateNotifier<AssignmentDetailsState> {
+  AssignmentDetailsController(this._repository)
+    : super(const AssignmentDetailsState());
 
   final AssignmentsRepository _repository;
 
@@ -229,7 +224,8 @@ class AssignmentDetailsController extends StateNotifier<AssignmentDetailsState> 
 }
 
 class AssignmentSubmitController extends StateNotifier<AssignmentSubmitState> {
-  AssignmentSubmitController(this._repository) : super(const AssignmentSubmitState());
+  AssignmentSubmitController(this._repository)
+    : super(const AssignmentSubmitState());
 
   final AssignmentsRepository _repository;
 
@@ -277,18 +273,30 @@ class AssignmentSubmitController extends StateNotifier<AssignmentSubmitState> {
 }
 
 final assignmentsListControllerProvider =
-    StateNotifierProvider<AssignmentsListController, AssignmentsListState>((ref) {
-  return AssignmentsListController(ref.watch(assignmentsRepositoryProvider));
-});
+    StateNotifierProvider<AssignmentsListController, AssignmentsListState>((
+      ref,
+    ) {
+      return AssignmentsListController(
+        ref.watch(assignmentsRepositoryProvider),
+      );
+    });
 
 final assignmentDetailsControllerProvider = StateNotifierProvider.autoDispose
-    .family<AssignmentDetailsController, AssignmentDetailsState, int>(
-        (ref, assignmentId) {
-  return AssignmentDetailsController(ref.watch(assignmentsRepositoryProvider));
-});
+    .family<AssignmentDetailsController, AssignmentDetailsState, int>((
+      ref,
+      assignmentId,
+    ) {
+      return AssignmentDetailsController(
+        ref.watch(assignmentsRepositoryProvider),
+      );
+    });
 
 final assignmentSubmitControllerProvider = StateNotifierProvider.autoDispose
-    .family<AssignmentSubmitController, AssignmentSubmitState, int>(
-        (ref, assignmentId) {
-  return AssignmentSubmitController(ref.watch(assignmentsRepositoryProvider));
-});
+    .family<AssignmentSubmitController, AssignmentSubmitState, int>((
+      ref,
+      assignmentId,
+    ) {
+      return AssignmentSubmitController(
+        ref.watch(assignmentsRepositoryProvider),
+      );
+    });

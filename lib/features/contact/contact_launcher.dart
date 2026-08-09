@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/security/safe_external_url.dart';
 import 'data/contact_channels.dart';
 
 /// Opens RSHD contact channels via platform handlers.
@@ -41,12 +42,10 @@ class ContactLauncher {
     var launched = false;
     final appUri = channels.instagramAppUri;
     if (appUri != null) {
-      launched = await _launch(
-        appUri,
-        mode: LaunchMode.externalApplication,
-      );
+      launched = await _launch(appUri, mode: LaunchMode.externalApplication);
     }
     if (!launched) {
+      if (!context.mounted) return;
       await _openUri(
         context,
         channels.instagramWebUri,
@@ -119,7 +118,9 @@ class ContactLauncher {
 
     final launched = await _launch(
       uri,
-      mode: external ? LaunchMode.externalApplication : LaunchMode.platformDefault,
+      mode: external
+          ? LaunchMode.externalApplication
+          : LaunchMode.platformDefault,
       failureMessage: failureMessage,
     );
     if (!launched && context.mounted) {
@@ -132,6 +133,13 @@ class ContactLauncher {
     LaunchMode mode = LaunchMode.platformDefault,
     String? failureMessage,
   }) async {
+    if (!SafeExternalUrl.isLaunchAllowed(uri, allowHttp: false)) {
+      if (kDebugMode) {
+        debugPrint('ContactLauncher: blocked unsafe scheme ${uri.scheme}');
+      }
+      return false;
+    }
+
     if (kDebugMode) {
       debugPrint('ContactLauncher: attempting ${uri.scheme} link');
     }
@@ -153,8 +161,8 @@ class ContactLauncher {
   }
 
   void _showError(BuildContext context, [String? message]) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message ?? launchFailedMessage)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message ?? launchFailedMessage)));
   }
 }

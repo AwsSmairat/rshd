@@ -1,0 +1,100 @@
+name: RSHD Security Gate
+
+on:
+  pull_request:
+    branches: [main, master, develop]
+  push:
+    branches: [main, master]
+  schedule:
+    # Weekly full audit (Sunday 02:00 UTC)
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+
+jobs:
+  fast-gate:
+    name: Fast Gate (PR)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite
+          coverage: none
+
+      - name: Install Laravel dependencies
+        working-directory: backend
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Laravel tests
+        working-directory: backend
+        run: php artisan test --exclude-group=manual
+
+      - name: Pint check
+        working-directory: backend
+        run: vendor/bin/pint --test
+        continue-on-error: true
+
+      - name: Composer audit
+        working-directory: backend
+        run: composer audit
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter analyze
+        run: flutter analyze
+        continue-on-error: true
+
+      - name: Flutter test
+        run: flutter test
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Semgrep security rules
+        run: semgrep --config security/semgrep/rshd-security.yml --error .
+        continue-on-error: true
+
+      - name: Secret scan (redacted)
+        run: |
+          ! git ls-files --error-unmatch backend/.env
+          ./security/scripts/security-audit.sh
+
+  full-audit:
+    name: Full Audit (scheduled)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: |
+          cd backend && composer install --no-interaction
+          flutter pub get
+          pip install semgrep
+
+      - name: Run full audit
+        run: chmod +x security/scripts/*.sh && ./security/scripts/full-audit.sh
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports
+          path: security/reports/

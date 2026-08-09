@@ -28,11 +28,13 @@ TermsContactInfo resolveTermsContactInfo({
   String? platformSupportPhone,
 }) {
   return TermsContactInfo(
-    supportEmail: (platformSupportEmail != null && platformSupportEmail.isNotEmpty)
+    supportEmail:
+        (platformSupportEmail != null && platformSupportEmail.isNotEmpty)
         ? platformSupportEmail
         : TermsAndConditionsConfig.supportEmail,
     legalEmail: TermsAndConditionsConfig.legalEmail,
-    supportPhone: (platformSupportPhone != null && platformSupportPhone.isNotEmpty)
+    supportPhone:
+        (platformSupportPhone != null && platformSupportPhone.isNotEmpty)
         ? platformSupportPhone
         : TermsAndConditionsConfig.supportPhone,
     companyAddress: TermsAndConditionsConfig.companyAddress,
@@ -48,9 +50,9 @@ Future<void> launchTermsEmail({
 }) async {
   if (email.isEmpty) {
     if (context != null && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('بريد التواصل غير متوفر')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('بريد التواصل غير متوفر')));
     }
     return;
   }
@@ -132,11 +134,11 @@ class TermsContactCard extends StatelessWidget {
   }
 
   ButtonStyle get _style => OutlinedButton.styleFrom(
-        foregroundColor: AppColors.darkGold,
-        side: const BorderSide(color: AppColors.darkGold),
-        minimumSize: const Size(double.infinity, 46),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      );
+    foregroundColor: AppColors.darkGold,
+    side: const BorderSide(color: AppColors.darkGold),
+    minimumSize: const Size(double.infinity, 46),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  );
 
   Widget _row(IconData icon, String label, String value) {
     if (value.isEmpty) return const SizedBox.shrink();
@@ -151,12 +153,14 @@ class TermsContactCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label,
-                    style: AppTextStyles.body.copyWith(
-                      fontSize: 12,
-                      color: AppColors.textMuted,
-                      fontWeight: FontWeight.w600,
-                    )),
+                Text(
+                  label,
+                  style: AppTextStyles.body.copyWith(
+                    fontSize: 12,
+                    color: AppColors.textMuted,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 Text(value, style: AppTextStyles.body.copyWith(fontSize: 14)),
               ],
             ),
@@ -293,24 +297,30 @@ class TermsFooter extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          Text(platformName,
-              textAlign: TextAlign.center,
-              style: AppTextStyles.subtitle.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppColors.primary,
-              )),
-          Text('إصدار الشروط: $version',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.body.copyWith(
-                fontSize: 12,
-                color: AppColors.textMuted,
-              )),
-          Text('آخر تحديث: $lastUpdated',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.body.copyWith(
-                fontSize: 12,
-                color: AppColors.textMuted,
-              )),
+          Text(
+            platformName,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.subtitle.copyWith(
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
+            ),
+          ),
+          Text(
+            'إصدار الشروط: $version',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.body.copyWith(
+              fontSize: 12,
+              color: AppColors.textMuted,
+            ),
+          ),
+          Text(
+            'آخر تحديث: $lastUpdated',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.body.copyWith(
+              fontSize: 12,
+              color: AppColors.textMuted,
+            ),
+          ),
         ],
       ),
     );

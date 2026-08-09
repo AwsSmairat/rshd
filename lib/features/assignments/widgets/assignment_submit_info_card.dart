@@ -10,10 +10,7 @@ import 'assignment_icon_panel.dart';
 import 'submission_status_badge.dart';
 
 class AssignmentSubmitInfoCard extends StatelessWidget {
-  const AssignmentSubmitInfoCard({
-    super.key,
-    required this.assignment,
-  });
+  const AssignmentSubmitInfoCard({super.key, required this.assignment});
 
   final AssignmentModel assignment;
 

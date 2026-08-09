@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\VideoStatus;
 use App\Models\Video;
 use App\Services\Bunny\BunnyStreamService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -43,7 +44,7 @@ class UploadVideoToBunnyJob implements ShouldQueue
             $bunnyStream->uploadLocalVideo($video);
             SyncBunnyVideoStatusJob::dispatch($this->videoId)->delay(now()->addSeconds(30));
         } catch (Throwable $exception) {
-            $video->update(['status' => \App\Enums\VideoStatus::Failed]);
+            $video->update(['status' => VideoStatus::Failed]);
 
             Log::warning('bunny.stream.upload.failed', [
                 'video_id' => $video->id,

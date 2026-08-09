@@ -2,11 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Pages\InstructorCalendar;
-use App\Filament\Pages\InstructorCourses;
-use App\Filament\Pages\InstructorProfile;
-use App\Filament\Pages\InstructorReports;
-use App\Filament\Pages\InstructorStudents;
 use App\Filament\Resources\AssignmentResource;
 use App\Filament\Resources\AssignmentSubmissionResource;
 use App\Filament\Resources\ExpenseResource;
@@ -29,6 +24,7 @@ use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class Dashboard extends BaseDashboard
@@ -87,13 +83,13 @@ class Dashboard extends BaseDashboard
     /**
      * @return array{
      *     stats: array<string, int>,
-     *     pendingSubmissions: \Illuminate\Support\Collection,
-     *     recentActivities: \Illuminate\Support\Collection,
-     *     subjects: \Illuminate\Support\Collection,
+     *     pendingSubmissions: Collection,
+     *     recentActivities: Collection,
+     *     subjects: Collection,
      *     studentOverview: array<string, int|float>,
      *     coursePerformance: array<string, mixed>,
-     *     calendarDays: \Illuminate\Support\Collection,
-     *     alerts: \Illuminate\Support\Collection
+     *     calendarDays: Collection,
+     *     alerts: Collection
      * }|null
      */
     public function instructorData(): ?array
@@ -201,7 +197,11 @@ class Dashboard extends BaseDashboard
             return;
         }
 
-        app(EnrollmentService::class)->revokeAccess($record->student, $record->subject);
+        app(EnrollmentService::class)->rejectPurchaseRequest(
+            $record->student,
+            $record->subject,
+            $this->authUser(),
+        );
 
         Notification::make()->title('تم رفض طلب التفعيل')->success()->send();
     }

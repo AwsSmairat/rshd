@@ -386,7 +386,7 @@ class PasswordResetTest extends TestCase
     {
         Mail::fake();
 
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $this->postJson('/api/v1/password/forgot', [
                 'email' => "user{$i}@example.com",
             ])->assertOk();

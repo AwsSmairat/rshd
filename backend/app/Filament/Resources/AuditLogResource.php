@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AuditLogResource\Pages;
 use App\Models\AuditLog;
 use App\Support\AuditActionCatalog;
+use Filament\Forms\Components\DatePicker;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -137,9 +138,9 @@ class AuditLogResource extends Resource
                 Tables\Filters\Filter::make('created_at')
                     ->label('التاريخ')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('from')
+                        DatePicker::make('from')
                             ->label('من'),
-                        \Filament\Forms\Components\DatePicker::make('until')
+                        DatePicker::make('until')
                             ->label('إلى'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {

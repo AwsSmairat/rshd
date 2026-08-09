@@ -136,12 +136,7 @@ class PdfAnnotationPainter extends CustomPainter {
 
     return raw
         .whereType<Map>()
-        .map(
-          (point) => Offset(
-            _asDouble(point['x']),
-            _asDouble(point['y']),
-          ),
-        )
+        .map((point) => Offset(_asDouble(point['x']), _asDouble(point['y'])))
         .toList();
   }
 

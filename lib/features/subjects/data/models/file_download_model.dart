@@ -1,8 +1,5 @@
 class FileDownloadModel {
-  const FileDownloadModel({
-    required this.url,
-    required this.expiresAt,
-  });
+  const FileDownloadModel({required this.url, required this.expiresAt});
 
   final String url;
   final DateTime? expiresAt;

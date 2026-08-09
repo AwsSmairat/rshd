@@ -5,10 +5,7 @@ import '../theme/app_text_styles.dart';
 
 /// Full-screen shield shown during capture or App Switcher privacy.
 class ProtectedContentOverlay extends StatelessWidget {
-  const ProtectedContentOverlay({
-    super.key,
-    this.showScreenshotNotice = false,
-  });
+  const ProtectedContentOverlay({super.key, this.showScreenshotNotice = false});
 
   final bool showScreenshotNotice;
 

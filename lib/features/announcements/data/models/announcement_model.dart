@@ -21,8 +21,7 @@ class AnnouncementModel {
   final String? subjectTitle;
   final String? createdAt;
 
-  bool get hasCarouselImage =>
-      imageUrl != null && imageUrl!.trim().isNotEmpty;
+  bool get hasCarouselImage => imageUrl != null && imageUrl!.trim().isNotEmpty;
 
   String? get resolvedImageUrl {
     final value = imageUrl?.trim();

@@ -2,18 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 
-enum PasswordStrength {
-  empty,
-  weak,
-  fair,
-  strong,
-}
+enum PasswordStrength { empty, weak, fair, strong }
 
 class PasswordStrengthIndicator extends StatelessWidget {
-  const PasswordStrengthIndicator({
-    super.key,
-    required this.password,
-  });
+  const PasswordStrengthIndicator({super.key, required this.password});
 
   final String password;
 

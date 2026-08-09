@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class AssignmentIconHelper {
   AssignmentIconHelper._();
 
-  static IconData iconFor({
-    required String title,
-    String? subjectTitle,
-  }) {
+  static IconData iconFor({required String title, String? subjectTitle}) {
     final haystack = _normalize('$title ${subjectTitle ?? ''}');
 
     if (_matches(haystack, const [
@@ -42,18 +39,11 @@ class AssignmentIconHelper {
       return Icons.code_rounded;
     }
 
-    if (_matches(haystack, const [
-      'مشروع',
-      'project',
-    ])) {
+    if (_matches(haystack, const ['مشروع', 'project'])) {
       return Icons.folder_special_outlined;
     }
 
-    if (_matches(haystack, const [
-      'مراجعة',
-      'review',
-      'general',
-    ])) {
+    if (_matches(haystack, const ['مراجعة', 'review', 'general'])) {
       return Icons.fact_check_outlined;
     }
 

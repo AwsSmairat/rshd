@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../../core/security/protected_content_cache.dart';
+import '../../../core/startup/startup_timing.dart';
 import '../data/auth_repository.dart';
 import '../data/models/user_model.dart';
 
@@ -57,72 +59,88 @@ class AuthController extends StateNotifier<AuthState> {
       'هذا التطبيق مخصص للطلاب فقط. يرجى استخدام لوحة التحكم من المتصفح.';
 
   final AuthRepository _repository;
+  bool _bootstrapInFlight = false;
+  bool _bootstrapCompleted = false;
 
   Future<bool> _rejectNonStudentAccess({required AuthStatus status}) async {
     await _repository.logout();
-    state = AuthState(
-      status: status,
-      errorMessage: studentOnlyMessage,
-    );
+    state = AuthState(status: status, errorMessage: studentOnlyMessage);
     return false;
   }
 
   Future<void> bootstrap() async {
-    state = state.copyWith(
-      status: AuthStatus.loading,
-      clearError: true,
-      fieldErrors: {},
-      clearPendingVerificationEmail: true,
-    );
-
-    final hasToken = await _repository.hasToken();
-    if (!hasToken) {
-      state = state.copyWith(
-        status: AuthStatus.unauthenticated,
-        clearUser: true,
-        clearError: true,
-      );
+    if (_bootstrapCompleted || _bootstrapInFlight) {
       return;
     }
+    _bootstrapInFlight = true;
 
-    final cachedEmail = (await _repository.getCachedUser())?.email;
-
+    StartupTiming.mark('T3');
     try {
-      final user = await _repository.me();
-      if (!user.isStudent) {
-        await _rejectNonStudentAccess(status: AuthStatus.unauthenticated);
+      final results = await Future.wait<Object?>([
+        _repository.purgeLegacyRememberedPassword(),
+        _repository.hasToken(),
+      ]);
+      StartupTiming.mark('T4');
+
+      final hasToken = results[1] as bool;
+
+      state = state.copyWith(
+        status: AuthStatus.loading,
+        clearError: true,
+        fieldErrors: {},
+        clearPendingVerificationEmail: true,
+      );
+
+      if (!hasToken) {
+        state = state.copyWith(
+          status: AuthStatus.unauthenticated,
+          clearUser: true,
+          clearError: true,
+        );
         return;
       }
-      if (!user.isEmailVerified) {
+
+      String? cachedEmail;
+
+      try {
+        cachedEmail = (await _repository.getCachedUser())?.email;
+
+        final user = await _repository.me();
+        if (!user.isStudent) {
+          await _rejectNonStudentAccess(status: AuthStatus.unauthenticated);
+          return;
+        }
+        if (!user.isEmailVerified) {
+          await _repository.logout();
+          state = AuthState(
+            status: AuthStatus.unauthenticated,
+            pendingVerificationEmail: user.email,
+            errorMessage: 'يرجى تأكيد بريدك الإلكتروني قبل استخدام التطبيق.',
+          );
+          return;
+        }
+        state = AuthState(status: AuthStatus.authenticated, user: user);
+      } on ApiException catch (error) {
         await _repository.logout();
+        if (error.message.contains('تأكيد بريدك')) {
+          state = AuthState(
+            status: AuthStatus.unauthenticated,
+            pendingVerificationEmail: cachedEmail,
+            errorMessage: error.message,
+          );
+          return;
+        }
         state = AuthState(
           status: AuthStatus.unauthenticated,
-          pendingVerificationEmail: user.email,
-          errorMessage: 'يرجى تأكيد بريدك الإلكتروني قبل استخدام التطبيق.',
+          errorMessage: error.isUnauthorized ? null : error.message,
         );
-        return;
+      } catch (_) {
+        await _repository.logout();
+        state = const AuthState(status: AuthStatus.unauthenticated);
       }
-      state = AuthState(
-        status: AuthStatus.authenticated,
-        user: user,
-      );
-    } on ApiException catch (error) {
-      await _repository.logout();
-      if (error.message.contains('تأكيد بريدك')) {
-        state = AuthState(
-          status: AuthStatus.unauthenticated,
-          pendingVerificationEmail: cachedEmail,
-          errorMessage: error.message,
-        );
-        return;
-      }
-      state = AuthState(
-        status: AuthStatus.unauthenticated,
-        errorMessage: error.isUnauthorized ? null : error.message,
-      );
-    } catch (_) {
-      await _repository.logout();
-      state = const AuthState(status: AuthStatus.unauthenticated);
+    } finally {
+      _bootstrapInFlight = false;
+      _bootstrapCompleted = true;
     }
   }
 
@@ -167,10 +185,15 @@ class AuthController extends StateNotifier<AuthState> {
         return LoginFlowResult.requiresEmailVerification;
       }
 
-      state = AuthState(
-        status: AuthStatus.authenticated,
-        user: session.user,
+      final previousUserId = state.user?.id;
+
+      state = AuthState(status: AuthStatus.authenticated, user: session.user);
+
+      await ProtectedContentCache.onUserChanged(
+        previousUserId: previousUserId,
+        nextUserId: session.user.id,
       );
+
       return LoginFlowResult.success;
     } on ApiException catch (error) {
       state = AuthState(
@@ -225,10 +248,7 @@ class AuthController extends StateNotifier<AuthState> {
         return RegisterResult.failed;
       }
 
-      state = AuthState(
-        status: AuthStatus.authenticated,
-        user: session.user,
-      );
+      state = AuthState(status: AuthStatus.authenticated, user: session.user);
       return RegisterResult.authenticated;
     } on ApiException catch (error) {
       state = AuthState(
@@ -267,10 +287,7 @@ class AuthController extends StateNotifier<AuthState> {
         return false;
       }
 
-      state = AuthState(
-        status: AuthStatus.authenticated,
-        user: session.user,
-      );
+      state = AuthState(status: AuthStatus.authenticated, user: session.user);
       return true;
     } on ApiException catch (error) {
       state = AuthState(
@@ -361,7 +378,9 @@ class AuthController extends StateNotifier<AuthState> {
     if (error.message.contains('60 ثانية')) {
       return error.message;
     }
-    return error.message.isNotEmpty ? error.message : 'تعذر تأكيد البريد الإلكتروني';
+    return error.message.isNotEmpty
+        ? error.message
+        : 'تعذر تأكيد البريد الإلكتروني';
   }
 
   Map<String, String> _mapFieldErrors(ApiException error) {
@@ -377,20 +396,12 @@ class AuthController extends StateNotifier<AuthState> {
   }
 }
 
-enum LoginFlowResult {
-  success,
-  requiresEmailVerification,
-  cancelled,
-  failed,
-}
+enum LoginFlowResult { success, requiresEmailVerification, cancelled, failed }
 
-enum RegisterResult {
-  requiresEmailVerification,
-  authenticated,
-  failed,
-}
+enum RegisterResult { requiresEmailVerification, authenticated, failed }
 
-final authControllerProvider =
-    StateNotifierProvider<AuthController, AuthState>((ref) {
-  return AuthController(ref.watch(authRepositoryProvider));
-});
+final authControllerProvider = StateNotifierProvider<AuthController, AuthState>(
+  (ref) {
+    return AuthController(ref.watch(authRepositoryProvider));
+  },
+);

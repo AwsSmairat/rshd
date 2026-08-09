@@ -28,9 +28,7 @@ class QuizQuestionModel {
       for (final item in answersJson) {
         if (item is Map<String, dynamic>) {
           try {
-            answers.add(
-              QuizAnswerModel.fromJson(item, questionId: questionId),
-            );
+            answers.add(QuizAnswerModel.fromJson(item, questionId: questionId));
           } catch (_) {}
         } else if (item is Map) {
           try {

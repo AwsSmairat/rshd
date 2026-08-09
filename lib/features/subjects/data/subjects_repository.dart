@@ -165,9 +165,7 @@ class SubjectsRepository {
       throw ApiException(message: 'تعذر تجديد رابط التشغيل.');
     }
 
-    return VideoPlaybackModel.fromJson(
-      Map<String, dynamic>.from(playbackJson),
-    );
+    return VideoPlaybackModel.fromJson(Map<String, dynamic>.from(playbackJson));
   }
 
   Future<LessonFileModel> getFileDetails(int fileId) async {
@@ -260,9 +258,7 @@ class SubjectsRepository {
   ) async {
     final response = await _apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.fileAnnotations(fileId),
-      data: {
-        'annotation_json': annotationJson,
-      },
+      data: {'annotation_json': annotationJson},
     );
 
     final apiResponse = ApiResponse<Map<String, dynamic>>.fromJson(

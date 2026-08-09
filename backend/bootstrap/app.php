@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\CheckPlatformMaintenance;
+use App\Http\Middleware\EnsureCleanApiResponse;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -21,8 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->prependToGroup('api', \App\Http\Middleware\CheckPlatformMaintenance::class);
-        $middleware->prependToGroup('api', \App\Http\Middleware\EnsureCleanApiResponse::class);
+        $middleware->prependToGroup('api', CheckPlatformMaintenance::class);
+        $middleware->prependToGroup('api', EnsureCleanApiResponse::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (ValidationException $e, Request $request) {
@@ -40,7 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json([
                     'success' => false,
                     'message' => 'غير مصرح. يرجى تسجيل الدخول.',
-                    'errors' => new \stdClass,
+                    'errors' => new stdClass,
                 ], 401);
             }
         });
@@ -50,7 +52,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json([
                     'success' => false,
                     'message' => $e->getMessage() ?: 'غير مصرح لك بالوصول.',
-                    'errors' => new \stdClass,
+                    'errors' => new stdClass,
                 ], 403);
             }
 
@@ -74,7 +76,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json([
                     'success' => false,
                     'message' => 'المورد غير موجود.',
-                    'errors' => new \stdClass,
+                    'errors' => new stdClass,
                 ], 404);
             }
         });
@@ -84,7 +86,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json([
                     'success' => false,
                     'message' => 'المسار غير موجود.',
-                    'errors' => new \stdClass,
+                    'errors' => new stdClass,
                 ], 404);
             }
         });

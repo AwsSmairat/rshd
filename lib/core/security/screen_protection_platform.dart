@@ -4,11 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 /// Native screen-protection events (no sensitive payloads).
-enum ScreenProtectionEventType {
-  captureStarted,
-  captureEnded,
-  screenshotTaken,
-}
+enum ScreenProtectionEventType { captureStarted, captureEnded, screenshotTaken }
 
 class ScreenProtectionEvent {
   const ScreenProtectionEvent(this.type);
@@ -22,17 +18,20 @@ abstract class ScreenProtectionPlatform {
   Future<bool> isScreenCaptured();
   Stream<ScreenProtectionEvent> get events;
 
-  static ScreenProtectionPlatform instance = MethodChannelScreenProtectionPlatform();
+  static ScreenProtectionPlatform instance =
+      MethodChannelScreenProtectionPlatform();
 }
 
-class MethodChannelScreenProtectionPlatform implements ScreenProtectionPlatform {
+class MethodChannelScreenProtectionPlatform
+    implements ScreenProtectionPlatform {
   MethodChannelScreenProtectionPlatform({
     MethodChannel? methodChannel,
     EventChannel? eventChannel,
-  })  : _methodChannel =
-            methodChannel ?? const MethodChannel('com.rshd/screen_protection'),
-        _eventChannel = eventChannel ??
-            const EventChannel('com.rshd/screen_protection/events');
+  }) : _methodChannel =
+           methodChannel ?? const MethodChannel('com.rshd/screen_protection'),
+       _eventChannel =
+           eventChannel ??
+           const EventChannel('com.rshd/screen_protection/events');
 
   final MethodChannel _methodChannel;
   final EventChannel _eventChannel;
@@ -73,8 +72,9 @@ class MethodChannelScreenProtectionPlatform implements ScreenProtectionPlatform 
   @override
   Future<bool> isScreenCaptured() async {
     try {
-      final captured =
-          await _methodChannel.invokeMethod<bool>('isScreenCaptured');
+      final captured = await _methodChannel.invokeMethod<bool>(
+        'isScreenCaptured',
+      );
       return captured ?? false;
     } on PlatformException {
       return false;
@@ -83,9 +83,11 @@ class MethodChannelScreenProtectionPlatform implements ScreenProtectionPlatform 
 
   @override
   Stream<ScreenProtectionEvent> get events {
-    return _events ??= _eventChannel.receiveBroadcastStream().map(_parseEvent).where(
-      (event) => event != null,
-    ).map((event) => event!);
+    return _events ??= _eventChannel
+        .receiveBroadcastStream()
+        .map(_parseEvent)
+        .where((event) => event != null)
+        .map((event) => event!);
   }
 
   ScreenProtectionEvent? _parseEvent(dynamic raw) {
@@ -93,14 +95,14 @@ class MethodChannelScreenProtectionPlatform implements ScreenProtectionPlatform 
     final typeName = raw['type']?.toString();
     return switch (typeName) {
       'capture_started' => const ScreenProtectionEvent(
-          ScreenProtectionEventType.captureStarted,
-        ),
+        ScreenProtectionEventType.captureStarted,
+      ),
       'capture_ended' => const ScreenProtectionEvent(
-          ScreenProtectionEventType.captureEnded,
-        ),
+        ScreenProtectionEventType.captureEnded,
+      ),
       'screenshot_taken' => const ScreenProtectionEvent(
-          ScreenProtectionEventType.screenshotTaken,
-        ),
+        ScreenProtectionEventType.screenshotTaken,
+      ),
       _ => null,
     };
   }

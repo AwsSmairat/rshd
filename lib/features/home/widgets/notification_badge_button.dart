@@ -23,10 +23,7 @@ class NotificationBadgeButton extends StatelessWidget {
         isLabelVisible: unreadCount > 0,
         label: Text(
           unreadCount > 9 ? '9+' : '$unreadCount',
-          style: const TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-          ),
+          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
         ),
         backgroundColor: AppColors.accent,
         textColor: AppColors.primary,

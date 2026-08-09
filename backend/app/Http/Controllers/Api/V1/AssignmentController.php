@@ -20,6 +20,10 @@ use Illuminate\Support\Str;
 
 class AssignmentController extends Controller
 {
+    private const BLOCKED_EXTENSIONS = [
+        'php', 'phtml', 'phar', 'exe', 'sh', 'bat', 'cmd', 'com', 'js', 'html', 'htm', 'svg', 'asp', 'aspx', 'jsp',
+    ];
+
     public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', Assignment::class);
@@ -79,18 +83,24 @@ class AssignmentController extends Controller
 
         if ($request->hasFile('file')) {
             if ($submission->file_path) {
-                Storage::disk('public')->delete($submission->file_path);
+                Storage::disk('local')->delete($submission->file_path);
             }
 
             $uploadedFile = $request->file('file');
-            $extension = $uploadedFile->getClientOriginalExtension();
-            $filename = Str::uuid().($extension !== '' ? '.'.$extension : '');
+            $extension = strtolower((string) $uploadedFile->getClientOriginalExtension());
+
+            if ($extension === '' || in_array($extension, self::BLOCKED_EXTENSIONS, true)) {
+                return $this->errorResponse('نوع الملف غير مسموح.', 422);
+            }
+
+            $safeOriginalName = basename(str_replace(['../', '..\\', '/', '\\'], '', $uploadedFile->getClientOriginalName()));
+            $filename = Str::uuid()->toString().'.'.$extension;
             $directory = "assignment-submissions/{$studentId}/{$assignment->id}";
-            $path = $uploadedFile->storeAs($directory, $filename, 'public');
+            $path = $uploadedFile->storeAs($directory, $filename, 'local');
 
             $submission->file_path = $path;
-            $submission->file_url = Storage::disk('public')->url($path);
-            $submission->original_file_name = $uploadedFile->getClientOriginalName();
+            $submission->file_url = null;
+            $submission->original_file_name = $safeOriginalName !== '' ? $safeOriginalName : $filename;
             $submission->file_size = $uploadedFile->getSize();
             $submission->file_mime_type = $uploadedFile->getMimeType();
         }

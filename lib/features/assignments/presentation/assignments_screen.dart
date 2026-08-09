@@ -29,7 +29,9 @@ class _AssignmentsScreenState extends ConsumerState<AssignmentsScreen> {
   }
 
   Future<void> _refresh() {
-    return ref.read(assignmentsListControllerProvider.notifier).load(refresh: true);
+    return ref
+        .read(assignmentsListControllerProvider.notifier)
+        .load(refresh: true);
   }
 
   void _handleUnauthorized(String? message) {
@@ -56,12 +58,8 @@ class _AssignmentsScreenState extends ConsumerState<AssignmentsScreen> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(
-              child: AssignmentsHeader(),
-            ),
-            ResponsiveSliverContent(
-              sliver: _buildContent(state),
-            ),
+            SliverToBoxAdapter(child: AssignmentsHeader()),
+            ResponsiveSliverContent(sliver: _buildContent(state)),
           ],
         ),
       ),
@@ -78,9 +76,7 @@ class _AssignmentsScreenState extends ConsumerState<AssignmentsScreen> {
       case FeatureLoadStatus.empty:
         return const SliverFillRemaining(
           hasScrollBody: false,
-          child: Center(
-            child: AssignmentsEmptyState(),
-          ),
+          child: Center(child: AssignmentsEmptyState()),
         );
       case FeatureLoadStatus.error:
         return SliverFillRemaining(
@@ -95,22 +91,19 @@ class _AssignmentsScreenState extends ConsumerState<AssignmentsScreen> {
         );
       case FeatureLoadStatus.loaded:
         return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final assignment = state.assignments[index];
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: index == state.assignments.length - 1 ? 0 : 16,
-                ),
-                child: AssignmentCard(
-                  assignment: assignment,
-                  onTap: () =>
-                      context.push(AppRoutes.assignmentDetails(assignment.id)),
-                ),
-              );
-            },
-            childCount: state.assignments.length,
-          ),
+          delegate: SliverChildBuilderDelegate((context, index) {
+            final assignment = state.assignments[index];
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: index == state.assignments.length - 1 ? 0 : 16,
+              ),
+              child: AssignmentCard(
+                assignment: assignment,
+                onTap: () =>
+                    context.push(AppRoutes.assignmentDetails(assignment.id)),
+              ),
+            );
+          }, childCount: state.assignments.length),
         );
     }
   }

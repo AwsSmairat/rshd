@@ -76,8 +76,9 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
         return;
       }
 
-      final current =
-          ref.read(subjectDetailsControllerProvider(widget.subjectId)).subject;
+      final current = ref
+          .read(subjectDetailsControllerProvider(widget.subjectId))
+          .subject;
       final merged = (current ?? updated).copyWith(
         enrollmentStatus: updated.enrollmentStatus,
       );
@@ -98,16 +99,16 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mapSubjectsError(error))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(mapSubjectsError(error))));
     } catch (_) {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تعذر إرسال طلب الشراء')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تعذر إرسال طلب الشراء')));
     } finally {
       if (mounted) {
         setState(() => _isRequesting = false);
@@ -130,9 +131,7 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             child: const Text('إلغاء الطلب'),
           ),
         ],
@@ -154,8 +153,9 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
         return;
       }
 
-      final current =
-          ref.read(subjectDetailsControllerProvider(widget.subjectId)).subject;
+      final current = ref
+          .read(subjectDetailsControllerProvider(widget.subjectId))
+          .subject;
       final merged = (current ?? updated).copyWith(
         enrollmentStatus: updated.enrollmentStatus,
       );
@@ -167,23 +167,23 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
           .read(subjectsListControllerProvider.notifier)
           .syncEnrollmentStatus(widget.subjectId, updated.enrollmentStatus);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إلغاء طلب الشراء.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تم إلغاء طلب الشراء.')));
     } on ApiException catch (error) {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mapSubjectsError(error))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(mapSubjectsError(error))));
     } catch (_) {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تعذر إلغاء طلب الشراء')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تعذر إلغاء طلب الشراء')));
     } finally {
       if (mounted) {
         setState(() => _isCancelling = false);
@@ -211,18 +211,26 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final detailsState =
-        ref.watch(subjectDetailsControllerProvider(widget.subjectId));
+    final detailsState = ref.watch(
+      subjectDetailsControllerProvider(widget.subjectId),
+    );
     final subject = detailsState.subject;
 
-    final lessonsState =
-        ref.watch(subjectLessonsControllerProvider(widget.subjectId));
+    final lessonsState = ref.watch(
+      subjectLessonsControllerProvider(widget.subjectId),
+    );
 
-    ref.listen(subjectLessonsControllerProvider(widget.subjectId), (prev, next) {
+    ref.listen(subjectLessonsControllerProvider(widget.subjectId), (
+      prev,
+      next,
+    ) {
       _handleUnauthorized(next.errorMessage);
     });
 
-    ref.listen(subjectDetailsControllerProvider(widget.subjectId), (prev, next) {
+    ref.listen(subjectDetailsControllerProvider(widget.subjectId), (
+      prev,
+      next,
+    ) {
       _handleUnauthorized(next.errorMessage);
     });
 
@@ -249,10 +257,7 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
       case FeatureLoadStatus.empty:
       case FeatureLoadStatus.loaded:
         if (subject == null) {
-          return ErrorView(
-            message: 'تعذر عرض بيانات المادة',
-            onRetry: _retry,
-          );
+          return ErrorView(message: 'تعذر عرض بيانات المادة', onRetry: _retry);
         }
         return RefreshIndicator(
           onRefresh: _retry,
@@ -321,7 +326,9 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
           child: Center(
             child: Text(
               'لا توجد أجزاء في هذه المادة',
-              style: TextStyle(color: AppColors.textMuted.withValues(alpha: 0.9)),
+              style: TextStyle(
+                color: AppColors.textMuted.withValues(alpha: 0.9),
+              ),
             ),
           ),
         );
@@ -343,7 +350,8 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
                   child: LessonCard(
                     lesson: entry.value,
                     displayOrder: entry.key + 1,
-                    initiallyExpanded: entry.key == 0 && state.lessons.length == 1,
+                    initiallyExpanded:
+                        entry.key == 0 && state.lessons.length == 1,
                   ),
                 ),
               )

@@ -43,10 +43,12 @@ class AnnotationHitTest {
         }
         return math.sqrt(dx * dx + dy * dy) <= tolerance * 2;
       case AnnotationType.highlighter:
-        if ((annotation.width.abs() > 0.001 || annotation.height.abs() > 0.001) &&
+        if ((annotation.width.abs() > 0.001 ||
+                annotation.height.abs() > 0.001) &&
             annotation.data['points'] == null) {
-          final left =
-              annotation.width >= 0 ? annotation.x : annotation.x + annotation.width;
+          final left = annotation.width >= 0
+              ? annotation.x
+              : annotation.x + annotation.width;
           final top = annotation.height >= 0
               ? annotation.y
               : annotation.y + annotation.height;
@@ -63,8 +65,9 @@ class AnnotationHitTest {
         return _hitsStroke(annotation, point, tolerance);
       case AnnotationType.shape:
         if (annotation.width.abs() > 0.001 || annotation.height.abs() > 0.001) {
-          final left =
-              annotation.width >= 0 ? annotation.x : annotation.x + annotation.width;
+          final left = annotation.width >= 0
+              ? annotation.x
+              : annotation.x + annotation.width;
           final top = annotation.height >= 0
               ? annotation.y
               : annotation.y + annotation.height;

@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 
 class NotificationTypeIcon extends StatelessWidget {
-  const NotificationTypeIcon({
-    super.key,
-    required this.type,
-    this.size = 22,
-  });
+  const NotificationTypeIcon({super.key, required this.type, this.size = 22});
 
   final String type;
   final double size;
@@ -23,11 +19,7 @@ class NotificationTypeIcon extends StatelessWidget {
         color: colors.background,
         shape: BoxShape.circle,
       ),
-      child: Icon(
-        _icon(),
-        color: colors.foreground,
-        size: size,
-      ),
+      child: Icon(_icon(), color: colors.foreground, size: size),
     );
   }
 
@@ -121,10 +113,7 @@ class NotificationTypeIcon extends StatelessWidget {
 }
 
 class _TypeColors {
-  const _TypeColors({
-    required this.background,
-    required this.foreground,
-  });
+  const _TypeColors({required this.background, required this.foreground});
 
   final Color background;
   final Color foreground;

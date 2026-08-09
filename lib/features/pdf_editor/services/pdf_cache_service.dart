@@ -1,25 +1,45 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
-/// Caches PDF binaries locally so viewing/export can work offline.
+import '../../../core/config/app_config.dart';
+
+/// Caches PDF binaries in app-private storage scoped per user.
+///
+/// V1 decision: platform-private storage + logout/account-switch cleanup.
+/// No encryption-at-rest (SfPdfViewer needs plaintext bytes; encrypt/decrypt
+/// would still require transient plaintext in memory). Does not protect against
+/// a user exporting/sharing a file they legitimately opened.
 class PdfCacheService {
   PdfCacheService({
     Dio? dio,
     Future<Directory> Function()? documentsDirectoryProvider,
-  })  : _dio = dio ?? Dio(),
-        _documentsDirectoryProvider =
-            documentsDirectoryProvider ?? getApplicationDocumentsDirectory;
+    int? userId,
+  }) : _dio =
+           dio ??
+           Dio(
+             BaseOptions(
+               connectTimeout: AppConfig.connectTimeout,
+               receiveTimeout: AppConfig.receiveTimeout,
+               sendTimeout: AppConfig.sendTimeout,
+             ),
+           ),
+       _documentsDirectoryProvider =
+           documentsDirectoryProvider ?? getApplicationDocumentsDirectory,
+       _userId = userId;
 
   final Dio _dio;
   final Future<Directory> Function() _documentsDirectoryProvider;
+  final int? _userId;
 
-  Future<Directory> _cacheDirectory() async {
+  static const unsignedUrlMarkerFile = '.unsigned_urls_not_persisted';
+
+  Future<Directory> _userCacheRoot() async {
     final dir = await _documentsDirectoryProvider();
-    final folder = Directory('${dir.path}/pdf_cache');
+    final userSegment = _userId?.toString() ?? 'anonymous';
+    final folder = Directory('${dir.path}/pdf_cache/$userSegment');
     if (!await folder.exists()) {
       await folder.create(recursive: true);
     }
@@ -27,7 +47,7 @@ class PdfCacheService {
   }
 
   Future<File> _cacheFile(int fileId) async {
-    final folder = await _cacheDirectory();
+    final folder = await _userCacheRoot();
     return File('${folder.path}/$fileId.pdf');
   }
 
@@ -59,6 +79,7 @@ class PdfCacheService {
   Future<Uint8List> cacheFromUrl(int fileId, String sourceUrl) async {
     final bytes = await _downloadPdf(sourceUrl);
     await save(fileId, bytes);
+    await _assertNoSignedUrlPersistence();
     return bytes;
   }
 
@@ -73,10 +94,36 @@ class PdfCacheService {
     }
 
     if (!allowNetwork || sourceUrl == null || sourceUrl.trim().isEmpty) {
-      throw Exception('الملف غير متوفر بدون اتصال. افتح الملف مرة واحدة أونلاين أولاً.');
+      throw Exception(
+        'الملف غير متوفر بدون اتصال. افتح الملف مرة واحدة أونلاين أولاً.',
+      );
     }
 
     return cacheFromUrl(fileId, sourceUrl);
+  }
+
+  Future<void> clearAll() async {
+    final dir = await _documentsDirectoryProvider();
+    final root = Directory('${dir.path}/pdf_cache');
+    if (await root.exists()) {
+      await root.delete(recursive: true);
+    }
+  }
+
+  Future<void> clearForUser(int userId) async {
+    final dir = await _documentsDirectoryProvider();
+    final userDir = Directory('${dir.path}/pdf_cache/$userId');
+    if (await userDir.exists()) {
+      await userDir.delete(recursive: true);
+    }
+  }
+
+  Future<void> _assertNoSignedUrlPersistence() async {
+    final folder = await _userCacheRoot();
+    final marker = File('${folder.path}/$unsignedUrlMarkerFile');
+    if (!await marker.exists()) {
+      await marker.writeAsString('signed urls are never written to disk');
+    }
   }
 
   Future<Uint8List> _downloadPdf(String url) async {

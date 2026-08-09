@@ -56,7 +56,9 @@ class ProfileModel {
       }
     } else if (deviceJson is Map) {
       try {
-        activeDevice = DeviceModel.fromJson(Map<String, dynamic>.from(deviceJson));
+        activeDevice = DeviceModel.fromJson(
+          Map<String, dynamic>.from(deviceJson),
+        );
       } catch (_) {
         activeDevice = null;
       }

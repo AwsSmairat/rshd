@@ -71,10 +71,16 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
         title: const Text('تسجيل الخروج'),
         content: const Text('هل أنت متأكد أنك تريد تسجيل الخروج؟'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('إلغاء'),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('تسجيل خروج', style: TextStyle(color: Color(0xFF991B1B))),
+            child: const Text(
+              'تسجيل خروج',
+              style: TextStyle(color: Color(0xFF991B1B)),
+            ),
           ),
         ],
       ),
@@ -103,19 +109,21 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
 
   void _toggleAllNotifications(StudentPreferencesModel prefs) {
     final enable = !_allNotificationsEnabled(prefs);
-    ref.read(studentSettingsControllerProvider.notifier).updatePreferencesBatch({
-      'notify_lessons': enable,
-      'notify_assignments': enable,
-      'notify_assignment_reminders': enable,
-      'notify_quizzes': enable,
-      'notify_quiz_reminders': enable,
-      'notify_grades': enable,
-      'notify_messages': enable,
-      'notify_announcements': enable,
-      'notify_platform_updates': enable,
-      'notification_sound': enable,
-      'notification_vibration': enable,
-    });
+    ref
+        .read(studentSettingsControllerProvider.notifier)
+        .updatePreferencesBatch({
+          'notify_lessons': enable,
+          'notify_assignments': enable,
+          'notify_assignment_reminders': enable,
+          'notify_quizzes': enable,
+          'notify_quiz_reminders': enable,
+          'notify_grades': enable,
+          'notify_messages': enable,
+          'notify_announcements': enable,
+          'notify_platform_updates': enable,
+          'notification_sound': enable,
+          'notification_vibration': enable,
+        });
   }
 
   void _showInfoDialog(
@@ -150,9 +158,9 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
       }
       if (next.actionMessage != null &&
           next.actionMessage != previous?.actionMessage) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.actionMessage!)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.actionMessage!)));
       }
       if (next.errorMessage != null &&
           next.errorMessage != previous?.errorMessage &&
@@ -179,7 +187,8 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
       case FeatureLoadStatus.error:
         return ErrorView(
           message: state.errorMessage ?? 'تعذر تحميل الإعدادات',
-          onRetry: () => ref.read(studentSettingsControllerProvider.notifier).load(),
+          onRetry: () =>
+              ref.read(studentSettingsControllerProvider.notifier).load(),
         );
       case FeatureLoadStatus.empty:
       case FeatureLoadStatus.loaded:
@@ -187,7 +196,8 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
         if (settings == null) {
           return ErrorView(
             message: 'تعذر تحميل الإعدادات',
-            onRetry: () => ref.read(studentSettingsControllerProvider.notifier).load(),
+            onRetry: () =>
+                ref.read(studentSettingsControllerProvider.notifier).load(),
           );
         }
         return _buildContent(settings, state, isLoggingOut);
@@ -203,9 +213,9 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
     const cardGap = 8.0;
 
     Widget spaced(Widget child) => Padding(
-          padding: const EdgeInsets.only(bottom: cardGap),
-          child: child,
-        );
+      padding: const EdgeInsets.only(bottom: cardGap),
+      child: child,
+    );
 
     final profilePhoto = ProfilePhotoCard(
       profile: settings.profile,
@@ -231,9 +241,9 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
     final security = SecuritySettingsCard(
       profile: settings.profile,
       onChangePassword: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const ChangePasswordScreen()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const ChangePasswordScreen()));
       },
       onTwoFactorTap: () {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -373,8 +383,9 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
     }
 
     return RefreshIndicator(
-      onRefresh: () =>
-          ref.read(studentSettingsControllerProvider.notifier).load(refresh: true),
+      onRefresh: () => ref
+          .read(studentSettingsControllerProvider.notifier)
+          .load(refresh: true),
       color: AppColors.secondary,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),

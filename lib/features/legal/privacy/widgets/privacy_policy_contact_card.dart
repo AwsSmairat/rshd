@@ -55,7 +55,11 @@ class PrivacyPolicyContactCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.contact_mail_outlined, color: AppColors.darkGold, size: 22),
+              Icon(
+                Icons.contact_mail_outlined,
+                color: AppColors.darkGold,
+                size: 22,
+              ),
               const SizedBox(width: 8),
               Text(
                 'بيانات التواصل',
@@ -145,10 +149,7 @@ class _ContactRow extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: AppTextStyles.body.copyWith(
-                    fontSize: 14,
-                    height: 1.4,
-                  ),
+                  style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.4),
                 ),
               ],
             ),
@@ -226,11 +227,11 @@ class PrivacyActionButtons extends StatelessWidget {
   }
 
   ButtonStyle get _outlineStyle => OutlinedButton.styleFrom(
-        foregroundColor: AppColors.darkGold,
-        side: const BorderSide(color: AppColors.darkGold),
-        minimumSize: const Size(double.infinity, 46),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      );
+    foregroundColor: AppColors.darkGold,
+    side: const BorderSide(color: AppColors.darkGold),
+    minimumSize: const Size(double.infinity, 46),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  );
 }
 
 class DeleteAccountButton extends StatelessWidget {
@@ -301,9 +302,7 @@ Future<void> launchPrivacyEmail({
 
   final launched = await launchUrl(uri);
   if (!launched && context != null && context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(email)),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(email)));
   }
 }
 
@@ -313,10 +312,12 @@ PrivacyContactInfo resolvePrivacyContactInfo({
 }) {
   return PrivacyContactInfo(
     privacyEmail: PrivacyPolicyConfig.privacyEmail,
-    supportEmail: (platformSupportEmail != null && platformSupportEmail.isNotEmpty)
+    supportEmail:
+        (platformSupportEmail != null && platformSupportEmail.isNotEmpty)
         ? platformSupportEmail
         : PrivacyPolicyConfig.supportEmail,
-    supportPhone: (platformSupportPhone != null && platformSupportPhone.isNotEmpty)
+    supportPhone:
+        (platformSupportPhone != null && platformSupportPhone.isNotEmpty)
         ? platformSupportPhone
         : PrivacyPolicyConfig.supportPhone,
     companyAddress: PrivacyPolicyConfig.companyAddress,

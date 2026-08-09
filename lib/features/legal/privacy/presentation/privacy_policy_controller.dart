@@ -76,5 +76,7 @@ class PrivacyPolicyController extends StateNotifier<PrivacyPolicyState> {
 
 final privacyPolicyControllerProvider =
     StateNotifierProvider<PrivacyPolicyController, PrivacyPolicyState>((ref) {
-  return PrivacyPolicyController(ref.watch(privacyPolicyRepositoryProvider));
-});
+      return PrivacyPolicyController(
+        ref.watch(privacyPolicyRepositoryProvider),
+      );
+    });

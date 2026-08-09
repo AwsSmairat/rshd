@@ -85,18 +85,15 @@ class AnnotationLocalCache {
 }
 
 class PdfReadingSession {
-  const PdfReadingSession({
-    required this.pageNumber,
-    required this.zoomLevel,
-  });
+  const PdfReadingSession({required this.pageNumber, required this.zoomLevel});
 
   final int pageNumber;
   final double zoomLevel;
 
   Map<String, dynamic> toJson() => {
-        'page_number': pageNumber,
-        'zoom_level': zoomLevel,
-      };
+    'page_number': pageNumber,
+    'zoom_level': zoomLevel,
+  };
 
   factory PdfReadingSession.fromJson(Map<String, dynamic> json) {
     return PdfReadingSession(

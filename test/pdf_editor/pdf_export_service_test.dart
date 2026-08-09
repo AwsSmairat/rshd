@@ -1,12 +1,10 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rshd/features/pdf_editor/services/pdf_arabic_font_loader.dart';
 import 'package:rshd/features/pdf_editor/services/pdf_cache_service.dart';
 import 'package:rshd/features/pdf_editor/services/pdf_export_service.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import 'pdf_export_test_helpers.dart';
 
@@ -186,7 +184,9 @@ void main() {
 
     test('exports offline from cached PDF bytes', () async {
       final source = await createTestPdfBytes();
-      final cacheRoot = await Directory.systemTemp.createTemp('pdf_cache_offline_');
+      final cacheRoot = await Directory.systemTemp.createTemp(
+        'pdf_cache_offline_',
+      );
       final cacheService = PdfCacheService(
         documentsDirectoryProvider: () async => cacheRoot,
       );

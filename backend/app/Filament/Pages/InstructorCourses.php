@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Filament\Concerns\InstructorOnlyPage;
 use App\Filament\Concerns\MapsInstructorSubjectUrls;
 use App\Filament\Resources\SubjectResource;
+use App\Models\Subject;
 use App\Models\User;
 use App\Services\InstructorDashboardService;
 use Filament\Pages\Page;
@@ -31,7 +32,7 @@ class InstructorCourses extends Page
 
     public ?string $loadError = null;
 
-    /** @var Collection<int, array{subject: \App\Models\Subject, students_count: int, lessons_count: int, announcements_count: int, icon: string}> */
+    /** @var Collection<int, array{subject: Subject, students_count: int, lessons_count: int, announcements_count: int, icon: string}> */
     public Collection $courses;
 
     public function mount(): void

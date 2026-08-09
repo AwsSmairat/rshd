@@ -229,6 +229,43 @@ class EnrollmentService
         return $enrollment;
     }
 
+    public function rejectPurchaseRequest(
+        User $student,
+        Subject $subject,
+        ?User $actor = null,
+    ): void {
+        $enrollment = SubjectStudent::query()
+            ->where('student_id', $student->id)
+            ->where('subject_id', $subject->id)
+            ->first();
+
+        if ($enrollment === null) {
+            return;
+        }
+
+        if ($enrollment->payment_status === PaymentStatus::Paid
+            && $enrollment->access_status === AccessStatus::Active) {
+            $this->revokeAccess($student, $subject, $actor);
+
+            return;
+        }
+
+        if ($enrollment->access_status !== AccessStatus::Pending
+            && $enrollment->payment_status !== PaymentStatus::Unpaid) {
+            $this->revokeAccess($student, $subject, $actor);
+
+            return;
+        }
+
+        $enrollment->delete();
+
+        $this->audit->logActivation(
+            'enrollment.rejected',
+            $actor ?? $student,
+            'تم رفض طلب تفعيل مادة «'.$subject->title.'» للطالب «'.$student->name.'».',
+        );
+    }
+
     public function revokeAccess(User $student, Subject $subject, ?User $actor = null): void
     {
         SubjectStudent::query()
@@ -254,6 +291,10 @@ class EnrollmentService
             ->first();
 
         if ($enrollment === null) {
+            return 'none';
+        }
+
+        if (in_array($enrollment->access_status, [AccessStatus::Revoked, AccessStatus::Expired], true)) {
             return 'none';
         }
 

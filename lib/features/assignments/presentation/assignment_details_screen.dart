@@ -18,10 +18,7 @@ import '../widgets/submitted_file_card.dart';
 import 'assignments_controller.dart';
 
 class AssignmentDetailsScreen extends ConsumerStatefulWidget {
-  const AssignmentDetailsScreen({
-    super.key,
-    required this.assignmentId,
-  });
+  const AssignmentDetailsScreen({super.key, required this.assignmentId});
 
   final int assignmentId;
 
@@ -54,7 +51,9 @@ class _AssignmentDetailsScreenState
     if (!mounted) {
       return;
     }
-    await ref.read(assignmentsListControllerProvider.notifier).load(refresh: true);
+    await ref
+        .read(assignmentsListControllerProvider.notifier)
+        .load(refresh: true);
     _loadDetails();
   }
 
@@ -71,12 +70,12 @@ class _AssignmentDetailsScreenState
       assignmentDetailsControllerProvider(widget.assignmentId),
     );
 
-    ref.listen(
-      assignmentDetailsControllerProvider(widget.assignmentId),
-      (previous, next) {
-        _handleUnauthorized(next.errorMessage);
-      },
-    );
+    ref.listen(assignmentDetailsControllerProvider(widget.assignmentId), (
+      previous,
+      next,
+    ) {
+      _handleUnauthorized(next.errorMessage);
+    });
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -86,10 +85,9 @@ class _AssignmentDetailsScreenState
             child: LuxuryAssignmentHeader(title: 'تفاصيل الواجب'),
           ),
           ResponsiveSliverContent(
-            padding: AppLayoutMetrics.of(context).pagePadding(
-              top: 8,
-              bottom: 28,
-            ),
+            padding: AppLayoutMetrics.of(
+              context,
+            ).pagePadding(top: 8, bottom: 28),
             sliver: _buildContent(state),
           ),
         ],

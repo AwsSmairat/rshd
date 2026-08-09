@@ -22,8 +22,10 @@ class HomeDashboardModel {
   });
 
   final String studentName;
+
   /// Activated/enrolled subjects for "موادي".
   final List<SubjectModel> subjects;
+
   /// All active catalog subjects for department cards counts.
   final List<SubjectModel> catalogSubjects;
   final List<AssignmentModel> assignments;
@@ -74,7 +76,8 @@ class HomeDashboardModel {
 
     final sorted = [...subjects];
     sorted.sort(
-      (a, b) => resolvedProgressPercent(b).compareTo(resolvedProgressPercent(a)),
+      (a, b) =>
+          resolvedProgressPercent(b).compareTo(resolvedProgressPercent(a)),
     );
     return sorted;
   }
@@ -102,15 +105,16 @@ class HomeDashboardModel {
       }
     }
 
-    final subjectAssignments =
-        assignments.where((assignment) => assignment.subjectId == subjectId);
-    final subjectQuizzes =
-        quizzes.where((quiz) => quiz.subjectId == subjectId);
+    final subjectAssignments = assignments.where(
+      (assignment) => assignment.subjectId == subjectId,
+    );
+    final subjectQuizzes = quizzes.where((quiz) => quiz.subjectId == subjectId);
     final total = subjectAssignments.length + subjectQuizzes.length;
     if (total == 0) {
       return 0;
     }
-    final completed = subjectAssignments.where((a) => a.isSubmitted).length +
+    final completed =
+        subjectAssignments.where((a) => a.isSubmitted).length +
         subjectQuizzes.where((q) => q.isCompleted).length;
     return (completed / total) * 100;
   }

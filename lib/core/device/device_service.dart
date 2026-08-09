@@ -11,7 +11,7 @@ import '../storage/secure_storage_service.dart';
 
 class DeviceService {
   DeviceService({required SecureStorageService secureStorage})
-      : _secureStorage = secureStorage;
+    : _secureStorage = secureStorage;
 
   final SecureStorageService _secureStorage;
   final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
@@ -90,7 +90,9 @@ class DeviceService {
   String _generateStableId() {
     final random = Random.secure();
     final values = List<int>.generate(16, (_) => random.nextInt(256));
-    return values.map((value) => value.toRadixString(16).padLeft(2, '0')).join();
+    return values
+        .map((value) => value.toRadixString(16).padLeft(2, '0'))
+        .join();
   }
 }
 

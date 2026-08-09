@@ -37,6 +37,7 @@ class LuxuryQuizHeader extends StatelessWidget {
           ),
         ),
         child: Stack(
+          clipBehavior: Clip.hardEdge,
           children: [
             Positioned(
               left: -24,
@@ -150,9 +151,7 @@ class _BackButton extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.white.withValues(alpha: 0.08),
-            border: Border.all(
-              color: AppColors.white.withValues(alpha: 0.22),
-            ),
+            border: Border.all(color: AppColors.white.withValues(alpha: 0.22)),
           ),
           child: const Icon(
             Icons.arrow_forward_ios_rounded,

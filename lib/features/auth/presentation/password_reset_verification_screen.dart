@@ -16,10 +16,7 @@ import 'widgets/luxury_login_card.dart';
 import 'widgets/otp_input_row.dart';
 
 class PasswordResetVerificationScreen extends ConsumerStatefulWidget {
-  const PasswordResetVerificationScreen({
-    super.key,
-    required this.email,
-  });
+  const PasswordResetVerificationScreen({super.key, required this.email});
 
   final String email;
 
@@ -73,10 +70,9 @@ class _PasswordResetVerificationScreenState
       return;
     }
 
-    final success = await ref.read(passwordResetControllerProvider.notifier).verifyCode(
-          email: widget.email,
-          code: _code,
-        );
+    final success = await ref
+        .read(passwordResetControllerProvider.notifier)
+        .verifyCode(email: widget.email, code: _code);
 
     if (!mounted || !success) return;
 
@@ -100,9 +96,9 @@ class _PasswordResetVerificationScreenState
     if (success) {
       _otpKey.currentState?.clear();
       _startResendTimer();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إرسال رمز جديد')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('تم إرسال رمز جديد')));
     }
   }
 
@@ -167,7 +163,9 @@ class _PasswordResetVerificationScreenState
               ),
               SizedBox(height: metrics.fieldSpacing),
               TextButton(
-                onPressed: (_secondsRemaining > 0 || _isResending) ? null : _resend,
+                onPressed: (_secondsRemaining > 0 || _isResending)
+                    ? null
+                    : _resend,
                 child: Text(
                   _secondsRemaining > 0
                       ? 'إعادة الإرسال بعد $_secondsRemaining ث'

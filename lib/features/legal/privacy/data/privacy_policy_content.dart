@@ -131,9 +131,7 @@ class PrivacyPolicyContent {
       id: 'device_permissions',
       title: 'صلاحيات الجهاز',
       icon: Icons.smartphone_outlined,
-      paragraphs: [
-        'قد يطلب التطبيق الصلاحيات التالية عند الحاجة:',
-      ],
+      paragraphs: ['قد يطلب التطبيق الصلاحيات التالية عند الحاجة:'],
       subsections: [
         PrivacyPolicySubsection(
           title: 'الكاميرا',
@@ -141,9 +139,7 @@ class PrivacyPolicyContent {
         ),
         PrivacyPolicySubsection(
           title: 'الصور والملفات',
-          items: [
-            'لاختيار صورة شخصية أو رفع ملف واجب من الجهاز.',
-          ],
+          items: ['لاختيار صورة شخصية أو رفع ملف واجب من الجهاز.'],
         ),
         PrivacyPolicySubsection(
           title: 'الإشعارات',

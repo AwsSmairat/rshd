@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Enums\AccessStatus;
-use App\Enums\ContentStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\UserRole;
 use App\Filament\Concerns\ChecksPlatformInstructorSettings;
@@ -20,6 +19,7 @@ use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class SubjectStudentResource extends Resource
 {
@@ -82,7 +82,7 @@ class SubjectStudentResource extends Resource
         return auth()->user()?->isAdmin() ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         if (auth()->user()?->isAdmin()) {
             return true;

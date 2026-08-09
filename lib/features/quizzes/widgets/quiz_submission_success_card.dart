@@ -5,10 +5,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 
 class QuizSubmissionSuccessCard extends StatelessWidget {
-  const QuizSubmissionSuccessCard({
-    super.key,
-    required this.quizTitle,
-  });
+  const QuizSubmissionSuccessCard({super.key, required this.quizTitle});
 
   final String quizTitle;
 
@@ -49,9 +46,7 @@ class QuizSubmissionSuccessCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             quizTitle,
-            style: AppTextStyles.body.copyWith(
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class RegisterLoginLink extends StatelessWidget {
-  const RegisterLoginLink({
-    super.key,
-    required this.onLoginTap,
-  });
+  const RegisterLoginLink({super.key, required this.onLoginTap});
 
   final VoidCallback onLoginTap;
 

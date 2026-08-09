@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/platform/platform_settings.dart';
 import '../../../core/platform/platform_settings_controller.dart';
 import '../../../core/router/app_router.dart';
-import '../../../core/layout/app_layout_metrics.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../../auth/presentation/auth_controller.dart';
 import '../../subjects/presentation/subjects_controller.dart';
+import '../../subjects/widgets/subjects_header.dart';
 import '../data/models/quiz_model.dart';
 import '../widgets/liquid_glass_quiz_info_card.dart';
-import '../widgets/luxury_quiz_header.dart';
 import '../widgets/quiz_not_attempted_card.dart';
 import '../widgets/quiz_result_summary_card.dart';
 import '../widgets/quiz_score_helper.dart';
@@ -21,10 +22,7 @@ import '../widgets/quizzes_state_views.dart';
 import 'quizzes_controller.dart';
 
 class QuizDetailsScreen extends ConsumerStatefulWidget {
-  const QuizDetailsScreen({
-    super.key,
-    required this.quizId,
-  });
+  const QuizDetailsScreen({super.key, required this.quizId});
 
   final int quizId;
 
@@ -42,8 +40,9 @@ class _QuizDetailsScreenState extends ConsumerState<QuizDetailsScreen> {
   }
 
   void _loadDetails() {
-    final cached =
-        ref.read(quizzesListControllerProvider.notifier).findById(widget.quizId);
+    final cached = ref
+        .read(quizzesListControllerProvider.notifier)
+        .findById(widget.quizId);
     ref
         .read(quizDetailsControllerProvider(widget.quizId).notifier)
         .load(widget.quizId, cached: cached);
@@ -81,7 +80,9 @@ class _QuizDetailsScreenState extends ConsumerState<QuizDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(quizDetailsControllerProvider(widget.quizId));
-    final allowQuizRetake = ref.watch(platformSettingsProvider).maybeWhen(
+    final allowQuizRetake = ref
+        .watch(platformSettingsProvider)
+        .maybeWhen(
           data: (settings) => settings.allowQuizRetake,
           orElse: () => PlatformSettings.fallback.allowQuizRetake,
         );
@@ -91,18 +92,28 @@ class _QuizDetailsScreenState extends ConsumerState<QuizDetailsScreen> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: CustomScrollView(
-        slivers: [
-          const SliverToBoxAdapter(
-            child: LuxuryQuizHeader(title: 'تفاصيل الاختبار'),
+      backgroundColor: AppColors.background,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SubjectsHeader(
+            title: 'تفاصيل الاختبار',
+            backgroundIcon: Icons.quiz_outlined,
           ),
-          ResponsiveSliverContent(
-            padding: AppLayoutMetrics.of(context).pagePadding(
-              top: 8,
-              bottom: 28,
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
+                ResponsiveSliverContent(
+                  padding: AppLayoutMetrics.of(
+                    context,
+                  ).pagePadding(top: 8, bottom: 28),
+                  sliver: _buildContent(
+                    state,
+                    allowQuizRetake: allowQuizRetake,
+                  ),
+                ),
+              ],
             ),
-            sliver: _buildContent(state, allowQuizRetake: allowQuizRetake),
           ),
         ],
       ),
@@ -167,8 +178,8 @@ class _QuizDetailsScreenState extends ConsumerState<QuizDetailsScreen> {
                 primaryLabel: startLabel,
                 onPrimary: quiz.isActive
                     ? (canRetake || !quiz.isCompleted
-                        ? _startQuiz
-                        : () => _viewResult(quiz))
+                          ? _startQuiz
+                          : () => _viewResult(quiz))
                     : null,
               ),
             ],

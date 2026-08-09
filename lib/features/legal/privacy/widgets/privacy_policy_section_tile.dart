@@ -53,7 +53,10 @@ class PrivacyPolicySectionTile extends StatelessWidget {
                 onToggle();
               }
             },
-            tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            tilePadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 4,
+            ),
             childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 16),
             leading: Container(
               width: 36,
@@ -72,16 +75,15 @@ class PrivacyPolicySectionTile extends StatelessWidget {
                 color: AppColors.text,
               ),
             ),
-            trailing: trailing ??
+            trailing:
+                trailing ??
                 Icon(
                   isExpanded
                       ? Icons.keyboard_arrow_up_rounded
                       : Icons.keyboard_arrow_down_rounded,
                   color: AppColors.textMuted,
                 ),
-            children: [
-              PrivacyPolicySection(section: section),
-            ],
+            children: [PrivacyPolicySection(section: section)],
           ),
         ),
       ),

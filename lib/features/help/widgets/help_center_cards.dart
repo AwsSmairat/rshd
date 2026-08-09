@@ -6,10 +6,7 @@ import '../../../core/widgets/liquid_glass_surface.dart';
 import '../data/help_center_model.dart';
 
 class HelpSupportCard extends StatelessWidget {
-  const HelpSupportCard({
-    super.key,
-    required this.onContact,
-  });
+  const HelpSupportCard({super.key, required this.onContact});
 
   final VoidCallback onContact;
 

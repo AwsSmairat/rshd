@@ -18,10 +18,7 @@ void main() {
         'status': 'active',
         'avatar_url': null,
       },
-      'preferences': {
-        'notify_lessons': true,
-        'language': 'ar',
-      },
+      'preferences': {'notify_lessons': true, 'language': 'ar'},
       'devices': [],
     });
 

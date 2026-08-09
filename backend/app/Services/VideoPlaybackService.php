@@ -8,8 +8,8 @@ use App\Models\User;
 use App\Models\Video;
 use App\Services\Video\BunnyStreamVideoProvider;
 use App\Services\Video\LocalVideoProvider;
+use App\Support\SafeLogger;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class VideoPlaybackService
@@ -36,7 +36,7 @@ class VideoPlaybackService
         try {
             return $this->resolveProvider($video)->generateSignedPlaybackUrl($video, $user);
         } catch (RuntimeException $exception) {
-            Log::warning('video.playback.failed', [
+            SafeLogger::warning('video.playback.failed', [
                 'video_id' => $video->id,
                 'user_id' => $user->id,
                 'provider' => $video->storage_provider,
@@ -65,7 +65,7 @@ class VideoPlaybackService
     {
         if ($video->storage_provider === 'bunny') {
             if ($this->shouldServeLocalFallback($video)) {
-                Log::info('video.playback.bunny_local_fallback', [
+                SafeLogger::info('video.playback.bunny_local_fallback', [
                     'video_id' => $video->id,
                 ]);
 
@@ -81,7 +81,7 @@ class VideoPlaybackService
             }
 
             if ($video->hasLocalStoredFile()) {
-                Log::warning('video.playback.bunny_dev_local_fallback', [
+                SafeLogger::warning('video.playback.bunny_dev_local_fallback', [
                     'video_id' => $video->id,
                 ]);
 

@@ -35,10 +35,7 @@ class RegisterFormField extends StatelessWidget {
       textInputAction: textInputAction,
       validator: validator,
       textAlign: TextAlign.right,
-      style: const TextStyle(
-        color: AppColors.text,
-        fontSize: 14,
-      ),
+      style: const TextStyle(color: AppColors.text, fontSize: 14),
       decoration: InputDecoration(
         hintText: hintText,
         errorText: errorText,
@@ -58,10 +55,7 @@ class RegisterFormField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: AppColors.accent,
-            width: 1.5,
-          ),
+          borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),

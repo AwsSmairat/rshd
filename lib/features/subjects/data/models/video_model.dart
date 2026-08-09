@@ -17,11 +17,7 @@ DateTime? _parseDateTime(dynamic value) {
 }
 
 class VideoPlaybackModel {
-  const VideoPlaybackModel({
-    required this.url,
-    this.expiresAt,
-    this.type,
-  });
+  const VideoPlaybackModel({required this.url, this.expiresAt, this.type});
 
   final String url;
   final DateTime? expiresAt;
@@ -142,8 +138,7 @@ class VideoModel {
   final String? createdAt;
   final String? updatedAt;
 
-  bool get canPlay =>
-      !isLocked && (playback?.url.trim().isNotEmpty ?? false);
+  bool get canPlay => !isLocked && (playback?.url.trim().isNotEmpty ?? false);
 
   factory VideoModel.fromJson(Map<String, dynamic> json) {
     final progressJson = json['progress'];
@@ -158,10 +153,8 @@ class VideoModel {
       playback: playbackJson is Map<String, dynamic>
           ? VideoPlaybackModel.fromJson(playbackJson)
           : playbackJson is Map
-              ? VideoPlaybackModel.fromJson(
-                  Map<String, dynamic>.from(playbackJson),
-                )
-              : null,
+          ? VideoPlaybackModel.fromJson(Map<String, dynamic>.from(playbackJson))
+          : null,
       durationSeconds: _asInt(json['duration_seconds']),
       status: json['status']?.toString() ?? 'ready',
       isFree: isFree,
@@ -169,10 +162,8 @@ class VideoModel {
       progress: progressJson is Map<String, dynamic>
           ? VideoProgressModel.fromJson(progressJson)
           : progressJson is Map
-              ? VideoProgressModel.fromJson(
-                  Map<String, dynamic>.from(progressJson),
-                )
-              : null,
+          ? VideoProgressModel.fromJson(Map<String, dynamic>.from(progressJson))
+          : null,
       createdAt: json['created_at']?.toString(),
       updatedAt: json['updated_at']?.toString(),
     );
@@ -212,8 +203,7 @@ class VideoModel {
     }
   }
 
-  bool get isPendingPlayback =>
-      status == 'uploading' || status == 'processing';
+  bool get isPendingPlayback => status == 'uploading' || status == 'processing';
 
   String get pendingPlaybackMessage {
     switch (status) {

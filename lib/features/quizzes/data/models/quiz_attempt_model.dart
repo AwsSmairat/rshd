@@ -17,8 +17,7 @@ class QuizAttemptModel {
   final String? submittedAt;
   final int? questionsCount;
 
-  bool get isSubmitted =>
-      submittedAt != null && submittedAt!.isNotEmpty;
+  bool get isSubmitted => submittedAt != null && submittedAt!.isNotEmpty;
 
   factory QuizAttemptModel.fromJson(Map<String, dynamic> json) {
     return QuizAttemptModel(

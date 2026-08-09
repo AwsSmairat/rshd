@@ -1,0 +1,82 @@
+rules:
+  - id: rshd-laravel-001-missing-authorize
+    message: "RSHD-LARAVEL-001: Controller method may access model by user ID without authorize()/policy."
+    severity: WARNING
+    languages: [php]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              public function $METHOD($...,$id,$...) {
+                ...
+                $MODEL = $CLASS::findOrFail($id);
+                ...
+              }
+          - pattern: |
+              public function $METHOD($...,$model,$...) {
+                ...
+              }
+    paths:
+      include:
+        - backend/app/Http/Controllers/
+    metadata:
+      category: authorization
+      requires_manual_review: true
+
+  - id: rshd-laravel-005-env-outside-config
+    message: "RSHD-LARAVEL-005: env() used outside config/ — use config() instead."
+    severity: ERROR
+    languages: [php]
+    pattern: env($KEY, ...)
+    paths:
+      exclude:
+        - backend/config/
+
+  - id: rshd-laravel-006-dd-dump
+    message: "RSHD-LARAVEL-006: dd()/dump() must not be committed."
+    severity: ERROR
+    languages: [php]
+    pattern-either:
+      - pattern: dd(...)
+      - pattern: dump(...)
+
+  - id: rshd-laravel-007-sensitive-log
+    message: "RSHD-LARAVEL-007: Log may contain token/password — manual review."
+    severity: WARNING
+    languages: [php]
+    pattern-either:
+      - pattern: Log::$LEVEL($MSG, $DATA)
+      - pattern: logger($MSG, $DATA)
+    metavariable-regex:
+      metavariable: $MSG
+      regex: (?i).*(token|password|authorization|secret|api_key).*
+
+  - id: rshd-laravel-009-raw-sql-interpolation
+    message: "RSHD-LARAVEL-009: Possible raw SQL with interpolated user input."
+    severity: ERROR
+    languages: [php]
+    pattern-either:
+      - pattern: DB::raw($X)
+      - pattern: "SELECT ... {$...} ..."
+    requires_manual_review: true
+
+  - id: rshd-laravel-010-mass-assignment
+    message: "RSHD-LARAVEL-010: request->all() may enable unsafe mass assignment."
+    severity: WARNING
+    languages: [php]
+    pattern: $MODEL->create($REQUEST->all())
+
+  - id: rshd-laravel-002-permanent-file-url
+    message: "RSHD-LARAVEL-002: Permanent file_url exposure risk — verify API resource excludes it."
+    severity: WARNING
+    languages: [php]
+    pattern: Storage::disk('public')->url(...)
+    paths:
+      include:
+        - backend/app/
+
+  - id: rshd-laravel-004-public-storage-fallback
+    message: "RSHD-LARAVEL-004: Public storage URL fallback on protected file model."
+    severity: WARNING
+    languages: [php]
+    pattern: |
+      return url(Storage::disk('public')->url($this->file_url));

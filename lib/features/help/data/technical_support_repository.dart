@@ -53,7 +53,8 @@ class TechnicalSupportRepository {
   }
 }
 
-final technicalSupportRepositoryProvider =
-    Provider<TechnicalSupportRepository>((ref) {
-  return TechnicalSupportRepository(ref.watch(apiClientProvider));
-});
+final technicalSupportRepositoryProvider = Provider<TechnicalSupportRepository>(
+  (ref) {
+    return TechnicalSupportRepository(ref.watch(apiClientProvider));
+  },
+);

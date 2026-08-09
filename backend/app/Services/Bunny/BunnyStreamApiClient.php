@@ -2,6 +2,7 @@
 
 namespace App\Services\Bunny;
 
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -82,7 +83,7 @@ class BunnyStreamApiClient
         return $payload;
     }
 
-    protected function request(): \Illuminate\Http\Client\PendingRequest
+    protected function request(): PendingRequest
     {
         if (! $this->isConfigured()) {
             throw new RuntimeException('Bunny Stream API credentials are not configured.');

@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-08-10T00:00:00+03:00",
+  "laravel": {
+    "path": "backend/composer.lock",
+    "audit_tool": "composer audit",
+    "known_vulnerabilities_baseline": 2
+  },
+  "flutter": {
+    "path": "pubspec.yaml",
+    "direct_dependencies": 22,
+    "git_sourced": 0,
+    "notable": [
+      {"name": "dio", "purpose": "HTTP client"},
+      {"name": "flutter_secure_storage", "purpose": "token storage"},
+      {"name": "webview_flutter", "purpose": "embed video player"},
+      {"name": "syncfusion_flutter_pdfviewer", "purpose": "PDF viewing/editing"},
+      {"name": "share_plus", "purpose": "PDF export share sheet"}
+    ]
+  }
+}

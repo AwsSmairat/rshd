@@ -9,10 +9,7 @@ import '../../quizzes/widgets/quiz_card.dart';
 import 'home_section_header.dart';
 
 class AvailableQuizzesSection extends StatelessWidget {
-  const AvailableQuizzesSection({
-    super.key,
-    required this.quizzes,
-  });
+  const AvailableQuizzesSection({super.key, required this.quizzes});
 
   final List<QuizModel> quizzes;
 

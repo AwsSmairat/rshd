@@ -6,6 +6,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
+import '../security/safe_external_url.dart';
+
 /// Registers the native WebView implementation before any [WebViewController] is created.
 void ensureWebViewPlatformInitialized() {
   if (WebViewPlatform.instance != null) {
@@ -54,6 +56,13 @@ WebViewController createEmbedWebViewController({
         onPageStarted: onPageStarted,
         onPageFinished: onPageFinished,
         onWebResourceError: onWebResourceError,
+        onNavigationRequest: (request) {
+          final uri = Uri.tryParse(request.url);
+          if (uri == null || !SafeExternalUrl.isWebViewNavigationAllowed(uri)) {
+            return NavigationDecision.prevent;
+          }
+          return NavigationDecision.navigate;
+        },
       ),
     );
 

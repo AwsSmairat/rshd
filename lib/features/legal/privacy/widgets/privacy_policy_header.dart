@@ -112,7 +112,7 @@ class PrivacyPolicyHeader extends StatelessWidget {
                             width: 36,
                             height: 36,
                             fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) => Icon(
+                            errorBuilder: (context, error, stackTrace) => Icon(
                               Icons.school_outlined,
                               color: AppColors.accent.withValues(alpha: 0.8),
                               size: 28,

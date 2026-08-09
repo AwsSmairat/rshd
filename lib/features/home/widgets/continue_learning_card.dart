@@ -100,10 +100,7 @@ class ContinueLearningCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _SubjectThumb(
-                subject: subject,
-                size: compact ? 64 : 72,
-              ),
+              _SubjectThumb(subject: subject, size: compact ? 64 : 72),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -118,7 +115,8 @@ class ContinueLearningCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (instructorName != null && instructorName.isNotEmpty) ...[
+                    if (instructorName != null &&
+                        instructorName.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
                         instructorName,
@@ -192,10 +190,7 @@ class ContinueLearningCard extends StatelessWidget {
 }
 
 class _SubjectThumb extends StatelessWidget {
-  const _SubjectThumb({
-    required this.subject,
-    this.size = 72,
-  });
+  const _SubjectThumb({required this.subject, this.size = 72});
 
   final SubjectModel subject;
   final double size;

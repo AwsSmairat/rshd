@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\PlatformSetting;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -441,7 +442,7 @@ class PlatformSettingsService
     }
 
     /**
-     * @return list<string|\Illuminate\Contracts\Validation\ValidationRule>
+     * @return list<string|ValidationRule>
      */
     public function passwordRules(bool $confirmed = false): array
     {
@@ -487,7 +488,35 @@ class PlatformSettingsService
             'file',
             'max:'.($maxMb * 1024),
             'mimes:'.$mimes,
+            'mimetypes:'.implode(',', $this->assignmentAllowedMimeTypes($types)),
         ];
+    }
+
+    /**
+     * @param  list<string>  $types
+     * @return list<string>
+     */
+    protected function assignmentAllowedMimeTypes(array $types): array
+    {
+        $map = [
+            'pdf' => 'application/pdf',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'zip' => 'application/zip',
+        ];
+
+        $mimes = [];
+        foreach ($types as $type) {
+            $key = ltrim(strtolower((string) $type), '.');
+            if (isset($map[$key])) {
+                $mimes[] = $map[$key];
+            }
+        }
+
+        return array_values(array_unique($mimes));
     }
 
     /**
@@ -511,7 +540,7 @@ class PlatformSettingsService
         $path = $this->get('main_logo', null, 'branding');
 
         return filled($path)
-            ? \Illuminate\Support\Facades\Storage::disk('public')->url((string) $path)
+            ? Storage::disk('public')->url((string) $path)
             : null;
     }
 
@@ -521,7 +550,7 @@ class PlatformSettingsService
             $path = $this->get($key, null, 'branding');
 
             if (filled($path)) {
-                return \Illuminate\Support\Facades\Storage::disk('public')->url((string) $path);
+                return Storage::disk('public')->url((string) $path);
             }
         }
 
@@ -533,7 +562,7 @@ class PlatformSettingsService
         $path = $this->get('icon_logo', null, 'branding');
 
         if (filled($path)) {
-            return \Illuminate\Support\Facades\Storage::disk('public')->url((string) $path);
+            return Storage::disk('public')->url((string) $path);
         }
 
         return $this->faviconUrl();

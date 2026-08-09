@@ -116,7 +116,9 @@ class StudentSettingsHeader extends StatelessWidget {
                                 vertical: 5,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.darkGold.withValues(alpha: 0.9),
+                                color: AppColors.darkGold.withValues(
+                                  alpha: 0.9,
+                                ),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
@@ -146,7 +148,8 @@ class StudentSettingsHeader extends StatelessWidget {
                         'assets/images/rshd_logo_no_bg.png',
                         width: metrics.isTablet ? 56 : 48,
                         height: metrics.isTablet ? 56 : 48,
-                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        errorBuilder: (context, error, stackTrace) =>
+                            const SizedBox.shrink(),
                       ),
                     ],
                   ),

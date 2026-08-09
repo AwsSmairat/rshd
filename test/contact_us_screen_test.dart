@@ -9,7 +9,9 @@ import 'package:rshd/features/contact/presentation/contact_us_screen.dart';
 import 'package:rshd/features/contact/widgets/contact_channel_card.dart';
 
 void main() {
-  testWidgets('ContactUsScreen shows all channels with placeholders', (tester) async {
+  testWidgets('ContactUsScreen shows all channels with placeholders', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -29,9 +31,7 @@ void main() {
             ),
           ),
         ],
-        child: const MaterialApp(
-          home: ContactUsScreen(),
-        ),
+        child: const MaterialApp(home: ContactUsScreen()),
       ),
     );
 
@@ -46,7 +46,9 @@ void main() {
     expect(find.text('لينكدإن'), findsOneWidget);
   });
 
-  testWidgets('ContactUsScreen enables cards when admin values exist', (tester) async {
+  testWidgets('ContactUsScreen enables cards when admin values exist', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -75,9 +77,7 @@ void main() {
             ),
           ),
         ],
-        child: const MaterialApp(
-          home: ContactUsScreen(),
-        ),
+        child: const MaterialApp(home: ContactUsScreen()),
       ),
     );
 

@@ -177,7 +177,9 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
 
     try {
       final refreshedPlayback = await widget.onRefreshPlayback!();
-      if (!mounted || refreshedPlayback == null || refreshedPlayback.url.isEmpty) {
+      if (!mounted ||
+          refreshedPlayback == null ||
+          refreshedPlayback.url.isEmpty) {
         return;
       }
 
@@ -227,24 +229,18 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
     }
 
     if (_errorMessage != null) {
-      return _PlaybackErrorState(
-        message: _errorMessage!,
-        onRetry: _retry,
-      );
+      return _PlaybackErrorState(message: _errorMessage!, onRetry: _retry);
     }
 
     return Stack(
       fit: StackFit.expand,
       children: [
-        if (_controller != null)
-          WebViewWidget(controller: _controller!),
+        if (_controller != null) WebViewWidget(controller: _controller!),
         if (_isLoading || _isRefreshing)
           const ColoredBox(
             color: Colors.black87,
             child: Center(
-              child: CircularProgressIndicator(
-                color: AppColors.darkGold,
-              ),
+              child: CircularProgressIndicator(color: AppColors.darkGold),
             ),
           ),
       ],
@@ -253,10 +249,7 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
 }
 
 class _PlaybackErrorState extends StatelessWidget {
-  const _PlaybackErrorState({
-    required this.message,
-    required this.onRetry,
-  });
+  const _PlaybackErrorState({required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;
@@ -268,10 +261,7 @@ class _PlaybackErrorState extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFFFE4E6),
-            Color(0xFFFFF7ED),
-          ],
+          colors: [Color(0xFFFFE4E6), Color(0xFFFFF7ED)],
         ),
       ),
       padding: const EdgeInsets.all(24),

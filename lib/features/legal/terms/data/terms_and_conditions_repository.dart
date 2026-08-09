@@ -101,7 +101,9 @@ class TermsAndConditionsRepository {
     );
   }
 
-  Future<TermsDocument> _loadCachedOrLocal({TermsAcceptanceStatus? status}) async {
+  Future<TermsDocument> _loadCachedOrLocal({
+    TermsAcceptanceStatus? status,
+  }) async {
     final cached = await _cache.load(StorageKeys.legalTermsCache);
     if (cached != null) {
       return LegalDocumentParser.parseTerms(
@@ -183,13 +185,16 @@ extension on TermsDocument {
 
 final termsAndConditionsRepositoryProvider =
     Provider<TermsAndConditionsRepository>((ref) {
-  return TermsAndConditionsRepository(
-    ref.watch(apiClientProvider),
-    LegalLocalCache(),
-  );
-});
+      return TermsAndConditionsRepository(
+        ref.watch(apiClientProvider),
+        LegalLocalCache(),
+      );
+    });
 
-final termsAcceptanceStatusProvider =
-    FutureProvider<TermsAcceptanceStatus?>((ref) async {
-  return ref.watch(termsAndConditionsRepositoryProvider).fetchAcceptanceStatus();
+final termsAcceptanceStatusProvider = FutureProvider<TermsAcceptanceStatus?>((
+  ref,
+) async {
+  return ref
+      .watch(termsAndConditionsRepositoryProvider)
+      .fetchAcceptanceStatus();
 });

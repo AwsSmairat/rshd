@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="pdf_cache/" />
+        <exclude domain="file" path="pdf_annotations/" />
+        <exclude domain="file" path="pdf_sessions/" />
+        <exclude domain="file" path="pdf_exports/" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="pdf_cache/" />
+        <exclude domain="file" path="pdf_annotations/" />
+        <exclude domain="file" path="pdf_sessions/" />
+        <exclude domain="file" path="pdf_exports/" />
+    </device-transfer>
+</data-extraction-rules>

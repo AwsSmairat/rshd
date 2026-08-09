@@ -131,6 +131,9 @@ class LegalDocumentParser {
       return const [];
     }
 
-    return raw.map((item) => item.toString()).where((item) => item.isNotEmpty).toList();
+    return raw
+        .map((item) => item.toString())
+        .where((item) => item.isNotEmpty)
+        .toList();
   }
 }
