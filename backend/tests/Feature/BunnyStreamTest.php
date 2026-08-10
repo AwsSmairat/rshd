@@ -46,6 +46,7 @@ class BunnyStreamTest extends TestCase
         $this->seed(RolePermissionSeeder::class);
         Storage::fake('lesson_videos');
 
+        Config::set('video.provider', 'bunny');
         Config::set('video.bunny.library_id', '12345');
         Config::set('video.bunny.api_key', 'stream-api-key');
         Config::set('video.bunny.read_only_api_key', 'read-only-key');
