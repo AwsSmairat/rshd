@@ -15,6 +15,10 @@ jobs:
     name: Fast Gate (PR)
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.event_name == 'push'
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ${{ github.workspace }}/backend/database/database.sqlite
     steps:
       - uses: actions/checkout@v4
 
@@ -30,9 +34,22 @@ jobs:
           php -v
           composer --version
 
+      - name: Generate CI application key
+        run: |
+          echo "APP_KEY=base64:$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+
+      - name: Prepare SQLite database
+        run: |
+          mkdir -p backend/database
+          touch backend/database/database.sqlite
+
       - name: Install Laravel dependencies
         working-directory: backend
         run: composer install --no-interaction --prefer-dist
+
+      - name: Run migrations
+        working-directory: backend
+        run: php artisan migrate --force
 
       - name: Laravel tests
         working-directory: backend
@@ -75,6 +92,10 @@ jobs:
     name: Full Audit (scheduled)
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ${{ github.workspace }}/backend/database/database.sqlite
     steps:
       - uses: actions/checkout@v4
 
@@ -89,6 +110,15 @@ jobs:
           php -v
           composer --version
 
+      - name: Generate CI application key
+        run: |
+          echo "APP_KEY=base64:$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+
+      - name: Prepare SQLite database
+        run: |
+          mkdir -p backend/database
+          touch backend/database/database.sqlite
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -97,6 +127,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd backend && composer install --no-interaction
+          cd backend && php artisan migrate --force
           flutter pub get
           pip install semgrep
 
