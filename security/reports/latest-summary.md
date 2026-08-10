@@ -1,15 +1,15 @@
 # RSHD Quality & Security Gate — Latest Summary
 
-**Timestamp:** 2026-08-09T22:15:14Z  
-**Git commit:** `5d71935296fd785183f148a6e9d78fbb2ab29a5a`
+**Timestamp:** 2026-08-10T14:12:54Z  
+**Git commit:** `25d44bdfc3a8e17b299ced07dd7e8a0a8cda5d77`
 
 ## Overall
 
 | Metric | Result |
 |--------|--------|
-| **Overall Gate** | **PASS** |
-| Quality Score | 100/100 |
-| Security Score | 95/100 |
+| **Overall Gate** | **FAIL** |
+| Quality Score | 75/100 |
+| Security Score | 80/100 |
 | Security Contract Coverage | 100% (30/30 with automated tests) |
 | Authorization Test Coverage | 100% |
 
@@ -27,7 +27,7 @@
 | Severity | Count |
 |----------|-------|
 | Critical | 0 |
-| High | 0 |
+| High | 1 |
 | Medium | 1 |
 | Low | 0 |
 | Secrets (tracked) | 0 |
@@ -36,13 +36,13 @@
 
 | Check | Status |
 |-------|--------|
-| Laravel tests | 203 pass / 0 fail |
+| Laravel tests | 205 pass / 1 fail |
 | Flutter tests | PASS |
 | Flutter analyze | see flutter-analyze.log |
 | Pint | see pint.log |
 | Composer audit | see composer-audit.log |
 | Semgrep | see security-audit.yaml |
-| One-command audit | PASS |
+| One-command audit | FAIL |
 | CI security gate | CREATED (see .github/workflows/security-gate.yml) |
 
 ## Coverage gaps (baseline)

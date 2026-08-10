@@ -6,6 +6,9 @@ import '../../../core/startup/startup_timing.dart';
 import '../data/auth_repository.dart';
 import '../data/models/user_model.dart';
 
+const _deviceMismatchMessage =
+    'هذا الحساب متصل على جهاز آخر، يرجى التواصل مع الإدارة لإعادة تعيين الجهاز.';
+
 enum AuthStatus {
   initial,
   loading,
@@ -196,10 +199,13 @@ class AuthController extends StateNotifier<AuthState> {
 
       return LoginFlowResult.success;
     } on ApiException catch (error) {
+      final isDeviceMismatch = _isDeviceMismatchError(error);
       state = AuthState(
         status: AuthStatus.error,
-        errorMessage: _mapLoginError(error),
-        fieldErrors: _mapFieldErrors(error),
+        errorMessage: isDeviceMismatch
+            ? _deviceMismatchMessage
+            : _mapLoginError(error),
+        fieldErrors: isDeviceMismatch ? const {} : _mapFieldErrors(error),
       );
       return LoginFlowResult.failed;
     } catch (_) {
@@ -251,10 +257,13 @@ class AuthController extends StateNotifier<AuthState> {
       state = AuthState(status: AuthStatus.authenticated, user: session.user);
       return RegisterResult.authenticated;
     } on ApiException catch (error) {
+      final isDeviceMismatch = _isDeviceMismatchError(error);
       state = AuthState(
         status: AuthStatus.error,
-        errorMessage: error.message,
-        fieldErrors: _mapFieldErrors(error),
+        errorMessage: isDeviceMismatch
+            ? _deviceMismatchMessage
+            : error.message,
+        fieldErrors: isDeviceMismatch ? const {} : _mapFieldErrors(error),
       );
       return RegisterResult.failed;
     } catch (_) {
@@ -336,10 +345,11 @@ class AuthController extends StateNotifier<AuthState> {
   }
 
   String _mapLoginError(ApiException error) {
+    if (_isDeviceMismatchError(error)) {
+      return _deviceMismatchMessage;
+    }
+
     if (error.isForbidden) {
-      if (error.message.contains('جهاز آخر')) {
-        return error.message;
-      }
       if (error.message.contains('تأكيد بريدك')) {
         return error.message;
       }
@@ -362,7 +372,23 @@ class AuthController extends StateNotifier<AuthState> {
     return error.message;
   }
 
+  bool _isDeviceMismatchError(ApiException error) {
+    if (error.isDeviceMismatch) {
+      return true;
+    }
+
+    final message = error.message;
+    return message.contains('جهاز آخر') ||
+        message.contains('device_mismatch') ||
+        (error.isForbidden &&
+            (message.contains('متصل') || message.contains('مرتبط')));
+  }
+
   String _mapVerificationError(ApiException error) {
+    if (_isDeviceMismatchError(error)) {
+      return _deviceMismatchMessage;
+    }
+
     if (error.statusCode == null && error.message.contains('اتصال')) {
       return 'تعذر الاتصال بالسيرفر';
     }
@@ -384,13 +410,25 @@ class AuthController extends StateNotifier<AuthState> {
   }
 
   Map<String, String> _mapFieldErrors(ApiException error) {
+    if (_isDeviceMismatchError(error)) {
+      return const {};
+    }
+
     final mapped = <String, String>{};
     error.errors?.forEach((key, value) {
-      if (value is List && value.isNotEmpty) {
-        mapped[key] = value.first.toString();
-      } else if (value != null) {
-        mapped[key] = value.toString();
+      final raw = value is List && value.isNotEmpty
+          ? value.first.toString()
+          : value?.toString();
+      if (raw == null || raw.isEmpty) {
+        return;
       }
+
+      if (key == 'email' && raw.contains('incorrect')) {
+        mapped[key] = 'بيانات الدخول غير صحيحة.';
+        return;
+      }
+
+      mapped[key] = raw;
     });
     return mapped;
   }

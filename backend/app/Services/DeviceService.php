@@ -8,7 +8,9 @@ use InvalidArgumentException;
 
 class DeviceService
 {
-    public const DEVICE_MISMATCH_MESSAGE = 'هذا الحساب مرتبط بجهاز آخر. يرجى التواصل مع الإدارة لإعادة تعيين الجهاز.';
+    public const DEVICE_MISMATCH_CODE = 'device_mismatch';
+
+    public const DEVICE_MISMATCH_MESSAGE = 'هذا الحساب متصل على جهاز آخر، يرجى التواصل مع الإدارة لإعادة تعيين الجهاز.';
 
     public function __construct(
         protected PlatformSettingsService $settings,

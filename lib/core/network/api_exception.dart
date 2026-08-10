@@ -4,16 +4,20 @@ class ApiException implements Exception {
     this.statusCode,
     this.errors,
     this.data,
+    this.errorCode,
   });
 
   final String message;
   final int? statusCode;
   final Map<String, dynamic>? errors;
   final Map<String, dynamic>? data;
+  final String? errorCode;
 
   bool get isUnauthorized => statusCode == 401;
   bool get isForbidden => statusCode == 403;
   bool get isValidationError => statusCode == 422;
+
+  bool get isDeviceMismatch => errorCode == 'device_mismatch';
 
   bool get requiresEmailVerification =>
       data?['requires_email_verification'] == true;

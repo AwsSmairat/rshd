@@ -118,6 +118,7 @@ class ApiClient {
         data: payload['data'] is Map
             ? Map<String, dynamic>.from(payload['data'] as Map)
             : null,
+        errorCode: payload['error_code']?.toString(),
       );
     }
 

@@ -55,13 +55,23 @@ trait ApiResponse
         return $this->successList($collection->resolve(), $message, $status);
     }
 
-    protected function errorResponse(string $message, int $status = 400, ?array $errors = null): JsonResponse
-    {
-        return response()->json([
+    protected function errorResponse(
+        string $message,
+        int $status = 400,
+        ?array $errors = null,
+        ?string $errorCode = null,
+    ): JsonResponse {
+        $payload = [
             'success' => false,
             'message' => $message,
             'errors' => $errors ?? new \stdClass,
-        ], $status);
+        ];
+
+        if ($errorCode !== null) {
+            $payload['error_code'] = $errorCode;
+        }
+
+        return response()->json($payload, $status);
     }
 
     protected function validationErrorResponse(
@@ -84,11 +94,13 @@ trait ApiResponse
         );
     }
 
-    protected function forbiddenResponse(?string $message = null): JsonResponse
+    protected function forbiddenResponse(?string $message = null, ?string $errorCode = null): JsonResponse
     {
         return $this->errorResponse(
             $message ?? 'غير مصرح لك بالوصول.',
             403,
+            null,
+            $errorCode,
         );
     }
 }

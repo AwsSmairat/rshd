@@ -1,7 +1,7 @@
-timestamp: 2026-08-09T22:15:14Z
-quality_score: 100
+timestamp: 2026-08-10T14:12:54Z
+quality_score: 75
 results:
-  - laravel_tests|PASS|See laravel-test.log
+  - laravel_tests|FAIL|See laravel-test.log
   - pint|PASS|Clean
   - composer_audit|PASS|No known vulnerabilities
   - flutter_analyze|PASS|Clean

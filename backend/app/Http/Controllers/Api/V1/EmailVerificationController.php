@@ -30,7 +30,10 @@ class EmailVerificationController extends Controller
 
         if ($user->email_verified_at !== null) {
             if (! app(DeviceService::class)->assertStudentDeviceAllowed($user, $this->devicePayload($validated))) {
-                return $this->forbiddenResponse(DeviceService::DEVICE_MISMATCH_MESSAGE);
+                return $this->forbiddenResponse(
+                DeviceService::DEVICE_MISMATCH_MESSAGE,
+                DeviceService::DEVICE_MISMATCH_CODE,
+            );
             }
 
             $token = $user->createToken('api')->plainTextToken;
@@ -50,7 +53,10 @@ class EmailVerificationController extends Controller
         $user->refresh();
 
         if (! app(DeviceService::class)->assertStudentDeviceAllowed($user, $this->devicePayload($validated))) {
-            return $this->forbiddenResponse(DeviceService::DEVICE_MISMATCH_MESSAGE);
+            return $this->forbiddenResponse(
+                DeviceService::DEVICE_MISMATCH_MESSAGE,
+                DeviceService::DEVICE_MISMATCH_CODE,
+            );
         }
 
         $token = $user->createToken('api')->plainTextToken;

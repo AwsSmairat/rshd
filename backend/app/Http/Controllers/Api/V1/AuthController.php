@@ -75,7 +75,10 @@ class AuthController extends Controller
         }
 
         if (! app(DeviceService::class)->assertStudentDeviceAllowed($user, $this->devicePayload($validated))) {
-            return $this->forbiddenResponse(DeviceService::DEVICE_MISMATCH_MESSAGE);
+            return $this->forbiddenResponse(
+                DeviceService::DEVICE_MISMATCH_MESSAGE,
+                DeviceService::DEVICE_MISMATCH_CODE,
+            );
         }
 
         $token = $user->createToken('api')->plainTextToken;
@@ -150,7 +153,10 @@ class AuthController extends Controller
         }
 
         if (! app(DeviceService::class)->assertStudentDeviceAllowed($user, $this->devicePayload($validated))) {
-            return $this->forbiddenResponse(DeviceService::DEVICE_MISMATCH_MESSAGE);
+            return $this->forbiddenResponse(
+                DeviceService::DEVICE_MISMATCH_MESSAGE,
+                DeviceService::DEVICE_MISMATCH_CODE,
+            );
         }
 
         $token = $user->createToken('api')->plainTextToken;
@@ -182,7 +188,10 @@ class AuthController extends Controller
         }
 
         if (! app(DeviceService::class)->assertStudentDeviceAllowed($user, $this->devicePayload($validated))) {
-            return $this->forbiddenResponse(DeviceService::DEVICE_MISMATCH_MESSAGE);
+            return $this->forbiddenResponse(
+                DeviceService::DEVICE_MISMATCH_MESSAGE,
+                DeviceService::DEVICE_MISMATCH_CODE,
+            );
         }
 
         $token = $user->createToken('api')->plainTextToken;
@@ -213,7 +222,10 @@ class AuthController extends Controller
         }
 
         if (! app(DeviceService::class)->assertStudentDeviceAllowed($user, $this->devicePayload($validated))) {
-            return $this->forbiddenResponse(DeviceService::DEVICE_MISMATCH_MESSAGE);
+            return $this->forbiddenResponse(
+                DeviceService::DEVICE_MISMATCH_MESSAGE,
+                DeviceService::DEVICE_MISMATCH_CODE,
+            );
         }
 
         $token = $user->createToken('api')->plainTextToken;

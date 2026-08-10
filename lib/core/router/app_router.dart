@@ -24,6 +24,7 @@ import '../../features/maintenance/maintenance_screen.dart';
 import '../../features/legal/terms/presentation/terms_acceptance_gate_controller.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
+import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/contact/presentation/contact_us_screen.dart';
 import '../../features/help/presentation/help_center_screen.dart';
 import '../../features/help/presentation/technical_support_screen.dart';
@@ -49,6 +50,7 @@ class AppRoutes {
   AppRoutes._();
 
   static const splash = '/splash';
+  static const onboarding = '/onboarding';
   static const login = '/login';
   static const register = '/register';
   static const verifyEmail = '/verify-email';
@@ -148,6 +150,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final platformSettings = ref.read(platformSettingsProvider).value;
 
       final isSplash = location == AppRoutes.splash;
+      final isOnboarding = location == AppRoutes.onboarding;
       final isMaintenance = location == AppRoutes.maintenance;
       final isLogin = location == AppRoutes.login;
       final isRegister = location == AppRoutes.register;
@@ -162,7 +165,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isPasswordResetRoute =
           isForgotPassword || isPasswordResetVerify || isPasswordResetNew;
       final isAuthRoute =
-          isLogin || isRegister || isVerifyEmail || isPasswordResetRoute;
+          isLogin ||
+          isRegister ||
+          isVerifyEmail ||
+          isPasswordResetRoute ||
+          isOnboarding;
 
       if (platformSettings?.maintenanceMode == true &&
           !isMaintenance &&
@@ -254,6 +261,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.splash,
         pageBuilder: (context, state) =>
             buildAppRoutePage(state: state, child: const SplashScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.onboarding,
+        pageBuilder: (context, state) =>
+            buildAppRoutePage(state: state, child: const OnboardingScreen()),
       ),
       GoRoute(
         path: AppRoutes.maintenance,

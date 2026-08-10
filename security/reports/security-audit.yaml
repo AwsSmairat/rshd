@@ -1,18 +1,16 @@
-timestamp: 2026-08-09T22:15:41Z
-security_score: 95
-semgrep_status: SCAN_COMPLETED_NO_BLOCKERS
+timestamp: 2026-08-10T14:13:21Z
+security_score: 80
+semgrep_status: TOOL_FAILURE
 secrets: 0
 critical: 0
-high: 0
+high: 1
 medium: 1
 low: 0
 results:
   - secret_scan|PASS|secrets=0
   - composer_advisories|PASS|exceptions valid
-  - semgrep_security_scan|WARN|non-zero exit — see /Users/dollar/Dev/rshd/security/reports/semgrep-security.json
-  - semgrep_quality_scan|PASS|see /Users/dollar/Dev/rshd/security/reports/semgrep-quality.json
-  - semgrep_mobile_scan|WARN|see semgrep-mobile.json
-  - semgrep_enforcement|PASS|reviewed=46 false_positive=32
+  - semgrep_security|TOOL_MISSING|semgrep not installed
+  - semgrep_quality|TOOL_MISSING|semgrep not installed
   - contract_gaps|WARN|0 coverage gaps documented
   - env_outside_config|PASS|No env() in app/
   - dd_dump|PASS|Clean
