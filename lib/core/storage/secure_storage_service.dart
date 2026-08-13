@@ -137,4 +137,16 @@ class SecureStorageService {
   Future<void> write(String key, String value) {
     return _storage.write(key: key, value: value);
   }
+
+  Future<void> markOnboardingCompleted() {
+    return _storage.write(
+      key: StorageKeys.onboardingCompleted,
+      value: 'true',
+    );
+  }
+
+  Future<bool> isOnboardingCompleted() async {
+    final value = await _storage.read(key: StorageKeys.onboardingCompleted);
+    return value == 'true';
+  }
 }

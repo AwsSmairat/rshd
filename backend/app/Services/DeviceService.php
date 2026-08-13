@@ -64,6 +64,45 @@ class DeviceService
     }
 
     /**
+     * Read-only pre-auth check: true when the student already has the maximum
+     * number of active devices and the incoming device_id is not one of them.
+     *
+     * @param  array{device_id?: string|null, device_name?: string|null, platform?: string|null}  $deviceData
+     */
+    public function studentHasForeignActiveDevice(User $user, array $deviceData): bool
+    {
+        if (! $user->isStudent() || ! $this->settings->deviceBindingEnabled()) {
+            return false;
+        }
+
+        $deviceId = $deviceData['device_id'] ?? null;
+        if (empty($deviceId)) {
+            return $this->settings->deviceIdRequired()
+                && StudentDevice::query()
+                    ->where('student_id', $user->id)
+                    ->where('is_active', true)
+                    ->exists();
+        }
+
+        $activeDevices = StudentDevice::query()
+            ->where('student_id', $user->id)
+            ->where('is_active', true)
+            ->get();
+
+        if ($activeDevices->isEmpty()) {
+            return false;
+        }
+
+        if ($activeDevices->firstWhere('device_id', $deviceId) !== null) {
+            return false;
+        }
+
+        $maxDevices = max(1, $this->settings->integer('max_active_devices', 1, 'students'));
+
+        return $activeDevices->count() >= $maxDevices;
+    }
+
+    /**
      * @param  array{device_id: string, device_name?: string|null, platform?: string|null}  $deviceData
      */
     public function registerOrCheckDevice(User $student, array $deviceData): StudentDevice

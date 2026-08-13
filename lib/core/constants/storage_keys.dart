@@ -11,4 +11,5 @@ class StorageKeys {
   static const passwordResetEmail = 'password_reset_email';
   static const legalPrivacyCache = 'legal_privacy_cache';
   static const legalTermsCache = 'legal_terms_cache';
+  static const onboardingCompleted = 'rshd_onboarding_completed_v1';
 }

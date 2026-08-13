@@ -123,6 +123,15 @@ class AuthController extends Controller
             ]);
         }
 
+        if ($user && $user->isStudent() && $user->status !== UserStatus::Blocked) {
+            if (app(DeviceService::class)->studentHasForeignActiveDevice($user, $this->devicePayload($validated))) {
+                return $this->forbiddenResponse(
+                    DeviceService::DEVICE_MISMATCH_MESSAGE,
+                    DeviceService::DEVICE_MISMATCH_CODE,
+                );
+            }
+        }
+
         if (! $user || ! $user->password || ! Hash::check($validated['password'], $user->password)) {
             $throttle->hit($email);
             $audit->logAuth('login.failed', $user, 'محاولة دخول فاشلة للحساب «'.$email.'».');

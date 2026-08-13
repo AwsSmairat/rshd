@@ -81,6 +81,27 @@ class LoginDeviceMismatchTest extends TestCase
             ->assertJsonStructure(['data' => ['token', 'user']]);
     }
 
+    public function test_foreign_device_returns_mismatch_before_password_check(): void
+    {
+        $student = $this->createStudent([
+            'email' => 'device-early@rshd.test',
+            'password' => Hash::make('secret-password'),
+        ]);
+
+        $this->createActiveDevice($student, 'registered-device');
+
+        $this->postJson('/api/v1/login', [
+            'email' => $student->email,
+            'password' => 'wrong-password',
+            'device_id' => 'foreign-device',
+            'device_name' => 'Other Phone',
+            'platform' => 'ios',
+        ])
+            ->assertForbidden()
+            ->assertJsonPath('error_code', DeviceService::DEVICE_MISMATCH_CODE)
+            ->assertJsonPath('message', DeviceService::DEVICE_MISMATCH_MESSAGE);
+    }
+
     protected function createActiveDevice(User $student, string $deviceId): StudentDevice
     {
         return StudentDevice::query()->create([
