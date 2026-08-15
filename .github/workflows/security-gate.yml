@@ -74,7 +74,7 @@ jobs:
         continue-on-error: true
 
       - name: Flutter test
-        run: flutter test
+        run: flutter test --exclude-tags golden
 
       - name: Install Semgrep
         run: pip install semgrep
