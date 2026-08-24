@@ -260,9 +260,7 @@ class AuthController extends StateNotifier<AuthState> {
       final isDeviceMismatch = _isDeviceMismatchError(error);
       state = AuthState(
         status: AuthStatus.error,
-        errorMessage: isDeviceMismatch
-            ? _deviceMismatchMessage
-            : error.message,
+        errorMessage: isDeviceMismatch ? _deviceMismatchMessage : error.message,
         fieldErrors: isDeviceMismatch ? const {} : _mapFieldErrors(error),
       );
       return RegisterResult.failed;

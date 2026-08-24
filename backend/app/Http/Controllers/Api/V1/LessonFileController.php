@@ -7,6 +7,8 @@ use App\Http\Requests\Api\V1\StoreAnnotationRequest;
 use App\Http\Resources\LessonFileResource;
 use App\Models\LessonFile;
 use App\Models\PdfAnnotation;
+use App\Models\User;
+use App\Services\LessonFileAccessService;
 use App\Services\LessonFileDownloadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -48,6 +50,13 @@ class LessonFileController extends Controller
     public function stream(Request $request, LessonFile $lessonFile): StreamedResponse
     {
         if (! $request->hasValidSignature()) {
+            abort(403, 'Download link is invalid or expired.');
+        }
+
+        $userId = (int) $request->query('uid');
+        $user = $userId > 0 ? User::query()->find($userId) : null;
+
+        if ($user === null || ! app(LessonFileAccessService::class)->canDownload($user, $lessonFile)) {
             abort(403, 'Download link is invalid or expired.');
         }
 

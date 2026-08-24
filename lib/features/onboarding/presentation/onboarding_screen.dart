@@ -410,12 +410,7 @@ class OnboardingStudyToolsPage extends StatelessWidget {
               if (allowScroll)
                 Expanded(
                   child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        header,
-                        illustration,
-                      ],
-                    ),
+                    child: Column(children: [header, illustration]),
                   ),
                 )
               else ...[
@@ -764,8 +759,7 @@ class OnboardingProgressPage extends StatelessWidget {
                 height: illustrationHeight,
                 child: Semantics(
                   image: true,
-                  label:
-                      'طالب يتابع تقدمه الدراسي وإنجازاته في RSHD',
+                  label: 'طالب يتابع تقدمه الدراسي وإنجازاته في RSHD',
                   child: _ProgressIllustration(
                     asset: illustrationAsset,
                     availableWidth: media.size.width,
@@ -775,8 +769,7 @@ class OnboardingProgressPage extends StatelessWidget {
             : Expanded(
                 child: Semantics(
                   image: true,
-                  label:
-                      'طالب يتابع تقدمه الدراسي وإنجازاته في RSHD',
+                  label: 'طالب يتابع تقدمه الدراسي وإنجازاته في RSHD',
                   child: _ProgressIllustration(
                     asset: illustrationAsset,
                     availableWidth: media.size.width,
@@ -796,12 +789,7 @@ class OnboardingProgressPage extends StatelessWidget {
               if (allowScroll)
                 Expanded(
                   child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        header,
-                        illustration,
-                      ],
-                    ),
+                    child: Column(children: [header, illustration]),
                   ),
                 )
               else ...[

@@ -64,7 +64,11 @@ class BunnyStreamVideoProvider implements VideoProviderInterface
 
         $embedKey = (string) config('video.bunny.embed_token_key');
 
-        if ($embedKey !== '') {
+        if ($embedKey === '') {
+            if (config('video.bunny.require_embed_token', false)) {
+                throw new RuntimeException('Bunny embed token key is not configured.');
+            }
+        } else {
             $expires = $expiresAt->getTimestamp();
             $query['expires'] = (string) $expires;
             $query['token'] = $this->embedTokenSigner->sign($videoId, $embedKey, $expires);
@@ -129,6 +133,10 @@ class BunnyStreamVideoProvider implements VideoProviderInterface
         if (config('video.bunny.playback_mode', 'embed') === 'cdn') {
             return filled(config('video.bunny.token_key'))
                 && filled(config('video.bunny.cdn_hostname'));
+        }
+
+        if (config('video.bunny.require_embed_token', false)) {
+            return filled(config('video.bunny.embed_token_key'));
         }
 
         return true;

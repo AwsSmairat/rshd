@@ -281,6 +281,36 @@ class EnrollmentService
     }
 
     /**
+     * @param  array<int, int|string>  $subjectIds
+     * @return array<int, 'none'|'pending'|'active'>
+     */
+    public function enrollmentStatusMapFor(User $student, array $subjectIds): array
+    {
+        $ids = array_values(array_unique(array_map('intval', $subjectIds)));
+        $statuses = [];
+
+        foreach ($ids as $id) {
+            $statuses[$id] = 'none';
+        }
+
+        if ($ids === []) {
+            return $statuses;
+        }
+
+        $enrollments = SubjectStudent::query()
+            ->where('student_id', $student->id)
+            ->whereIn('subject_id', $ids)
+            ->get()
+            ->keyBy('subject_id');
+
+        foreach ($ids as $id) {
+            $statuses[$id] = $this->statusFromEnrollment($enrollments->get($id));
+        }
+
+        return $statuses;
+    }
+
+    /**
      * @return 'none'|'pending'|'active'
      */
     public function enrollmentStatusFor(User $student, Subject $subject): string
@@ -290,6 +320,14 @@ class EnrollmentService
             ->where('subject_id', $subject->id)
             ->first();
 
+        return $this->statusFromEnrollment($enrollment);
+    }
+
+    /**
+     * @return 'none'|'pending'|'active'
+     */
+    protected function statusFromEnrollment(?SubjectStudent $enrollment): string
+    {
         if ($enrollment === null) {
             return 'none';
         }

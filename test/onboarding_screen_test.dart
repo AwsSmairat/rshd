@@ -12,8 +12,9 @@ import 'package:rshd/features/onboarding/presentation/onboarding_screen.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  const secureStorageChannel =
-      MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
+  const secureStorageChannel = MethodChannel(
+    'plugins.it_nomads.com/flutter_secure_storage',
+  );
 
   late Map<String, String> secureStore;
 
@@ -21,34 +22,36 @@ void main() {
     secureStore = {};
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(secureStorageChannel, (MethodCall call) async {
-      switch (call.method) {
-        case 'write':
-          final key = call.arguments['key'] as String;
-          final value = call.arguments['value'] as String?;
-          if (value == null) {
-            secureStore.remove(key);
-          } else {
-            secureStore[key] = value;
+        .setMockMethodCallHandler(secureStorageChannel, (
+          MethodCall call,
+        ) async {
+          switch (call.method) {
+            case 'write':
+              final key = call.arguments['key'] as String;
+              final value = call.arguments['value'] as String?;
+              if (value == null) {
+                secureStore.remove(key);
+              } else {
+                secureStore[key] = value;
+              }
+              return null;
+            case 'read':
+              final key = call.arguments['key'] as String;
+              return secureStore[key];
+            case 'delete':
+              final key = call.arguments['key'] as String;
+              secureStore.remove(key);
+              return null;
+            case 'deleteAll':
+              secureStore.clear();
+              return null;
+            case 'containsKey':
+              final key = call.arguments['key'] as String;
+              return secureStore.containsKey(key);
+            default:
+              return null;
           }
-          return null;
-        case 'read':
-          final key = call.arguments['key'] as String;
-          return secureStore[key];
-        case 'delete':
-          final key = call.arguments['key'] as String;
-          secureStore.remove(key);
-          return null;
-        case 'deleteAll':
-          secureStore.clear();
-          return null;
-        case 'containsKey':
-          final key = call.arguments['key'] as String;
-          return secureStore.containsKey(key);
-        default:
-          return null;
-      }
-    });
+        });
   });
 
   tearDown(() {
@@ -90,9 +93,7 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          secureStorageProvider.overrideWithValue(storage),
-        ],
+        overrides: [secureStorageProvider.overrideWithValue(storage)],
         child: MaterialApp.router(
           routerConfig: router,
           builder: (context, child) => MediaQuery(
@@ -205,7 +206,8 @@ void main() {
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is Directionality && widget.textDirection == TextDirection.rtl,
+            widget is Directionality &&
+            widget.textDirection == TextDirection.rtl,
       ),
       findsWidgets,
     );
@@ -292,7 +294,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('page state persists after swipe forward and back', (tester) async {
+  testWidgets('page state persists after swipe forward and back', (
+    tester,
+  ) async {
     await pumpOnboarding(tester);
 
     await tester.drag(find.byType(PageView), const Offset(320, 0));
@@ -317,9 +321,7 @@ void main() {
 
     expect(find.text('تقدّمك قدامك… وهدفك أقرب'), findsOneWidget);
     expect(
-      find.text(
-        'تابع إنجازك، اختباراتك ودرجاتك، وخليك دائمًا عارف وين وصلت.',
-      ),
+      find.text('تابع إنجازك، اختباراتك ودرجاتك، وخليك دائمًا عارف وين وصلت.'),
       findsOneWidget,
     );
     expect(find.text('LEARN | ACHIEVE | GROW'), findsOneWidget);
@@ -366,7 +368,9 @@ void main() {
     expect(secureStore[StorageKeys.onboardingCompleted], 'true');
   });
 
-  testWidgets('system back from page three returns to page two', (tester) async {
+  testWidgets('system back from page three returns to page two', (
+    tester,
+  ) async {
     await pumpOnboarding(tester);
     await goToPage(tester, 2);
 
@@ -409,7 +413,8 @@ void main() {
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is Directionality && widget.textDirection == TextDirection.rtl,
+            widget is Directionality &&
+            widget.textDirection == TextDirection.rtl,
       ),
       findsWidgets,
     );

@@ -36,7 +36,7 @@ class LessonFileDownloadService
         }
 
         if (filled($lessonFile->file_path)) {
-            return $this->generateLocalSignedUrl($lessonFile);
+            return $this->generateLocalSignedUrl($lessonFile, $user);
         }
 
         return null;
@@ -45,7 +45,7 @@ class LessonFileDownloadService
     /**
      * @return array{url: string, expires_at: Carbon}|null
      */
-    protected function generateLocalSignedUrl(LessonFile $lessonFile): ?array
+    protected function generateLocalSignedUrl(LessonFile $lessonFile, User $user): ?array
     {
         $diskName = $lessonFile->localSourceDiskName();
         $path = (string) $lessonFile->file_path;
@@ -67,7 +67,10 @@ class LessonFileDownloadService
             'url' => URL::temporarySignedRoute(
                 'api.v1.files.stream',
                 $expiresAt,
-                ['file' => $lessonFile->id],
+                [
+                    'file' => $lessonFile->id,
+                    'uid' => $user->id,
+                ],
             ),
             'expires_at' => $expiresAt,
         ];

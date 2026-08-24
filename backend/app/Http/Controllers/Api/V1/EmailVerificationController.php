@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\UserStatus;
 use App\Exceptions\EmailVerificationException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\ResendEmailVerificationRequest;
@@ -25,23 +26,15 @@ class EmailVerificationController extends Controller
             ->first();
 
         if ($user === null || ! $user->isStudent()) {
-            return $this->errorResponse('المستخدم غير موجود.', 404);
+            return $this->errorResponse('الرمز غير صحيح', 422);
+        }
+
+        if ($user->status === UserStatus::Blocked) {
+            return $this->forbiddenResponse('حسابك غير مفعّل حالياً. يرجى التواصل مع الإدارة.');
         }
 
         if ($user->email_verified_at !== null) {
-            if (! app(DeviceService::class)->assertStudentDeviceAllowed($user, $this->devicePayload($validated))) {
-                return $this->forbiddenResponse(
-                DeviceService::DEVICE_MISMATCH_MESSAGE,
-                DeviceService::DEVICE_MISMATCH_CODE,
-            );
-            }
-
-            $token = $user->createToken('api')->plainTextToken;
-
-            return $this->successResponse([
-                'token' => $token,
-                'user' => (new UserResource($user->load('activeStudentDevice')))->resolve($request),
-            ], 'تم تأكيد البريد الإلكتروني بنجاح.');
+            return $this->errorResponse('البريد الإلكتروني مؤكد بالفعل. يرجى تسجيل الدخول.', 422);
         }
 
         try {
@@ -78,11 +71,11 @@ class EmailVerificationController extends Controller
             ->first();
 
         if ($user === null || ! $user->isStudent()) {
-            return $this->errorResponse('المستخدم غير موجود.', 404);
+            return $this->successResponse(null, 'تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني');
         }
 
         if ($user->email_verified_at !== null) {
-            return $this->successResponse(null, 'البريد الإلكتروني مؤكد بالفعل.');
+            return $this->successResponse(null, 'تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني');
         }
 
         try {

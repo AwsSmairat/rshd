@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/auth/presentation/auth_controller.dart';
+import '../network/api_client.dart';
 import '../platform/platform_settings.dart';
 import '../platform/platform_settings_controller.dart';
 import 'startup_route_resolver.dart';
@@ -53,6 +54,7 @@ class StartupCoordinator extends StateNotifier<StartupCoordinatorState> {
   }
 
   final Ref ref;
+  bool _onboardingCompleted = false;
 
   Future<void> ensureAuthBootstrapStarted() async {
     if (state.authBootstrapStarted) {
@@ -61,6 +63,7 @@ class StartupCoordinator extends StateNotifier<StartupCoordinatorState> {
 
     state = state.copyWith(authBootstrapStarted: true);
     StartupTiming.mark('T5');
+    _onboardingCompleted = await _readOnboardingCompleted();
     await ref.read(authControllerProvider.notifier).bootstrap();
     StartupTiming.mark('T6');
     _updateDestinationFromAuth(ref.read(authControllerProvider));
@@ -96,6 +99,7 @@ class StartupCoordinator extends StateNotifier<StartupCoordinatorState> {
     final route = resolveStartupRoute(
       authState: authState,
       platformSettings: settings,
+      onboardingCompleted: _onboardingCompleted,
     );
 
     if (route == null) {
@@ -107,6 +111,14 @@ class StartupCoordinator extends StateNotifier<StartupCoordinatorState> {
     }
 
     state = state.copyWith(destinationRoute: route);
+  }
+
+  Future<bool> _readOnboardingCompleted() async {
+    try {
+      return await ref.read(secureStorageProvider).isOnboardingCompleted();
+    } catch (_) {
+      return false;
+    }
   }
 }
 

@@ -9,6 +9,7 @@ import '../../../core/theme/app_text_styles.dart';
 import 'auth_controller.dart';
 import 'widgets/register_form_field.dart';
 import 'widgets/register_header.dart';
+import 'widgets/register_legal_links.dart';
 import 'widgets/register_login_link.dart';
 import 'widgets/register_submit_button.dart';
 import 'widgets/security_notice_card.dart';
@@ -263,6 +264,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       const SizedBox(height: 20),
                       const SecurityNoticeCard(),
+                      const SizedBox(height: 12),
+                      const RegisterLegalLinks(),
                       const SizedBox(height: 20),
                       RegisterSubmitButton(
                         label: 'إنشاء حساب',

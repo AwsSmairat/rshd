@@ -6,6 +6,7 @@ import '../router/app_router.dart';
 String? resolveStartupRoute({
   required AuthState authState,
   required PlatformSettings? platformSettings,
+  bool onboardingCompleted = false,
 }) {
   if (platformSettings?.maintenanceMode == true) {
     return AppRoutes.maintenance;
@@ -26,6 +27,9 @@ String? resolveStartupRoute({
       final pendingEmail = authState.pendingVerificationEmail;
       if (pendingEmail != null) {
         return '${AppRoutes.verifyEmail}?email=${Uri.encodeComponent(pendingEmail)}';
+      }
+      if (!onboardingCompleted) {
+        return AppRoutes.onboarding;
       }
       return AppRoutes.login;
     case AuthStatus.initial:

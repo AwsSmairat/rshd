@@ -119,7 +119,7 @@ class EmailVerificationSecurityTest extends TestCase
         $this->assertNull($userB->fresh()->email_verified_at);
     }
 
-    public function test_already_verified_user_can_obtain_session_without_replaying_otp(): void
+    public function test_already_verified_user_cannot_obtain_session_without_otp(): void
     {
         $user = $this->createUnverifiedStudent('verify-done@rshd.test');
         $code = $this->sendAndCaptureCode($user);
@@ -130,13 +130,58 @@ class EmailVerificationSecurityTest extends TestCase
             'device_id' => 'verify-done-device',
         ])->assertOk();
 
+        $this->assertNotNull($user->fresh()->email_verified_at);
+
         $this->postJson('/api/v1/email/verify', [
             'email' => $user->email,
             'code' => '999999',
             'device_id' => 'verify-done-device-2',
         ])
+            ->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonMissingPath('data.token');
+
+        $this->assertSame(1, $user->fresh()->tokens()->count());
+    }
+
+    public function test_blocked_student_cannot_verify_email_or_obtain_token(): void
+    {
+        $user = $this->createUnverifiedStudent('verify-blocked@rshd.test');
+        $code = $this->sendAndCaptureCode($user);
+        $user->forceFill(['status' => UserStatus::Blocked])->save();
+
+        $this->postJson('/api/v1/email/verify', [
+            'email' => $user->email,
+            'code' => $code,
+            'device_id' => 'verify-blocked-device',
+        ])
+            ->assertForbidden()
+            ->assertJsonMissingPath('data.token');
+
+        $this->assertSame(0, $user->fresh()->tokens()->count());
+    }
+
+    public function test_unknown_email_verify_returns_generic_invalid_code(): void
+    {
+        $this->postJson('/api/v1/email/verify', [
+            'email' => 'missing-verify@rshd.test',
+            'code' => '123456',
+        ])
+            ->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'الرمز غير صحيح')
+            ->assertJsonMissingPath('data.token');
+    }
+
+    public function test_unknown_email_resend_returns_generic_success_without_sending_mail(): void
+    {
+        $this->postJson('/api/v1/email/resend', [
+            'email' => 'missing-resend@rshd.test',
+        ])
             ->assertOk()
-            ->assertJsonStructure(['data' => ['token', 'user']]);
+            ->assertJsonPath('success', true);
+
+        Mail::assertNothingSent();
     }
 
     private function createUnverifiedStudent(string $email): User

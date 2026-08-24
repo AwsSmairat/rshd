@@ -72,7 +72,7 @@ void main() {
 
     final startup = container.read(startupCoordinatorProvider);
     expect(startup.startupDecisionReady, isTrue);
-    expect(startup.destinationRoute, '/login');
+    expect(startup.destinationRoute, '/onboarding');
   });
 
   test('animation finished with ready auth enables navigation state', () async {

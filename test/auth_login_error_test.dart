@@ -48,41 +48,35 @@ void main() {
   test('login hides email field error for device mismatch message', () async {
     final controller = AuthController(
       _DeviceMismatchAuthRepository(
-        ApiException(
-          message: deviceMessage,
-          statusCode: 403,
-        ),
+        ApiException(message: deviceMessage, statusCode: 403),
       ),
     );
 
-    await controller.login(
-      email: 'student@rshd.test',
-      password: 'password',
-    );
+    await controller.login(email: 'student@rshd.test', password: 'password');
 
     expect(controller.state.errorMessage, deviceMessage);
     expect(controller.state.fieldErrors, isEmpty);
   });
 
-  test('login maps incorrect credentials to Arabic banner and field error', () async {
-    final controller = AuthController(
-      _DeviceMismatchAuthRepository(
-        ApiException(
-          message: 'The given data was invalid.',
-          statusCode: 422,
-          errors: {
-            'email': ['The provided credentials are incorrect.'],
-          },
+  test(
+    'login maps incorrect credentials to Arabic banner and field error',
+    () async {
+      final controller = AuthController(
+        _DeviceMismatchAuthRepository(
+          ApiException(
+            message: 'The given data was invalid.',
+            statusCode: 422,
+            errors: {
+              'email': ['The provided credentials are incorrect.'],
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    await controller.login(
-      email: 'student@rshd.test',
-      password: 'wrong',
-    );
+      await controller.login(email: 'student@rshd.test', password: 'wrong');
 
-    expect(controller.state.errorMessage, 'بيانات الدخول غير صحيحة.');
-    expect(controller.state.fieldErrors['email'], 'بيانات الدخول غير صحيحة.');
-  });
+      expect(controller.state.errorMessage, 'بيانات الدخول غير صحيحة.');
+      expect(controller.state.fieldErrors['email'], 'بيانات الدخول غير صحيحة.');
+    },
+  );
 }

@@ -170,6 +170,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           isVerifyEmail ||
           isPasswordResetRoute ||
           isOnboarding;
+      final isLegalPage =
+          location == AppRoutes.privacyPolicy ||
+          location == AppRoutes.termsAndConditions;
 
       if (platformSettings?.maintenanceMode == true &&
           !isMaintenance &&
@@ -246,7 +249,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             isRegister) {
           return AppRoutes.login;
         }
-        if (!isAuthRoute && !isSplash && !isMaintenance) {
+        if (!isAuthRoute && !isSplash && !isMaintenance && !isLegalPage) {
           if (authState.pendingVerificationEmail != null) {
             return '${AppRoutes.verifyEmail}?email=${Uri.encodeComponent(authState.pendingVerificationEmail!)}';
           }

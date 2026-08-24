@@ -400,6 +400,19 @@ class BunnyStreamTest extends TestCase
         $this->assertSame('embed', $playback['type']);
     }
 
+    public function test_embed_playback_fails_closed_when_embed_token_required_and_missing(): void
+    {
+        Config::set('video.bunny.require_embed_token', true);
+        Config::set('video.bunny.embed_token_key', '');
+
+        [$student, $video] = $this->createBunnyVideoScenario();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Bunny embed token key is not configured.');
+
+        app(BunnyStreamVideoProvider::class)->generateSignedPlaybackUrl($video, $student);
+    }
+
     public function test_embed_token_is_appended_when_embed_key_configured(): void
     {
         Config::set('video.bunny.embed_token_key', 'embed-secret-key');

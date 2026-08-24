@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Services\EnrollmentService;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -66,6 +67,38 @@ class EnrollmentPurchaseRequestTest extends TestCase
         $status = app(EnrollmentService::class)->enrollmentStatusFor($student, $subject);
 
         $this->assertSame('none', $status);
+    }
+
+    public function test_catalog_loads_enrollment_status_in_one_query(): void
+    {
+        [$student] = $this->createPendingPurchaseScenario();
+
+        $instructor = User::factory()->create([
+            'role' => UserRole::Instructor,
+            'status' => UserStatus::Active,
+            'email_verified_at' => now(),
+        ]);
+
+        foreach (['مادة ثانية', 'مادة ثالثة'] as $title) {
+            Subject::query()->create([
+                'instructor_id' => $instructor->id,
+                'title' => $title,
+                'description' => 'وصف',
+                'category' => SubjectCategory::Medicine->value,
+                'status' => ContentStatus::Active,
+                'price' => 40,
+            ]);
+        }
+
+        Sanctum::actingAs($student);
+        DB::enableQueryLog();
+
+        $this->getJson('/api/v1/subjects')->assertOk();
+
+        $subjectStudentQueries = collect(DB::getQueryLog())
+            ->filter(fn (array $query): bool => str_contains(strtolower($query['query']), 'subject_student'));
+
+        $this->assertLessThanOrEqual(1, $subjectStudentQueries->count());
     }
 
     /**

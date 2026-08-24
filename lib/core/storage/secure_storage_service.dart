@@ -139,10 +139,7 @@ class SecureStorageService {
   }
 
   Future<void> markOnboardingCompleted() {
-    return _storage.write(
-      key: StorageKeys.onboardingCompleted,
-      value: 'true',
-    );
+    return _storage.write(key: StorageKeys.onboardingCompleted, value: 'true');
   }
 
   Future<bool> isOnboardingCompleted() async {

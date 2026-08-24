@@ -185,10 +185,38 @@ class LessonFileDownloadTest extends TestCase
         $this->assertStringContainsString('/api/v1/files/'.$file->id.'/stream', $url);
         $this->assertStringContainsString('signature=', $url);
         $this->assertStringContainsString('expires=', $url);
+        $this->assertStringContainsString('uid='.$student->id, $url);
 
         $streamResponse = $this->get($url);
         $streamResponse->assertOk();
         $this->assertSame('%PDF-1.4 pending-local', $streamResponse->streamedContent());
+    }
+
+    public function test_local_stream_rejects_request_after_student_is_blocked(): void
+    {
+        [$student, $file] = $this->createEnrolledLessonFileScenario();
+
+        $file->forceFill([
+            'external_path' => null,
+            'storage_status' => LessonFileStorageStatus::Pending,
+            'storage_disk' => 'lesson_files',
+            'file_path' => 'sources/blocked-local.pdf',
+        ])->save();
+
+        Storage::disk('lesson_files')->put(
+            'sources/blocked-local.pdf',
+            '%PDF-1.4 blocked-local',
+        );
+
+        Sanctum::actingAs($student);
+
+        $url = (string) $this->getJson('/api/v1/files/'.$file->id.'/download')
+            ->assertOk()
+            ->json('data.url');
+
+        $student->forceFill(['status' => UserStatus::Blocked])->save();
+
+        $this->get($url)->assertForbidden();
     }
 
     /**

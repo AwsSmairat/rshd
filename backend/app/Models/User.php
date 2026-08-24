@@ -252,6 +252,10 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     protected static function booted(): void
     {
         static::updated(function (User $user): void {
+            if ($user->wasChanged('status') && $user->status === UserStatus::Blocked) {
+                $user->tokens()->delete();
+            }
+
             if (! $user->wasChanged('password')) {
                 return;
             }

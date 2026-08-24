@@ -110,4 +110,35 @@ class QuizSubmitAuthorizationTest extends TestCase
         $this->postJson('/api/v1/quizzes/'.$foreignQuiz->id.'/start')
             ->assertForbidden();
     }
+
+    public function test_foreign_quiz_question_does_not_inflate_score(): void
+    {
+        [$student, $quiz, $question] = $this->createEnrolledQuizScenario();
+        [, $foreignQuiz, $foreignQuestion, $foreignCorrect] = $this->createEnrolledQuizScenario();
+
+        $foreignQuiz->forceFill([
+            'subject_id' => $quiz->subject_id,
+            'lesson_id' => $quiz->lesson_id,
+        ])->save();
+        $foreignQuestion->forceFill(['quiz_id' => $foreignQuiz->id, 'points' => 100])->save();
+
+        Sanctum::actingAs($student);
+
+        $this->postJson('/api/v1/quizzes/'.$quiz->id.'/start')->assertOk();
+
+        $response = $this->postJson('/api/v1/quizzes/'.$quiz->id.'/submit', [
+            'answers' => [
+                [
+                    'question_id' => $question->id,
+                    'answer_id' => null,
+                ],
+                [
+                    'question_id' => $foreignQuestion->id,
+                    'answer_id' => $foreignCorrect->id,
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertEquals(0.0, (float) $response->json('data.score'));
+    }
 }

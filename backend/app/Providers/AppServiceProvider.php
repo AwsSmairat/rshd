@@ -125,9 +125,13 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('auth-email-verify', function (Request $request) {
+            $email = strtolower((string) $request->input('email', ''));
+
             return [
                 Limit::perMinute(10)->by($request->ip()),
                 Limit::perHour(30)->by($request->ip()),
+                Limit::perMinute(5)->by($request->ip().'|'.$email),
+                Limit::perHour(20)->by($request->ip().'|'.$email),
             ];
         });
 
@@ -202,7 +206,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected function assertProductionVideoSecurity(): void
     {
-        if (! app()->environment('production')) {
+        if (! app()->environment(['production', 'staging'])) {
             return;
         }
 
@@ -226,6 +230,8 @@ class AppServiceProvider extends ServiceProvider
                 $bunnyReady = $bunnyReady
                     && filled(config('video.bunny.token_key'))
                     && filled(config('video.bunny.cdn_hostname'));
+            } else {
+                $bunnyReady = $bunnyReady && filled(config('video.bunny.embed_token_key'));
             }
 
             if (! $bunnyReady) {

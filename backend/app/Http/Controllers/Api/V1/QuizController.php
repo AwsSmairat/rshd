@@ -12,10 +12,8 @@ use App\Http\Resources\QuizAttemptResource;
 use App\Http\Resources\QuizResource;
 use App\Models\Grade;
 use App\Models\Quiz;
-use App\Models\QuizAnswer;
 use App\Models\QuizAttempt;
 use App\Models\QuizAttemptAnswer;
-use App\Models\QuizQuestion;
 use App\Services\PlatformNotificationService;
 use App\Services\PlatformSettingsService;
 use Illuminate\Http\JsonResponse;
@@ -72,29 +70,39 @@ class QuizController extends Controller
 
         $studentId = $request->user()->id;
 
-        $attempt = QuizAttempt::query()
-            ->where('quiz_id', $quiz->id)
-            ->where('student_id', $studentId)
-            ->whereNull('submitted_at')
-            ->latest('started_at')
-            ->first();
-
-        if (! $attempt) {
-            $hasSubmittedAttempt = QuizAttempt::query()
+        $attempt = DB::transaction(function () use ($quiz, $studentId, $settings) {
+            $attempt = QuizAttempt::query()
                 ->where('quiz_id', $quiz->id)
                 ->where('student_id', $studentId)
-                ->whereNotNull('submitted_at')
-                ->exists();
+                ->whereNull('submitted_at')
+                ->lockForUpdate()
+                ->latest('started_at')
+                ->first();
 
-            if ($hasSubmittedAttempt && ! $settings->enabled('allow_quiz_retake', 'students')) {
-                return $this->errorResponse('إعادة الاختبار غير مسموحة.', 422);
+            if (! $attempt) {
+                $hasSubmittedAttempt = QuizAttempt::query()
+                    ->where('quiz_id', $quiz->id)
+                    ->where('student_id', $studentId)
+                    ->whereNotNull('submitted_at')
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($hasSubmittedAttempt && ! $settings->enabled('allow_quiz_retake', 'students')) {
+                    return null;
+                }
+
+                $attempt = QuizAttempt::query()->create([
+                    'quiz_id' => $quiz->id,
+                    'student_id' => $studentId,
+                    'started_at' => now(),
+                ]);
             }
 
-            $attempt = QuizAttempt::query()->create([
-                'quiz_id' => $quiz->id,
-                'student_id' => $studentId,
-                'started_at' => now(),
-            ]);
+            return $attempt;
+        });
+
+        if ($attempt === null) {
+            return $this->errorResponse('إعادة الاختبار غير مسموحة.', 422);
         }
 
         $quiz->load(['questions.answers']);
@@ -122,23 +130,24 @@ class QuizController extends Controller
             ->latest('started_at')
             ->firstOrFail();
 
-        $quiz->load('questions');
+        $quiz->load(['questions.answers']);
 
         $result = DB::transaction(function () use ($request, $quiz, $attempt, $user) {
             $totalPoints = $quiz->questions->sum('points');
             $earnedPoints = 0;
 
             foreach ($request->validated('answers') as $answerData) {
-                $question = $quiz->questions->firstWhere('id', $answerData['question_id'])
-                    ?? QuizQuestion::query()->findOrFail($answerData['question_id']);
+                $question = $quiz->questions->firstWhere('id', $answerData['question_id']);
+
+                if ($question === null) {
+                    continue;
+                }
 
                 $isCorrect = false;
 
                 if (! empty($answerData['answer_id'])) {
-                    $selectedAnswer = QuizAnswer::query()->find($answerData['answer_id']);
-                    $isCorrect = $selectedAnswer !== null
-                        && $selectedAnswer->question_id === $question->id
-                        && $selectedAnswer->is_correct;
+                    $selectedAnswer = $question->answers->firstWhere('id', $answerData['answer_id']);
+                    $isCorrect = $selectedAnswer !== null && $selectedAnswer->is_correct;
                 }
 
                 QuizAttemptAnswer::query()->create([

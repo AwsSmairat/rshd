@@ -64,6 +64,7 @@ rules:
     pattern-not-inside: |
       onNavigationRequest: ...
 
+  - id: rshd-mobile-007
     message: "RSHD-MOBILE-007: Hardcoded cleartext HTTP API in release path."
     severity: WARNING
     languages: [dart]

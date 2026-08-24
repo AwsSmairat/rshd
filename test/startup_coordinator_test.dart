@@ -68,10 +68,20 @@ void main() {
       expect(route, startsWith(AppRoutes.verifyEmail));
     });
 
-    test('unauthenticated routes to login', () {
+    test('unauthenticated first launch routes to onboarding', () {
       final route = resolveStartupRoute(
         authState: const AuthState(status: AuthStatus.unauthenticated),
         platformSettings: PlatformSettings.fallback,
+      );
+
+      expect(route, AppRoutes.onboarding);
+    });
+
+    test('unauthenticated returning user routes to login', () {
+      final route = resolveStartupRoute(
+        authState: const AuthState(status: AuthStatus.unauthenticated),
+        platformSettings: PlatformSettings.fallback,
+        onboardingCompleted: true,
       );
 
       expect(route, AppRoutes.login);
@@ -86,13 +96,13 @@ void main() {
       expect(route, isNull);
     });
 
-    test('invalid session routes to login', () {
+    test('invalid session routes to onboarding until completed', () {
       final route = resolveStartupRoute(
         authState: const AuthState(status: AuthStatus.unauthenticated),
         platformSettings: PlatformSettings.fallback,
       );
 
-      expect(route, AppRoutes.login);
+      expect(route, AppRoutes.onboarding);
     });
   });
 

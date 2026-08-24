@@ -85,10 +85,9 @@ class GradesAuthorizationTest extends TestCase
 
         Sanctum::actingAs($student);
 
-        // GradePolicy::viewAny does not deny blocked students today.
         $this->getJson('/api/v1/grades')
-            ->assertOk()
-            ->assertJsonPath('success', true);
+            ->assertForbidden()
+            ->assertJsonPath('success', false);
     }
 
     protected function createGradeFor(User $student, float $value, string $notes): Grade

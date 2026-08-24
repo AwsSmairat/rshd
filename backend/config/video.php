@@ -40,6 +40,13 @@ return [
         // cdn   = signed HLS direct to Pull Zone (requires correct BUNNY_STREAM_TOKEN_KEY)
         'playback_mode' => env('BUNNY_STREAM_PLAYBACK_MODE', 'embed'),
         'embed_token_key' => env('BUNNY_STREAM_EMBED_TOKEN_KEY'),
+        'require_embed_token' => filter_var(
+            env(
+                'BUNNY_STREAM_REQUIRE_EMBED_TOKEN',
+                in_array(env('APP_ENV'), ['production', 'staging'], true),
+            ),
+            FILTER_VALIDATE_BOOLEAN,
+        ),
         // Serve staged local file when Bunny CDN is blocked/misconfigured.
         'local_fallback' => env('BUNNY_STREAM_LOCAL_FALLBACK', env('APP_ENV') === 'local'),
     ],

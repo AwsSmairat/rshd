@@ -86,10 +86,16 @@ class SubjectController extends Controller
             $query->where('category', $category);
         }
 
-        $subjects = $query->latest()->get()->each(function (Subject $subject) use ($user, $enrollmentService): void {
+        $subjects = $query->latest()->get();
+        $statuses = $enrollmentService->enrollmentStatusMapFor(
+            $user,
+            $subjects->pluck('id')->all(),
+        );
+
+        $subjects->each(function (Subject $subject) use ($statuses): void {
             $subject->setAttribute(
                 'enrollment_status',
-                $enrollmentService->enrollmentStatusFor($user, $subject),
+                $statuses[$subject->id] ?? 'none',
             );
         });
 
