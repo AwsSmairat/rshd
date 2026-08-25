@@ -158,7 +158,7 @@ class PasswordResetTest extends TestCase
 
         $code = $this->requestResetAndCaptureCode($user->email);
 
-        $this->travel(11)->minutes();
+        $this->travel(31)->seconds();
 
         $this->postJson('/api/v1/password/verify', [
             'email' => $user->email,
@@ -204,7 +204,7 @@ class PasswordResetTest extends TestCase
 
         $firstCode = $this->requestResetAndCaptureCode($user->email);
 
-        $this->travel(61)->seconds();
+        $this->travel(31)->seconds();
 
         $secondCode = $this->resendAndCaptureCode($user->email);
         $this->assertNotSame($firstCode, $secondCode);
@@ -234,7 +234,44 @@ class PasswordResetTest extends TestCase
 
         $this->postJson('/api/v1/password/resend', [
             'email' => $user->email,
-        ])->assertStatus(429);
+        ])->assertStatus(429)
+            ->assertJsonPath('message', 'يرجى الانتظار 30 ثانية قبل إعادة إرسال الرمز');
+
+        $this->travel(31)->seconds();
+
+        $this->postJson('/api/v1/password/resend', [
+            'email' => $user->email,
+        ])->assertOk();
+    }
+
+    public function test_password_reset_otp_ttl_and_email_are_30_seconds(): void
+    {
+        Mail::fake();
+        $this->freezeTime();
+
+        $user = $this->createStudent([
+            'email' => 'student@rshdacademy.com',
+            'password' => Hash::make('Oldpassword1'),
+            'password_set_at' => now(),
+        ]);
+
+        $this->requestResetAndCaptureCode($user->email);
+
+        $record = StudentPasswordResetCode::query()
+            ->where('user_id', $user->id)
+            ->latest('id')
+            ->firstOrFail();
+
+        $this->assertTrue(
+            $record->expires_at->equalTo(
+                $record->created_at->copy()->addSeconds(StudentPasswordResetService::OTP_EXPIRY_SECONDS)
+            )
+        );
+
+        Mail::assertSent(
+            StudentPasswordResetCodeMail::class,
+            fn (StudentPasswordResetCodeMail $mail) => $mail->expirySeconds === StudentPasswordResetService::OTP_EXPIRY_SECONDS,
+        );
     }
 
     public function test_reset_token_cannot_be_used_twice(): void

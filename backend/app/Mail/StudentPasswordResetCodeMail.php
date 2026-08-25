@@ -12,15 +12,11 @@ class StudentPasswordResetCodeMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public int $expiryMinutes;
-
     public function __construct(
         public User $user,
         #[\SensitiveParameter] public string $code,
-    ) {
-        $settings = app(PlatformSettingsService::class);
-        $this->expiryMinutes = max(1, $settings->integer('otp_expiry_minutes', 10, 'registration'));
-    }
+        public int $expirySeconds,
+    ) {}
 
     public function build(): self
     {
@@ -35,7 +31,7 @@ class StudentPasswordResetCodeMail extends Mailable
                 'user' => $this->user,
                 'code' => $this->code,
                 'platformName' => $platformName,
-                'expiryMinutes' => $this->expiryMinutes,
+                'expirySeconds' => $this->expirySeconds,
             ]);
     }
 }

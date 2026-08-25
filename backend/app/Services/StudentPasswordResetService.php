@@ -29,6 +29,10 @@ class StudentPasswordResetService
 
     private const RESET_IP_MAX = 15;
 
+    public const OTP_EXPIRY_SECONDS = 30;
+
+    public const RESEND_COOLDOWN_SECONDS = 30;
+
     public function __construct(
         protected PlatformSettingsService $settings,
     ) {}
@@ -137,7 +141,7 @@ class StudentPasswordResetService
 
         $user = $this->findResettableStudent($email);
 
-        $cooldown = max(15, $this->settings->integer('otp_resend_cooldown_seconds', 60, 'registration'));
+        $cooldown = self::RESEND_COOLDOWN_SECONDS;
 
         $latest = StudentPasswordResetCode::query()
             ->where('user_id', $user->id)
@@ -163,13 +167,13 @@ class StudentPasswordResetService
             ->update(['used_at' => now()]);
 
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        $expiryMinutes = max(1, $this->settings->integer('otp_expiry_minutes', 10, 'registration'));
+        $expirySeconds = self::OTP_EXPIRY_SECONDS;
 
         StudentPasswordResetCode::query()->create([
             'user_id' => $user->id,
             'email' => $user->email,
             'code_hash' => Hash::make($code),
-            'expires_at' => now()->addMinutes($expiryMinutes),
+            'expires_at' => now()->addSeconds($expirySeconds),
             'attempts' => 0,
         ]);
 
@@ -178,7 +182,9 @@ class StudentPasswordResetService
         }
 
         $this->settings->applyMailPreferences();
-        Mail::to($user->email)->send(new StudentPasswordResetCodeMail($user, $code));
+        Mail::to($user->email)->send(
+            new StudentPasswordResetCodeMail($user, $code, $expirySeconds)
+        );
     }
 
     protected function findResettableStudent(string $email): User
