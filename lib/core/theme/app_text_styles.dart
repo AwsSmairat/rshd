@@ -5,39 +5,44 @@ import 'app_colors.dart';
 class AppTextStyles {
   AppTextStyles._();
 
-  static const title = TextStyle(
-    fontSize: 24,
-    fontWeight: FontWeight.w700,
-    color: AppColors.text,
-  );
+  static TextStyle title([AppColors colors = AppColors.light]) =>
+      TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: colors.text);
 
-  static const subtitle = TextStyle(
+  static TextStyle subtitle([AppColors colors = AppColors.light]) => TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w500,
-    color: AppColors.textMuted,
+    color: colors.textMuted,
   );
 
-  static const body = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w400,
-    color: AppColors.text,
-  );
+  static TextStyle body([AppColors colors = AppColors.light]) =>
+      TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: colors.text);
 
-  static const caption = TextStyle(
+  static TextStyle caption([AppColors colors = AppColors.light]) => TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w400,
-    color: AppColors.textMuted,
+    color: colors.textMuted,
   );
 
-  static const button = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-    color: AppColors.white,
-  );
+  static TextStyle button([AppColors colors = AppColors.light]) =>
+      TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: colors.white);
 
-  static const error = TextStyle(
-    fontSize: 13,
-    fontWeight: FontWeight.w500,
-    color: AppColors.error,
-  );
+  static TextStyle error([AppColors colors = AppColors.light]) =>
+      TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: colors.error);
+
+  static TextStyle titleOf(BuildContext context) =>
+      title(AppColors.of(context));
+
+  static TextStyle subtitleOf(BuildContext context) =>
+      subtitle(AppColors.of(context));
+
+  static TextStyle bodyOf(BuildContext context) => body(AppColors.of(context));
+
+  static TextStyle captionOf(BuildContext context) =>
+      caption(AppColors.of(context));
+
+  static TextStyle buttonOf(BuildContext context) =>
+      button(AppColors.of(context));
+
+  static TextStyle errorOf(BuildContext context) =>
+      error(AppColors.of(context));
 }

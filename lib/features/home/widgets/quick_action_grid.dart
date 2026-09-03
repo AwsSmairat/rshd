@@ -124,14 +124,14 @@ class _QuickActionTile extends StatelessWidget {
             alignment: Alignment.center,
             child: Icon(
               action.icon,
-              color: AppColors.primary,
+              color: AppColors.of(context).primary,
               size: metrics.quickActionIconSize,
             ),
           ),
           SizedBox(height: metrics.isTablet ? 10 : 8),
           Text(
             action.label,
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: metrics.quickActionLabelFontSize,
               height: 1.25,
               fontWeight: FontWeight.w600,

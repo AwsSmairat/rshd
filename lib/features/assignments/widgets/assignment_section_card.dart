@@ -24,21 +24,21 @@ class AssignmentSectionCard extends StatelessWidget {
       fillOpacity: 0.38,
       borderOpacity: 0.7,
       blurSigma: 16,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.04,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(icon, size: 18, color: AppColors.darkGold),
+              Icon(icon, size: 18, color: AppColors.of(context).darkGold),
               const SizedBox(width: 8),
               Text(
                 title,
-                style: AppTextStyles.subtitle.copyWith(
+                style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
+                  color: AppColors.of(context).primary,
                 ),
               ),
             ],

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:rshd/core/network/api_exception.dart';
 import 'package:rshd/features/legal/shared/legal_document_parser.dart';
 import 'package:rshd/features/legal/shared/legal_icon_mapper.dart';
+import 'package:rshd/features/legal/shared/legal_remote_fallback.dart';
 import 'package:rshd/features/legal/privacy/data/privacy_policy_content.dart';
 import 'package:rshd/features/legal/privacy/data/privacy_policy_model.dart';
 import 'package:rshd/features/legal/terms/data/terms_and_conditions_content.dart';
@@ -85,6 +87,38 @@ void main() {
       );
       expect(doc.requiresAcceptance, isTrue);
       expect(doc.acceptedVersion, '1.0');
+    });
+  });
+
+  group('shouldUseLegalLocalFallback', () {
+    test('uses bundled legal pages when the API has no published document', () {
+      expect(
+        shouldUseLegalLocalFallback(
+          ApiException(message: 'غير متاحة', statusCode: 404),
+        ),
+        isTrue,
+      );
+      expect(
+        shouldUseLegalLocalFallback(
+          ApiException(message: 'لا يوجد اتصال بالسيرفر'),
+        ),
+        isTrue,
+      );
+    });
+
+    test('does not hide auth failures behind local legal content', () {
+      expect(
+        shouldUseLegalLocalFallback(
+          ApiException(message: 'غير مصرح', statusCode: 401),
+        ),
+        isFalse,
+      );
+      expect(
+        shouldUseLegalLocalFallback(
+          ApiException(message: 'ممنوع', statusCode: 403),
+        ),
+        isFalse,
+      );
     });
   });
 }

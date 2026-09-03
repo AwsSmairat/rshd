@@ -75,8 +75,8 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
     return Material(
       color: Colors.transparent,
       child: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.cardWhite,
+        decoration: BoxDecoration(
+          color: AppColors.of(context).cardWhite,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
@@ -89,7 +89,7 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.textMuted.withValues(alpha: 0.3),
+                  color: AppColors.of(context).textMuted.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(99),
                 ),
               ),
@@ -97,7 +97,9 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
             const SizedBox(height: 16),
             Text(
               _title,
-              style: AppTextStyles.subtitle.copyWith(color: AppColors.primary),
+              style: AppTextStyles.subtitleOf(
+                context,
+              ).copyWith(color: AppColors.of(context).primary),
               textAlign: TextAlign.right,
             ),
             const SizedBox(height: 16),
@@ -128,7 +130,7 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
                 ),
                 const SizedBox(height: 12),
               ],
-              Text('السماكة', style: AppTextStyles.caption),
+              Text('السماكة', style: AppTextStyles.captionOf(context)),
               Slider(
                 value: _currentStrokeWidth.clamp(
                   widget.tool == PdfEditorTool.highlighter ? 0.01 : 0.002,
@@ -136,15 +138,15 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
                 ),
                 min: widget.tool == PdfEditorTool.highlighter ? 0.01 : 0.002,
                 max: widget.tool == PdfEditorTool.highlighter ? 0.05 : 0.02,
-                activeColor: AppColors.primary,
+                activeColor: AppColors.of(context).primary,
                 onChanged: _updateStrokeWidth,
               ),
-              Text('الشفافية', style: AppTextStyles.caption),
+              Text('الشفافية', style: AppTextStyles.captionOf(context)),
               Slider(
                 value: _currentOpacity.clamp(0.1, 1),
                 min: 0.1,
                 max: 1,
-                activeColor: AppColors.accent,
+                activeColor: AppColors.of(context).accent,
                 onChanged: _updateOpacity,
               ),
               _PreviewStroke(
@@ -165,12 +167,12 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
                 },
               ),
               const SizedBox(height: 12),
-              Text('حجم الممحاة', style: AppTextStyles.caption),
+              Text('حجم الممحاة', style: AppTextStyles.captionOf(context)),
               Slider(
                 value: _eraserSize.clamp(0.005, 0.04),
                 min: 0.005,
                 max: 0.04,
-                activeColor: AppColors.primary,
+                activeColor: AppColors.of(context).primary,
                 onChanged: (value) {
                   setState(() => _eraserSize = value);
                   widget.onEraserSizeChanged(value);
@@ -272,7 +274,9 @@ class _ColorRow extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? AppColors.accent : Colors.transparent,
+                  color: isSelected
+                      ? AppColors.of(context).accent
+                      : Colors.transparent,
                   width: 2,
                 ),
               ),
@@ -298,7 +302,7 @@ class _PreviewStroke extends StatelessWidget {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: AppColors.of(context).background,
         borderRadius: BorderRadius.circular(12),
       ),
       alignment: Alignment.center,

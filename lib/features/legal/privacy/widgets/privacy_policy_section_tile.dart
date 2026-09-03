@@ -28,16 +28,16 @@ class PrivacyPolicySectionTile extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
-          color: AppColors.cardWhite,
+          color: AppColors.of(context).cardWhite,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: isExpanded
-                ? AppColors.darkGold.withValues(alpha: 0.35)
+                ? AppColors.of(context).darkGold.withValues(alpha: 0.35)
                 : const Color(0xFFE5E7EB),
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.04),
+              color: AppColors.of(context).primary.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -62,17 +62,21 @@ class PrivacyPolicySectionTile extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: AppColors.of(context).background,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(section.icon, color: AppColors.darkGold, size: 18),
+              child: Icon(
+                section.icon,
+                color: AppColors.of(context).darkGold,
+                size: 18,
+              ),
             ),
             title: Text(
               section.title,
-              style: AppTextStyles.body.copyWith(
+              style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: AppColors.text,
+                color: AppColors.of(context).text,
               ),
             ),
             trailing:
@@ -81,7 +85,7 @@ class PrivacyPolicySectionTile extends StatelessWidget {
                   isExpanded
                       ? Icons.keyboard_arrow_up_rounded
                       : Icons.keyboard_arrow_down_rounded,
-                  color: AppColors.textMuted,
+                  color: AppColors.of(context).textMuted,
                 ),
             children: [PrivacyPolicySection(section: section)],
           ),

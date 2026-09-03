@@ -27,7 +27,7 @@ class PrivacyPolicyFooter extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.cardWhite,
+        color: AppColors.of(context).cardWhite,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
@@ -71,8 +71,8 @@ class PrivacyPolicyFooter extends StatelessWidget {
               icon: const Icon(Icons.mail_outline),
               label: const Text('التواصل بخصوص الخصوصية'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.darkGold,
-                side: const BorderSide(color: AppColors.darkGold),
+                foregroundColor: AppColors.of(context).darkGold,
+                side: BorderSide(color: AppColors.of(context).darkGold),
                 minimumSize: const Size(double.infinity, 48),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -81,31 +81,31 @@ class PrivacyPolicyFooter extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Divider(color: AppColors.textMuted.withValues(alpha: 0.2)),
+          Divider(
+            color: AppColors.of(context).textMuted.withValues(alpha: 0.2),
+          ),
           const SizedBox(height: 12),
           Text(
             platformName,
-            style: AppTextStyles.subtitle.copyWith(
+            style: AppTextStyles.subtitleOf(context).copyWith(
               fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+              color: AppColors.of(context).primary,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
           Text(
             'إصدار السياسة: $version',
-            style: AppTextStyles.body.copyWith(
-              fontSize: 12,
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
             textAlign: TextAlign.center,
           ),
           Text(
             'آخر تحديث: $lastUpdated',
-            style: AppTextStyles.body.copyWith(
-              fontSize: 12,
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
             textAlign: TextAlign.center,
           ),
         ],

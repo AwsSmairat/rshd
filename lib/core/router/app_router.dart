@@ -147,7 +147,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final authState = ref.read(authControllerProvider);
       final location = state.matchedLocation;
-      final platformSettings = ref.read(platformSettingsProvider).value;
+      final platformSettings = ref.read(platformSettingsProvider).resolved;
 
       final isSplash = location == AppRoutes.splash;
       final isOnboarding = location == AppRoutes.onboarding;
@@ -174,13 +174,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           location == AppRoutes.privacyPolicy ||
           location == AppRoutes.termsAndConditions;
 
-      if (platformSettings?.maintenanceMode == true &&
+      if (platformSettings.maintenanceMode == true &&
           !isMaintenance &&
           !isSplash) {
         return AppRoutes.maintenance;
       }
 
-      if (platformSettings?.maintenanceMode != true && isMaintenance) {
+      if (platformSettings.maintenanceMode != true && isMaintenance) {
         return AppRoutes.splash;
       }
 
@@ -245,7 +245,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         if (isVerifyEmail) {
           return null;
         }
-        if (platformSettings?.studentRegistrationEnabled == false &&
+        if (platformSettings.studentRegistrationEnabled == false &&
             isRegister) {
           return AppRoutes.login;
         }

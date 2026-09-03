@@ -37,12 +37,14 @@ class ProfileDetailRow extends StatelessWidget {
                 width: iconSize,
                 height: iconSize,
                 decoration: BoxDecoration(
-                  color: AppColors.background,
+                  color: AppColors.of(context).background,
                   borderRadius: BorderRadius.circular(dense ? 10 : 12),
                 ),
                 child: Icon(
                   icon,
-                  color: dense ? AppColors.darkGold : AppColors.primary,
+                  color: dense
+                      ? AppColors.of(context).darkGold
+                      : AppColors.of(context).primary,
                   size: dense ? 18 : 20,
                 ),
               ),
@@ -50,10 +52,10 @@ class ProfileDetailRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: dense ? 13 : 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.text,
+                    color: AppColors.of(context).text,
                     height: 1.2,
                   ),
                 ),
@@ -62,9 +64,9 @@ class ProfileDetailRow extends StatelessWidget {
               Flexible(
                 child: Text(
                   value,
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: dense ? 12 : 13,
-                    color: valueColor ?? AppColors.textMuted,
+                    color: valueColor ?? AppColors.of(context).textMuted,
                     height: 1.2,
                   ),
                   textAlign: TextAlign.end,

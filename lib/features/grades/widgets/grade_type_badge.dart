@@ -10,7 +10,7 @@ class GradeTypeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = _colors();
+    final colors = _colors(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -20,7 +20,7 @@ class GradeTypeBadge extends StatelessWidget {
       ),
       child: Text(
         _label(),
-        style: AppTextStyles.body.copyWith(
+        style: AppTextStyles.bodyOf(context).copyWith(
           fontSize: 12,
           color: colors.foreground,
           fontWeight: FontWeight.w600,
@@ -42,7 +42,7 @@ class GradeTypeBadge extends StatelessWidget {
     }
   }
 
-  _BadgeColors _colors() {
+  _BadgeColors _colors(BuildContext context) {
     switch (sourceType) {
       case 'quiz':
         return const _BadgeColors(
@@ -51,14 +51,14 @@ class GradeTypeBadge extends StatelessWidget {
         );
       case 'assignment':
         return _BadgeColors(
-          background: AppColors.accent.withValues(alpha: 0.2),
-          foreground: AppColors.darkGold,
+          background: AppColors.of(context).accent.withValues(alpha: 0.2),
+          foreground: AppColors.of(context).darkGold,
         );
       case 'manual':
       default:
         return _BadgeColors(
-          background: AppColors.primary.withValues(alpha: 0.08),
-          foreground: AppColors.primary,
+          background: AppColors.of(context).primary.withValues(alpha: 0.08),
+          foreground: AppColors.of(context).primary,
         );
     }
   }

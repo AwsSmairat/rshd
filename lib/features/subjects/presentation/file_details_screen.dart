@@ -60,12 +60,12 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: _buildBody(state),
+      backgroundColor: AppColors.of(context).background,
+      body: _buildBody(context, state),
     );
   }
 
-  Widget _buildBody(FileDetailsState state) {
+  Widget _buildBody(BuildContext context, FileDetailsState state) {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
@@ -83,8 +83,8 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
         }
 
         return RefreshIndicator(
-          color: AppColors.accent,
-          backgroundColor: AppColors.cardWhite,
+          color: AppColors.of(context).accent,
+          backgroundColor: AppColors.of(context).cardWhite,
           onRefresh: _reloadFile,
           edgeOffset: MediaQuery.paddingOf(context).top + kToolbarHeight,
           child: CustomScrollView(
@@ -186,8 +186,8 @@ class _FileDetailsHero extends StatelessWidget {
       stretch: false,
       elevation: 0,
       scrolledUnderElevation: 0,
-      backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.white,
+      backgroundColor: AppColors.of(context).primary,
+      foregroundColor: AppColors.of(context).white,
       title: Text(
         title,
         maxLines: 1,
@@ -195,11 +195,14 @@ class _FileDetailsHero extends StatelessWidget {
         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
       ),
       flexibleSpace: DecoratedBox(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.centerRight,
             end: Alignment.centerLeft,
-            colors: [AppColors.primary, AppColors.secondaryNavy],
+            colors: [
+              AppColors.of(context).primary,
+              AppColors.of(context).secondaryNavy,
+            ],
           ),
         ),
       ),
@@ -212,7 +215,7 @@ class _FilePreviewCard extends StatelessWidget {
 
   final LessonFileModel file;
 
-  Color get _accentColor {
+  Color _accentColor(BuildContext context) {
     switch (file.fileType) {
       case 'pdf':
         return const Color(0xFFC0392B);
@@ -221,9 +224,9 @@ class _FilePreviewCard extends StatelessWidget {
       case 'doc':
         return const Color(0xFF2471A3);
       case 'image':
-        return AppColors.secondary;
+        return AppColors.of(context).secondary;
       default:
-        return AppColors.darkGold;
+        return AppColors.of(context).darkGold;
     }
   }
 
@@ -234,7 +237,7 @@ class _FilePreviewCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: AppColors.glassShadow.withValues(alpha: 0.12),
+            color: AppColors.of(context).glassShadow.withValues(alpha: 0.12),
             blurRadius: 22,
             offset: const Offset(0, 10),
           ),
@@ -246,7 +249,7 @@ class _FilePreviewCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
           fillOpacity: 0.34,
-          tintColor: _accentColor,
+          tintColor: _accentColor(context),
           tintOpacity: 0.06,
           child: Column(
             children: [
@@ -259,22 +262,28 @@ class _FilePreviewCard extends StatelessWidget {
                     begin: Alignment.topRight,
                     end: Alignment.bottomLeft,
                     colors: [
-                      _accentColor.withValues(alpha: 0.18),
-                      _accentColor.withValues(alpha: 0.08),
+                      _accentColor(context).withValues(alpha: 0.18),
+                      _accentColor(context).withValues(alpha: 0.08),
                     ],
                   ),
                   border: Border.all(
-                    color: _accentColor.withValues(alpha: 0.22),
+                    color: _accentColor(context).withValues(alpha: 0.22),
                     width: 1.2,
                   ),
                 ),
-                child: Icon(file.fileIcon, size: 42, color: _accentColor),
+                child: Icon(
+                  file.fileIcon,
+                  size: 42,
+                  color: _accentColor(context),
+                ),
               ),
               const SizedBox(height: 16),
               Text(
                 file.title,
                 textAlign: TextAlign.center,
-                style: AppTextStyles.title.copyWith(fontSize: 20, height: 1.35),
+                style: AppTextStyles.titleOf(
+                  context,
+                ).copyWith(fontSize: 20, height: 1.35),
               ),
               const SizedBox(height: 10),
               Container(
@@ -283,13 +292,13 @@ class _FilePreviewCard extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: _accentColor.withValues(alpha: 0.1),
+                  color: _accentColor(context).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
                   file.fileTypeLabel,
-                  style: AppTextStyles.caption.copyWith(
-                    color: _accentColor,
+                  style: AppTextStyles.captionOf(context).copyWith(
+                    color: _accentColor(context),
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.4,
                   ),
@@ -336,8 +345,8 @@ class _FileMetaSection extends StatelessWidget {
             label: 'الحالة',
             value: file.isLocked ? 'مقفل' : 'متاح',
             valueColor: file.isLocked
-                ? AppColors.textMuted
-                : AppColors.secondary,
+                ? AppColors.of(context).textMuted
+                : AppColors.of(context).secondary,
           ),
         ),
       ],
@@ -367,24 +376,23 @@ class _MetaChip extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.secondary),
+          Icon(icon, size: 18, color: AppColors.of(context).secondary),
           const SizedBox(height: 8),
           Text(
             label,
-            style: AppTextStyles.caption.copyWith(
-              color: AppColors.textMuted,
-              fontSize: 11,
-            ),
+            style: AppTextStyles.captionOf(
+              context,
+            ).copyWith(color: AppColors.of(context).textMuted, fontSize: 11),
           ),
           const SizedBox(height: 2),
           Text(
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontWeight: FontWeight.w700,
               fontSize: 13,
-              color: valueColor ?? AppColors.text,
+              color: valueColor ?? AppColors.of(context).text,
             ),
           ),
         ],
@@ -413,8 +421,8 @@ class _FileStatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = tone == _FileStatusTone.locked
-        ? AppColors.secondary
-        : AppColors.darkGold;
+        ? AppColors.of(context).secondary
+        : AppColors.of(context).darkGold;
 
     return LiquidGlassSurface(
       borderRadius: BorderRadius.circular(18),
@@ -436,8 +444,8 @@ class _FileStatusCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             title,
-            style: AppTextStyles.subtitle.copyWith(
-              color: AppColors.primary,
+            style: AppTextStyles.subtitleOf(context).copyWith(
+              color: AppColors.of(context).primary,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -445,8 +453,8 @@ class _FileStatusCard extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: AppTextStyles.body.copyWith(
-              color: AppColors.textMuted,
+            style: AppTextStyles.bodyOf(context).copyWith(
+              color: AppColors.of(context).textMuted,
               height: 1.55,
               fontSize: 13,
             ),
@@ -458,9 +466,9 @@ class _FileStatusCard extends StatelessWidget {
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: const Text('تحديث'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
+                foregroundColor: AppColors.of(context).primary,
                 side: BorderSide(
-                  color: AppColors.primary.withValues(alpha: 0.18),
+                  color: AppColors.of(context).primary.withValues(alpha: 0.18),
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 18,
@@ -491,14 +499,17 @@ class _PrimaryActionButton extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.centerRight,
           end: Alignment.centerLeft,
-          colors: [AppColors.primary, AppColors.secondaryNavy],
+          colors: [
+            AppColors.of(context).primary,
+            AppColors.of(context).secondaryNavy,
+          ],
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.22),
+            color: AppColors.of(context).primary.withValues(alpha: 0.22),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -514,9 +525,12 @@ class _PrimaryActionButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: AppColors.white, size: 22),
+                Icon(icon, color: AppColors.of(context).white, size: 22),
                 const SizedBox(width: 10),
-                Text(label, style: AppTextStyles.button.copyWith(fontSize: 15)),
+                Text(
+                  label,
+                  style: AppTextStyles.buttonOf(context).copyWith(fontSize: 15),
+                ),
               ],
             ),
           ),
@@ -541,13 +555,13 @@ class _InfoNote extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.textMuted),
+          Icon(icon, size: 18, color: AppColors.of(context).textMuted),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
-              style: AppTextStyles.caption.copyWith(
-                color: AppColors.textMuted,
+              style: AppTextStyles.captionOf(context).copyWith(
+                color: AppColors.of(context).textMuted,
                 height: 1.5,
                 fontSize: 12.5,
               ),

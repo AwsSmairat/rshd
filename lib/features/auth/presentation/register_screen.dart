@@ -89,7 +89,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     return IconButton(
       icon: Icon(
         obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-        color: AppColors.textMuted,
+        color: AppColors.of(context).textMuted,
         size: 20,
       ),
       onPressed: onToggle,
@@ -125,19 +125,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     children: [
                       Text(
                         'إنشاء حساب طالب جديد',
-                        style: AppTextStyles.title.copyWith(
+                        style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 22,
-                          color: AppColors.primary,
+                          color: AppColors.of(context).primary,
                         ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'أنشئ حسابك ثم أكد بريدك الإلكتروني للوصول إلى التطبيق',
-                        style: AppTextStyles.subtitle.copyWith(
-                          height: 1.5,
-                          fontSize: 13,
-                        ),
+                        style: AppTextStyles.subtitleOf(
+                          context,
+                        ).copyWith(height: 1.5, fontSize: 13),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 24),
@@ -145,13 +144,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: AppColors.cardWhite,
+                            color: AppColors.of(context).cardWhite,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.accent),
+                            border: Border.all(
+                              color: AppColors.of(context).accent,
+                            ),
                           ),
                           child: Text(
                             'التسجيل الذاتي للطلاب غير مفعّل حالياً.',
-                            style: AppTextStyles.subtitle,
+                            style: AppTextStyles.subtitleOf(context),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -161,15 +162,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.error.withValues(alpha: 0.08),
+                            color: AppColors.of(
+                              context,
+                            ).error.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: AppColors.error.withValues(alpha: 0.2),
+                              color: AppColors.of(
+                                context,
+                              ).error.withValues(alpha: 0.2),
                             ),
                           ),
                           child: Text(
                             authState.errorMessage!,
-                            style: AppTextStyles.error,
+                            style: AppTextStyles.errorOf(context),
                             textAlign: TextAlign.center,
                           ),
                         ),

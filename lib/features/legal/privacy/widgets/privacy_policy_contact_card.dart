@@ -39,12 +39,12 @@ class PrivacyPolicyContactCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.cardWhite,
+        color: AppColors.of(context).cardWhite,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.05),
+            color: AppColors.of(context).primary.withValues(alpha: 0.05),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -57,16 +57,16 @@ class PrivacyPolicyContactCard extends StatelessWidget {
             children: [
               Icon(
                 Icons.contact_mail_outlined,
-                color: AppColors.darkGold,
+                color: AppColors.of(context).darkGold,
                 size: 22,
               ),
               const SizedBox(width: 8),
               Text(
                 'بيانات التواصل',
-                style: AppTextStyles.subtitle.copyWith(
+                style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.text,
+                  color: AppColors.of(context).text,
                 ),
               ),
             ],
@@ -132,7 +132,7 @@ class _ContactRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.darkGold),
+          Icon(icon, size: 18, color: AppColors.of(context).darkGold),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -140,16 +140,18 @@ class _ContactRow extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
-                    color: AppColors.textMuted,
+                    color: AppColors.of(context).textMuted,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.4),
+                  style: AppTextStyles.bodyOf(
+                    context,
+                  ).copyWith(fontSize: 14, height: 1.4),
                 ),
               ],
             ),
@@ -182,7 +184,7 @@ class PrivacyActionButtons extends StatelessWidget {
               onPressed: onPrivacyContact,
               icon: const Icon(Icons.mail_outline, size: 18),
               label: const Text('الخصوصية'),
-              style: _outlineStyle,
+              style: _outlineStyle(context),
             ),
           ),
           const SizedBox(width: 10),
@@ -191,7 +193,7 @@ class PrivacyActionButtons extends StatelessWidget {
               onPressed: onReportIssue,
               icon: const Icon(Icons.report_outlined, size: 18),
               label: const Text('إبلاغ'),
-              style: _outlineStyle,
+              style: _outlineStyle(context),
             ),
           ),
         ],
@@ -208,7 +210,7 @@ class PrivacyActionButtons extends StatelessWidget {
             onPressed: onPrivacyContact,
             icon: const Icon(Icons.mail_outline),
             label: const Text('التواصل بخصوص الخصوصية'),
-            style: _outlineStyle,
+            style: _outlineStyle(context),
           ),
         ),
         const SizedBox(height: 10),
@@ -219,16 +221,16 @@ class PrivacyActionButtons extends StatelessWidget {
             onPressed: onReportIssue,
             icon: const Icon(Icons.report_outlined),
             label: const Text('الإبلاغ عن مشكلة'),
-            style: _outlineStyle,
+            style: _outlineStyle(context),
           ),
         ),
       ],
     );
   }
 
-  ButtonStyle get _outlineStyle => OutlinedButton.styleFrom(
-    foregroundColor: AppColors.darkGold,
-    side: const BorderSide(color: AppColors.darkGold),
+  ButtonStyle _outlineStyle(BuildContext context) => OutlinedButton.styleFrom(
+    foregroundColor: AppColors.of(context).darkGold,
+    side: BorderSide(color: AppColors.of(context).darkGold),
     minimumSize: const Size(double.infinity, 46),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
   );

@@ -15,26 +15,25 @@ class QuizNotAttemptedCard extends StatelessWidget {
       fillOpacity: 0.34,
       borderOpacity: 0.62,
       blurSigma: 16,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.05,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'لم تقم بحل هذا الاختبار بعد',
-            style: AppTextStyles.subtitle.copyWith(
+            style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+              color: AppColors.of(context).primary,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             'ابدأ الاختبار لعرض نتيجتك هنا',
-            style: AppTextStyles.body.copyWith(
-              fontSize: 13,
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
           ),
         ],
       ),

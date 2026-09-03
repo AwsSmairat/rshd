@@ -87,7 +87,7 @@ class _TechnicalSupportScreenState
     final metrics = AppLayoutMetrics.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.of(context).background,
       body: switch (state.status) {
         FeatureLoadStatus.initial || FeatureLoadStatus.loading =>
           const LoadingWidget(message: 'جاري تحميل الدعم الفني...'),
@@ -104,7 +104,7 @@ class _TechnicalSupportScreenState
                 onRefresh: () => ref
                     .read(technicalSupportControllerProvider.notifier)
                     .load(refresh: true),
-                color: AppColors.secondary,
+                color: AppColors.of(context).secondary,
                 child: CustomScrollView(
                   controller: _scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
@@ -157,15 +157,15 @@ class _TechnicalSupportScreenState
       return Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.cardWhite,
+          color: AppColors.of(context).cardWhite,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: const Color(0xFFE5E7EB)),
         ),
         child: Text(
           'ابدأ محادثة جديدة مع فريق الدعم الفني — سيظهر طلبك لجميع المسؤولين حتى يقبله أحدهم.',
-          style: AppTextStyles.body.copyWith(
+          style: AppTextStyles.bodyOf(context).copyWith(
             fontSize: 13,
-            color: AppColors.textMuted,
+            color: AppColors.of(context).textMuted,
             height: 1.5,
           ),
         ),
@@ -185,15 +185,15 @@ class _TechnicalSupportScreenState
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.cardWhite,
+        color: AppColors.of(context).cardWhite,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       child: Text(
         statusText,
-        style: AppTextStyles.body.copyWith(
+        style: AppTextStyles.bodyOf(context).copyWith(
           fontSize: 13,
-          color: AppColors.primary,
+          color: AppColors.of(context).primary,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -208,16 +208,15 @@ class _TechnicalSupportScreenState
         margin: const EdgeInsets.only(top: 16),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: AppColors.cardWhite,
+          color: AppColors.of(context).cardWhite,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: const Color(0xFFE5E7EB)),
         ),
         child: Text(
           'لا توجد رسائل بعد. اكتب رسالتك الأولى أدناه.',
-          style: AppTextStyles.body.copyWith(
-            fontSize: 13,
-            color: AppColors.textMuted,
-          ),
+          style: AppTextStyles.bodyOf(
+            context,
+          ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
           textAlign: TextAlign.center,
         ),
       );
@@ -241,12 +240,12 @@ class _TechnicalSupportScreenState
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: message.isMine
-              ? AppColors.primary.withValues(alpha: 0.1)
-              : AppColors.cardWhite,
+              ? AppColors.of(context).primary.withValues(alpha: 0.1)
+              : AppColors.of(context).cardWhite,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: message.isMine
-                ? AppColors.primary.withValues(alpha: 0.2)
+                ? AppColors.of(context).primary.withValues(alpha: 0.2)
                 : const Color(0xFFE5E7EB),
           ),
         ),
@@ -256,23 +255,25 @@ class _TechnicalSupportScreenState
             if (!message.isMine && (message.senderName?.isNotEmpty ?? false))
               Text(
                 message.senderName!,
-                style: AppTextStyles.body.copyWith(
+                style: AppTextStyles.bodyOf(context).copyWith(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.darkGold,
+                  color: AppColors.of(context).darkGold,
                 ),
               ),
             Text(
               message.body,
-              style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.5),
+              style: AppTextStyles.bodyOf(
+                context,
+              ).copyWith(fontSize: 14, height: 1.5),
             ),
             if (time.isNotEmpty) ...[
               const SizedBox(height: 6),
               Text(
                 time,
-                style: AppTextStyles.body.copyWith(
+                style: AppTextStyles.bodyOf(context).copyWith(
                   fontSize: 10,
-                  color: AppColors.textMuted,
+                  color: AppColors.of(context).textMuted,
                 ),
               ),
             ],
@@ -293,8 +294,8 @@ class _TechnicalSupportScreenState
         16,
         MediaQuery.paddingOf(context).bottom + 12,
       ),
-      decoration: const BoxDecoration(
-        color: AppColors.cardWhite,
+      decoration: BoxDecoration(
+        color: AppColors.of(context).cardWhite,
         border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
       ),
       child: Row(
@@ -314,7 +315,7 @@ class _TechnicalSupportScreenState
                     ? 'اكتب رسالتك للدعم الفني...'
                     : 'المحادثة منتهية — ابدأ برسالة جديدة',
                 filled: true,
-                fillColor: AppColors.background,
+                fillColor: AppColors.of(context).background,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
@@ -327,7 +328,7 @@ class _TechnicalSupportScreenState
           FilledButton(
             onPressed: canSend && !state.sending ? _sendMessage : null,
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.of(context).primary,
               minimumSize: const Size(52, 52),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),

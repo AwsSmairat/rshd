@@ -225,9 +225,9 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                 _editor.selectAnnotation(null);
                 Navigator.pop(context);
               },
-              child: const Text(
+              child: Text(
                 'حذف',
-                style: TextStyle(color: AppColors.error),
+                style: TextStyle(color: AppColors.of(context).error),
               ),
             ),
             TextButton(
@@ -258,7 +258,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
   void _showSelectionActions(PdfEditorAnnotation annotation) {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.cardWhite,
+      backgroundColor: AppColors.of(context).cardWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -286,9 +286,9 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                   },
                 ),
               ListTile(
-                leading: const Icon(
+                leading: Icon(
                   Icons.delete_outline,
-                  color: AppColors.error,
+                  color: AppColors.of(context).error,
                 ),
                 title: const Text('حذف'),
                 onTap: () {
@@ -322,7 +322,10 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               _editor.deleteAnnotation(note.id, note.pageNumber);
               Navigator.pop(context);
             },
-            child: const Text('حذف', style: TextStyle(color: AppColors.error)),
+            child: Text(
+              'حذف',
+              style: TextStyle(color: AppColors.of(context).error),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -493,7 +496,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
   void _openMoreMenu() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.cardWhite,
+      backgroundColor: AppColors.of(context).cardWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -553,7 +556,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.cardWhite,
+      backgroundColor: AppColors.of(context).cardWhite,
       builder: (context) {
         return DraggableScrollableSheet(
           expand: false,
@@ -567,7 +570,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                 return ListTile(
                   title: Text('الصفحة $page'),
                   trailing: _state.currentPage == page
-                      ? const Icon(Icons.check, color: AppColors.accent)
+                      ? Icon(Icons.check, color: AppColors.of(context).accent)
                       : null,
                   onTap: () {
                     _pdfController.jumpToPage(page);
@@ -633,7 +636,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
   void _showShapePicker() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.cardWhite,
+      backgroundColor: AppColors.of(context).cardWhite,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -647,9 +650,9 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               children: [
                 Text(
                   'اختر الشكل',
-                  style: AppTextStyles.subtitle.copyWith(
-                    color: AppColors.primary,
-                  ),
+                  style: AppTextStyles.subtitleOf(
+                    context,
+                  ).copyWith(color: AppColors.of(context).primary),
                   textAlign: TextAlign.right,
                 ),
                 const SizedBox(height: 12),
@@ -750,7 +753,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
       child: Focus(
         autofocus: true,
         child: Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: AppColors.of(context).background,
           appBar: PdfEditorHeader(
             fileName: widget.title,
             currentPage: _state.currentPage,
@@ -1015,7 +1018,7 @@ class _ShapeOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.background,
+      color: AppColors.of(context).background,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
@@ -1025,12 +1028,12 @@ class _ShapeOption extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: AppColors.primary, size: 20),
+              Icon(icon, color: AppColors.of(context).primary, size: 20),
               const SizedBox(width: 6),
               Text(
                 label,
-                style: AppTextStyles.body.copyWith(
-                  color: AppColors.primary,
+                style: AppTextStyles.bodyOf(context).copyWith(
+                  color: AppColors.of(context).primary,
                   fontWeight: FontWeight.w600,
                 ),
               ),

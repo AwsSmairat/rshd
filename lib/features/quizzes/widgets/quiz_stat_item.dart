@@ -27,17 +27,16 @@ class QuizStatItem extends StatelessWidget {
             height: 38,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.accent.withValues(alpha: 0.14),
+              color: AppColors.of(context).accent.withValues(alpha: 0.14),
             ),
-            child: Icon(icon, size: 18, color: AppColors.darkGold),
+            child: Icon(icon, size: 18, color: AppColors.of(context).darkGold),
           ),
           const SizedBox(height: 10),
           Text(
             label,
-            style: AppTextStyles.body.copyWith(
-              fontSize: 12,
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -45,10 +44,10 @@ class QuizStatItem extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             value,
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+              color: AppColors.of(context).primary,
             ),
             textAlign: TextAlign.center,
             maxLines: 2,

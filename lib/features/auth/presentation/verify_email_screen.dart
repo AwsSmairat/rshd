@@ -124,18 +124,22 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                   tooltip: 'رجوع',
                   onPressed: () => context.go(AppRoutes.login),
                   icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                  color: AppColors.primary,
+                  color: AppColors.of(context).primary,
                 ),
               ),
               Text(
                 'تأكيد البريد الإلكتروني',
-                style: AppTextStyles.title.copyWith(color: AppColors.primary),
+                style: AppTextStyles.titleOf(
+                  context,
+                ).copyWith(color: AppColors.of(context).primary),
                 textAlign: TextAlign.right,
               ),
               SizedBox(height: metrics.fieldSpacing * 0.5),
               Text(
                 'أدخل رمز التحقق المرسل إلى\n${widget.email}',
-                style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                style: AppTextStyles.bodyOf(
+                  context,
+                ).copyWith(color: AppColors.of(context).textMuted),
                 textAlign: TextAlign.right,
               ),
               SizedBox(height: metrics.sectionSpacing),
@@ -146,26 +150,26 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                   vertical: metrics.isTablet ? 14 : 12,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.background,
+                  color: AppColors.of(context).background,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.35),
+                    color: AppColors.of(context).accent.withValues(alpha: 0.35),
                   ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.mail_outline_rounded,
-                      color: AppColors.accent,
+                      color: AppColors.of(context).accent,
                       size: metrics.isTablet ? 22 : 20,
                     ),
                     SizedBox(width: metrics.fieldSpacing * 0.75),
                     Expanded(
                       child: Text(
                         widget.email,
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.bodyOf(context).copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
+                          color: AppColors.of(context).primary,
                         ),
                         textAlign: TextAlign.right,
                         overflow: TextOverflow.ellipsis,
@@ -192,15 +196,15 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                 Container(
                   padding: EdgeInsets.all(metrics.isTablet ? 14 : 12),
                   decoration: BoxDecoration(
-                    color: AppColors.error.withValues(alpha: 0.08),
+                    color: AppColors.of(context).error.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.error.withValues(alpha: 0.2),
+                      color: AppColors.of(context).error.withValues(alpha: 0.2),
                     ),
                   ),
                   child: Text(
                     authState.errorMessage!,
-                    style: AppTextStyles.error,
+                    style: AppTextStyles.errorOf(context),
                     textAlign: TextAlign.center,
                   ),
                 ),

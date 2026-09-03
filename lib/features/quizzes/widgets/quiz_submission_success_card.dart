@@ -17,7 +17,7 @@ class QuizSubmissionSuccessCard extends StatelessWidget {
       fillOpacity: 0.38,
       borderOpacity: 0.7,
       blurSigma: 16,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.04,
       child: Column(
         children: [
@@ -37,16 +37,17 @@ class QuizSubmissionSuccessCard extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             'تم تسليم الاختبار',
-            style: AppTextStyles.title.copyWith(
-              fontSize: 20,
-              color: AppColors.primary,
-            ),
+            style: AppTextStyles.titleOf(
+              context,
+            ).copyWith(fontSize: 20, color: AppColors.of(context).primary),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
           Text(
             quizTitle,
-            style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(color: AppColors.of(context).textMuted),
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

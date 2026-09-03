@@ -29,14 +29,14 @@ class SubjectsHeader extends StatelessWidget {
       child: Container(
         width: double.infinity,
         constraints: const BoxConstraints(minHeight: 168),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               Color(0xFF091729),
-              AppColors.primary,
-              AppColors.secondaryNavy,
+              AppColors.of(context).primary,
+              AppColors.of(context).secondaryNavy,
             ],
           ),
         ),
@@ -69,7 +69,7 @@ class SubjectsHeader extends StatelessWidget {
                       style: TextStyle(
                         fontSize: metrics.pageHeaderTitleFontSize,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.white,
+                        color: AppColors.of(context).white,
                       ),
                     ),
                     if (canPop)
@@ -93,9 +93,9 @@ class SubjectsHeader extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.accent.withValues(alpha: 0.12),
-                        AppColors.accent,
-                        AppColors.accent.withValues(alpha: 0.12),
+                        AppColors.of(context).accent.withValues(alpha: 0.12),
+                        AppColors.of(context).accent,
+                        AppColors.of(context).accent.withValues(alpha: 0.12),
                       ],
                     ),
                   ),
@@ -126,11 +126,13 @@ class _BackButton extends StatelessWidget {
           height: 40,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: AppColors.white.withValues(alpha: 0.22)),
+            border: Border.all(
+              color: AppColors.of(context).white.withValues(alpha: 0.22),
+            ),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.arrow_forward_ios_rounded,
-            color: AppColors.white,
+            color: AppColors.of(context).white,
             size: 18,
           ),
         ),

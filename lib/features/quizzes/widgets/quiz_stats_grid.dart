@@ -67,7 +67,7 @@ class QuizStatsGrid extends StatelessWidget {
       fillOpacity: 0.38,
       borderOpacity: 0.7,
       blurSigma: 16,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.03,
       child: Column(
         children: [

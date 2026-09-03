@@ -21,7 +21,7 @@ class GradesSummaryCard extends StatelessWidget {
       fillOpacity: 0.38,
       borderOpacity: 0.62,
       blurSigma: 16,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.05,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -36,8 +36,8 @@ class GradesSummaryCard extends StatelessWidget {
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
                 colors: [
-                  AppColors.primary.withValues(alpha: 0.92),
-                  AppColors.secondaryNavy.withValues(alpha: 0.88),
+                  AppColors.of(context).primary.withValues(alpha: 0.92),
+                  AppColors.of(context).secondaryNavy.withValues(alpha: 0.88),
                 ],
               ),
             ),
@@ -49,23 +49,27 @@ class GradesSummaryCard extends StatelessWidget {
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: AppColors.accent.withValues(alpha: 0.16),
+                        color: AppColors.of(
+                          context,
+                        ).accent.withValues(alpha: 0.16),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: AppColors.accent.withValues(alpha: 0.35),
+                          color: AppColors.of(
+                            context,
+                          ).accent.withValues(alpha: 0.35),
                         ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.insights_rounded,
-                        color: AppColors.accent,
+                        color: AppColors.of(context).accent,
                         size: 18,
                       ),
                     ),
                     const SizedBox(width: 10),
                     Text(
                       'ملخص الدرجات',
-                      style: AppTextStyles.subtitle.copyWith(
-                        color: AppColors.white,
+                      style: AppTextStyles.subtitleOf(context).copyWith(
+                        color: AppColors.of(context).white,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -74,19 +78,19 @@ class GradesSummaryCard extends StatelessWidget {
                 const SizedBox(height: 18),
                 Text(
                   average != null ? '${average.toStringAsFixed(1)}%' : '—',
-                  style: AppTextStyles.title.copyWith(
+                  style: AppTextStyles.titleOf(context).copyWith(
                     fontSize: 42,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.white,
+                    color: AppColors.of(context).white,
                     height: 1,
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   'المتوسط العام',
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 13,
-                    color: AppColors.white.withValues(alpha: 0.72),
+                    color: AppColors.of(context).white.withValues(alpha: 0.72),
                   ),
                 ),
               ],
@@ -106,7 +110,7 @@ class GradesSummaryCard extends StatelessWidget {
                 Container(
                   width: 1,
                   height: 44,
-                  color: AppColors.accent.withValues(alpha: 0.22),
+                  color: AppColors.of(context).accent.withValues(alpha: 0.22),
                 ),
                 Expanded(
                   child: _SummaryStatTile(
@@ -141,23 +145,22 @@ class _SummaryStatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, size: 18, color: AppColors.darkGold),
+        Icon(icon, size: 18, color: AppColors.of(context).darkGold),
         const SizedBox(height: 6),
         Text(
           value,
-          style: AppTextStyles.title.copyWith(
+          style: AppTextStyles.titleOf(context).copyWith(
             fontSize: 20,
-            color: AppColors.primary,
+            color: AppColors.of(context).primary,
             fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: AppTextStyles.body.copyWith(
-            fontSize: 12,
-            color: AppColors.textMuted,
-          ),
+          style: AppTextStyles.bodyOf(
+            context,
+          ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
           textAlign: TextAlign.center,
         ),
       ],

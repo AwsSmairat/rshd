@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/preferences/app_display_preferences.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/security/screen_protection_provider.dart';
 import '../../../core/theme/app_colors.dart';
@@ -13,7 +14,9 @@ import '../../../core/widgets/loading_widget.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../../auth/presentation/auth_controller.dart';
 import '../data/models/video_model.dart';
+import '../playback/floating_playback_controller.dart';
 import '../services/video_progress_tracker.dart';
+import '../widgets/floating_playback_launch_button.dart';
 import '../widgets/rshd_embed_video_player.dart';
 import '../widgets/rshd_video_player.dart';
 import 'subjects_controller.dart';
@@ -29,10 +32,14 @@ class VideoDetailsScreen extends ConsumerStatefulWidget {
 }
 
 class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
+  final GlobalKey<RshdVideoPlayerState> _nativePlayerKey =
+      GlobalKey<RshdVideoPlayerState>();
+  FloatingPlaybackController? _floatingPlayback;
   VideoProgressTracker? _progressTracker;
   int? _trackerVideoId;
   bool _isPlaying = false;
   Timer? _statusPollTimer;
+  VideoModel? _activeVideo;
 
   @override
   void initState() {
@@ -45,9 +52,32 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _floatingPlayback = ref.read(floatingPlaybackControllerProvider);
+  }
+
+  @override
   void dispose() {
     _statusPollTimer?.cancel();
     _progressTracker?.dispose();
+    final video = _activeVideo;
+    final playback = video?.playback;
+    final floating = _floatingPlayback;
+    if (floating != null &&
+        video != null &&
+        (playback?.usesEmbedPlayer ?? false) &&
+        (playback?.url.trim().isNotEmpty ?? false) &&
+        !floating.isMinimized) {
+      floating.attachEmbed(
+        videoId: video.id,
+        title: video.title,
+        playbackUrl: playback?.url ?? '',
+        expiresAt: playback?.expiresAt,
+        durationSeconds: video.durationSeconds,
+        minimized: true,
+      );
+    }
     super.dispose();
   }
 
@@ -92,6 +122,16 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
   }
 
   void _ensureProgressTracker(VideoModel video) {
+    final savePosition = ref
+        .read(appDisplayPreferencesProvider)
+        .saveWatchPosition;
+    if (!savePosition) {
+      _progressTracker?.dispose();
+      _progressTracker = null;
+      _trackerVideoId = video.id;
+      return;
+    }
+
     if (_trackerVideoId == video.id && _progressTracker != null) {
       return;
     }
@@ -102,6 +142,9 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     final durationSeconds = video.durationSeconds > 0
         ? video.durationSeconds
         : 1;
+    final details = ref.read(
+      videoDetailsControllerProvider(widget.videoId).notifier,
+    );
 
     _progressTracker = VideoProgressTracker(
       durationSeconds: durationSeconds,
@@ -111,14 +154,12 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
             required int durationSeconds,
             bool showSuccessMessage = false,
           }) {
-            return ref
-                .read(videoDetailsControllerProvider(widget.videoId).notifier)
-                .syncProgress(
-                  videoId: widget.videoId,
-                  currentPositionSeconds: currentPositionSeconds,
-                  durationSeconds: durationSeconds,
-                  showSuccessMessage: showSuccessMessage,
-                );
+            return details.syncProgress(
+              videoId: widget.videoId,
+              currentPositionSeconds: currentPositionSeconds,
+              durationSeconds: durationSeconds,
+              showSuccessMessage: showSuccessMessage,
+            );
           },
     );
   }
@@ -139,6 +180,47 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     );
   }
 
+  void _floatAndLeave() {
+    final video = _activeVideo;
+    final playback = video?.playback;
+    final floating = _floatingPlayback;
+    if (floating != null &&
+        video != null &&
+        (playback?.usesEmbedPlayer ?? false) &&
+        (playback?.url.trim().isNotEmpty ?? false)) {
+      floating.attachEmbed(
+        videoId: video.id,
+        title: video.title,
+        playbackUrl: playback?.url ?? '',
+        expiresAt: playback?.expiresAt,
+        durationSeconds: video.durationSeconds,
+        minimized: true,
+      );
+    }
+
+    if (!mounted) {
+      return;
+    }
+    if (context.canPop()) {
+      context.pop();
+      return;
+    }
+    context.go(AppRoutes.home);
+  }
+
+  Future<void> _onFloatPressed() async {
+    final native = _nativePlayerKey.currentState;
+    if (native != null) {
+      final started = await native.startFloating();
+      if (!started && mounted) {
+        _showSnackBar('انتظر تجهيز الفيديو ثم اضغط تشغيل عائم');
+      }
+      return;
+    }
+
+    _floatAndLeave();
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(videoDetailsControllerProvider(widget.videoId));
@@ -153,7 +235,7 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.of(context).background,
       body: _buildBody(state),
     );
   }
@@ -177,6 +259,7 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
 
         _ensureProgressTracker(video);
         _syncStatusPolling(video);
+        _activeVideo = video;
 
         final savedProgress = video.progress;
         final livePercentage =
@@ -187,10 +270,12 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
             _progressTracker?.currentPositionSeconds ??
             savedProgress?.currentPosition ??
             0;
+        final playbackUrl = video.playback?.url.trim() ?? '';
+        final canFloat = playbackUrl.isNotEmpty && video.status == 'ready';
 
         return RefreshIndicator(
-          color: AppColors.accent,
-          backgroundColor: AppColors.cardWhite,
+          color: AppColors.of(context).accent,
+          backgroundColor: AppColors.of(context).cardWhite,
           onRefresh: _reloadVideo,
           edgeOffset: MediaQuery.paddingOf(context).top + kToolbarHeight,
           child: CustomScrollView(
@@ -198,7 +283,10 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
               parent: BouncingScrollPhysics(),
             ),
             slivers: [
-              _VideoDetailsHero(title: video.title),
+              _VideoDetailsHero(
+                title: video.title,
+                onFloat: canFloat ? _onFloatPressed : null,
+              ),
               ResponsiveSliverContent(
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
@@ -231,12 +319,12 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
       playback?.expiresAt,
     );
 
-    return DecoratedBox(
+    final playerCard = DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: AppColors.glassShadow.withValues(alpha: 0.14),
+            color: AppColors.of(context).glassShadow.withValues(alpha: 0.14),
             blurRadius: 22,
             offset: const Offset(0, 10),
           ),
@@ -248,6 +336,18 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
             ? AspectRatio(aspectRatio: 16 / 9, child: content)
             : content,
       ),
+    );
+
+    if (!showsVideoPlayer) {
+      return playerCard;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        playerCard,
+        FloatingPlaybackLaunchBar(onPressed: _onFloatPressed),
+      ],
     );
   }
 
@@ -285,12 +385,29 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     final savedPosition = video.progress?.currentPosition ?? 0;
     final playback = video.playback;
     final blockPlayback = ref.watch(shouldHideProtectedContentProvider);
+    final floating = ref.read(floatingPlaybackControllerProvider);
+    final display = ref.watch(appDisplayPreferencesProvider);
+    final resumeSeconds = display.saveWatchPosition ? savedPosition : 0;
 
     if (playback?.usesEmbedPlayer ?? false) {
+      if (floating.session?.videoId == video.id &&
+          floating.session?.usesEmbed == true &&
+          floating.isMinimized) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) {
+            return;
+          }
+          _floatingPlayback?.restore();
+        });
+      }
       return RshdEmbedVideoPlayer(
         playbackUrl: playbackUrl,
         expiresAt: expiresAt,
         blockPlayback: blockPlayback,
+        autoPlay: display.autoPlayVideo,
+        rememberPosition: display.saveWatchPosition,
+        quality: display.videoQuality,
+        onRequestFloating: _floatAndLeave,
         onRefreshPlayback: () => ref
             .read(videoDetailsControllerProvider(widget.videoId).notifier)
             .refreshPlayback(widget.videoId),
@@ -298,10 +415,37 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     }
 
     return RshdVideoPlayer(
+      key: _nativePlayerKey,
       playbackUrl: playbackUrl,
       expiresAt: expiresAt,
-      initialPositionSeconds: savedPosition,
+      initialPositionSeconds: resumeSeconds,
+      autoPlay: display.autoPlayVideo,
       blockPlayback: blockPlayback,
+      existingController: floating.controllerFor(video.id),
+      onControllerReady: (controller) {
+        _floatingPlayback?.attachNative(
+          videoId: video.id,
+          title: video.title,
+          playbackUrl: playbackUrl,
+          controller: controller,
+          expiresAt: expiresAt,
+          durationSeconds: video.durationSeconds,
+        );
+      },
+      onWillReplaceController: () {
+        _floatingPlayback?.detachNativeWithoutDispose();
+      },
+      onPlayerDetached: ({required bool keepPlaying}) {
+        final current = _floatingPlayback;
+        if (current == null || current.session?.videoId != video.id) {
+          return;
+        }
+        current.playerDetached(keepPlaying: keepPlaying);
+      },
+      onHandoffFloating: () {
+        _floatingPlayback?.minimizeNative();
+      },
+      onRequestFloating: _floatAndLeave,
       onPositionChanged: _onPositionChanged,
       onPlaybackStateChanged: _onPlaybackStateChanged,
       onRefreshPlayback: () => ref
@@ -321,9 +465,10 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
 }
 
 class _VideoDetailsHero extends StatelessWidget {
-  const _VideoDetailsHero({required this.title});
+  const _VideoDetailsHero({required this.title, this.onFloat});
 
   final String title;
+  final VoidCallback? onFloat;
 
   @override
   Widget build(BuildContext context) {
@@ -338,20 +483,31 @@ class _VideoDetailsHero extends StatelessWidget {
       stretch: false,
       elevation: 0,
       scrolledUnderElevation: 0,
-      backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.white,
+      backgroundColor: AppColors.of(context).primary,
+      foregroundColor: AppColors.of(context).white,
       title: Text(
         title,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
       ),
+      actions: [
+        if (onFloat != null)
+          IconButton(
+            tooltip: 'تشغيل عائم',
+            onPressed: onFloat,
+            icon: const Icon(Icons.picture_in_picture_alt_rounded),
+          ),
+      ],
       flexibleSpace: DecoratedBox(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.centerRight,
             end: Alignment.centerLeft,
-            colors: [AppColors.primary, AppColors.secondaryNavy],
+            colors: [
+              AppColors.of(context).primary,
+              AppColors.of(context).secondaryNavy,
+            ],
           ),
         ),
       ),
@@ -379,9 +535,9 @@ class _PlayerPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color accent = switch (tone) {
-      _PlaceholderTone.error => AppColors.error,
-      _PlaceholderTone.locked => AppColors.secondary,
-      _PlaceholderTone.pending => AppColors.darkGold,
+      _PlaceholderTone.error => AppColors.of(context).error,
+      _PlaceholderTone.locked => AppColors.of(context).secondary,
+      _PlaceholderTone.pending => AppColors.of(context).darkGold,
     };
 
     return Container(
@@ -391,7 +547,10 @@ class _PlayerPlaceholder extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [AppColors.cardWhite, accent.withValues(alpha: 0.07)],
+          colors: [
+            AppColors.of(context).cardWhite,
+            accent.withValues(alpha: 0.07),
+          ],
         ),
       ),
       child: Column(
@@ -409,8 +568,8 @@ class _PlayerPlaceholder extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             title,
-            style: AppTextStyles.subtitle.copyWith(
-              color: AppColors.primary,
+            style: AppTextStyles.subtitleOf(context).copyWith(
+              color: AppColors.of(context).primary,
               fontWeight: FontWeight.w700,
               fontSize: 15,
             ),
@@ -421,10 +580,9 @@ class _PlayerPlaceholder extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.caption.copyWith(
-              color: AppColors.textMuted,
-              height: 1.35,
-            ),
+            style: AppTextStyles.captionOf(
+              context,
+            ).copyWith(color: AppColors.of(context).textMuted, height: 1.35),
           ),
           if (onRetry != null) ...[
             const SizedBox(height: 10),
@@ -433,9 +591,11 @@ class _PlayerPlaceholder extends StatelessWidget {
               icon: const Icon(Icons.refresh_rounded, size: 16),
               label: const Text('تحديث'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.secondary,
+                foregroundColor: AppColors.of(context).secondary,
                 side: BorderSide(
-                  color: AppColors.secondary.withValues(alpha: 0.35),
+                  color: AppColors.of(
+                    context,
+                  ).secondary.withValues(alpha: 0.35),
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -469,7 +629,9 @@ class _VideoInfoSection extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             video.title,
-            style: AppTextStyles.title.copyWith(fontSize: 22, height: 1.25),
+            style: AppTextStyles.titleOf(
+              context,
+            ).copyWith(fontSize: 22, height: 1.25),
           ),
           const SizedBox(height: 16),
           Wrap(
@@ -532,8 +694,8 @@ class _ProgressSection extends StatelessWidget {
             child: LinearProgressIndicator(
               minHeight: 10,
               value: progress > 0 ? progress : null,
-              backgroundColor: AppColors.background,
-              color: AppColors.accent,
+              backgroundColor: AppColors.of(context).background,
+              color: AppColors.of(context).accent,
             ),
           ),
           const SizedBox(height: 12),
@@ -544,13 +706,13 @@ class _ProgressSection extends StatelessWidget {
                   positionSeconds > 0
                       ? 'توقفت عند $positionSeconds ثانية'
                       : 'لم تبدأ المشاهدة بعد',
-                  style: AppTextStyles.caption,
+                  style: AppTextStyles.captionOf(context),
                 ),
               ),
               Text(
                 'من $durationLabel',
-                style: AppTextStyles.caption.copyWith(
-                  color: AppColors.secondary,
+                style: AppTextStyles.captionOf(context).copyWith(
+                  color: AppColors.of(context).secondary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -573,12 +735,12 @@ class _SurfaceCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.cardWhite,
+        color: AppColors.of(context).cardWhite,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.white, width: 1.2),
+        border: Border.all(color: AppColors.of(context).white, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: AppColors.glassShadow.withValues(alpha: 0.07),
+            color: AppColors.of(context).glassShadow.withValues(alpha: 0.07),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -603,17 +765,17 @@ class _SectionHeading extends StatelessWidget {
           width: 34,
           height: 34,
           decoration: BoxDecoration(
-            color: AppColors.accent.withValues(alpha: 0.16),
+            color: AppColors.of(context).accent.withValues(alpha: 0.16),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, size: 18, color: AppColors.darkGold),
+          child: Icon(icon, size: 18, color: AppColors.of(context).darkGold),
         ),
         const SizedBox(width: 10),
         Text(
           title,
-          style: AppTextStyles.body.copyWith(
+          style: AppTextStyles.bodyOf(context).copyWith(
             fontWeight: FontWeight.w700,
-            color: AppColors.primary,
+            color: AppColors.of(context).primary,
           ),
         ),
       ],
@@ -631,13 +793,13 @@ class _ProgressBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: AppColors.of(context).background,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
         '$percentage%',
-        style: AppTextStyles.caption.copyWith(
-          color: AppColors.secondary,
+        style: AppTextStyles.captionOf(context).copyWith(
+          color: AppColors.of(context).secondary,
           fontWeight: FontWeight.w800,
         ),
       ),
@@ -657,8 +819,8 @@ class _StatusChip extends StatelessWidget {
       'ready' => const Color(0xFF067647),
       'processing' => const Color(0xFFB54708),
       'uploading' => const Color(0xFF175CD3),
-      'failed' => AppColors.error,
-      _ => AppColors.textMuted,
+      'failed' => AppColors.of(context).error,
+      _ => AppColors.of(context).textMuted,
     };
 
     return Container(
@@ -679,10 +841,9 @@ class _StatusChip extends StatelessWidget {
           const SizedBox(width: 7),
           Text(
             label,
-            style: AppTextStyles.caption.copyWith(
-              color: color,
-              fontWeight: FontWeight.w700,
-            ),
+            style: AppTextStyles.captionOf(
+              context,
+            ).copyWith(color: color, fontWeight: FontWeight.w700),
           ),
         ],
       ),
@@ -706,25 +867,25 @@ class _InfoPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: AppColors.of(context).background,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: AppColors.secondary),
+          Icon(icon, size: 16, color: AppColors.of(context).secondary),
           const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 caption,
-                style: AppTextStyles.caption.copyWith(fontSize: 10),
+                style: AppTextStyles.captionOf(context).copyWith(fontSize: 10),
               ),
               Text(
                 label,
-                style: AppTextStyles.caption.copyWith(
-                  color: AppColors.primary,
+                style: AppTextStyles.captionOf(context).copyWith(
+                  color: AppColors.of(context).primary,
                   fontWeight: FontWeight.w700,
                 ),
               ),

@@ -19,7 +19,7 @@ class CourseProgressCard extends StatelessWidget {
   final double? progress;
   final double? width;
 
-  Color _gradientStart() {
+  Color _gradientStart(BuildContext context) {
     switch (subject.category) {
       case 'medicine':
         return const Color(0xFF7F1D1D);
@@ -28,20 +28,20 @@ class CourseProgressCard extends StatelessWidget {
       case 'it':
         return const Color(0xFF1E3A8A);
       default:
-        return AppColors.secondaryNavy;
+        return AppColors.of(context).secondaryNavy;
     }
   }
 
-  Color _gradientEnd() {
+  Color _gradientEnd(BuildContext context) {
     switch (subject.category) {
       case 'medicine':
         return const Color(0xFF991B1B);
       case 'engineering':
-        return AppColors.darkGold;
+        return AppColors.of(context).darkGold;
       case 'it':
-        return AppColors.primary;
+        return AppColors.of(context).primary;
       default:
-        return AppColors.primary;
+        return AppColors.of(context).primary;
     }
   }
 
@@ -82,13 +82,13 @@ class CourseProgressCard extends StatelessWidget {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
                               _CoverFallback(
-                                gradientStart: _gradientStart(),
-                                gradientEnd: _gradientEnd(),
+                                gradientStart: _gradientStart(context),
+                                gradientEnd: _gradientEnd(context),
                               ),
                         )
                       : _CoverFallback(
-                          gradientStart: _gradientStart(),
-                          gradientEnd: _gradientEnd(),
+                          gradientStart: _gradientStart(context),
+                          gradientEnd: _gradientEnd(context),
                         ),
                 ),
               ),
@@ -141,10 +141,10 @@ class CourseProgressCard extends StatelessWidget {
               children: [
                 Text(
                   subject.title,
-                  style: AppTextStyles.subtitle.copyWith(
+                  style: AppTextStyles.subtitleOf(context).copyWith(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.text,
+                    color: AppColors.of(context).text,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -153,9 +153,9 @@ class CourseProgressCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     instructorName,
-                    style: AppTextStyles.body.copyWith(
+                    style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 12,
-                      color: AppColors.textMuted,
+                      color: AppColors.of(context).textMuted,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -171,20 +171,20 @@ class CourseProgressCard extends StatelessWidget {
                           child: LinearProgressIndicator(
                             value: progress!.clamp(0, 1),
                             minHeight: 6,
-                            backgroundColor: AppColors.accent.withValues(
-                              alpha: 0.18,
-                            ),
-                            color: AppColors.accent,
+                            backgroundColor: AppColors.of(
+                              context,
+                            ).accent.withValues(alpha: 0.18),
+                            color: AppColors.of(context).accent,
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         '${(progress! * 100).round()}%',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.darkGold,
+                          color: AppColors.of(context).darkGold,
                         ),
                       ),
                     ],

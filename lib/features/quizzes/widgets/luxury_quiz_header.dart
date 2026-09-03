@@ -25,14 +25,14 @@ class LuxuryQuizHeader extends StatelessWidget {
       child: Container(
         width: double.infinity,
         constraints: const BoxConstraints(minHeight: 176),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               Color(0xFF091729),
-              AppColors.primary,
-              AppColors.secondaryNavy,
+              AppColors.of(context).primary,
+              AppColors.of(context).secondaryNavy,
             ],
           ),
         ),
@@ -58,7 +58,7 @@ class LuxuryQuizHeader extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: [
                       Colors.transparent,
-                      AppColors.accent.withValues(alpha: 0.35),
+                      AppColors.of(context).accent.withValues(alpha: 0.35),
                       Colors.transparent,
                     ],
                   ),
@@ -74,7 +74,7 @@ class LuxuryQuizHeader extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.accent.withValues(alpha: 0.45),
+                      AppColors.of(context).accent.withValues(alpha: 0.45),
                       Colors.transparent,
                     ],
                   ),
@@ -90,10 +90,10 @@ class LuxuryQuizHeader extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.white,
+                        color: AppColors.of(context).white,
                       ),
                     ),
                     if (canPop)
@@ -117,9 +117,9 @@ class LuxuryQuizHeader extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.accent.withValues(alpha: 0.12),
-                        AppColors.accent,
-                        AppColors.accent.withValues(alpha: 0.12),
+                        AppColors.of(context).accent.withValues(alpha: 0.12),
+                        AppColors.of(context).accent,
+                        AppColors.of(context).accent.withValues(alpha: 0.12),
                       ],
                     ),
                   ),
@@ -151,11 +151,13 @@ class _BackButton extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.white.withValues(alpha: 0.08),
-            border: Border.all(color: AppColors.white.withValues(alpha: 0.22)),
+            border: Border.all(
+              color: AppColors.of(context).white.withValues(alpha: 0.22),
+            ),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.arrow_forward_ios_rounded,
-            color: AppColors.white,
+            color: AppColors.of(context).white,
             size: 18,
           ),
         ),

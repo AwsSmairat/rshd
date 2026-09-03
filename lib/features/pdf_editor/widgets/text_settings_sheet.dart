@@ -52,8 +52,8 @@ class _TextSettingsSheetState extends State<TextSettingsSheet> {
     return Material(
       color: Colors.transparent,
       child: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.cardWhite,
+        decoration: BoxDecoration(
+          color: AppColors.of(context).cardWhite,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
@@ -66,7 +66,7 @@ class _TextSettingsSheetState extends State<TextSettingsSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.textMuted.withValues(alpha: 0.3),
+                  color: AppColors.of(context).textMuted.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(99),
                 ),
               ),
@@ -74,7 +74,9 @@ class _TextSettingsSheetState extends State<TextSettingsSheet> {
             const SizedBox(height: 16),
             Text(
               'إعدادات النص',
-              style: AppTextStyles.subtitle.copyWith(color: AppColors.primary),
+              style: AppTextStyles.subtitleOf(
+                context,
+              ).copyWith(color: AppColors.of(context).primary),
               textAlign: TextAlign.right,
             ),
             const SizedBox(height: 16),
@@ -97,7 +99,7 @@ class _TextSettingsSheetState extends State<TextSettingsSheet> {
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: selected
-                              ? AppColors.accent
+                              ? AppColors.of(context).accent
                               : Colors.transparent,
                           width: 2,
                         ),

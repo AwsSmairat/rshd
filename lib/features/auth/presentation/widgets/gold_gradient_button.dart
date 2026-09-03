@@ -30,14 +30,17 @@ class GoldGradientButton extends StatelessWidget {
             gradient: LinearGradient(
               colors: isLoading
                   ? [
-                      AppColors.accent.withValues(alpha: 0.6),
-                      AppColors.darkGold.withValues(alpha: 0.6),
+                      AppColors.of(context).accent.withValues(alpha: 0.6),
+                      AppColors.of(context).darkGold.withValues(alpha: 0.6),
                     ]
-                  : const [AppColors.accent, AppColors.darkGold],
+                  : [
+                      AppColors.of(context).accent,
+                      AppColors.of(context).darkGold,
+                    ],
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.darkGold.withValues(alpha: 0.35),
+                color: AppColors.of(context).darkGold.withValues(alpha: 0.35),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),

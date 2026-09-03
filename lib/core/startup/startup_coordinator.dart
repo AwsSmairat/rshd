@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/auth/presentation/auth_controller.dart';
 import '../network/api_client.dart';
-import '../platform/platform_settings.dart';
 import '../platform/platform_settings_controller.dart';
 import 'startup_route_resolver.dart';
 import 'startup_timing.dart';
@@ -94,8 +93,7 @@ class StartupCoordinator extends StateNotifier<StartupCoordinatorState> {
       return;
     }
 
-    final settings =
-        ref.read(platformSettingsProvider).value ?? PlatformSettings.fallback;
+    final settings = ref.read(platformSettingsProvider).resolved;
     final route = resolveStartupRoute(
       authState: authState,
       platformSettings: settings,

@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/storage_keys.dart';
@@ -8,6 +7,7 @@ import '../../../../core/network/api_exception.dart';
 import '../../../../core/network/api_response.dart';
 import '../../shared/legal_document_parser.dart';
 import '../../shared/legal_local_cache.dart';
+import '../../shared/legal_remote_fallback.dart';
 import 'privacy_policy_content.dart';
 import 'privacy_policy_model.dart';
 
@@ -29,12 +29,7 @@ class PrivacyPolicyRepository {
       _memoryCached = remote;
       return remote;
     } on ApiException catch (error) {
-      if (_isOfflineError(error)) {
-        return _loadCachedOrLocal();
-      }
-      rethrow;
-    } on DioException catch (error) {
-      if (_isDioOffline(error)) {
+      if (shouldUseLegalLocalFallback(error)) {
         return _loadCachedOrLocal();
       }
       rethrow;
@@ -81,20 +76,6 @@ class PrivacyPolicyRepository {
     return PrivacyPolicyContent.buildLocalDocument().copyWithSource(
       PrivacyPolicySource.local,
     );
-  }
-
-  bool _isOfflineError(ApiException error) {
-    return error.statusCode == null &&
-        (error.message.contains('اتصال') ||
-            error.message.contains('Internet') ||
-            error.message.contains('network'));
-  }
-
-  bool _isDioOffline(DioException error) {
-    return error.type == DioExceptionType.connectionError ||
-        error.type == DioExceptionType.connectionTimeout ||
-        error.type == DioExceptionType.receiveTimeout ||
-        error.type == DioExceptionType.sendTimeout;
   }
 }
 

@@ -26,18 +26,21 @@ class QuizResultSummaryCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.primary, AppColors.secondaryNavy],
+          colors: [
+            AppColors.of(context).primary,
+            AppColors.of(context).secondaryNavy,
+          ],
         ),
         border: Border.all(
-          color: AppColors.accent.withValues(alpha: 0.55),
+          color: AppColors.of(context).accent.withValues(alpha: 0.55),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.18),
+            color: AppColors.of(context).primary.withValues(alpha: 0.18),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -51,25 +54,24 @@ class QuizResultSummaryCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.accent,
+                    color: AppColors.of(context).accent,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   grade,
-                  style: AppTextStyles.title.copyWith(
-                    fontSize: 24,
-                    color: gradeColor,
-                  ),
+                  style: AppTextStyles.titleOf(
+                    context,
+                  ).copyWith(fontSize: 24, color: gradeColor),
                 ),
                 if (showEncouragement) ...[
                   const SizedBox(height: 6),
                   Text(
                     QuizScoreHelper.encouragement(score),
-                    style: AppTextStyles.body.copyWith(
+                    style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 12,
                       height: 1.4,
                       color: Colors.white.withValues(alpha: 0.82),

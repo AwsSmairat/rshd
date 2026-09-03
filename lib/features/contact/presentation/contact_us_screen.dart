@@ -123,7 +123,7 @@ class _ContactUsScreenState extends ConsumerState<ContactUsScreen> {
     final isRefreshing = settings.isLoading;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.of(context).background,
       body: RefreshIndicator(
         onRefresh: _refreshContactSettings,
         child: CustomScrollView(
@@ -143,17 +143,17 @@ class _ContactUsScreenState extends ConsumerState<ContactUsScreen> {
                   children: [
                     Text(
                       'وسائل التواصل',
-                      style: AppTextStyles.subtitle.copyWith(
+                      style: AppTextStyles.subtitleOf(context).copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
+                        color: AppColors.of(context).primary,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       'اضغط على أي بطاقة للتواصل مع فريق RSHD',
-                      style: AppTextStyles.body.copyWith(
+                      style: AppTextStyles.bodyOf(context).copyWith(
                         fontSize: 13,
-                        color: AppColors.textMuted,
+                        color: AppColors.of(context).textMuted,
                       ),
                     ),
                     if (isRefreshing) ...[

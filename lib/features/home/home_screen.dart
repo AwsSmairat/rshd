@@ -90,7 +90,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return RefreshIndicator(
       onRefresh: isLoading ? () async {} : _refresh,
-      color: AppColors.secondary,
+      color: AppColors.of(context).secondary,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
@@ -101,10 +101,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           if (isLoading || isRefreshing)
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: LinearProgressIndicator(
                 minHeight: 2,
-                color: AppColors.accent,
+                color: AppColors.of(context).accent,
                 backgroundColor: Colors.transparent,
               ),
             ),

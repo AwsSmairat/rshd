@@ -34,7 +34,7 @@ class QuizResultScreen extends StatelessWidget {
     final scoreDisplay = QuizScoreHelper.formatScore(parsedScore);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.of(context).background,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

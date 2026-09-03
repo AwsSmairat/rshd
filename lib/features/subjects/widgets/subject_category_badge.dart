@@ -12,16 +12,16 @@ class SubjectCategoryBadge extends StatelessWidget {
 
   final SubjectModel subject;
 
-  Color get _textColor {
+  Color _textColor(BuildContext context) {
     switch (SubjectGroupingHelper.resolveCategoryKey(subject)) {
       case 'medicine':
         return const Color(0xFF0F766E);
       case 'it':
         return const Color(0xFF234E70);
       case 'engineering':
-        return AppColors.darkGold;
+        return AppColors.of(context).darkGold;
       default:
-        return AppColors.primary;
+        return AppColors.of(context).primary;
     }
   }
 
@@ -45,7 +45,7 @@ class SubjectCategoryBadge extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: [
                 Colors.white.withValues(alpha: 0.48),
-                AppColors.accent.withValues(alpha: 0.18),
+                AppColors.of(context).accent.withValues(alpha: 0.18),
               ],
             ),
             borderRadius: BorderRadius.circular(20),
@@ -53,10 +53,10 @@ class SubjectCategoryBadge extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: _textColor,
+              color: _textColor(context),
             ),
           ),
         ),

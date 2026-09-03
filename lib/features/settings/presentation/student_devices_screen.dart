@@ -20,7 +20,9 @@ class StudentDevicesScreen extends ConsumerWidget {
           ? Center(
               child: Text(
                 'لا توجد أجهزة مسجّلة',
-                style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                style: AppTextStyles.bodyOf(
+                  context,
+                ).copyWith(color: AppColors.of(context).textMuted),
               ),
             )
           : ListView.separated(
@@ -87,7 +89,7 @@ class _DeviceTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.cardWhite,
+        color: AppColors.of(context).cardWhite,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
@@ -99,9 +101,9 @@ class _DeviceTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   device.deviceName ?? device.platform ?? 'جهاز',
-                  style: AppTextStyles.subtitle.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: AppTextStyles.subtitleOf(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w700),
                 ),
               ),
               if (device.isActive)
@@ -111,7 +113,7 @@ class _DeviceTile extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withValues(alpha: 0.2),
+                    color: AppColors.of(context).accent.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Text(
@@ -124,17 +126,15 @@ class _DeviceTile extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             'النظام: ${device.platform ?? '—'}',
-            style: AppTextStyles.body.copyWith(
-              fontSize: 13,
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
           ),
           Text(
             'آخر نشاط: $formatted',
-            style: AppTextStyles.body.copyWith(
-              fontSize: 13,
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
           ),
           const SizedBox(height: 10),
           Align(

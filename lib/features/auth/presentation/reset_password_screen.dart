@@ -107,20 +107,22 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     tooltip: 'رجوع',
                     onPressed: () => context.pop(),
                     icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                    color: AppColors.primary,
+                    color: AppColors.of(context).primary,
                   ),
                 ),
                 Text(
                   'كلمة مرور جديدة',
-                  style: AppTextStyles.title.copyWith(color: AppColors.primary),
+                  style: AppTextStyles.titleOf(
+                    context,
+                  ).copyWith(color: AppColors.of(context).primary),
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: metrics.fieldSpacing * 0.5),
                 Text(
                   'اختر كلمة مرور قوية لحسابك (8 أحرف على الأقل، حرف كبير، ورقم).',
-                  style: AppTextStyles.body.copyWith(
-                    color: AppColors.textMuted,
-                  ),
+                  style: AppTextStyles.bodyOf(
+                    context,
+                  ).copyWith(color: AppColors.of(context).textMuted),
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: metrics.sectionSpacing),
@@ -179,7 +181,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   SizedBox(height: metrics.fieldSpacing),
                   Text(
                     state.errorMessage!,
-                    style: AppTextStyles.error,
+                    style: AppTextStyles.errorOf(context),
                     textAlign: TextAlign.right,
                   ),
                 ],

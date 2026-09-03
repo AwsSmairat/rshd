@@ -191,10 +191,10 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
               child: Center(
                 child: Text(
                   _formatTime(state.remainingSeconds!),
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     color: state.remainingSeconds! <= 60
-                        ? AppColors.error
-                        : AppColors.accent,
+                        ? AppColors.of(context).error
+                        : AppColors.of(context).accent,
                     fontWeight: FontWeight.w700,
                   ),
                 ),

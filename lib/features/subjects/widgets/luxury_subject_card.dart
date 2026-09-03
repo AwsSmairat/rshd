@@ -22,16 +22,16 @@ class LuxurySubjectCard extends StatelessWidget {
   final VoidCallback? onRequestPurchase;
   final bool isRequesting;
 
-  Color get _accent {
+  Color _accent(BuildContext context) {
     switch (SubjectGroupingHelper.resolveCategoryKey(subject)) {
       case 'medicine':
         return const Color(0xFF0F766E);
       case 'it':
         return const Color(0xFF234E70);
       case 'engineering':
-        return AppColors.darkGold;
+        return AppColors.of(context).darkGold;
       default:
-        return AppColors.primary;
+        return AppColors.of(context).primary;
     }
   }
 
@@ -51,7 +51,9 @@ class LuxurySubjectCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
-                color: AppColors.glassShadow.withValues(alpha: 0.12),
+                color: AppColors.of(
+                  context,
+                ).glassShadow.withValues(alpha: 0.12),
                 blurRadius: 18,
                 offset: const Offset(0, 8),
               ),
@@ -67,11 +69,14 @@ class LuxurySubjectCard extends StatelessWidget {
                     coverUrl,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
-                      return _FallbackCover(accent: _accent, subject: subject);
+                      return _FallbackCover(
+                        accent: _accent(context),
+                        subject: subject,
+                      );
                     },
                   )
                 else
-                  _FallbackCover(accent: _accent, subject: subject),
+                  _FallbackCover(accent: _accent(context), subject: subject),
                 const DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -93,7 +98,9 @@ class LuxurySubjectCard extends StatelessWidget {
                     width: 10,
                     height: 22,
                     decoration: BoxDecoration(
-                      color: AppColors.accent.withValues(alpha: 0.95),
+                      color: AppColors.of(
+                        context,
+                      ).accent.withValues(alpha: 0.95),
                       borderRadius: const BorderRadius.vertical(
                         bottom: Radius.circular(6),
                       ),
@@ -119,7 +126,7 @@ class LuxurySubjectCard extends StatelessWidget {
                       const Spacer(),
                       Text(
                         subject.title,
-                        style: AppTextStyles.title.copyWith(
+                        style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 20,
                           height: 1.2,
                           color: Colors.white,
@@ -139,7 +146,7 @@ class LuxurySubjectCard extends StatelessWidget {
                         const SizedBox(height: 6),
                         Text(
                           'المدرّس: $instructorName',
-                          style: AppTextStyles.body.copyWith(
+                          style: AppTextStyles.bodyOf(context).copyWith(
                             fontSize: 13,
                             color: Colors.white.withValues(alpha: 0.88),
                           ),
@@ -162,8 +169,8 @@ class LuxurySubjectCard extends StatelessWidget {
                                   ? null
                                   : onRequestPurchase,
                               style: FilledButton.styleFrom(
-                                backgroundColor: AppColors.accent,
-                                foregroundColor: AppColors.primary,
+                                backgroundColor: AppColors.of(context).accent,
+                                foregroundColor: AppColors.of(context).primary,
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 10,
                                 ),
@@ -209,17 +216,17 @@ class _OverlayChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
             color: emphasize
-                ? AppColors.accent.withValues(alpha: 0.28)
+                ? AppColors.of(context).accent.withValues(alpha: 0.28)
                 : Colors.white.withValues(alpha: 0.18),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
           ),
           child: Text(
             label,
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: emphasize ? AppColors.accent : Colors.white,
+              color: emphasize ? AppColors.of(context).accent : Colors.white,
             ),
           ),
         ),
@@ -241,7 +248,7 @@ class _FallbackCover extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [accent, AppColors.primary],
+          colors: [accent, AppColors.of(context).primary],
         ),
       ),
       child: Center(

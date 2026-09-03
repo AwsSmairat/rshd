@@ -145,17 +145,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Container(
                     padding: EdgeInsets.all(metrics.isTablet ? 14 : 12),
                     decoration: BoxDecoration(
-                      color: AppColors.error.withValues(alpha: 0.08),
+                      color: AppColors.of(
+                        context,
+                      ).error.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: AppColors.error.withValues(alpha: 0.2),
+                        color: AppColors.of(
+                          context,
+                        ).error.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Text(
                       authState.errorMessage!,
-                      style: AppTextStyles.error.copyWith(
-                        fontSize: metrics.isTablet ? 14 : null,
-                      ),
+                      style: AppTextStyles.errorOf(
+                        context,
+                      ).copyWith(fontSize: metrics.isTablet ? 14 : null),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -192,7 +196,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       _obscurePassword
                           ? Icons.visibility_outlined
                           : Icons.visibility_off_outlined,
-                      color: AppColors.accent,
+                      color: AppColors.of(context).accent,
                       size: metrics.isTablet ? 22 : 20,
                     ),
                     onPressed: () {
@@ -236,7 +240,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       'ليس لديك حساب؟ ',
                       style: TextStyle(
                         fontSize: metrics.isTablet ? 14 : 13,
-                        color: AppColors.textMuted.withValues(alpha: 0.9),
+                        color: AppColors.of(
+                          context,
+                        ).textMuted.withValues(alpha: 0.9),
                       ),
                     ),
                     GestureDetector(
@@ -246,7 +252,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         style: TextStyle(
                           fontSize: metrics.isTablet ? 14 : 13,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          color: AppColors.of(context).primary,
                         ),
                       ),
                     ),

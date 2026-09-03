@@ -51,8 +51,8 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
       backgroundColor: Colors.transparent,
       body: RefreshIndicator(
         onRefresh: _refresh,
-        color: AppColors.darkGold,
-        backgroundColor: AppColors.cardWhite,
+        color: AppColors.of(context).darkGold,
+        backgroundColor: AppColors.of(context).cardWhite,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [

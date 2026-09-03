@@ -21,8 +21,8 @@ class QuizAnswerOption extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: Material(
         color: isSelected
-            ? AppColors.accent.withValues(alpha: 0.18)
-            : AppColors.white,
+            ? AppColors.of(context).accent.withValues(alpha: 0.18)
+            : AppColors.of(context).white,
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
@@ -34,8 +34,8 @@ class QuizAnswerOption extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isSelected
-                    ? AppColors.accent
-                    : AppColors.accent.withValues(alpha: 0.35),
+                    ? AppColors.of(context).accent
+                    : AppColors.of(context).accent.withValues(alpha: 0.35),
                 width: isSelected ? 1.5 : 1,
               ),
             ),
@@ -45,14 +45,16 @@ class QuizAnswerOption extends StatelessWidget {
                   isSelected
                       ? Icons.radio_button_checked
                       : Icons.radio_button_off,
-                  color: isSelected ? AppColors.primary : AppColors.textMuted,
+                  color: isSelected
+                      ? AppColors.of(context).primary
+                      : AppColors.of(context).textMuted,
                   size: 20,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     answerText,
-                    style: AppTextStyles.body.copyWith(
+                    style: AppTextStyles.bodyOf(context).copyWith(
                       fontWeight: isSelected
                           ? FontWeight.w600
                           : FontWeight.normal,

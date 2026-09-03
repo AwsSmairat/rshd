@@ -34,7 +34,7 @@ class PdfEditorHeader extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.cardWhite,
+      color: AppColors.of(context).cardWhite,
       elevation: 1,
       child: SafeArea(
         bottom: false,
@@ -46,7 +46,7 @@ class PdfEditorHeader extends StatelessWidget implements PreferredSizeWidget {
                 tooltip: 'رجوع',
                 onPressed: onBack,
                 icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                color: AppColors.primary,
+                color: AppColors.of(context).primary,
               ),
               Expanded(
                 child: Column(
@@ -57,8 +57,8 @@ class PdfEditorHeader extends StatelessWidget implements PreferredSizeWidget {
                       fileName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.subtitle.copyWith(
-                        color: AppColors.primary,
+                      style: AppTextStyles.subtitleOf(context).copyWith(
+                        color: AppColors.of(context).primary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -67,9 +67,9 @@ class PdfEditorHeader extends StatelessWidget implements PreferredSizeWidget {
                       totalPages > 0
                           ? 'الصفحة: $currentPage من $totalPages'
                           : 'الصفحة: $currentPage',
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                      style: AppTextStyles.captionOf(
+                        context,
+                      ).copyWith(color: AppColors.of(context).textMuted),
                     ),
                   ],
                 ),
@@ -79,19 +79,19 @@ class PdfEditorHeader extends StatelessWidget implements PreferredSizeWidget {
                 tooltip: 'بحث',
                 onPressed: onSearch,
                 icon: const Icon(Icons.search_rounded),
-                color: AppColors.primary,
+                color: AppColors.of(context).primary,
               ),
               IconButton(
                 tooltip: 'حفظ',
                 onPressed: saveStatus == PdfSaveStatus.saving ? null : onSave,
                 icon: const Icon(Icons.save_rounded),
-                color: AppColors.primary,
+                color: AppColors.of(context).primary,
               ),
               IconButton(
                 tooltip: 'المزيد',
                 onPressed: onMore,
                 icon: const Icon(Icons.more_vert_rounded),
-                color: AppColors.primary,
+                color: AppColors.of(context).primary,
               ),
             ],
           ),
@@ -112,23 +112,27 @@ class _SaveStatusChip extends StatelessWidget {
     final (label, color, icon) = switch (status) {
       PdfSaveStatus.saved => (
         'تم الحفظ',
-        AppColors.secondary,
+        AppColors.of(context).secondary,
         Icons.check_circle_outline,
       ),
-      PdfSaveStatus.saving => ('جارٍ الحفظ...', AppColors.accent, Icons.sync),
+      PdfSaveStatus.saving => (
+        'جارٍ الحفظ...',
+        AppColors.of(context).accent,
+        Icons.sync,
+      ),
       PdfSaveStatus.unsaved => (
         'تعديلات غير محفوظة',
-        AppColors.darkGold,
+        AppColors.of(context).darkGold,
         Icons.edit_note,
       ),
       PdfSaveStatus.failed => (
         'فشل الحفظ',
-        AppColors.error,
+        AppColors.of(context).error,
         Icons.error_outline,
       ),
       PdfSaveStatus.offlinePending => (
         'سيتم المزامنة',
-        AppColors.textMuted,
+        AppColors.of(context).textMuted,
         Icons.cloud_upload_outlined,
       ),
     };
@@ -149,7 +153,9 @@ class _SaveStatusChip extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               label,
-              style: AppTextStyles.caption.copyWith(color: color, fontSize: 11),
+              style: AppTextStyles.captionOf(
+                context,
+              ).copyWith(color: color, fontSize: 11),
             ),
           ],
         ),
@@ -209,7 +215,7 @@ class PdfEditorToolbar extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 12),
           child: FloatingActionButton.small(
             heroTag: 'show_toolbar',
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.of(context).primary,
             onPressed: onToggleVisibility,
             child: const Icon(Icons.keyboard_arrow_up, color: Colors.white),
           ),
@@ -218,7 +224,7 @@ class PdfEditorToolbar extends StatelessWidget {
     }
 
     final content = Material(
-      color: AppColors.glassToolbar,
+      color: AppColors.of(context).glassToolbar,
       elevation: 8,
       borderRadius: isTabletLandscape
           ? const BorderRadius.horizontal(left: Radius.circular(16))
@@ -377,19 +383,21 @@ class _ToolButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iconColor = !enabled
-        ? AppColors.textMuted.withValues(alpha: 0.5)
+        ? AppColors.of(context).textMuted.withValues(alpha: 0.5)
         : selected
-        ? AppColors.accent
-        : AppColors.primary;
+        ? AppColors.of(context).accent
+        : AppColors.of(context).primary;
     final labelColor = !enabled
-        ? AppColors.textMuted.withValues(alpha: 0.5)
+        ? AppColors.of(context).textMuted.withValues(alpha: 0.5)
         : selected
-        ? AppColors.primary
-        : AppColors.secondary;
-    final borderColor = selected ? AppColors.primary : const Color(0xFFD1D5DB);
+        ? AppColors.of(context).primary
+        : AppColors.of(context).secondary;
+    final borderColor = selected
+        ? AppColors.of(context).primary
+        : const Color(0xFFD1D5DB);
     final backgroundColor = selected
-        ? AppColors.accent.withValues(alpha: 0.18)
-        : AppColors.cardWhite;
+        ? AppColors.of(context).accent.withValues(alpha: 0.18)
+        : AppColors.of(context).cardWhite;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -403,8 +411,10 @@ class _ToolButton extends StatelessWidget {
           child: InkWell(
             onTap: enabled ? onTap : null,
             borderRadius: BorderRadius.circular(12),
-            splashColor: AppColors.accent.withValues(alpha: 0.2),
-            highlightColor: AppColors.primary.withValues(alpha: 0.08),
+            splashColor: AppColors.of(context).accent.withValues(alpha: 0.2),
+            highlightColor: AppColors.of(
+              context,
+            ).primary.withValues(alpha: 0.08),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 180),
               constraints: const BoxConstraints(minWidth: 58, minHeight: 52),
@@ -416,7 +426,9 @@ class _ToolButton extends StatelessWidget {
                 boxShadow: selected
                     ? [
                         BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.12),
+                          color: AppColors.of(
+                            context,
+                          ).primary.withValues(alpha: 0.12),
                           blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),
@@ -431,7 +443,7 @@ class _ToolButton extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     label,
-                    style: AppTextStyles.caption.copyWith(
+                    style: AppTextStyles.captionOf(context).copyWith(
                       fontSize: 10,
                       color: labelColor,
                       fontWeight: selected ? FontWeight.w700 : FontWeight.w600,

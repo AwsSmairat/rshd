@@ -23,17 +23,17 @@ class HomeSectionHeader extends StatelessWidget {
                 width: 4,
                 height: 20,
                 decoration: BoxDecoration(
-                  color: AppColors.accent,
+                  color: AppColors.of(context).accent,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
               const SizedBox(width: 10),
               Text(
                 title,
-                style: AppTextStyles.subtitle.copyWith(
+                style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: metrics.sectionTitleFontSize,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.text,
+                  color: AppColors.of(context).text,
                 ),
               ),
             ],
@@ -43,7 +43,7 @@ class HomeSectionHeader extends StatelessWidget {
           TextButton(
             onPressed: onViewAll,
             style: TextButton.styleFrom(
-              foregroundColor: AppColors.darkGold,
+              foregroundColor: AppColors.of(context).darkGold,
               padding: const EdgeInsets.symmetric(horizontal: 8),
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,

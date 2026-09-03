@@ -24,11 +24,13 @@ class VideoCard extends StatelessWidget {
           CircleAvatar(
             radius: 20,
             backgroundColor: locked
-                ? AppColors.textMuted.withValues(alpha: 0.12)
-                : AppColors.primary.withValues(alpha: 0.12),
+                ? AppColors.of(context).textMuted.withValues(alpha: 0.12)
+                : AppColors.of(context).primary.withValues(alpha: 0.12),
             child: Icon(
               locked ? Icons.lock_outline_rounded : Icons.play_arrow_rounded,
-              color: locked ? AppColors.textMuted : AppColors.primary,
+              color: locked
+                  ? AppColors.of(context).textMuted
+                  : AppColors.of(context).primary,
             ),
           ),
           const SizedBox(width: 12),
@@ -38,16 +40,15 @@ class VideoCard extends StatelessWidget {
               children: [
                 Text(
                   video.title,
-                  style: AppTextStyles.body.copyWith(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                  ),
+                  style: AppTextStyles.bodyOf(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   'المدة: ${video.formattedDuration}',
-                  style: AppTextStyles.body.copyWith(
-                    color: AppColors.textMuted,
+                  style: AppTextStyles.bodyOf(context).copyWith(
+                    color: AppColors.of(context).textMuted,
                     fontSize: 12,
                   ),
                 ),
@@ -57,13 +58,19 @@ class VideoCard extends StatelessWidget {
                   runSpacing: 4,
                   children: [
                     if (video.isFree)
-                      _Badge(label: 'مجاني', color: AppColors.secondary),
+                      _Badge(
+                        label: 'مجاني',
+                        color: AppColors.of(context).secondary,
+                      ),
                     if (locked)
-                      _Badge(label: 'مقفل', color: AppColors.textMuted)
+                      _Badge(
+                        label: 'مقفل',
+                        color: AppColors.of(context).textMuted,
+                      )
                     else
                       _Badge(
                         label: video.statusLabel,
-                        color: AppColors.secondary,
+                        color: AppColors.of(context).secondary,
                       ),
                   ],
                 ),
@@ -73,7 +80,9 @@ class VideoCard extends StatelessWidget {
           Icon(
             locked ? Icons.lock_outline_rounded : Icons.arrow_back_ios_new,
             size: 16,
-            color: locked ? AppColors.textMuted : AppColors.primary,
+            color: locked
+                ? AppColors.of(context).textMuted
+                : AppColors.of(context).primary,
           ),
         ],
       ),
@@ -97,11 +106,9 @@ class _Badge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: AppTextStyles.body.copyWith(
-          color: color,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-        ),
+        style: AppTextStyles.bodyOf(
+          context,
+        ).copyWith(color: color, fontSize: 11, fontWeight: FontWeight.w700),
       ),
     );
   }

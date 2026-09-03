@@ -107,11 +107,11 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.of(context).background,
       appBar: AppBar(
         title: const Text('حذف الحساب'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+        backgroundColor: AppColors.of(context).primary,
+        foregroundColor: AppColors.of(context).white,
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),

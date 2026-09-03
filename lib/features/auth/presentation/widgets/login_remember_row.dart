@@ -28,7 +28,7 @@ class LoginRememberRow extends StatelessWidget {
             child: TextButton(
               onPressed: onForgotPassword,
               style: TextButton.styleFrom(
-                foregroundColor: AppColors.secondary,
+                foregroundColor: AppColors.of(context).secondary,
                 padding: EdgeInsets.zero,
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -56,7 +56,7 @@ class LoginRememberRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: fontSize,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textMuted,
+                    color: AppColors.of(context).textMuted,
                   ),
                 ),
                 SizedBox(
@@ -65,10 +65,12 @@ class LoginRememberRow extends StatelessWidget {
                   child: Checkbox(
                     value: rememberMe,
                     onChanged: (value) => onRememberMeChanged(value ?? false),
-                    activeColor: AppColors.secondary,
-                    checkColor: AppColors.white,
+                    activeColor: AppColors.of(context).secondary,
+                    checkColor: AppColors.of(context).white,
                     side: BorderSide(
-                      color: AppColors.textMuted.withValues(alpha: 0.5),
+                      color: AppColors.of(
+                        context,
+                      ).textMuted.withValues(alpha: 0.5),
                     ),
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     visualDensity: VisualDensity.compact,

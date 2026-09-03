@@ -55,8 +55,8 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
       backgroundColor: Colors.transparent,
       body: RefreshIndicator(
         onRefresh: _refresh,
-        color: AppColors.darkGold,
-        backgroundColor: AppColors.cardWhite,
+        color: AppColors.of(context).darkGold,
+        backgroundColor: AppColors.of(context).cardWhite,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
@@ -105,8 +105,8 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
                 padding: const EdgeInsets.only(top: 20, bottom: 12),
                 child: Text(
                   'سجل الدرجات',
-                  style: AppTextStyles.subtitle.copyWith(
-                    color: AppColors.primary,
+                  style: AppTextStyles.subtitleOf(context).copyWith(
+                    color: AppColors.of(context).primary,
                     fontWeight: FontWeight.w700,
                   ),
                 ),

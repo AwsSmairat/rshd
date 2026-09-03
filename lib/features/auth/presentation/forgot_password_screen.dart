@@ -75,20 +75,22 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     tooltip: 'رجوع',
                     onPressed: () => context.pop(),
                     icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                    color: AppColors.primary,
+                    color: AppColors.of(context).primary,
                   ),
                 ),
                 Text(
                   'نسيت كلمة المرور؟',
-                  style: AppTextStyles.title.copyWith(color: AppColors.primary),
+                  style: AppTextStyles.titleOf(
+                    context,
+                  ).copyWith(color: AppColors.of(context).primary),
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: metrics.fieldSpacing * 0.5),
                 Text(
                   'أدخل بريدك الإلكتروني وسنساعدك في استعادة الوصول إلى حسابك.',
-                  style: AppTextStyles.body.copyWith(
-                    color: AppColors.textMuted,
-                  ),
+                  style: AppTextStyles.bodyOf(
+                    context,
+                  ).copyWith(color: AppColors.of(context).textMuted),
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: metrics.sectionSpacing),
@@ -111,7 +113,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   SizedBox(height: metrics.fieldSpacing),
                   Text(
                     state.errorMessage!,
-                    style: AppTextStyles.error,
+                    style: AppTextStyles.errorOf(context),
                     textAlign: TextAlign.right,
                   ),
                 ],

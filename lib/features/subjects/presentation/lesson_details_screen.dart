@@ -108,16 +108,18 @@ class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(lesson.title, style: AppTextStyles.title),
+              Text(lesson.title, style: AppTextStyles.titleOf(context)),
               const SizedBox(height: 8),
               Text(
                 lesson.isActive ? 'الحالة: متاح' : 'الحالة: ${lesson.status}',
-                style: AppTextStyles.body.copyWith(color: AppColors.secondary),
+                style: AppTextStyles.bodyOf(
+                  context,
+                ).copyWith(color: AppColors.of(context).secondary),
               ),
               if (lesson.description != null &&
                   lesson.description!.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                Text(lesson.description!, style: AppTextStyles.body),
+                Text(lesson.description!, style: AppTextStyles.bodyOf(context)),
               ],
               const SizedBox(height: 24),
               _ContentSection(
@@ -235,10 +237,9 @@ class _ContentSection extends StatelessWidget {
       children: [
         Text(
           title,
-          style: AppTextStyles.body.copyWith(
-            fontWeight: FontWeight.w700,
-            fontSize: 16,
-          ),
+          style: AppTextStyles.bodyOf(
+            context,
+          ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
         ),
         const SizedBox(height: 10),
         if (children.isEmpty)
@@ -246,13 +247,15 @@ class _ContentSection extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.of(context).white,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: const Color(0xFFE5E7EB)),
             ),
             child: Text(
               emptyMessage,
-              style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+              style: AppTextStyles.bodyOf(
+                context,
+              ).copyWith(color: AppColors.of(context).textMuted),
             ),
           )
         else

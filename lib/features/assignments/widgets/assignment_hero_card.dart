@@ -27,7 +27,7 @@ class AssignmentHeroCard extends StatelessWidget {
       fillOpacity: 0.38,
       borderOpacity: 0.7,
       blurSigma: 16,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.04,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -38,10 +38,10 @@ class AssignmentHeroCard extends StatelessWidget {
               children: [
                 Text(
                   assignment.title,
-                  style: AppTextStyles.title.copyWith(
+                  style: AppTextStyles.titleOf(context).copyWith(
                     fontSize: 20,
                     height: 1.3,
-                    color: AppColors.primary,
+                    color: AppColors.of(context).primary,
                   ),
                 ),
                 if (assignment.subjectTitle != null &&
@@ -49,9 +49,9 @@ class AssignmentHeroCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     assignment.subjectTitle!,
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.textMuted,
-                    ),
+                    style: AppTextStyles.bodyOf(
+                      context,
+                    ).copyWith(color: AppColors.of(context).textMuted),
                   ),
                 ],
                 const SizedBox(height: 12),
@@ -104,7 +104,7 @@ class AssignmentInfoGrid extends StatelessWidget {
             ? const Color(0xFF15803D)
             : assignment.isOverdue
             ? const Color(0xFF991B1B)
-            : AppColors.darkGold,
+            : AppColors.of(context).darkGold,
       ),
     ];
 
@@ -123,15 +123,15 @@ class AssignmentInfoGrid extends StatelessWidget {
                 Icon(
                   Icons.schedule_outlined,
                   size: 18,
-                  color: AppColors.darkGold,
+                  color: AppColors.of(context).darkGold,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   'معلومات الواجب',
-                  style: AppTextStyles.subtitle.copyWith(
+                  style: AppTextStyles.subtitleOf(context).copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
+                    color: AppColors.of(context).primary,
                   ),
                 ),
               ],
@@ -140,15 +140,20 @@ class AssignmentInfoGrid extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildCell(stats[0], showRight: true, showBottom: true),
+                child: _buildCell(
+                  context,
+                  stats[0],
+                  showRight: true,
+                  showBottom: true,
+                ),
               ),
-              Expanded(child: _buildCell(stats[1], showBottom: true)),
+              Expanded(child: _buildCell(context, stats[1], showBottom: true)),
             ],
           ),
           Row(
             children: [
-              Expanded(child: _buildCell(stats[2], showRight: true)),
-              Expanded(child: _buildCell(stats[3])),
+              Expanded(child: _buildCell(context, stats[2], showRight: true)),
+              Expanded(child: _buildCell(context, stats[3])),
             ],
           ),
         ],
@@ -157,6 +162,7 @@ class AssignmentInfoGrid extends StatelessWidget {
   }
 
   Widget _buildCell(
+    BuildContext context,
     _GridItem item, {
     bool showRight = false,
     bool showBottom = false,
@@ -181,26 +187,29 @@ class AssignmentInfoGrid extends StatelessWidget {
               height: 38,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.accent.withValues(alpha: 0.14),
+                color: AppColors.of(context).accent.withValues(alpha: 0.14),
               ),
-              child: Icon(item.icon, size: 18, color: AppColors.darkGold),
+              child: Icon(
+                item.icon,
+                size: 18,
+                color: AppColors.of(context).darkGold,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               item.label,
-              style: AppTextStyles.body.copyWith(
-                fontSize: 12,
-                color: AppColors.textMuted,
-              ),
+              style: AppTextStyles.bodyOf(
+                context,
+              ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
             Text(
               item.value,
-              style: AppTextStyles.body.copyWith(
+              style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: item.valueColor ?? AppColors.primary,
+                color: item.valueColor ?? AppColors.of(context).primary,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,

@@ -38,7 +38,7 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
     final metrics = AppLayoutMetrics.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.of(context).background,
       body: switch (state.status) {
         FeatureLoadStatus.initial || FeatureLoadStatus.loading =>
           const LoadingWidget(message: 'جاري تحميل مركز المساعدة...'),
@@ -52,7 +52,7 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
           onRefresh: () => ref
               .read(helpCenterControllerProvider.notifier)
               .load(refresh: true),
-          color: AppColors.secondary,
+          color: AppColors.of(context).secondary,
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
@@ -91,18 +91,17 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
       children: [
         Text(
           'كيف يمكننا مساعدتك؟',
-          style: AppTextStyles.subtitle.copyWith(
+          style: AppTextStyles.subtitleOf(context).copyWith(
             fontWeight: FontWeight.w700,
-            color: AppColors.primary,
+            color: AppColors.of(context).primary,
           ),
         ),
         const SizedBox(height: 6),
         Text(
           'تواصل مع مدرّس مادتك أو مع فريق الدعم الفني',
-          style: AppTextStyles.body.copyWith(
-            fontSize: 13,
-            color: AppColors.textMuted,
-          ),
+          style: AppTextStyles.bodyOf(
+            context,
+          ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
         ),
         const SizedBox(height: 16),
         HelpSupportCard(
@@ -111,25 +110,24 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
         const SizedBox(height: 20),
         Text(
           'المدرسون — موادك المفعّلة',
-          style: AppTextStyles.subtitle.copyWith(
-            fontWeight: FontWeight.w700,
-            fontSize: 15,
-          ),
+          style: AppTextStyles.subtitleOf(
+            context,
+          ).copyWith(fontWeight: FontWeight.w700, fontSize: 15),
         ),
         const SizedBox(height: 10),
         if (contacts.teachers.isEmpty)
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.cardWhite,
+              color: AppColors.of(context).cardWhite,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: const Color(0xFFE5E7EB)),
             ),
             child: Text(
               'لا توجد مواد مفعّلة حالياً. فعّل مادة أولاً لتتمكن من التواصل مع مدرّسها.',
-              style: AppTextStyles.body.copyWith(
+              style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 13,
-                color: AppColors.textMuted,
+                color: AppColors.of(context).textMuted,
                 height: 1.5,
               ),
               textAlign: TextAlign.center,

@@ -17,14 +17,17 @@ class AssignmentIconPanel extends StatelessWidget {
           height: 88,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [AppColors.primary, AppColors.secondaryNavy],
+              colors: [
+                AppColors.of(context).primary,
+                AppColors.of(context).secondaryNavy,
+              ],
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.18),
+                color: AppColors.of(context).primary.withValues(alpha: 0.18),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -39,7 +42,7 @@ class AssignmentIconPanel extends StatelessWidget {
                 color: Colors.white.withValues(alpha: 0.14),
                 border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
               ),
-              child: Icon(icon, color: AppColors.accent, size: 24),
+              child: Icon(icon, color: AppColors.of(context).accent, size: 24),
             ),
           ),
         ),
@@ -50,13 +53,13 @@ class AssignmentIconPanel extends StatelessWidget {
             width: 10,
             height: 22,
             decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.95),
+              color: AppColors.of(context).accent.withValues(alpha: 0.95),
               borderRadius: const BorderRadius.vertical(
                 bottom: Radius.circular(6),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.darkGold.withValues(alpha: 0.35),
+                  color: AppColors.of(context).darkGold.withValues(alpha: 0.35),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),

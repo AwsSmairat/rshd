@@ -120,18 +120,22 @@ class _PasswordResetVerificationScreenState
                   tooltip: 'رجوع',
                   onPressed: () => context.pop(),
                   icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                  color: AppColors.primary,
+                  color: AppColors.of(context).primary,
                 ),
               ),
               Text(
                 'تحقق من الرمز',
-                style: AppTextStyles.title.copyWith(color: AppColors.primary),
+                style: AppTextStyles.titleOf(
+                  context,
+                ).copyWith(color: AppColors.of(context).primary),
                 textAlign: TextAlign.right,
               ),
               SizedBox(height: metrics.fieldSpacing * 0.5),
               Text(
                 'أدخل رمز الاستعادة المرسل إلى\n${widget.email}',
-                style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                style: AppTextStyles.bodyOf(
+                  context,
+                ).copyWith(color: AppColors.of(context).textMuted),
                 textAlign: TextAlign.right,
               ),
               SizedBox(height: metrics.sectionSpacing),
@@ -151,7 +155,7 @@ class _PasswordResetVerificationScreenState
                 SizedBox(height: metrics.fieldSpacing),
                 Text(
                   state.errorMessage!,
-                  style: AppTextStyles.error,
+                  style: AppTextStyles.errorOf(context),
                   textAlign: TextAlign.center,
                 ),
               ],

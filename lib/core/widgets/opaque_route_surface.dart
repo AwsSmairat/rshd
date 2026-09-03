@@ -12,14 +12,17 @@ class OpaqueRouteSurface extends StatelessWidget {
   const OpaqueRouteSurface({
     super.key,
     required this.child,
-    this.backgroundColor = AppColors.background,
+    this.backgroundColor,
   });
 
   final Widget child;
-  final Color backgroundColor;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(color: backgroundColor, child: child);
+    return ColoredBox(
+      color: backgroundColor ?? AppColors.of(context).background,
+      child: child,
+    );
   }
 }

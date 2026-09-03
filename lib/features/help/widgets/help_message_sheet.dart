@@ -13,7 +13,7 @@ Future<bool> showHelpMessageSheet({
   final sent = await showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: AppColors.cardWhite,
+    backgroundColor: AppColors.of(context).cardWhite,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
@@ -111,18 +111,16 @@ class _HelpMessageSheetState extends State<_HelpMessageSheet> {
           const SizedBox(height: 16),
           Text(
             'رسالة إلى ${widget.teacher.instructorName}',
-            style: AppTextStyles.subtitle.copyWith(
-              fontWeight: FontWeight.w800,
-              fontSize: 17,
-            ),
+            style: AppTextStyles.subtitleOf(
+              context,
+            ).copyWith(fontWeight: FontWeight.w800, fontSize: 17),
           ),
           const SizedBox(height: 4),
           Text(
             widget.teacher.subjectTitle,
-            style: AppTextStyles.body.copyWith(
-              fontSize: 13,
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
           ),
           const SizedBox(height: 16),
           TextField(
@@ -137,7 +135,7 @@ class _HelpMessageSheetState extends State<_HelpMessageSheet> {
               hintText: 'اكتب رسالتك هنا...',
               hintTextDirection: TextDirection.rtl,
               filled: true,
-              fillColor: AppColors.background,
+              fillColor: AppColors.of(context).background,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
@@ -148,7 +146,7 @@ class _HelpMessageSheetState extends State<_HelpMessageSheet> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: AppColors.darkGold),
+                borderSide: BorderSide(color: AppColors.of(context).darkGold),
               ),
               counterText: '',
             ),
@@ -157,10 +155,9 @@ class _HelpMessageSheetState extends State<_HelpMessageSheet> {
             const SizedBox(height: 8),
             Text(
               _error!,
-              style: AppTextStyles.body.copyWith(
-                fontSize: 12,
-                color: AppColors.error,
-              ),
+              style: AppTextStyles.bodyOf(
+                context,
+              ).copyWith(fontSize: 12, color: AppColors.of(context).error),
             ),
           ],
           const SizedBox(height: 16),
@@ -183,7 +180,7 @@ class _HelpMessageSheetState extends State<_HelpMessageSheet> {
                 child: FilledButton(
                   onPressed: _sending ? null : _submit,
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.darkGold,
+                    backgroundColor: AppColors.of(context).darkGold,
                     minimumSize: const Size(double.infinity, 48),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

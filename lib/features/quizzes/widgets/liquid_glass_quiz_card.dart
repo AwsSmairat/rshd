@@ -31,7 +31,7 @@ class LiquidGlassQuizCard extends StatelessWidget {
       fillOpacity: 0.38,
       borderOpacity: 0.7,
       blurSigma: 16,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.04,
       onTap: onTap,
       child: Row(
@@ -47,10 +47,10 @@ class LiquidGlassQuizCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         quiz.title,
-                        style: AppTextStyles.title.copyWith(
+                        style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 17,
                           height: 1.3,
-                          color: AppColors.primary,
+                          color: AppColors.of(context).primary,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -66,8 +66,10 @@ class LiquidGlassQuizCard extends StatelessWidget {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            AppColors.accent.withValues(alpha: 0.45),
-                            AppColors.darkGold,
+                            AppColors.of(
+                              context,
+                            ).accent.withValues(alpha: 0.45),
+                            AppColors.of(context).darkGold,
                           ],
                         ),
                       ),
@@ -106,7 +108,7 @@ class LiquidGlassQuizCard extends StatelessWidget {
           Icon(
             Icons.arrow_back_ios_new_rounded,
             size: 16,
-            color: AppColors.primary.withValues(alpha: 0.55),
+            color: AppColors.of(context).primary.withValues(alpha: 0.55),
           ),
         ],
       ),
@@ -124,15 +126,14 @@ class _MetaRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: AppColors.darkGold),
+        Icon(icon, size: 14, color: AppColors.of(context).darkGold),
         const SizedBox(width: 6),
         Expanded(
           child: Text(
             text,
-            style: AppTextStyles.body.copyWith(
-              fontSize: 13,
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -156,7 +157,7 @@ class _QuizStatsBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: AppColors.textMuted.withValues(alpha: 0.08),
+        color: AppColors.of(context).textMuted.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: Colors.white.withValues(alpha: 0.45)),
       ),
@@ -191,14 +192,13 @@ class _StatChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 13, color: AppColors.darkGold),
+        Icon(icon, size: 13, color: AppColors.of(context).darkGold),
         const SizedBox(width: 4),
         Text(
           label,
-          style: AppTextStyles.body.copyWith(
-            fontSize: 12,
-            color: AppColors.textMuted,
-          ),
+          style: AppTextStyles.bodyOf(
+            context,
+          ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
         ),
       ],
     );

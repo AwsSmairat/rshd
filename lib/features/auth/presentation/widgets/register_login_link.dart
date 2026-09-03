@@ -17,17 +17,17 @@ class RegisterLoginLink extends StatelessWidget {
           'لديك حساب بالفعل؟ ',
           style: TextStyle(
             fontSize: 13,
-            color: AppColors.textMuted.withValues(alpha: 0.95),
+            color: AppColors.of(context).textMuted.withValues(alpha: 0.95),
           ),
         ),
         GestureDetector(
           onTap: onLoginTap,
-          child: const Text(
+          child: Text(
             'سجل الدخول',
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: AppColors.darkGold,
+              color: AppColors.of(context).darkGold,
             ),
           ),
         ),

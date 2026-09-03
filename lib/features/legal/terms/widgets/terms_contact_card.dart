@@ -85,12 +85,12 @@ class TermsContactCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.cardWhite,
+        color: AppColors.of(context).cardWhite,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.05),
+            color: AppColors.of(context).primary.withValues(alpha: 0.05),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -101,53 +101,72 @@ class TermsContactCard extends StatelessWidget {
         children: [
           Text(
             'التواصل',
-            style: AppTextStyles.subtitle.copyWith(
-              fontWeight: FontWeight.w700,
-              fontSize: 16,
-            ),
+            style: AppTextStyles.subtitleOf(
+              context,
+            ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
           ),
           const SizedBox(height: 12),
-          _row(Icons.support_agent_outlined, 'الدعم', contact.supportEmail),
-          _row(Icons.gavel_outlined, 'الشؤون القانونية', contact.legalEmail),
+          _row(
+            context,
+            Icons.support_agent_outlined,
+            'الدعم',
+            contact.supportEmail,
+          ),
+          _row(
+            context,
+            Icons.gavel_outlined,
+            'الشؤون القانونية',
+            contact.legalEmail,
+          ),
           if (contact.supportPhone.isNotEmpty)
-            _row(Icons.phone_outlined, 'الهاتف', contact.supportPhone),
+            _row(context, Icons.phone_outlined, 'الهاتف', contact.supportPhone),
           if (contact.companyAddress.isNotEmpty)
-            _row(Icons.location_on_outlined, 'العنوان', contact.companyAddress),
-          _row(Icons.access_time_outlined, 'ساعات العمل', contact.supportHours),
+            _row(
+              context,
+              Icons.location_on_outlined,
+              'العنوان',
+              contact.companyAddress,
+            ),
+          _row(
+            context,
+            Icons.access_time_outlined,
+            'ساعات العمل',
+            contact.supportHours,
+          ),
           const SizedBox(height: 14),
           OutlinedButton.icon(
             onPressed: onContact,
             icon: const Icon(Icons.mail_outline),
             label: const Text('تواصل معنا'),
-            style: _style,
+            style: _style(context),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: onReport,
             icon: const Icon(Icons.report_outlined),
             label: const Text('الإبلاغ عن مخالفة'),
-            style: _style,
+            style: _style(context),
           ),
         ],
       ),
     );
   }
 
-  ButtonStyle get _style => OutlinedButton.styleFrom(
-    foregroundColor: AppColors.darkGold,
-    side: const BorderSide(color: AppColors.darkGold),
+  ButtonStyle _style(BuildContext context) => OutlinedButton.styleFrom(
+    foregroundColor: AppColors.of(context).darkGold,
+    side: BorderSide(color: AppColors.of(context).darkGold),
     minimumSize: const Size(double.infinity, 46),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
   );
 
-  Widget _row(IconData icon, String label, String value) {
+  Widget _row(BuildContext context, IconData icon, String label, String value) {
     if (value.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.darkGold),
+          Icon(icon, size: 18, color: AppColors.of(context).darkGold),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -155,13 +174,16 @@ class TermsContactCard extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
-                    color: AppColors.textMuted,
+                    color: AppColors.of(context).textMuted,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                Text(value, style: AppTextStyles.body.copyWith(fontSize: 14)),
+                Text(
+                  value,
+                  style: AppTextStyles.bodyOf(context).copyWith(fontSize: 14),
+                ),
               ],
             ),
           ),
@@ -190,18 +212,20 @@ class TermsAcceptanceCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.accent.withValues(alpha: 0.1),
+        color: AppColors.of(context).accent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.darkGold.withValues(alpha: 0.35)),
+        border: Border.all(
+          color: AppColors.of(context).darkGold.withValues(alpha: 0.35),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             'مطلوب: موافقة على النسخة الجديدة',
-            style: AppTextStyles.subtitle.copyWith(
+            style: AppTextStyles.subtitleOf(context).copyWith(
               fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+              color: AppColors.of(context).primary,
             ),
           ),
           const SizedBox(height: 8),
@@ -216,7 +240,7 @@ class TermsAcceptanceCard extends StatelessWidget {
           FilledButton(
             onPressed: (!checked || isLoading) ? null : onAccept,
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.of(context).primary,
               minimumSize: const Size(double.infinity, 48),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -260,7 +284,7 @@ class TermsFooter extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.cardWhite,
+        color: AppColors.of(context).cardWhite,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
@@ -272,8 +296,8 @@ class TermsFooter extends StatelessWidget {
             icon: const Icon(Icons.privacy_tip_outlined),
             label: const Text('سياسة الخصوصية'),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.darkGold,
-              side: const BorderSide(color: AppColors.darkGold),
+              foregroundColor: AppColors.of(context).darkGold,
+              side: BorderSide(color: AppColors.of(context).darkGold),
               minimumSize: const Size(double.infinity, 46),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -300,26 +324,24 @@ class TermsFooter extends StatelessWidget {
           Text(
             platformName,
             textAlign: TextAlign.center,
-            style: AppTextStyles.subtitle.copyWith(
+            style: AppTextStyles.subtitleOf(context).copyWith(
               fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+              color: AppColors.of(context).primary,
             ),
           ),
           Text(
             'إصدار الشروط: $version',
             textAlign: TextAlign.center,
-            style: AppTextStyles.body.copyWith(
-              fontSize: 12,
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
           ),
           Text(
             'آخر تحديث: $lastUpdated',
             textAlign: TextAlign.center,
-            style: AppTextStyles.body.copyWith(
-              fontSize: 12,
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
           ),
         ],
       ),

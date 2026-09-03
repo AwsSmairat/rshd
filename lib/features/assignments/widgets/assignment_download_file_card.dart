@@ -69,7 +69,7 @@ class AssignmentDownloadFileCard extends StatelessWidget {
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              color: AppColors.cardWhite.withValues(alpha: 0.55),
+              color: AppColors.of(context).cardWhite.withValues(alpha: 0.55),
               border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
             ),
             child: Row(
@@ -78,10 +78,14 @@ class AssignmentDownloadFileCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withValues(alpha: 0.16),
+                    color: AppColors.of(context).accent.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(fileIcon, color: AppColors.darkGold, size: 26),
+                  child: Icon(
+                    fileIcon,
+                    color: AppColors.of(context).darkGold,
+                    size: 26,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -90,9 +94,9 @@ class AssignmentDownloadFileCard extends StatelessWidget {
                     children: [
                       Text(
                         displayName,
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.bodyOf(context).copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          color: AppColors.of(context).primary,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -100,9 +104,9 @@ class AssignmentDownloadFileCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         '$size • $mime',
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
-                          color: AppColors.textMuted,
+                          color: AppColors.of(context).textMuted,
                         ),
                       ),
                     ],
@@ -117,8 +121,10 @@ class AssignmentDownloadFileCard extends StatelessWidget {
             icon: const Icon(Icons.download_rounded, size: 18),
             label: const Text('تحميل الملف'),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: BorderSide(color: AppColors.accent.withValues(alpha: 0.65)),
+              foregroundColor: AppColors.of(context).primary,
+              side: BorderSide(
+                color: AppColors.of(context).accent.withValues(alpha: 0.65),
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),

@@ -17,11 +17,11 @@ class StudentBottomNav extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: AppColors.of(context).primary,
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.28),
+            color: AppColors.of(context).primary.withValues(alpha: 0.28),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -118,8 +118,8 @@ class _NavItem extends StatelessWidget {
                 icon,
                 size: 22,
                 color: isActive
-                    ? AppColors.accent
-                    : AppColors.white.withValues(alpha: 0.75),
+                    ? AppColors.of(context).accent
+                    : AppColors.of(context).white.withValues(alpha: 0.75),
               ),
               const SizedBox(height: 4),
               Text(
@@ -128,8 +128,8 @@ class _NavItem extends StatelessWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: isActive
-                      ? AppColors.accent
-                      : AppColors.white.withValues(alpha: 0.75),
+                      ? AppColors.of(context).accent
+                      : AppColors.of(context).white.withValues(alpha: 0.75),
                 ),
               ),
             ],
@@ -164,23 +164,32 @@ class _HomeNavItem extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: isActive
-                        ? const [AppColors.accent, AppColors.darkGold]
+                        ? [
+                            AppColors.of(context).accent,
+                            AppColors.of(context).darkGold,
+                          ]
                         : [
-                            AppColors.accent.withValues(alpha: 0.85),
-                            AppColors.darkGold.withValues(alpha: 0.85),
+                            AppColors.of(
+                              context,
+                            ).accent.withValues(alpha: 0.85),
+                            AppColors.of(
+                              context,
+                            ).darkGold.withValues(alpha: 0.85),
                           ],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.darkGold.withValues(alpha: 0.35),
+                      color: AppColors.of(
+                        context,
+                      ).darkGold.withValues(alpha: 0.35),
                       blurRadius: 12,
                       offset: const Offset(0, 6),
                     ),
                   ],
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.home_rounded,
-                  color: AppColors.primary,
+                  color: AppColors.of(context).primary,
                   size: 28,
                 ),
               ),
@@ -191,8 +200,8 @@ class _HomeNavItem extends StatelessWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
                   color: isActive
-                      ? AppColors.accent
-                      : AppColors.white.withValues(alpha: 0.85),
+                      ? AppColors.of(context).accent
+                      : AppColors.of(context).white.withValues(alpha: 0.85),
                 ),
               ),
             ],

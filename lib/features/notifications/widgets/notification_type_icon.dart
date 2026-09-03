@@ -10,7 +10,7 @@ class NotificationTypeIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = _colors();
+    final colors = _colors(context);
 
     return Container(
       width: 42,
@@ -54,7 +54,7 @@ class NotificationTypeIcon extends StatelessWidget {
     }
   }
 
-  _TypeColors _colors() {
+  _TypeColors _colors(BuildContext context) {
     switch (type) {
       case 'subject_activated':
         return const _TypeColors(
@@ -70,8 +70,8 @@ class NotificationTypeIcon extends StatelessWidget {
       case 'new_assignment':
       case 'assignment_reminder':
         return _TypeColors(
-          background: AppColors.accent.withValues(alpha: 0.2),
-          foreground: AppColors.darkGold,
+          background: AppColors.of(context).accent.withValues(alpha: 0.2),
+          foreground: AppColors.of(context).darkGold,
         );
       case 'quiz_created':
       case 'new_quiz':
@@ -83,8 +83,8 @@ class NotificationTypeIcon extends StatelessWidget {
       case 'grade_published':
       case 'new_grade':
         return _TypeColors(
-          background: AppColors.primary.withValues(alpha: 0.1),
-          foreground: AppColors.primary,
+          background: AppColors.of(context).primary.withValues(alpha: 0.1),
+          foreground: AppColors.of(context).primary,
         );
       case 'assignment_submitted':
         return const _TypeColors(
@@ -93,8 +93,8 @@ class NotificationTypeIcon extends StatelessWidget {
         );
       case 'instructor_reply':
         return _TypeColors(
-          background: AppColors.accent.withValues(alpha: 0.22),
-          foreground: AppColors.darkGold,
+          background: AppColors.of(context).accent.withValues(alpha: 0.22),
+          foreground: AppColors.of(context).darkGold,
         );
       case 'student_message':
         return const _TypeColors(
@@ -105,8 +105,8 @@ class NotificationTypeIcon extends StatelessWidget {
       case 'custom':
       default:
         return _TypeColors(
-          background: AppColors.textMuted.withValues(alpha: 0.12),
-          foreground: AppColors.secondary,
+          background: AppColors.of(context).textMuted.withValues(alpha: 0.12),
+          foreground: AppColors.of(context).secondary,
         );
     }
   }

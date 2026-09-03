@@ -26,16 +26,16 @@ class SubjectSectionHeader extends StatelessWidget {
     }
   }
 
-  Color get _iconColor {
+  Color _iconColor(BuildContext context) {
     switch (categoryKey) {
       case 'medicine':
         return const Color(0xFF0F766E);
       case 'it':
         return const Color(0xFF234E70);
       case 'engineering':
-        return AppColors.darkGold;
+        return AppColors.of(context).darkGold;
       default:
-        return AppColors.primary;
+        return AppColors.of(context).primary;
     }
   }
 
@@ -47,7 +47,7 @@ class SubjectSectionHeader extends StatelessWidget {
           width: 4,
           height: 22,
           decoration: BoxDecoration(
-            color: AppColors.accent,
+            color: AppColors.of(context).accent,
             borderRadius: BorderRadius.circular(4),
           ),
         ),
@@ -56,19 +56,19 @@ class SubjectSectionHeader extends StatelessWidget {
           width: 34,
           height: 34,
           decoration: BoxDecoration(
-            color: AppColors.accent.withValues(alpha: 0.18),
+            color: AppColors.of(context).accent.withValues(alpha: 0.18),
             shape: BoxShape.circle,
           ),
-          child: Icon(_icon, size: 18, color: _iconColor),
+          child: Icon(_icon, size: 18, color: _iconColor(context)),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: Text(
             title,
-            style: AppTextStyles.subtitle.copyWith(
+            style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 19,
               fontWeight: FontWeight.w800,
-              color: AppColors.primary,
+              color: AppColors.of(context).primary,
             ),
           ),
         ),

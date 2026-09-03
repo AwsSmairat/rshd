@@ -25,12 +25,15 @@ class QuizActionButton extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            gradient: const LinearGradient(
-              colors: [AppColors.primary, AppColors.secondaryNavy],
+            gradient: LinearGradient(
+              colors: [
+                AppColors.of(context).primary,
+                AppColors.of(context).secondaryNavy,
+              ],
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.18),
+                color: AppColors.of(context).primary.withValues(alpha: 0.18),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
@@ -41,7 +44,7 @@ class QuizActionButton extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
-              foregroundColor: AppColors.white,
+              foregroundColor: AppColors.of(context).white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -49,7 +52,7 @@ class QuizActionButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: AppColors.accent, size: 22),
+                Icon(icon, color: AppColors.of(context).accent, size: 22),
                 const SizedBox(width: 8),
                 Text(
                   label,
@@ -71,9 +74,13 @@ class QuizActionButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          backgroundColor: AppColors.cardWhite.withValues(alpha: 0.85),
-          side: BorderSide(color: AppColors.accent.withValues(alpha: 0.65)),
+          foregroundColor: AppColors.of(context).primary,
+          backgroundColor: AppColors.of(
+            context,
+          ).cardWhite.withValues(alpha: 0.85),
+          side: BorderSide(
+            color: AppColors.of(context).accent.withValues(alpha: 0.65),
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -81,7 +88,7 @@ class QuizActionButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: AppColors.darkGold, size: 20),
+            Icon(icon, color: AppColors.of(context).darkGold, size: 20),
             const SizedBox(width: 8),
             Text(
               label,

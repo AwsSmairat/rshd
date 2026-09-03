@@ -27,14 +27,14 @@ class StudentSettingsHeader extends StatelessWidget {
       clipper: LoginHeaderWaveClipper(),
       child: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               Color(0xFF091729),
-              AppColors.primary,
-              AppColors.secondaryNavy,
+              AppColors.of(context).primary,
+              AppColors.of(context).secondaryNavy,
             ],
           ),
         ),
@@ -67,9 +67,9 @@ class StudentSettingsHeader extends StatelessWidget {
                 style: IconButton.styleFrom(
                   backgroundColor: Colors.white.withValues(alpha: 0.08),
                 ),
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_back_ios_new,
-                  color: AppColors.white,
+                  color: AppColors.of(context).white,
                   size: 18,
                 ),
               ),
@@ -85,10 +85,10 @@ class StudentSettingsHeader extends StatelessWidget {
                 children: [
                   Text(
                     'إعدادات الطالب',
-                    style: AppTextStyles.subtitle.copyWith(
+                    style: AppTextStyles.subtitleOf(context).copyWith(
                       fontSize: metrics.pageHeaderTitleFontSize,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.white,
+                      color: AppColors.of(context).white,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -102,9 +102,9 @@ class StudentSettingsHeader extends StatelessWidget {
                           children: [
                             Text(
                               name,
-                              style: AppTextStyles.title.copyWith(
+                              style: AppTextStyles.titleOf(context).copyWith(
                                 fontSize: metrics.isTablet ? 24 : 22,
-                                color: AppColors.white,
+                                color: AppColors.of(context).white,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -116,27 +116,28 @@ class StudentSettingsHeader extends StatelessWidget {
                                 vertical: 5,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.darkGold.withValues(
-                                  alpha: 0.9,
-                                ),
+                                color: AppColors.of(
+                                  context,
+                                ).darkGold.withValues(alpha: 0.9),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.school_outlined,
                                     size: 14,
-                                    color: AppColors.white,
+                                    color: AppColors.of(context).white,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     'طالب',
-                                    style: AppTextStyles.body.copyWith(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.white,
-                                    ),
+                                    style: AppTextStyles.bodyOf(context)
+                                        .copyWith(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.of(context).white,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -168,9 +169,9 @@ class StudentSettingsHeader extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.accent.withValues(alpha: 0.1),
-                        AppColors.accent,
-                        AppColors.accent.withValues(alpha: 0.1),
+                        AppColors.of(context).accent.withValues(alpha: 0.1),
+                        AppColors.of(context).accent,
+                        AppColors.of(context).accent.withValues(alpha: 0.1),
                       ],
                     ),
                   ),
@@ -196,13 +197,17 @@ class _Avatar extends StatelessWidget {
       height: 78,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: AppColors.accent, width: 2),
-        color: AppColors.primary.withValues(alpha: 0.35),
+        border: Border.all(color: AppColors.of(context).accent, width: 2),
+        color: AppColors.of(context).primary.withValues(alpha: 0.35),
       ),
       clipBehavior: Clip.antiAlias,
       child: url != null && url!.isNotEmpty
           ? Image.network(url!, fit: BoxFit.cover)
-          : const Icon(Icons.person_outline, color: AppColors.accent, size: 36),
+          : Icon(
+              Icons.person_outline,
+              color: AppColors.of(context).accent,
+              size: 36,
+            ),
     );
   }
 }

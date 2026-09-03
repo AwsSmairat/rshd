@@ -61,22 +61,22 @@ class ProfileInfoCard extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.background,
+                  color: AppColors.of(context).background,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.person_outline,
-                  color: AppColors.darkGold,
+                  color: AppColors.of(context).darkGold,
                   size: 22,
                 ),
               ),
               const SizedBox(width: 10),
               Text(
                 'بيانات الحساب',
-                style: AppTextStyles.subtitle.copyWith(
+                style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.text,
+                  color: AppColors.of(context).text,
                 ),
               ),
             ],

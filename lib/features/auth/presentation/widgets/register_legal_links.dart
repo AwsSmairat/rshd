@@ -15,15 +15,15 @@ class RegisterLegalLinks extends StatelessWidget {
         style: TextStyle(
           fontSize: 12,
           height: 1.5,
-          color: AppColors.textMuted.withValues(alpha: 0.95),
+          color: AppColors.of(context).textMuted.withValues(alpha: 0.95),
         ),
         children: [
           const TextSpan(text: 'بإنشاء الحساب أنت توافق على '),
           TextSpan(
             text: 'شروط الاستخدام',
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w700,
-              color: AppColors.darkGold,
+              color: AppColors.of(context).darkGold,
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () => context.push(AppRoutes.termsAndConditions),
@@ -31,9 +31,9 @@ class RegisterLegalLinks extends StatelessWidget {
           const TextSpan(text: ' و'),
           TextSpan(
             text: 'سياسة الخصوصية',
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w700,
-              color: AppColors.darkGold,
+              color: AppColors.of(context).darkGold,
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () => context.push(AppRoutes.privacyPolicy),

@@ -40,10 +40,10 @@ class ResultProgressCircle extends StatelessWidget {
             children: [
               Text(
                 centerText,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.accent,
+                  color: AppColors.of(context).accent,
                 ),
               ),
               const SizedBox(height: 2),
@@ -51,7 +51,7 @@ class ResultProgressCircle extends StatelessWidget {
                 subtitle,
                 style: TextStyle(
                   fontSize: 11,
-                  color: AppColors.accent.withValues(alpha: 0.85),
+                  color: AppColors.of(context).accent.withValues(alpha: 0.85),
                 ),
               ),
             ],
@@ -84,7 +84,11 @@ class _ResultRingPainter extends CustomPainter {
       ..shader = SweepGradient(
         startAngle: startAngle,
         endAngle: startAngle + (2 * math.pi * progress),
-        colors: const [AppColors.accent, AppColors.darkGold, AppColors.accent],
+        colors: [
+          AppColors.light.accent,
+          AppColors.light.darkGold,
+          AppColors.light.accent,
+        ],
       ).createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth

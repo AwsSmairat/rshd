@@ -83,13 +83,15 @@ class UpcomingAssignmentsSection extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: AppColors.cardWhite,
+                color: AppColors.of(context).cardWhite,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFE5E7EB)),
               ),
               child: Text(
                 'لا توجد مهام قادمة حالياً',
-                style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                style: AppTextStyles.bodyOf(
+                  context,
+                ).copyWith(color: AppColors.of(context).textMuted),
                 textAlign: TextAlign.center,
               ),
             )

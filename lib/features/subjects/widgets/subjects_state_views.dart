@@ -21,7 +21,7 @@ class SubjectsEmptyState extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       fillOpacity: 0.32,
       borderOpacity: 0.55,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.06,
       child: Column(
         children: [
@@ -29,32 +29,32 @@ class SubjectsEmptyState extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.16),
+              color: AppColors.of(context).accent.withValues(alpha: 0.16),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.menu_book_outlined,
-              color: AppColors.darkGold,
+              color: AppColors.of(context).darkGold,
               size: 32,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             message,
-            style: AppTextStyles.subtitle.copyWith(
+            style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+              color: AppColors.of(context).primary,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
             subtitle,
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 13,
               height: 1.5,
-              color: AppColors.textMuted,
+              color: AppColors.of(context).textMuted,
             ),
             textAlign: TextAlign.center,
           ),
@@ -127,7 +127,7 @@ class _SkeletonBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: AppColors.accent.withValues(alpha: 0.12),
+        color: AppColors.of(context).accent.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(radius),
       ),
     );
@@ -153,13 +153,17 @@ class SubjectsErrorState extends StatelessWidget {
       borderOpacity: 0.52,
       child: Column(
         children: [
-          const Icon(Icons.error_outline, color: AppColors.error, size: 36),
+          Icon(
+            Icons.error_outline,
+            color: AppColors.of(context).error,
+            size: 36,
+          ),
           const SizedBox(height: 12),
           Text(
             message,
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.text,
+              color: AppColors.of(context).text,
             ),
             textAlign: TextAlign.center,
           ),
@@ -169,8 +173,10 @@ class SubjectsErrorState extends StatelessWidget {
             icon: const Icon(Icons.refresh, size: 18),
             label: const Text('إعادة المحاولة'),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: BorderSide(color: AppColors.accent.withValues(alpha: 0.6)),
+              foregroundColor: AppColors.of(context).primary,
+              side: BorderSide(
+                color: AppColors.of(context).accent.withValues(alpha: 0.6),
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

@@ -8,6 +8,8 @@ import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/platform/platform_settings_controller.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_theme_controller.dart';
+import '../../../core/preferences/app_display_preferences.dart';
 import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/loading_widget.dart';
 import '../../../core/widgets/responsive_content.dart';
@@ -152,7 +154,36 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
     final authState = ref.watch(authControllerProvider);
 
     ref.listen(studentSettingsControllerProvider, (previous, next) {
-      if (next.errorMessage?.contains('انتهت الجلسة') == true && mounted) {
+      final prefs = next.settings?.preferences;
+      final previousPrefs = previous?.settings?.preferences;
+      if (prefs != null &&
+          (previousPrefs == null ||
+              prefs.theme != previousPrefs.theme ||
+              prefs.fontSize != previousPrefs.fontSize ||
+              prefs.autoPlayVideo != previousPrefs.autoPlayVideo ||
+              prefs.saveWatchPosition != previousPrefs.saveWatchPosition ||
+              prefs.defaultVideoQuality != previousPrefs.defaultVideoQuality)) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) {
+            return;
+          }
+          if (prefs.theme != previousPrefs?.theme) {
+            ref.read(appThemeControllerProvider.notifier).setTheme(prefs.theme);
+          }
+          ref
+              .read(appDisplayPreferencesProvider.notifier)
+              .applyFromSettings(
+                fontSize: prefs.fontSize,
+                autoPlayVideo: prefs.autoPlayVideo,
+                saveWatchPosition: prefs.saveWatchPosition,
+                videoQuality: prefs.defaultVideoQuality,
+              );
+        });
+      }
+      if (!mounted) {
+        return;
+      }
+      if (next.errorMessage?.contains('انتهت الجلسة') == true) {
         ref.read(authControllerProvider.notifier).logout();
         context.go(AppRoutes.login);
       }
@@ -245,13 +276,6 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
           context,
         ).push(MaterialPageRoute(builder: (_) => const ChangePasswordScreen()));
       },
-      onTwoFactorTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('المصادقة الثنائية غير متاحة حالياً على المنصة'),
-          ),
-        );
-      },
       onDevices: () {
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -289,9 +313,30 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
 
     final appPreferences = AppPreferencesCard(
       preferences: settings.preferences,
-      onChanged: (key, value) => ref
-          .read(studentSettingsControllerProvider.notifier)
-          .updatePreference(key, value),
+      onChanged: (key, value) {
+        if (key == 'theme' && value is String) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) {
+              return;
+            }
+            ref.read(appThemeControllerProvider.notifier).setTheme(value);
+          });
+        }
+        final display = ref.read(appDisplayPreferencesProvider.notifier);
+        switch (key) {
+          case 'font_size' when value is String:
+            display.apply(fontSize: value);
+          case 'auto_play_video' when value is bool:
+            display.apply(autoPlayVideo: value);
+          case 'save_watch_position' when value is bool:
+            display.apply(saveWatchPosition: value);
+          case 'default_video_quality' when value is String:
+            display.apply(videoQuality: value);
+        }
+        ref
+            .read(studentSettingsControllerProvider.notifier)
+            .updatePreference(key, value);
+      },
     );
 
     final notifications = NotificationSettingsCard(
@@ -386,7 +431,7 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
       onRefresh: () => ref
           .read(studentSettingsControllerProvider.notifier)
           .load(refresh: true),
-      color: AppColors.secondary,
+      color: AppColors.of(context).secondary,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [

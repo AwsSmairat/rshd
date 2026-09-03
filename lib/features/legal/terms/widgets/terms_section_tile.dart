@@ -19,19 +19,21 @@ class TermsSection extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 10),
             child: Text(
               p,
-              style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.65),
+              style: AppTextStyles.bodyOf(
+                context,
+              ).copyWith(fontSize: 14, height: 1.65),
             ),
           ),
         ),
         if (section.bulletPoints.isNotEmpty)
-          ...section.bulletPoints.map(_bullet),
+          ...section.bulletPoints.map((item) => _bullet(context, item)),
         if (section.subsections.isNotEmpty)
-          ...section.subsections.map(_subsection),
+          ...section.subsections.map((item) => _subsection(context, item)),
       ],
     );
   }
 
-  Widget _bullet(String item) {
+  Widget _bullet(BuildContext context, String item) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, right: 4),
       child: Row(
@@ -41,8 +43,8 @@ class TermsSection extends StatelessWidget {
             margin: const EdgeInsets.only(top: 7),
             width: 6,
             height: 6,
-            decoration: const BoxDecoration(
-              color: AppColors.darkGold,
+            decoration: BoxDecoration(
+              color: AppColors.of(context).darkGold,
               shape: BoxShape.circle,
             ),
           ),
@@ -50,7 +52,9 @@ class TermsSection extends StatelessWidget {
           Expanded(
             child: Text(
               item,
-              style: AppTextStyles.body.copyWith(fontSize: 14, height: 1.6),
+              style: AppTextStyles.bodyOf(
+                context,
+              ).copyWith(fontSize: 14, height: 1.6),
             ),
           ),
         ],
@@ -58,7 +62,7 @@ class TermsSection extends StatelessWidget {
     );
   }
 
-  Widget _subsection(TermsSubsection subsection) {
+  Widget _subsection(BuildContext context, TermsSubsection subsection) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
@@ -66,14 +70,14 @@ class TermsSection extends StatelessWidget {
         children: [
           Text(
             subsection.title,
-            style: AppTextStyles.subtitle.copyWith(
+            style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+              color: AppColors.of(context).primary,
             ),
           ),
           const SizedBox(height: 6),
-          ...subsection.items.map(_bullet),
+          ...subsection.items.map((item) => _bullet(context, item)),
         ],
       ),
     );
@@ -99,16 +103,16 @@ class TermsSectionTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: AppColors.cardWhite,
+        color: AppColors.of(context).cardWhite,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isExpanded
-              ? AppColors.darkGold.withValues(alpha: 0.35)
+              ? AppColors.of(context).darkGold.withValues(alpha: 0.35)
               : const Color(0xFFE5E7EB),
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.04),
+            color: AppColors.of(context).primary.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -128,17 +132,20 @@ class TermsSectionTile extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.background,
+              color: AppColors.of(context).background,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(section.icon, color: AppColors.darkGold, size: 18),
+            child: Icon(
+              section.icon,
+              color: AppColors.of(context).darkGold,
+              size: 18,
+            ),
           ),
           title: Text(
             section.title,
-            style: AppTextStyles.body.copyWith(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 14, fontWeight: FontWeight.w700),
           ),
           trailing:
               trailing ??
@@ -146,7 +153,7 @@ class TermsSectionTile extends StatelessWidget {
                 isExpanded
                     ? Icons.keyboard_arrow_up_rounded
                     : Icons.keyboard_arrow_down_rounded,
-                color: AppColors.textMuted,
+                color: AppColors.of(context).textMuted,
               ),
           children: [TermsSection(section: section)],
         ),

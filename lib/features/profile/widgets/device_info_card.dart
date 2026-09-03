@@ -38,22 +38,22 @@ class DeviceInfoCard extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.background,
+                  color: AppColors.of(context).background,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.smartphone_outlined,
-                  color: AppColors.darkGold,
+                  color: AppColors.of(context).darkGold,
                   size: 22,
                 ),
               ),
               const SizedBox(width: 10),
               Text(
                 'الجهاز المرتبط',
-                style: AppTextStyles.subtitle.copyWith(
+                style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.text,
+                  color: AppColors.of(context).text,
                 ),
               ),
             ],
@@ -66,16 +66,18 @@ class DeviceInfoCard extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.devices_other_outlined,
-                    color: AppColors.textMuted.withValues(alpha: 0.7),
+                    color: AppColors.of(
+                      context,
+                    ).textMuted.withValues(alpha: 0.7),
                     size: 22,
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'لا يوجد جهاز مرتبط حالياً',
-                      style: AppTextStyles.body.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                      style: AppTextStyles.bodyOf(
+                        context,
+                      ).copyWith(color: AppColors.of(context).textMuted),
                     ),
                   ),
                 ],

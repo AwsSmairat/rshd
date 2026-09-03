@@ -134,10 +134,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
             color: switch (strength) {
               <= 1 => Colors.red,
               2 => Colors.orange,
-              3 => AppColors.darkGold,
+              3 => AppColors.of(context).darkGold,
               _ => Colors.green,
             },
-            backgroundColor: AppColors.background,
+            backgroundColor: AppColors.of(context).background,
           ),
           const SizedBox(height: 8),
           const Text('يجب أن تكون 8 أحرف على الأقل.'),

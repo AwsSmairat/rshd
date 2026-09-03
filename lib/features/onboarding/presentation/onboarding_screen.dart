@@ -82,7 +82,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: AppColors.of(context).background,
           body: SafeArea(
             child: PageView(
               controller: _pageController,
@@ -155,7 +155,7 @@ class OnboardingLearningPage extends StatelessWidget {
                   child: TextButton(
                     onPressed: onSkip,
                     style: TextButton.styleFrom(
-                      foregroundColor: AppColors.primary,
+                      foregroundColor: AppColors.of(context).primary,
                       minimumSize: const Size(64, 48),
                       textStyle: const TextStyle(
                         fontSize: 17,
@@ -176,13 +176,13 @@ class OnboardingLearningPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              const Directionality(
+              Directionality(
                 textDirection: TextDirection.ltr,
                 child: Text(
                   'LEARN | ACHIEVE | GROW',
                   maxLines: 1,
                   style: TextStyle(
-                    color: AppColors.darkGold,
+                    color: AppColors.of(context).darkGold,
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.15,
@@ -195,7 +195,7 @@ class OnboardingLearningPage extends StatelessWidget {
                 textAlign: TextAlign.center,
                 textDirection: TextDirection.rtl,
                 style: TextStyle(
-                  color: AppColors.primary,
+                  color: AppColors.of(context).primary,
                   fontSize: compact ? 27 : 31,
                   height: 1.16,
                   fontWeight: FontWeight.w800,
@@ -207,7 +207,7 @@ class OnboardingLearningPage extends StatelessWidget {
                 textAlign: TextAlign.center,
                 textDirection: TextDirection.rtl,
                 style: TextStyle(
-                  color: AppColors.secondaryNavy,
+                  color: AppColors.of(context).secondaryNavy,
                   fontSize: compact ? 15 : 16.5,
                   height: 1.45,
                   fontWeight: FontWeight.w500,
@@ -248,8 +248,8 @@ class OnboardingLearningPage extends StatelessWidget {
                     child: FilledButton(
                       onPressed: onNext,
                       style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.accent,
-                        foregroundColor: AppColors.primary,
+                        backgroundColor: AppColors.of(context).accent,
+                        foregroundColor: AppColors.of(context).primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(17),
                         ),
@@ -311,7 +311,7 @@ class OnboardingStudyToolsPage extends StatelessWidget {
                 child: TextButton(
                   onPressed: onSkip,
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.primary,
+                    foregroundColor: AppColors.of(context).primary,
                     minimumSize: const Size(64, 48),
                     textStyle: const TextStyle(
                       fontSize: 17,
@@ -332,13 +332,13 @@ class OnboardingStudyToolsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 2),
-            const Directionality(
+            Directionality(
               textDirection: TextDirection.ltr,
               child: Text(
                 'LEARN | ACHIEVE | GROW',
                 maxLines: 1,
                 style: TextStyle(
-                  color: AppColors.darkGold,
+                  color: AppColors.of(context).darkGold,
                   fontSize: 10.5,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.15,
@@ -351,7 +351,7 @@ class OnboardingStudyToolsPage extends StatelessWidget {
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
               style: TextStyle(
-                color: AppColors.primary,
+                color: AppColors.of(context).primary,
                 fontSize: compact ? 26 : 30,
                 height: 1.18,
                 fontWeight: FontWeight.w800,
@@ -363,7 +363,7 @@ class OnboardingStudyToolsPage extends StatelessWidget {
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
               style: TextStyle(
-                color: AppColors.secondaryNavy,
+                color: AppColors.of(context).secondaryNavy,
                 fontSize: compact ? 15 : 16.5,
                 height: 1.45,
                 fontWeight: FontWeight.w500,
@@ -440,8 +440,8 @@ class OnboardingStudyToolsPage extends StatelessWidget {
                     child: FilledButton(
                       onPressed: onNext,
                       style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.accent,
-                        foregroundColor: AppColors.primary,
+                        backgroundColor: AppColors.of(context).accent,
+                        foregroundColor: AppColors.of(context).primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(17),
                         ),
@@ -600,8 +600,8 @@ class _IllustrationBadgeLabel extends StatelessWidget {
         maxLines: 2,
         textAlign: TextAlign.center,
         textDirection: TextDirection.rtl,
-        style: const TextStyle(
-          color: AppColors.primary,
+        style: TextStyle(
+          color: AppColors.of(context).primary,
           fontSize: 12,
           height: 1.1,
           fontWeight: FontWeight.w700,
@@ -637,11 +637,14 @@ class OnboardingPageIndicator extends StatelessWidget {
             width: active ? 13 : 11,
             height: active ? 13 : 11,
             decoration: BoxDecoration(
-              color: active ? AppColors.accent : Colors.transparent,
+              color: active ? AppColors.of(context).accent : Colors.transparent,
               shape: BoxShape.circle,
               border: active
                   ? null
-                  : Border.all(color: AppColors.secondary, width: 1.25),
+                  : Border.all(
+                      color: AppColors.of(context).secondary,
+                      width: 1.25,
+                    ),
             ),
           );
         }),
@@ -692,7 +695,7 @@ class OnboardingProgressPage extends StatelessWidget {
                 child: TextButton(
                   onPressed: onSkip,
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.primary,
+                    foregroundColor: AppColors.of(context).primary,
                     minimumSize: const Size(64, 48),
                     textStyle: const TextStyle(
                       fontSize: 17,
@@ -713,13 +716,13 @@ class OnboardingProgressPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 2),
-            const Directionality(
+            Directionality(
               textDirection: TextDirection.ltr,
               child: Text(
                 'LEARN | ACHIEVE | GROW',
                 maxLines: 1,
                 style: TextStyle(
-                  color: AppColors.darkGold,
+                  color: AppColors.of(context).darkGold,
                   fontSize: 10.5,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.15,
@@ -732,7 +735,7 @@ class OnboardingProgressPage extends StatelessWidget {
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
               style: TextStyle(
-                color: AppColors.primary,
+                color: AppColors.of(context).primary,
                 fontSize: compact ? 26 : 30,
                 height: 1.18,
                 fontWeight: FontWeight.w800,
@@ -744,7 +747,7 @@ class OnboardingProgressPage extends StatelessWidget {
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
               style: TextStyle(
-                color: AppColors.secondaryNavy,
+                color: AppColors.of(context).secondaryNavy,
                 fontSize: compact ? 15 : 16.5,
                 height: 1.45,
                 fontWeight: FontWeight.w500,
@@ -819,8 +822,8 @@ class OnboardingProgressPage extends StatelessWidget {
                     child: FilledButton(
                       onPressed: onStart,
                       style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.accent,
-                        foregroundColor: AppColors.primary,
+                        backgroundColor: AppColors.of(context).accent,
+                        foregroundColor: AppColors.of(context).primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(17),
                         ),
@@ -841,7 +844,7 @@ class OnboardingProgressPage extends StatelessWidget {
                 child: TextButton(
                   onPressed: onLogin,
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.secondaryNavy,
+                    foregroundColor: AppColors.of(context).secondaryNavy,
                     minimumSize: const Size(64, 44),
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
@@ -853,15 +856,17 @@ class OnboardingProgressPage extends StatelessWidget {
                         'لديك حساب؟ ',
                         style: TextStyle(
                           fontSize: compact ? 14 : 15,
-                          color: AppColors.textMuted.withValues(alpha: 0.95),
+                          color: AppColors.of(
+                            context,
+                          ).textMuted.withValues(alpha: 0.95),
                         ),
                       ),
-                      const Text(
+                      Text(
                         'تسجيل الدخول',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.darkGold,
+                          color: AppColors.of(context).darkGold,
                         ),
                       ),
                     ],

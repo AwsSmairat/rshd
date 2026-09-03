@@ -35,18 +35,18 @@ class RegisterFormField extends StatelessWidget {
       textInputAction: textInputAction,
       validator: validator,
       textAlign: TextAlign.right,
-      style: const TextStyle(color: AppColors.text, fontSize: 14),
+      style: TextStyle(color: AppColors.of(context).text, fontSize: 14),
       decoration: InputDecoration(
         hintText: hintText,
         errorText: errorText,
         filled: true,
-        fillColor: AppColors.cardWhite,
+        fillColor: AppColors.of(context).cardWhite,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 14,
           vertical: 16,
         ),
         hintStyle: TextStyle(
-          color: AppColors.textMuted.withValues(alpha: 0.75),
+          color: AppColors.of(context).textMuted.withValues(alpha: 0.75),
           fontSize: 14,
         ),
         enabledBorder: OutlineInputBorder(
@@ -55,19 +55,22 @@ class RegisterFormField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
+          borderSide: BorderSide(
+            color: AppColors.of(context).accent,
+            width: 1.5,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: AppColors.of(context).error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: AppColors.of(context).error),
         ),
         prefixIcon: icon == null
             ? null
-            : Icon(icon, color: AppColors.textMuted, size: 22),
+            : Icon(icon, color: AppColors.of(context).textMuted, size: 22),
         prefixIconConstraints: const BoxConstraints(
           minWidth: 48,
           minHeight: 48,

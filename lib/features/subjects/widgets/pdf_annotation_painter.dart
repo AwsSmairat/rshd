@@ -16,7 +16,7 @@ class PdfAnnotationPainter extends CustomPainter {
   final List<Offset>? currentStroke;
   final Rect? previewHighlight;
 
-  static const _defaultColor = AppColors.accent;
+  static const _defaultColor = Color(0xFFD6B56D);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -81,10 +81,10 @@ class PdfAnnotationPainter extends CustomPainter {
     for (final item in notes) {
       final center = Offset(_asDouble(item['x']), _asDouble(item['y']));
       final fill = Paint()
-        ..color = AppColors.primary
+        ..color = AppColors.light.primary
         ..style = PaintingStyle.fill;
       final border = Paint()
-        ..color = AppColors.accent
+        ..color = AppColors.light.accent
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2;
 

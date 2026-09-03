@@ -86,7 +86,7 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
     );
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.of(context).background,
       body: switch (state.status) {
         PrivacyPolicyLoadStatus.initial || PrivacyPolicyLoadStatus.loading =>
           const LoadingWidget(message: 'جاري تحميل سياسة الخصوصية...'),
@@ -128,7 +128,7 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
       onRefresh: () => ref
           .read(privacyPolicyControllerProvider.notifier)
           .load(refresh: true),
-      color: AppColors.secondary,
+      color: AppColors.of(context).secondary,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
@@ -263,9 +263,9 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
       children: [
         Text(
           'الأقسام',
-          style: AppTextStyles.subtitle.copyWith(
+          style: AppTextStyles.subtitleOf(context).copyWith(
             fontWeight: FontWeight.w700,
-            color: AppColors.primary,
+            color: AppColors.of(context).primary,
           ),
         ),
         const Spacer(),
@@ -292,15 +292,17 @@ class _OfflineBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.accent.withValues(alpha: 0.15),
+        color: AppColors.of(context).accent.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.darkGold.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: AppColors.of(context).darkGold.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         children: [
           Icon(
             isLocal ? Icons.article_outlined : Icons.cloud_off_outlined,
-            color: AppColors.darkGold,
+            color: AppColors.of(context).darkGold,
             size: 20,
           ),
           const SizedBox(width: 10),
@@ -309,7 +311,7 @@ class _OfflineBanner extends StatelessWidget {
               isLocal
                   ? 'يتم عرض النسخة المحلية من سياسة الخصوصية.'
                   : 'تعذر الاتصال — يتم عرض النسخة المحلية الاحتياطية.',
-              style: AppTextStyles.body.copyWith(fontSize: 13),
+              style: AppTextStyles.bodyOf(context).copyWith(fontSize: 13),
             ),
           ),
         ],

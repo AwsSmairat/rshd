@@ -14,7 +14,7 @@ class ProtectedContentOverlay extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Material(
-        color: AppColors.primary,
+        color: AppColors.of(context).primary,
         child: SafeArea(
           child: Center(
             child: Padding(
@@ -26,16 +26,20 @@ class ProtectedContentOverlay extends StatelessWidget {
                     width: 72,
                     height: 72,
                     decoration: BoxDecoration(
-                      color: AppColors.white.withValues(alpha: 0.08),
+                      color: AppColors.of(
+                        context,
+                      ).white.withValues(alpha: 0.08),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: AppColors.accent.withValues(alpha: 0.55),
+                        color: AppColors.of(
+                          context,
+                        ).accent.withValues(alpha: 0.55),
                         width: 1.5,
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.shield_outlined,
-                      color: AppColors.accent,
+                      color: AppColors.of(context).accent,
                       size: 36,
                     ),
                   ),
@@ -43,8 +47,8 @@ class ProtectedContentOverlay extends StatelessWidget {
                   Text(
                     'المحتوى محمي',
                     textAlign: TextAlign.center,
-                    style: AppTextStyles.title.copyWith(
-                      color: AppColors.white,
+                    style: AppTextStyles.titleOf(context).copyWith(
+                      color: AppColors.of(context).white,
                       fontWeight: FontWeight.w700,
                       fontSize: 22,
                     ),
@@ -55,8 +59,10 @@ class ProtectedContentOverlay extends StatelessWidget {
                         ? 'تم التقاط لقطة شاشة. المحتوى التعليمي محمي ولا يجوز مشاركته.'
                         : 'أوقف تسجيل أو مشاركة الشاشة لعرض المحتوى.',
                     textAlign: TextAlign.center,
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.white.withValues(alpha: 0.82),
+                    style: AppTextStyles.bodyOf(context).copyWith(
+                      color: AppColors.of(
+                        context,
+                      ).white.withValues(alpha: 0.82),
                       height: 1.5,
                     ),
                   ),

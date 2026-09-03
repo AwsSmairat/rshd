@@ -28,10 +28,12 @@ class LessonAssignmentTile extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 20,
-            backgroundColor: AppColors.accent.withValues(alpha: 0.16),
-            child: const Icon(
+            backgroundColor: AppColors.of(
+              context,
+            ).accent.withValues(alpha: 0.16),
+            child: Icon(
               Icons.assignment_outlined,
-              color: AppColors.darkGold,
+              color: AppColors.of(context).darkGold,
             ),
           ),
           const SizedBox(width: 12),
@@ -41,18 +43,17 @@ class LessonAssignmentTile extends StatelessWidget {
               children: [
                 Text(
                   assignment.title,
-                  style: AppTextStyles.body.copyWith(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                  ),
+                  style: AppTextStyles.bodyOf(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
                 ),
                 if (assignment.dueDate != null &&
                     assignment.dueDate!.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Text(
                     'موعد التسليم: ${_formatDate(assignment.dueDate!)}',
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.textMuted,
+                    style: AppTextStyles.bodyOf(context).copyWith(
+                      color: AppColors.of(context).textMuted,
                       fontSize: 12,
                     ),
                   ),
@@ -64,7 +65,7 @@ class LessonAssignmentTile extends StatelessWidget {
           ),
           Icon(
             Icons.chevron_left_rounded,
-            color: AppColors.primary.withValues(alpha: 0.5),
+            color: AppColors.of(context).primary.withValues(alpha: 0.5),
           ),
         ],
       ),
@@ -99,8 +100,13 @@ class LessonQuizTile extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 20,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.12),
-            child: const Icon(Icons.quiz_outlined, color: AppColors.primary),
+            backgroundColor: AppColors.of(
+              context,
+            ).primary.withValues(alpha: 0.12),
+            child: Icon(
+              Icons.quiz_outlined,
+              color: AppColors.of(context).primary,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -109,10 +115,9 @@ class LessonQuizTile extends StatelessWidget {
               children: [
                 Text(
                   quiz.title,
-                  style: AppTextStyles.body.copyWith(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                  ),
+                  style: AppTextStyles.bodyOf(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
                 ),
                 if (duration != null || questions != null) ...[
                   const SizedBox(height: 6),
@@ -121,8 +126,8 @@ class LessonQuizTile extends StatelessWidget {
                       if (duration != null) '$duration دقيقة',
                       if (questions != null) '$questions سؤال',
                     ].join(' · '),
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.textMuted,
+                    style: AppTextStyles.bodyOf(context).copyWith(
+                      color: AppColors.of(context).textMuted,
                       fontSize: 12,
                     ),
                   ),
@@ -134,7 +139,7 @@ class LessonQuizTile extends StatelessWidget {
           ),
           Icon(
             Icons.chevron_left_rounded,
-            color: AppColors.primary.withValues(alpha: 0.5),
+            color: AppColors.of(context).primary.withValues(alpha: 0.5),
           ),
         ],
       ),

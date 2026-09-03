@@ -66,7 +66,9 @@ class LiquidGlassSurface extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.glassShadow.withValues(alpha: 0.07),
+                color: AppColors.of(
+                  context,
+                ).glassShadow.withValues(alpha: 0.07),
                 blurRadius: 18,
                 offset: const Offset(0, 8),
               ),
@@ -83,12 +85,10 @@ class LiquidGlassSurface extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: resolvedRadius,
-          splashColor: (highlightColor ?? AppColors.accent).withValues(
-            alpha: 0.12,
-          ),
-          highlightColor: (highlightColor ?? AppColors.accent).withValues(
-            alpha: 0.06,
-          ),
+          splashColor: (highlightColor ?? AppColors.of(context).accent)
+              .withValues(alpha: 0.12),
+          highlightColor: (highlightColor ?? AppColors.of(context).accent)
+              .withValues(alpha: 0.06),
           child: surface,
         ),
       );

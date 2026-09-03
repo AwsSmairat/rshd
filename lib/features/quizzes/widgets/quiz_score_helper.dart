@@ -38,7 +38,7 @@ class QuizScoreHelper {
       return const Color(0xFF16A34A);
     }
     if (score >= 60) {
-      return AppColors.darkGold;
+      return AppColors.light.darkGold;
     }
     return const Color(0xFF991B1B);
   }

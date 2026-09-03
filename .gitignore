@@ -47,3 +47,4 @@ app.*.map.json
 # OAuth secrets (copy from *.example files)
 oauth_defines.json
 ios/Flutter/OAuth.xcconfig
+tool/staging_defines.json

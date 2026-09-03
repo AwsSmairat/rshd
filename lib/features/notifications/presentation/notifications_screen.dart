@@ -88,7 +88,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       backgroundColor: Colors.transparent,
       body: RefreshIndicator(
         onRefresh: _refresh,
-        color: AppColors.secondary,
+        color: AppColors.of(context).secondary,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [

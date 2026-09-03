@@ -16,7 +16,7 @@ class QuizzesEmptyState extends StatelessWidget {
       fillOpacity: 0.38,
       borderOpacity: 0.7,
       blurSigma: 16,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.06,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -25,32 +25,32 @@ class QuizzesEmptyState extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.16),
+              color: AppColors.of(context).accent.withValues(alpha: 0.16),
               shape: BoxShape.circle,
             ),
             child: Icon(
               QuizIconHelper.sectionIcon,
-              color: AppColors.darkGold,
+              color: AppColors.of(context).darkGold,
               size: 32,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             'لا توجد اختبارات حالياً',
-            style: AppTextStyles.subtitle.copyWith(
+            style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+              color: AppColors.of(context).primary,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
             'ستظهر الاختبارات هنا عند إضافتها من المدرّس',
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 13,
               height: 1.5,
-              color: AppColors.textMuted,
+              color: AppColors.of(context).textMuted,
             ),
             textAlign: TextAlign.center,
           ),
@@ -133,13 +133,17 @@ class QuizzesErrorState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.error_outline, color: AppColors.error, size: 36),
+          Icon(
+            Icons.error_outline,
+            color: AppColors.of(context).error,
+            size: 36,
+          ),
           const SizedBox(height: 12),
           Text(
             message,
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.text,
+              color: AppColors.of(context).text,
             ),
             textAlign: TextAlign.center,
           ),
@@ -149,8 +153,10 @@ class QuizzesErrorState extends StatelessWidget {
             icon: const Icon(Icons.refresh, size: 18),
             label: const Text('إعادة المحاولة'),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: BorderSide(color: AppColors.accent.withValues(alpha: 0.6)),
+              foregroundColor: AppColors.of(context).primary,
+              side: BorderSide(
+                color: AppColors.of(context).accent.withValues(alpha: 0.6),
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -179,7 +185,7 @@ class _SkeletonBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: AppColors.accent.withValues(alpha: 0.12),
+        color: AppColors.of(context).accent.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(radius),
       ),
     );

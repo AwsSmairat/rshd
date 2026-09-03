@@ -24,7 +24,7 @@ class ContactChannelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = iconColor ?? AppColors.darkGold;
+    final accent = iconColor ?? AppColors.of(context).darkGold;
     final disabled = !isEnabled;
 
     return Semantics(
@@ -37,7 +37,7 @@ class ContactChannelCard extends StatelessWidget {
         fillOpacity: disabled ? 0.22 : 0.38,
         borderOpacity: disabled ? 0.35 : 0.65,
         blurSigma: 16,
-        tintColor: AppColors.accent,
+        tintColor: AppColors.of(context).accent,
         tintOpacity: disabled ? 0.02 : 0.04,
         onTap: isEnabled ? onTap : null,
         child: Row(
@@ -51,7 +51,7 @@ class ContactChannelCard extends StatelessWidget {
               ),
               child: Icon(
                 icon,
-                color: disabled ? AppColors.textMuted : accent,
+                color: disabled ? AppColors.of(context).textMuted : accent,
                 size: 26,
               ),
             ),
@@ -62,19 +62,21 @@ class ContactChannelCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppTextStyles.body.copyWith(
+                    style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textMuted,
+                      color: AppColors.of(context).textMuted,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     value,
-                    style: AppTextStyles.body.copyWith(
+                    style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: disabled ? AppColors.textMuted : AppColors.primary,
+                      color: disabled
+                          ? AppColors.of(context).textMuted
+                          : AppColors.of(context).primary,
                       height: 1.35,
                     ),
                   ),
@@ -84,7 +86,7 @@ class ContactChannelCard extends StatelessWidget {
             if (isEnabled)
               Icon(
                 Icons.chevron_left_rounded,
-                color: AppColors.primary.withValues(alpha: 0.45),
+                color: AppColors.of(context).primary.withValues(alpha: 0.45),
               ),
           ],
         ),

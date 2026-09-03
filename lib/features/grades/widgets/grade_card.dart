@@ -16,7 +16,7 @@ class GradeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gradeValue = grade.gradeValue ?? 0;
-    final accent = _gradeAccent(gradeValue);
+    final accent = _gradeAccent(context, gradeValue);
 
     return LiquidGlassSurface(
       borderRadius: BorderRadius.circular(24),
@@ -24,7 +24,7 @@ class GradeCard extends StatelessWidget {
       fillOpacity: 0.35,
       borderOpacity: 0.65,
       blurSigma: 16,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.04,
       onTap: onTap,
       child: Row(
@@ -40,10 +40,10 @@ class GradeCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         grade.displayTitle,
-                        style: AppTextStyles.title.copyWith(
+                        style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 17,
                           height: 1.3,
-                          color: AppColors.primary,
+                          color: AppColors.of(context).primary,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -60,7 +60,7 @@ class GradeCard extends StatelessWidget {
                           end: Alignment.bottomCenter,
                           colors: [
                             accent.withValues(alpha: 0.45),
-                            AppColors.darkGold,
+                            AppColors.of(context).darkGold,
                           ],
                         ),
                       ),
@@ -72,9 +72,9 @@ class GradeCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     grade.subjectTitle!,
-                    style: AppTextStyles.body.copyWith(
+                    style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 13,
-                      color: AppColors.textMuted,
+                      color: AppColors.of(context).textMuted,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -90,14 +90,16 @@ class GradeCard extends StatelessWidget {
                       Icon(
                         Icons.calendar_today_outlined,
                         size: 13,
-                        color: AppColors.textMuted.withValues(alpha: 0.85),
+                        color: AppColors.of(
+                          context,
+                        ).textMuted.withValues(alpha: 0.85),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         _formatDate(grade.createdAt!),
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
-                          color: AppColors.textMuted,
+                          color: AppColors.of(context).textMuted,
                         ),
                       ),
                     ],
@@ -112,18 +114,18 @@ class GradeCard extends StatelessWidget {
           Icon(
             Icons.arrow_back_ios_new_rounded,
             size: 16,
-            color: AppColors.primary.withValues(alpha: 0.55),
+            color: AppColors.of(context).primary.withValues(alpha: 0.55),
           ),
         ],
       ),
     );
   }
 
-  Color _gradeAccent(double value) {
-    if (value >= 85) return AppColors.darkGold;
-    if (value >= 70) return AppColors.accent;
-    if (value >= 50) return AppColors.secondary;
-    return AppColors.error.withValues(alpha: 0.85);
+  Color _gradeAccent(BuildContext context, double value) {
+    if (value >= 85) return AppColors.of(context).darkGold;
+    if (value >= 70) return AppColors.of(context).accent;
+    if (value >= 50) return AppColors.of(context).secondary;
+    return AppColors.of(context).error.withValues(alpha: 0.85);
   }
 
   String _formatDate(String raw) {
@@ -157,7 +159,9 @@ class _GradeScoreRing extends StatelessWidget {
             child: CircularProgressIndicator(
               value: progress,
               strokeWidth: 4,
-              backgroundColor: AppColors.accent.withValues(alpha: 0.14),
+              backgroundColor: AppColors.of(
+                context,
+              ).accent.withValues(alpha: 0.14),
               color: accent,
               strokeCap: StrokeCap.round,
             ),
@@ -167,18 +171,18 @@ class _GradeScoreRing extends StatelessWidget {
             children: [
               Text(
                 value % 1 == 0 ? '${value.toInt()}' : value.toStringAsFixed(1),
-                style: AppTextStyles.title.copyWith(
+                style: AppTextStyles.titleOf(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.primary,
+                  color: AppColors.of(context).primary,
                   height: 1,
                 ),
               ),
               Text(
                 '%',
-                style: AppTextStyles.body.copyWith(
+                style: AppTextStyles.bodyOf(context).copyWith(
                   fontSize: 10,
-                  color: AppColors.textMuted,
+                  color: AppColors.of(context).textMuted,
                   height: 1,
                 ),
               ),

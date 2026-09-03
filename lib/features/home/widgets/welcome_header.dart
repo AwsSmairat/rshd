@@ -28,14 +28,14 @@ class WelcomeHeader extends StatelessWidget {
       clipper: LoginHeaderWaveClipper(),
       child: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               Color(0xFF091729),
-              AppColors.primary,
-              AppColors.secondaryNavy,
+              AppColors.of(context).primary,
+              AppColors.of(context).secondaryNavy,
             ],
           ),
         ),
@@ -59,13 +59,13 @@ class WelcomeHeader extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.15),
+                    color: AppColors.of(context).accent.withValues(alpha: 0.15),
                   ),
                 ),
                 child: Icon(
                   Icons.menu_book_outlined,
                   size: 28,
-                  color: AppColors.accent.withValues(alpha: 0.3),
+                  color: AppColors.of(context).accent.withValues(alpha: 0.3),
                 ),
               ),
             ),
@@ -86,19 +86,23 @@ class WelcomeHeader extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           text: TextSpan(
-                            style: AppTextStyles.title.copyWith(
+                            style: AppTextStyles.titleOf(context).copyWith(
                               fontSize: metrics.headerTitleFontSize,
                               fontWeight: FontWeight.w700,
                               height: 1.3,
                             ),
                             children: [
-                              const TextSpan(
+                              TextSpan(
                                 text: 'مرحباً، ',
-                                style: TextStyle(color: AppColors.accent),
+                                style: TextStyle(
+                                  color: AppColors.of(context).accent,
+                                ),
                               ),
                               TextSpan(
                                 text: studentName,
-                                style: const TextStyle(color: AppColors.white),
+                                style: TextStyle(
+                                  color: AppColors.of(context).white,
+                                ),
                               ),
                             ],
                           ),
@@ -114,12 +118,14 @@ class WelcomeHeader extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: AppColors.white.withValues(alpha: 0.18),
+                            color: AppColors.of(
+                              context,
+                            ).white.withValues(alpha: 0.18),
                           ),
                         ),
                         child: NotificationBadgeButton(
                           unreadCount: unreadCount,
-                          iconColor: AppColors.white,
+                          iconColor: AppColors.of(context).white,
                         ),
                       ),
                     ],
@@ -127,9 +133,11 @@ class WelcomeHeader extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     'تابع تعلمك اليوم من منصة RSHD',
-                    style: AppTextStyles.body.copyWith(
+                    style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: metrics.isTablet ? 15 : 14,
-                      color: AppColors.white.withValues(alpha: 0.82),
+                      color: AppColors.of(
+                        context,
+                      ).white.withValues(alpha: 0.82),
                     ),
                   ),
                 ],
@@ -147,9 +155,9 @@ class WelcomeHeader extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.accent.withValues(alpha: 0.1),
-                        AppColors.accent,
-                        AppColors.accent.withValues(alpha: 0.1),
+                        AppColors.of(context).accent.withValues(alpha: 0.1),
+                        AppColors.of(context).accent,
+                        AppColors.of(context).accent.withValues(alpha: 0.1),
                       ],
                     ),
                   ),
@@ -179,12 +187,14 @@ class _HeaderIconButton extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: AppColors.white.withValues(alpha: 0.18)),
+        border: Border.all(
+          color: AppColors.of(context).white.withValues(alpha: 0.18),
+        ),
       ),
       child: IconButton(
         tooltip: tooltip,
         onPressed: onTap,
-        icon: Icon(icon, color: AppColors.white, size: 22),
+        icon: Icon(icon, color: AppColors.of(context).white, size: 22),
       ),
     );
   }

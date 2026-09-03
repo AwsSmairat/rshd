@@ -20,14 +20,14 @@ class ContactUsHeader extends StatelessWidget {
       child: Container(
         width: double.infinity,
         constraints: const BoxConstraints(minHeight: 200),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               Color(0xFF091729),
-              AppColors.primary,
-              AppColors.secondaryNavy,
+              AppColors.of(context).primary,
+              AppColors.of(context).secondaryNavy,
             ],
           ),
         ),
@@ -79,10 +79,9 @@ class ContactUsHeader extends StatelessWidget {
                         Expanded(
                           child: Text(
                             'تواصل معنا',
-                            style: AppTextStyles.title.copyWith(
-                              color: Colors.white,
-                              fontSize: 22,
-                            ),
+                            style: AppTextStyles.titleOf(
+                              context,
+                            ).copyWith(color: Colors.white, fontSize: 22),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -92,7 +91,7 @@ class ContactUsHeader extends StatelessWidget {
                     const SizedBox(height: 16),
                     Text(
                       'نحن هنا لمساعدتك — اختر وسيلة التواصل المناسبة',
-                      style: AppTextStyles.body.copyWith(
+                      style: AppTextStyles.bodyOf(context).copyWith(
                         color: Colors.white.withValues(alpha: 0.88),
                         height: 1.5,
                       ),

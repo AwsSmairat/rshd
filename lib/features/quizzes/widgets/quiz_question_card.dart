@@ -28,15 +28,14 @@ class QuizQuestionCard extends StatelessWidget {
       children: [
         Text(
           'السؤال $questionNumber من $totalQuestions',
-          style: AppTextStyles.body.copyWith(
-            color: AppColors.textMuted,
-            fontSize: 13,
-          ),
+          style: AppTextStyles.bodyOf(
+            context,
+          ).copyWith(color: AppColors.of(context).textMuted, fontSize: 13),
         ),
         const SizedBox(height: 12),
         Text(
           question.questionText,
-          style: AppTextStyles.title.copyWith(fontSize: 18),
+          style: AppTextStyles.titleOf(context).copyWith(fontSize: 18),
         ),
         const SizedBox(height: 20),
         ...question.answers.map(

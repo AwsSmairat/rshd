@@ -10,7 +10,7 @@ class InkAnnotationPainter extends CustomPainter {
     required this.annotations,
     required this.metrics,
     this.currentStroke,
-    this.currentColor = AppColors.primary,
+    this.currentColor = const Color(0xFF0B1F3A),
     this.currentStrokeWidth = 3,
     this.currentOpacity = 1,
     this.selectedId,
@@ -82,7 +82,7 @@ class InkAnnotationPainter extends CustomPainter {
     if (selectedId == annotation.id) {
       final bounds = _boundsForPoints(screenPoints);
       final border = Paint()
-        ..color = AppColors.accent
+        ..color = AppColors.light.accent
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5;
       canvas.drawRect(bounds.inflate(4), border);
@@ -129,7 +129,7 @@ class InkAnnotationPainter extends CustomPainter {
   }
 
   Color _parseColor(String? value) {
-    if (value == null || value.isEmpty) return AppColors.accent;
+    if (value == null || value.isEmpty) return AppColors.light.accent;
     final hex = value.replaceAll('#', '');
     if (hex.length == 6) {
       final parsed = int.tryParse('FF$hex', radix: 16);
@@ -139,7 +139,7 @@ class InkAnnotationPainter extends CustomPainter {
       final parsed = int.tryParse(hex, radix: 16);
       if (parsed != null) return Color(parsed);
     }
-    return AppColors.accent;
+    return AppColors.light.accent;
   }
 
   double _asDouble(dynamic value, [double fallback = 0]) {
@@ -163,7 +163,7 @@ class ShapeAnnotationPainter extends CustomPainter {
     required this.metrics,
     this.previewRect,
     this.previewShape = PdfEditorShapeTool.rectangle,
-    this.previewColor = AppColors.primary,
+    this.previewColor = const Color(0xFF0B1F3A),
     this.previewStrokeWidth = 2,
     this.selectedId,
   });
@@ -262,7 +262,7 @@ class ShapeAnnotationPainter extends CustomPainter {
 
     if (selectedId == annotation.id) {
       final border = Paint()
-        ..color = AppColors.accent
+        ..color = AppColors.light.accent
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5;
       canvas.drawRect(rect.inflate(4), border);
@@ -296,13 +296,13 @@ class ShapeAnnotationPainter extends CustomPainter {
   }
 
   Color _parseColor(String? value) {
-    if (value == null || value.isEmpty) return AppColors.primary;
+    if (value == null || value.isEmpty) return AppColors.light.primary;
     final hex = value.replaceAll('#', '');
     if (hex.length == 6) {
       final parsed = int.tryParse('FF$hex', radix: 16);
       if (parsed != null) return Color(parsed);
     }
-    return AppColors.primary;
+    return AppColors.light.primary;
   }
 
   double _asDouble(dynamic value, [double fallback = 0]) {

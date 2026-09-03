@@ -26,21 +26,23 @@ class MaintenanceScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.construction_rounded,
                 size: 72,
-                color: AppColors.accent,
+                color: AppColors.of(context).accent,
               ),
               const SizedBox(height: 24),
               Text(
                 'المنصة تحت الصيانة',
-                style: AppTextStyles.title.copyWith(color: AppColors.primary),
+                style: AppTextStyles.titleOf(
+                  context,
+                ).copyWith(color: AppColors.of(context).primary),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
                 message,
-                style: AppTextStyles.subtitle,
+                style: AppTextStyles.subtitleOf(context),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),

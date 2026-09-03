@@ -11,7 +11,7 @@ class SecurityNoticeCard extends StatelessWidget {
     return LiquidGlassSurface(
       borderRadius: BorderRadius.circular(16),
       padding: const EdgeInsets.all(14),
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.12,
       borderOpacity: 0.55,
       child: Row(
@@ -20,17 +20,17 @@ class SecurityNoticeCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.18),
+              color: AppColors.of(context).accent.withValues(alpha: 0.18),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.verified_user_outlined,
-              color: AppColors.darkGold,
+              color: AppColors.of(context).darkGold,
               size: 22,
             ),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -39,7 +39,7 @@ class SecurityNoticeCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
+                    color: AppColors.of(context).primary,
                   ),
                 ),
                 SizedBox(height: 4),
@@ -48,7 +48,7 @@ class SecurityNoticeCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.5,
-                    color: AppColors.textMuted,
+                    color: AppColors.of(context).textMuted,
                   ),
                 ),
               ],

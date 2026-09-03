@@ -21,7 +21,7 @@ class TermsHeader extends StatelessWidget {
   final String version;
   final String lastUpdated;
 
-  static const _logoAsset = 'assets/images/rshd_logo.png';
+  static const _logoAsset = 'assets/images/rshd_logo_no_bg.png';
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +33,14 @@ class TermsHeader extends StatelessWidget {
       child: Container(
         width: double.infinity,
         constraints: const BoxConstraints(minHeight: 230),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               Color(0xFF091729),
-              AppColors.primary,
-              AppColors.secondaryNavy,
+              AppColors.of(context).primary,
+              AppColors.of(context).secondaryNavy,
             ],
           ),
         ),
@@ -78,9 +78,9 @@ class TermsHeader extends StatelessWidget {
                               button: true,
                               child: IconButton(
                                 onPressed: () => context.pop(),
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.arrow_back_ios_new_rounded,
-                                  color: AppColors.white,
+                                  color: AppColors.of(context).white,
                                   size: 20,
                                 ),
                               ),
@@ -91,7 +91,9 @@ class TermsHeader extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.gavel_outlined,
-                              color: AppColors.accent.withValues(alpha: 0.95),
+                              color: AppColors.of(
+                                context,
+                              ).accent.withValues(alpha: 0.95),
                               size: 22,
                             ),
                             const SizedBox(width: 8),
@@ -100,7 +102,7 @@ class TermsHeader extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: metrics.pageHeaderTitleFontSize,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.white,
+                                color: AppColors.of(context).white,
                               ),
                             ),
                           ],
@@ -114,7 +116,9 @@ class TermsHeader extends StatelessWidget {
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) => Icon(
                               Icons.school_outlined,
-                              color: AppColors.accent.withValues(alpha: 0.8),
+                              color: AppColors.of(
+                                context,
+                              ).accent.withValues(alpha: 0.8),
                               size: 28,
                             ),
                           ),
@@ -125,7 +129,7 @@ class TermsHeader extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     subtitle,
-                    style: AppTextStyles.body.copyWith(
+                    style: AppTextStyles.bodyOf(context).copyWith(
                       color: Colors.white.withValues(alpha: 0.88),
                       fontSize: 14,
                       height: 1.5,
@@ -135,8 +139,10 @@ class TermsHeader extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     'الإصدار: $version',
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.accent.withValues(alpha: 0.95),
+                    style: AppTextStyles.bodyOf(context).copyWith(
+                      color: AppColors.of(
+                        context,
+                      ).accent.withValues(alpha: 0.95),
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -144,7 +150,7 @@ class TermsHeader extends StatelessWidget {
                   ),
                   Text(
                     'آخر تحديث: $lastUpdated',
-                    style: AppTextStyles.body.copyWith(
+                    style: AppTextStyles.bodyOf(context).copyWith(
                       color: Colors.white.withValues(alpha: 0.75),
                       fontSize: 12,
                     ),

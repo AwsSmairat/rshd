@@ -24,12 +24,12 @@ class HelpSupportCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.08),
+                  color: AppColors.of(context).primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.support_agent_outlined,
-                  color: AppColors.primary,
+                  color: AppColors.of(context).primary,
                 ),
               ),
               const SizedBox(width: 12),
@@ -39,16 +39,15 @@ class HelpSupportCard extends StatelessWidget {
                   children: [
                     Text(
                       'الدعم الفني',
-                      style: AppTextStyles.subtitle.copyWith(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                      ),
+                      style: AppTextStyles.subtitleOf(
+                        context,
+                      ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
                     ),
                     Text(
                       'تواصل مع إدارة المنصة للمساعدة التقنية',
-                      style: AppTextStyles.body.copyWith(
+                      style: AppTextStyles.bodyOf(context).copyWith(
                         fontSize: 12,
-                        color: AppColors.textMuted,
+                        color: AppColors.of(context).textMuted,
                       ),
                     ),
                   ],
@@ -62,7 +61,7 @@ class HelpSupportCard extends StatelessWidget {
             icon: const Icon(Icons.chat_bubble_outline, size: 18),
             label: const Text('بدء محادثة الدعم الفني'),
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.of(context).primary,
               minimumSize: const Size(double.infinity, 46),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -98,10 +97,13 @@ class HelpTeacherContactTile extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.15),
+              color: AppColors.of(context).accent.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.person_outline, color: AppColors.darkGold),
+            child: Icon(
+              Icons.person_outline,
+              color: AppColors.of(context).darkGold,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -110,25 +112,24 @@ class HelpTeacherContactTile extends StatelessWidget {
               children: [
                 Text(
                   teacher.subjectTitle,
-                  style: AppTextStyles.body.copyWith(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
-                  ),
+                  style: AppTextStyles.bodyOf(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w800, fontSize: 14),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   teacher.instructorName,
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
-                    color: AppColors.textMuted,
+                    color: AppColors.of(context).textMuted,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'رسالة داخل المنصة',
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 11,
-                    color: AppColors.darkGold,
+                    color: AppColors.of(context).darkGold,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -139,8 +140,8 @@ class HelpTeacherContactTile extends StatelessWidget {
           OutlinedButton(
             onPressed: onContact,
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.darkGold,
-              side: const BorderSide(color: AppColors.darkGold),
+              foregroundColor: AppColors.of(context).darkGold,
+              side: BorderSide(color: AppColors.of(context).darkGold),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),

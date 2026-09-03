@@ -37,16 +37,16 @@ class DashboardSummaryCard extends StatelessWidget {
             ),
             child: Icon(
               icon,
-              color: AppColors.primary,
+              color: AppColors.of(context).primary,
               size: metrics.isTablet ? 20 : 18,
             ),
           ),
           const Spacer(),
           Text(
             value,
-            style: AppTextStyles.title.copyWith(
+            style: AppTextStyles.titleOf(context).copyWith(
               fontSize: metrics.isTablet ? 28 : 24,
-              color: AppColors.text,
+              color: AppColors.of(context).text,
             ),
           ),
           Container(
@@ -54,16 +54,16 @@ class DashboardSummaryCard extends StatelessWidget {
             height: 2,
             margin: const EdgeInsets.only(top: 5, bottom: 5),
             decoration: BoxDecoration(
-              color: AppColors.accent,
+              color: AppColors.of(context).accent,
               borderRadius: BorderRadius.circular(999),
             ),
           ),
           Text(
             label,
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: metrics.isTablet ? 12 : 11,
               height: 1.3,
-              color: AppColors.textMuted,
+              color: AppColors.of(context).textMuted,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

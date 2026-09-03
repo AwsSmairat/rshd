@@ -12,22 +12,28 @@ class LinkedDeviceNotice extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.accent.withValues(alpha: 0.1),
+        color: AppColors.of(context).accent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.accent.withValues(alpha: 0.35)),
+        border: Border.all(
+          color: AppColors.of(context).accent.withValues(alpha: 0.35),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.shield_outlined, color: AppColors.darkGold, size: 22),
+          Icon(
+            Icons.shield_outlined,
+            color: AppColors.of(context).darkGold,
+            size: 22,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               'حسابك مرتبط بهذا الجهاز لحماية المحتوى التعليمي.',
-              style: AppTextStyles.body.copyWith(
+              style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 13,
                 height: 1.45,
-                color: AppColors.primary,
+                color: AppColors.of(context).primary,
               ),
             ),
           ),

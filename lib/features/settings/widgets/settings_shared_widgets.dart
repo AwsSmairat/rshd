@@ -42,12 +42,12 @@ class _SettingsSectionCardState extends State<SettingsSectionCard> {
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(16, 14, 16, _expanded ? 6 : 14),
       decoration: BoxDecoration(
-        color: AppColors.cardWhite,
+        color: AppColors.of(context).cardWhite,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.05),
+            color: AppColors.of(context).primary.withValues(alpha: 0.05),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -71,17 +71,17 @@ class _SettingsSectionCardState extends State<SettingsSectionCard> {
                         children: [
                           Icon(
                             widget.icon,
-                            color: AppColors.darkGold,
+                            color: AppColors.of(context).darkGold,
                             size: 20,
                           ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               widget.title,
-                              style: AppTextStyles.subtitle.copyWith(
+                              style: AppTextStyles.subtitleOf(context).copyWith(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.text,
+                                color: AppColors.of(context).text,
                               ),
                             ),
                           ),
@@ -90,9 +90,9 @@ class _SettingsSectionCardState extends State<SettingsSectionCard> {
                             duration: const Duration(milliseconds: 200),
                             child: Icon(
                               Icons.expand_more,
-                              color: AppColors.textMuted.withValues(
-                                alpha: 0.85,
-                              ),
+                              color: AppColors.of(
+                                context,
+                              ).textMuted.withValues(alpha: 0.85),
                               size: 22,
                             ),
                           ),
@@ -154,16 +154,16 @@ class SettingsItemTile extends StatelessWidget {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: AppColors.background,
+              color: AppColors.of(context).background,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: AppColors.darkGold, size: 18),
+            child: Icon(icon, color: AppColors.of(context).darkGold, size: 18),
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               label,
-              style: AppTextStyles.body.copyWith(
+              style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 height: 1.2,
@@ -174,9 +174,9 @@ class SettingsItemTile extends StatelessWidget {
             Flexible(
               child: Text(
                 value!,
-                style: AppTextStyles.body.copyWith(
+                style: AppTextStyles.bodyOf(context).copyWith(
                   fontSize: 12,
-                  color: valueColor ?? AppColors.textMuted,
+                  color: valueColor ?? AppColors.of(context).textMuted,
                   height: 1.2,
                 ),
                 textAlign: TextAlign.end,
@@ -189,7 +189,7 @@ class SettingsItemTile extends StatelessWidget {
           if (onTap != null)
             Icon(
               Icons.chevron_left,
-              color: AppColors.textMuted.withValues(alpha: 0.8),
+              color: AppColors.of(context).textMuted.withValues(alpha: 0.8),
               size: 18,
             ),
         ],
@@ -240,10 +240,9 @@ Future<T?> showSettingsOptionPicker<T>({
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
               child: Text(
                 title,
-                style: AppTextStyles.subtitle.copyWith(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: AppTextStyles.subtitleOf(
+                  context,
+                ).copyWith(fontSize: 16, fontWeight: FontWeight.w700),
               ),
             ),
             ...options.map((option) {
@@ -251,7 +250,7 @@ Future<T?> showSettingsOptionPicker<T>({
               return ListTile(
                 title: Text(option.label),
                 trailing: selected
-                    ? const Icon(Icons.check, color: AppColors.darkGold)
+                    ? Icon(Icons.check, color: AppColors.of(context).darkGold)
                     : null,
                 onTap: () => Navigator.pop(context, option.value),
               );
@@ -289,7 +288,7 @@ class SettingsSwitchTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     height: 1.2,
@@ -301,8 +300,10 @@ class SettingsSwitchTile extends StatelessWidget {
                 child: Switch.adaptive(
                   value: value,
                   onChanged: onChanged,
-                  activeTrackColor: AppColors.darkGold.withValues(alpha: 0.45),
-                  activeThumbColor: AppColors.darkGold,
+                  activeTrackColor: AppColors.of(
+                    context,
+                  ).darkGold.withValues(alpha: 0.45),
+                  activeThumbColor: AppColors.of(context).darkGold,
                 ),
               ),
             ],

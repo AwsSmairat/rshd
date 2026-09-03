@@ -34,10 +34,23 @@ final platformSettingsProvider =
       PlatformSettingsController.new,
     );
 
+extension ResolvedPlatformSettings on AsyncValue<PlatformSettings> {
+  /// Never throws. Offline / loading / error all fall back to local defaults
+  /// so splash and router redirects cannot hang.
+  PlatformSettings get resolved => asData?.value ?? PlatformSettings.fallback;
+}
+
 class PlatformSettingsController extends AsyncNotifier<PlatformSettings> {
   @override
   Future<PlatformSettings> build() async {
-    return ref.read(platformSettingsRepositoryProvider).fetchPublicSettings();
+    try {
+      return await ref
+          .read(platformSettingsRepositoryProvider)
+          .fetchPublicSettings();
+    } catch (_) {
+      // Public settings must never block app startup (splash hang).
+      return PlatformSettings.fallback;
+    }
   }
 
   Future<void> refresh() async {

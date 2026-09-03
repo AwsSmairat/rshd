@@ -14,11 +14,11 @@ class SubjectCoverPalette {
       case 'medicine':
         return (const Color(0xFF7F1D1D), const Color(0xFF991B1B));
       case 'engineering':
-        return (const Color(0xFF92400E), AppColors.darkGold);
+        return (const Color(0xFF92400E), AppColors.light.darkGold);
       case 'it':
-        return (const Color(0xFF1E3A8A), AppColors.primary);
+        return (const Color(0xFF1E3A8A), AppColors.light.primary);
       default:
-        return (AppColors.secondaryNavy, AppColors.primary);
+        return (AppColors.light.secondaryNavy, AppColors.light.primary);
     }
   }
 }
@@ -42,8 +42,8 @@ class SubjectDetailsHero extends StatelessWidget {
       stretch: true,
       elevation: 0,
       scrolledUnderElevation: 0,
-      backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.white,
+      backgroundColor: AppColors.of(context).primary,
+      foregroundColor: AppColors.of(context).white,
       title: Text(
         subject.title,
         maxLines: 1,
@@ -105,7 +105,7 @@ class SubjectDetailsHero extends StatelessWidget {
                     ),
                     child: Icon(
                       SubjectIconHelper.iconForSubject(subject),
-                      color: AppColors.white,
+                      color: AppColors.of(context).white,
                       size: 28,
                     ),
                   ),
@@ -117,8 +117,8 @@ class SubjectDetailsHero extends StatelessWidget {
                       children: [
                         Text(
                           subject.title,
-                          style: AppTextStyles.title.copyWith(
-                            color: AppColors.white,
+                          style: AppTextStyles.titleOf(context).copyWith(
+                            color: AppColors.of(context).white,
                             fontSize: 24,
                             height: 1.2,
                           ),
@@ -129,7 +129,7 @@ class SubjectDetailsHero extends StatelessWidget {
                           const SizedBox(height: 6),
                           Text(
                             subject.instructor!.name,
-                            style: AppTextStyles.body.copyWith(
+                            style: AppTextStyles.bodyOf(context).copyWith(
                               color: Colors.white.withValues(alpha: 0.88),
                               fontSize: 13,
                             ),
@@ -175,7 +175,7 @@ class SubjectDetailsMetaCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       fillOpacity: 0.3,
       borderOpacity: 0.58,
-      tintColor: AppColors.primary,
+      tintColor: AppColors.of(context).primary,
       tintOpacity: 0.05,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -217,10 +217,9 @@ class SubjectDetailsMetaCard extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               subject.description!,
-              style: AppTextStyles.body.copyWith(
-                color: AppColors.text,
-                height: 1.55,
-              ),
+              style: AppTextStyles.bodyOf(
+                context,
+              ).copyWith(color: AppColors.of(context).text, height: 1.55),
             ),
           ],
           if (subject.isEnrollmentActive &&
@@ -230,17 +229,17 @@ class SubjectDetailsMetaCard extends StatelessWidget {
               children: [
                 Text(
                   'التقدم',
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
+                    color: AppColors.of(context).primary,
                   ),
                 ),
                 const Spacer(),
                 Text(
                   '${subject.progressPercent!.round()}%',
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontWeight: FontWeight.w800,
-                    color: AppColors.darkGold,
+                    color: AppColors.of(context).darkGold,
                   ),
                 ),
               ],
@@ -251,8 +250,10 @@ class SubjectDetailsMetaCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 minHeight: 8,
                 value: (subject.progressPercent! / 100).clamp(0, 1),
-                backgroundColor: AppColors.accent.withValues(alpha: 0.18),
-                color: AppColors.accent,
+                backgroundColor: AppColors.of(
+                  context,
+                ).accent.withValues(alpha: 0.18),
+                color: AppColors.of(context).accent,
               ),
             ),
           ],
@@ -265,25 +266,29 @@ class SubjectDetailsMetaCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: AppColors.accent.withValues(alpha: 0.12),
+                      color: AppColors.of(
+                        context,
+                      ).accent.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: AppColors.accent.withValues(alpha: 0.28),
+                        color: AppColors.of(
+                          context,
+                        ).accent.withValues(alpha: 0.28),
                       ),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           Icons.info_outline_rounded,
-                          color: AppColors.darkGold,
+                          color: AppColors.of(context).darkGold,
                           size: 20,
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             'طلب الشراء قيد المراجعة. يمكنك مشاهدة الفيديوهات المجانية حتى يتم تفعيل المادة.',
-                            style: AppTextStyles.body.copyWith(
-                              color: AppColors.primary,
+                            style: AppTextStyles.bodyOf(context).copyWith(
+                              color: AppColors.of(context).primary,
                               fontWeight: FontWeight.w600,
                               height: 1.45,
                             ),
@@ -308,9 +313,11 @@ class SubjectDetailsMetaCard extends StatelessWidget {
                       isCancelling ? 'جاري الإلغاء...' : 'إلغاء طلب الشراء',
                     ),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.error,
+                      foregroundColor: AppColors.of(context).error,
                       side: BorderSide(
-                        color: AppColors.error.withValues(alpha: 0.45),
+                        color: AppColors.of(
+                          context,
+                        ).error.withValues(alpha: 0.45),
                       ),
                       minimumSize: const Size(double.infinity, 48),
                       shape: RoundedRectangleBorder(
@@ -329,8 +336,8 @@ class SubjectDetailsMetaCard extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 'معاينة المحتوى — الفيديوهات المجانية متاحة للمشاهدة',
-                style: AppTextStyles.body.copyWith(
-                  color: AppColors.textMuted,
+                style: AppTextStyles.bodyOf(context).copyWith(
+                  color: AppColors.of(context).textMuted,
                   fontSize: 13,
                 ),
                 textAlign: TextAlign.center,
@@ -362,27 +369,33 @@ class SubjectDetailsSectionHeader extends StatelessWidget {
           height: 26,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(999),
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [AppColors.accent, AppColors.darkGold],
+              colors: [
+                AppColors.of(context).accent,
+                AppColors.of(context).darkGold,
+              ],
             ),
           ),
         ),
         const SizedBox(width: 12),
-        Text(title, style: AppTextStyles.title.copyWith(fontSize: 20)),
+        Text(
+          title,
+          style: AppTextStyles.titleOf(context).copyWith(fontSize: 20),
+        ),
         if (count != null && count! > 0) ...[
           const SizedBox(width: 10),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.08),
+              color: AppColors.of(context).primary.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text(
               '$count',
-              style: AppTextStyles.body.copyWith(
-                color: AppColors.primary,
+              style: AppTextStyles.bodyOf(context).copyWith(
+                color: AppColors.of(context).primary,
                 fontWeight: FontWeight.w800,
                 fontSize: 12,
               ),
@@ -457,13 +470,13 @@ class _MetaChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: highlighted
-            ? AppColors.accent.withValues(alpha: 0.22)
-            : AppColors.primary.withValues(alpha: 0.06),
+            ? AppColors.of(context).accent.withValues(alpha: 0.22)
+            : AppColors.of(context).primary.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(
           color: highlighted
-              ? AppColors.accent.withValues(alpha: 0.45)
-              : AppColors.primary.withValues(alpha: 0.08),
+              ? AppColors.of(context).accent.withValues(alpha: 0.45)
+              : AppColors.of(context).primary.withValues(alpha: 0.08),
         ),
       ),
       child: Row(
@@ -472,13 +485,17 @@ class _MetaChip extends StatelessWidget {
           Icon(
             icon,
             size: 15,
-            color: highlighted ? AppColors.darkGold : AppColors.secondary,
+            color: highlighted
+                ? AppColors.of(context).darkGold
+                : AppColors.of(context).secondary,
           ),
           const SizedBox(width: 6),
           Text(
             label,
-            style: AppTextStyles.body.copyWith(
-              color: highlighted ? AppColors.primary : AppColors.text,
+            style: AppTextStyles.bodyOf(context).copyWith(
+              color: highlighted
+                  ? AppColors.of(context).primary
+                  : AppColors.of(context).text,
               fontWeight: FontWeight.w700,
               fontSize: 12,
             ),
@@ -509,14 +526,17 @@ class _PurchaseButton extends StatelessWidget {
             gradient: LinearGradient(
               colors: isRequesting
                   ? [
-                      AppColors.accent.withValues(alpha: 0.6),
-                      AppColors.darkGold.withValues(alpha: 0.6),
+                      AppColors.of(context).accent.withValues(alpha: 0.6),
+                      AppColors.of(context).darkGold.withValues(alpha: 0.6),
                     ]
-                  : const [AppColors.accent, AppColors.darkGold],
+                  : [
+                      AppColors.of(context).accent,
+                      AppColors.of(context).darkGold,
+                    ],
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.darkGold.withValues(alpha: 0.28),
+                color: AppColors.of(context).darkGold.withValues(alpha: 0.28),
                 blurRadius: 14,
                 offset: const Offset(0, 6),
               ),

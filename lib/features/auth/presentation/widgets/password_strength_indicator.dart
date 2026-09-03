@@ -25,10 +25,10 @@ class PasswordStrengthIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final strength = evaluate(password);
     final (label, color, progress) = switch (strength) {
-      PasswordStrength.empty => ('', AppColors.textMuted, 0.0),
-      PasswordStrength.weak => ('ضعيفة', AppColors.error, 0.33),
-      PasswordStrength.fair => ('متوسطة', AppColors.darkGold, 0.66),
-      PasswordStrength.strong => ('قوية', AppColors.secondary, 1.0),
+      PasswordStrength.empty => ('', AppColors.of(context).textMuted, 0.0),
+      PasswordStrength.weak => ('ضعيفة', AppColors.of(context).error, 0.33),
+      PasswordStrength.fair => ('متوسطة', AppColors.of(context).darkGold, 0.66),
+      PasswordStrength.strong => ('قوية', AppColors.of(context).secondary, 1.0),
     };
 
     if (strength == PasswordStrength.empty) {
@@ -43,7 +43,7 @@ class PasswordStrengthIndicator extends StatelessWidget {
           child: LinearProgressIndicator(
             value: progress,
             minHeight: 6,
-            backgroundColor: AppColors.background,
+            backgroundColor: AppColors.of(context).background,
             color: color,
           ),
         ),

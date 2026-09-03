@@ -135,14 +135,18 @@ class _AnnouncementDetailsScreenState
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: AppColors.cardWhite,
+                    color: AppColors.of(context).cardWhite,
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(
-                      color: AppColors.accent.withValues(alpha: 0.28),
+                      color: AppColors.of(
+                        context,
+                      ).accent.withValues(alpha: 0.28),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.06),
+                        color: AppColors.of(
+                          context,
+                        ).primary.withValues(alpha: 0.06),
                         blurRadius: 14,
                         offset: const Offset(0, 6),
                       ),
@@ -161,11 +165,11 @@ class _AnnouncementDetailsScreenState
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
                                 return Container(
-                                  color: AppColors.background,
+                                  color: AppColors.of(context).background,
                                   alignment: Alignment.center,
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.broken_image_outlined,
-                                    color: AppColors.textMuted,
+                                    color: AppColors.of(context).textMuted,
                                   ),
                                 );
                               },
@@ -179,9 +183,9 @@ class _AnnouncementDetailsScreenState
                           Expanded(
                             child: Text(
                               announcement.title,
-                              style: AppTextStyles.title.copyWith(
+                              style: AppTextStyles.titleOf(context).copyWith(
                                 fontSize: 22,
-                                color: AppColors.primary,
+                                color: AppColors.of(context).primary,
                               ),
                             ),
                           ),
@@ -205,17 +209,17 @@ class _AnnouncementDetailsScreenState
                       const SizedBox(height: 8),
                       Text(
                         'نص الإعلان',
-                        style: AppTextStyles.subtitle.copyWith(
+                        style: AppTextStyles.subtitleOf(context).copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          color: AppColors.of(context).primary,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         announcement.body ?? '—',
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.bodyOf(context).copyWith(
                           height: 1.6,
-                          color: AppColors.text,
+                          color: AppColors.of(context).text,
                         ),
                       ),
                     ],
@@ -252,13 +256,12 @@ class _InfoRow extends StatelessWidget {
         children: [
           Text(
             label,
-            style: AppTextStyles.body.copyWith(
-              color: AppColors.textMuted,
-              fontSize: 13,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(color: AppColors.of(context).textMuted, fontSize: 13),
           ),
           const SizedBox(height: 4),
-          Text(value, style: AppTextStyles.body),
+          Text(value, style: AppTextStyles.bodyOf(context)),
         ],
       ),
     );

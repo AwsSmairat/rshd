@@ -9,16 +9,17 @@ class LiquidGlassBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     return Stack(
       fit: StackFit.expand,
       children: [
-        const DecoratedBox(
+        DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFFF6F1E7), Color(0xFFEDE4D4), Color(0xFFE8EEF6)],
-              stops: [0.0, 0.42, 1.0],
+              colors: colors.backgroundGradient,
+              stops: const [0.0, 0.42, 1.0],
             ),
           ),
         ),
@@ -27,7 +28,7 @@ class LiquidGlassBackground extends StatelessWidget {
           right: -70,
           child: _GlassBlob(
             size: 280,
-            color: AppColors.accent.withValues(alpha: 0.26),
+            color: colors.accent.withValues(alpha: 0.26),
           ),
         ),
         Positioned(
@@ -35,7 +36,7 @@ class LiquidGlassBackground extends StatelessWidget {
           left: -50,
           child: _GlassBlob(
             size: 210,
-            color: AppColors.secondary.withValues(alpha: 0.16),
+            color: colors.secondary.withValues(alpha: 0.16),
           ),
         ),
         Positioned(
@@ -43,7 +44,7 @@ class LiquidGlassBackground extends StatelessWidget {
           right: 20,
           child: _GlassBlob(
             size: 190,
-            color: AppColors.primary.withValues(alpha: 0.1),
+            color: colors.primary.withValues(alpha: 0.1),
           ),
         ),
         Positioned(
@@ -51,7 +52,7 @@ class LiquidGlassBackground extends StatelessWidget {
           left: -30,
           child: _GlassBlob(
             size: 240,
-            color: AppColors.darkGold.withValues(alpha: 0.14),
+            color: colors.darkGold.withValues(alpha: 0.14),
           ),
         ),
         child,

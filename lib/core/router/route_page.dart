@@ -7,7 +7,7 @@ import '../widgets/opaque_route_surface.dart';
 Page<void> buildAppRoutePage({
   required GoRouterState state,
   required Widget child,
-  Color backgroundColor = const Color(0xFFF6F1E7),
+  Color? backgroundColor,
 }) {
   return MaterialPage<void>(
     key: state.pageKey,

@@ -32,7 +32,7 @@ class LoginHeaderWaveClipper extends CustomClipper<Path> {
 class LoginHeader extends StatelessWidget {
   const LoginHeader({super.key});
 
-  static const _logoAsset = 'assets/images/rshd_logo.png';
+  static const _logoAsset = 'assets/images/rshd_logo_no_bg.png';
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +42,15 @@ class LoginHeader extends StatelessWidget {
       clipper: LoginHeaderWaveClipper(),
       child: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF091729), AppColors.primary, AppColors.secondary],
+            colors: [
+              Color(0xFF091729),
+              AppColors.of(context).primary,
+              AppColors.of(context).secondary,
+            ],
           ),
         ),
         child: Stack(
@@ -69,13 +73,13 @@ class LoginHeader extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.12),
+                    color: AppColors.of(context).accent.withValues(alpha: 0.12),
                   ),
                 ),
                 child: Icon(
                   Icons.menu_book_outlined,
                   size: metrics.isLargeTablet ? 38 : 32,
-                  color: AppColors.accent.withValues(alpha: 0.35),
+                  color: AppColors.of(context).accent.withValues(alpha: 0.35),
                 ),
               ),
             ),
@@ -95,7 +99,9 @@ class LoginHeader extends StatelessWidget {
                     return Icon(
                       Icons.medical_services_outlined,
                       size: metrics.headerLogoHeight * 0.6,
-                      color: AppColors.accent.withValues(alpha: 0.8),
+                      color: AppColors.of(
+                        context,
+                      ).accent.withValues(alpha: 0.8),
                     );
                   },
                 ),

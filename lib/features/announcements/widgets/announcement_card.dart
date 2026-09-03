@@ -41,10 +41,9 @@ class AnnouncementCard extends StatelessWidget {
               children: [
                 Text(
                   announcement.title,
-                  style: AppTextStyles.title.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: AppTextStyles.titleOf(
+                    context,
+                  ).copyWith(fontSize: 16, fontWeight: FontWeight.w800),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -53,8 +52,8 @@ class AnnouncementCard extends StatelessWidget {
                     announcement.body!.trim().isNotEmpty)
                   Text(
                     announcement.shortBody,
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.textMuted,
+                    style: AppTextStyles.bodyOf(context).copyWith(
+                      color: AppColors.of(context).textMuted,
                       fontSize: 13,
                       height: 1.4,
                     ),
@@ -72,9 +71,9 @@ class AnnouncementCard extends StatelessWidget {
                         announcement.subjectTitle!.isNotEmpty)
                       Text(
                         announcement.subjectTitle!,
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
-                          color: AppColors.secondary,
+                          color: AppColors.of(context).secondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -82,9 +81,9 @@ class AnnouncementCard extends StatelessWidget {
                         announcement.createdAt!.isNotEmpty)
                       Text(
                         _formatDate(announcement.createdAt!),
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 11,
-                          color: AppColors.textMuted,
+                          color: AppColors.of(context).textMuted,
                         ),
                       ),
                   ],
@@ -96,7 +95,7 @@ class AnnouncementCard extends StatelessWidget {
           Icon(
             Icons.arrow_back_ios_new_rounded,
             size: 14,
-            color: AppColors.primary.withValues(alpha: 0.45),
+            color: AppColors.of(context).primary.withValues(alpha: 0.45),
           ),
         ],
       ),
@@ -130,10 +129,10 @@ class _AnnouncementThumb extends StatelessWidget {
           return Container(
             width: 72,
             height: 72,
-            color: AppColors.accent.withValues(alpha: 0.12),
-            child: const Icon(
+            color: AppColors.of(context).accent.withValues(alpha: 0.12),
+            child: Icon(
               Icons.campaign_outlined,
-              color: AppColors.darkGold,
+              color: AppColors.of(context).darkGold,
             ),
           );
         },

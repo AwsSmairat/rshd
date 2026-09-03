@@ -55,7 +55,7 @@ class DepartmentCard extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             title,
-            style: AppTextStyles.subtitle.copyWith(
+            style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: titleColor,
@@ -64,10 +64,10 @@ class DepartmentCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             subtitle,
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 12,
               height: 1.45,
-              color: AppColors.textMuted,
+              color: AppColors.of(context).textMuted,
             ),
             maxLines: 3,
             overflow: TextOverflow.ellipsis,

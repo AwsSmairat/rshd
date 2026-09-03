@@ -90,7 +90,7 @@ class ContinueLearningCard extends StatelessWidget {
       padding: EdgeInsets.all(compact ? 14 : 16),
       fillOpacity: 0.26,
       borderOpacity: 0.55,
-      tintColor: AppColors.primary,
+      tintColor: AppColors.of(context).primary,
       tintOpacity: 0.07,
       blurSigma: 20,
       child: Column(
@@ -108,7 +108,7 @@ class ContinueLearningCard extends StatelessWidget {
                   children: [
                     Text(
                       subject.title,
-                      style: AppTextStyles.body.copyWith(
+                      style: AppTextStyles.bodyOf(context).copyWith(
                         fontWeight: FontWeight.w800,
                         fontSize: compact ? 14 : 15,
                       ),
@@ -120,9 +120,9 @@ class ContinueLearningCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         instructorName,
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
-                          color: AppColors.textMuted,
+                          color: AppColors.of(context).textMuted,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -145,17 +145,18 @@ class ContinueLearningCard extends StatelessWidget {
             child: LinearProgressIndicator(
               minHeight: 6,
               value: progress / 100,
-              backgroundColor: AppColors.primary.withValues(alpha: 0.08),
-              color: AppColors.accent,
+              backgroundColor: AppColors.of(
+                context,
+              ).primary.withValues(alpha: 0.08),
+              color: AppColors.of(context).accent,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             '${progress.round()}% مكتمل',
-            style: AppTextStyles.body.copyWith(
-              fontSize: 11,
-              color: AppColors.secondary,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 11, color: AppColors.of(context).secondary),
           ),
           const SizedBox(height: 12),
           Align(
@@ -166,8 +167,8 @@ class ContinueLearningCard extends StatelessWidget {
                 extra: subject,
               ),
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.white,
+                backgroundColor: AppColors.of(context).primary,
+                foregroundColor: AppColors.of(context).white,
                 padding: EdgeInsets.symmetric(
                   horizontal: compact ? 14 : 18,
                   vertical: compact ? 8 : 10,
@@ -211,7 +212,7 @@ class _SubjectThumb extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.glassShadow.withValues(alpha: 0.06),
+            color: AppColors.of(context).glassShadow.withValues(alpha: 0.06),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -222,16 +223,16 @@ class _SubjectThumb extends StatelessWidget {
           ? Image.network(
               url,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => _fallback(),
+              errorBuilder: (context, error, stackTrace) => _fallback(context),
             )
-          : _fallback(),
+          : _fallback(context),
     );
   }
 
-  Widget _fallback() {
+  Widget _fallback(BuildContext context) {
     return Icon(
       Icons.play_lesson_outlined,
-      color: AppColors.secondary,
+      color: AppColors.of(context).secondary,
       size: size * 0.44,
     );
   }

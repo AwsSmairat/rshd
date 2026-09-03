@@ -92,7 +92,7 @@ class _QuizDetailsScreenState extends ConsumerState<QuizDetailsScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.of(context).background,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

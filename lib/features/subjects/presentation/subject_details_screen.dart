@@ -131,7 +131,9 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.of(context).error,
+            ),
             child: const Text('إلغاء الطلب'),
           ),
         ],
@@ -235,7 +237,7 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.of(context).background,
       body: _buildBody(detailsState, lessonsState, subject),
     );
   }
@@ -327,7 +329,7 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
             child: Text(
               'لا توجد أجزاء في هذه المادة',
               style: TextStyle(
-                color: AppColors.textMuted.withValues(alpha: 0.9),
+                color: AppColors.of(context).textMuted.withValues(alpha: 0.9),
               ),
             ),
           ),

@@ -161,7 +161,7 @@ void main() {
     await tester.tap(find.text('التالي'));
     await tester.pumpAndSettle();
 
-    expect(indicatorDecoration(tester, 1).color, AppColors.accent);
+    expect(indicatorDecoration(tester, 1).color, AppColors.light.accent);
     expect(indicatorDecoration(tester, 0).color, Colors.transparent);
   });
 
@@ -211,7 +211,7 @@ void main() {
       ),
       findsWidgets,
     );
-    expect(indicatorDecoration(tester, 1).color, AppColors.accent);
+    expect(indicatorDecoration(tester, 1).color, AppColors.light.accent);
     expect(indicatorDecoration(tester, 0).color, Colors.transparent);
     expect(indicatorDecoration(tester, 2).color, Colors.transparent);
   });
@@ -220,7 +220,7 @@ void main() {
     await pumpOnboarding(tester);
     await goToPage(tester, 2);
 
-    expect(indicatorDecoration(tester, 2).color, AppColors.accent);
+    expect(indicatorDecoration(tester, 2).color, AppColors.light.accent);
     expect(find.text('ابدأ الآن'), findsOneWidget);
   });
 
@@ -241,7 +241,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('كل أدواتك للدراسة… بمكان واحد'), findsOneWidget);
-    expect(indicatorDecoration(tester, 1).color, AppColors.accent);
+    expect(indicatorDecoration(tester, 1).color, AppColors.light.accent);
   });
 
   testWidgets('swipe back from page two to page one works', (tester) async {
@@ -252,7 +252,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('تعلّم بطريقة أذكى'), findsOneWidget);
-    expect(indicatorDecoration(tester, 0).color, AppColors.accent);
+    expect(indicatorDecoration(tester, 0).color, AppColors.light.accent);
   });
 
   testWidgets('system back from page two returns to page one', (tester) async {
@@ -264,7 +264,7 @@ void main() {
 
     expect(handled, isTrue);
     expect(find.text('تعلّم بطريقة أذكى'), findsOneWidget);
-    expect(indicatorDecoration(tester, 0).color, AppColors.accent);
+    expect(indicatorDecoration(tester, 0).color, AppColors.light.accent);
   });
 
   testWidgets('page two has no network images', (tester) async {
@@ -310,7 +310,7 @@ void main() {
     await tester.tap(find.text('التالي'));
     await tester.pumpAndSettle();
     expect(find.text('كل أدواتك للدراسة… بمكان واحد'), findsOneWidget);
-    expect(indicatorDecoration(tester, 1).color, AppColors.accent);
+    expect(indicatorDecoration(tester, 1).color, AppColors.light.accent);
   });
 
   testWidgets('page three renders title description and illustration', (
@@ -337,7 +337,7 @@ void main() {
     await pumpOnboarding(tester);
     await goToPage(tester, 2);
 
-    expect(indicatorDecoration(tester, 2).color, AppColors.accent);
+    expect(indicatorDecoration(tester, 2).color, AppColors.light.accent);
     expect(indicatorDecoration(tester, 0).color, Colors.transparent);
     expect(indicatorDecoration(tester, 1).color, Colors.transparent);
   });
@@ -379,7 +379,7 @@ void main() {
 
     expect(handled, isTrue);
     expect(find.text('كل أدواتك للدراسة… بمكان واحد'), findsOneWidget);
-    expect(indicatorDecoration(tester, 1).color, AppColors.accent);
+    expect(indicatorDecoration(tester, 1).color, AppColors.light.accent);
   });
 
   testWidgets('swipe back from page three to page two works', (tester) async {
@@ -390,7 +390,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('كل أدواتك للدراسة… بمكان واحد'), findsOneWidget);
-    expect(indicatorDecoration(tester, 1).color, AppColors.accent);
+    expect(indicatorDecoration(tester, 1).color, AppColors.light.accent);
   });
 
   testWidgets('page three skip saves completion and navigates to login', (

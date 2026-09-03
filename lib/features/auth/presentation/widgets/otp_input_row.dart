@@ -90,7 +90,7 @@ class OtpInputRowState extends State<OtpInputRow> {
                     style: TextStyle(
                       fontSize: fontSize,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.text,
+                      color: AppColors.of(context).text,
                       height: 1.1,
                     ),
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -106,13 +106,15 @@ class OtpInputRowState extends State<OtpInputRow> {
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: AppColors.accent.withValues(alpha: 0.45),
+                          color: AppColors.of(
+                            context,
+                          ).accent.withValues(alpha: 0.45),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: AppColors.primary,
+                        borderSide: BorderSide(
+                          color: AppColors.of(context).primary,
                           width: 1.5,
                         ),
                       ),

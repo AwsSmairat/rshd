@@ -15,7 +15,7 @@ class GradesEmptyState extends StatelessWidget {
       fillOpacity: 0.35,
       borderOpacity: 0.65,
       blurSigma: 16,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.06,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -24,32 +24,32 @@ class GradesEmptyState extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.16),
+              color: AppColors.of(context).accent.withValues(alpha: 0.16),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.emoji_events_outlined,
-              color: AppColors.darkGold,
+              color: AppColors.of(context).darkGold,
               size: 32,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             'لا توجد درجات حالياً',
-            style: AppTextStyles.subtitle.copyWith(
+            style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+              color: AppColors.of(context).primary,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
             'ستظهر درجاتك هنا بعد تقييم الواجبات والاختبارات',
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 13,
               height: 1.5,
-              color: AppColors.textMuted,
+              color: AppColors.of(context).textMuted,
             ),
             textAlign: TextAlign.center,
           ),

@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolePermissionSeeder::class,
             BaseUsersSeeder::class,
+            LegalDocumentSeeder::class,
             // DemoDataSeeder intentionally not called — use only when needed for local demos.
         ]);
     }

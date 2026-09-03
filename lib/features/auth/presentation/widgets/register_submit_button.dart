@@ -28,14 +28,14 @@ class RegisterSubmitButton extends StatelessWidget {
             gradient: LinearGradient(
               colors: isLoading
                   ? [
-                      AppColors.primary.withValues(alpha: 0.65),
+                      AppColors.of(context).primary.withValues(alpha: 0.65),
                       const Color(0xFF102A4C).withValues(alpha: 0.65),
                     ]
-                  : const [AppColors.primary, Color(0xFF102A4C)],
+                  : [AppColors.of(context).primary, Color(0xFF102A4C)],
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.22),
+                color: AppColors.of(context).primary.withValues(alpha: 0.22),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
@@ -43,12 +43,12 @@ class RegisterSubmitButton extends StatelessWidget {
           ),
           child: Center(
             child: isLoading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 22,
                     height: 22,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: AppColors.accent,
+                      color: AppColors.of(context).accent,
                     ),
                   )
                 : Row(
@@ -56,16 +56,16 @@ class RegisterSubmitButton extends StatelessWidget {
                     children: [
                       Text(
                         label,
-                        style: const TextStyle(
-                          color: AppColors.accent,
+                        style: TextStyle(
+                          color: AppColors.of(context).accent,
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Icon(
+                      Icon(
                         Icons.person_add_alt_1_outlined,
-                        color: AppColors.accent,
+                        color: AppColors.of(context).accent,
                         size: 20,
                       ),
                     ],

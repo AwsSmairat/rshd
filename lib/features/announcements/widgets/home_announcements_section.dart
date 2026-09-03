@@ -36,7 +36,7 @@ class HomeAnnouncementsSection extends StatelessWidget {
               width: 4,
               height: 20,
               decoration: BoxDecoration(
-                color: AppColors.accent,
+                color: AppColors.of(context).accent,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -48,8 +48,8 @@ class HomeAnnouncementsSection extends StatelessWidget {
               padding: const EdgeInsets.only(top: 8),
               child: Text(
                 'تعذر تحميل بعض الإعلانات',
-                style: AppTextStyles.body.copyWith(
-                  color: AppColors.textMuted,
+                style: AppTextStyles.bodyOf(context).copyWith(
+                  color: AppColors.of(context).textMuted,
                   fontSize: 12,
                 ),
                 textAlign: TextAlign.center,

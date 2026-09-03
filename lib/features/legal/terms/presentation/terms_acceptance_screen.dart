@@ -44,7 +44,7 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.of(context).background,
       appBar: AppBar(
         title: const Text('تحديث الشروط والأحكام'),
         automaticallyImplyLeading: false,
@@ -58,7 +58,7 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.cardWhite,
+                  color: AppColors.of(context).cardWhite,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: const Color(0xFFE5E7EB)),
                 ),
@@ -67,31 +67,31 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
                   children: [
                     Text(
                       'تم تحديث الشروط والأحكام',
-                      style: AppTextStyles.title.copyWith(
+                      style: AppTextStyles.titleOf(context).copyWith(
                         fontSize: 20,
-                        color: AppColors.primary,
+                        color: AppColors.of(context).primary,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'يرجى قراءة النسخة الحالية والموافقة عليها لمتابعة استخدام التطبيق.',
-                      style: AppTextStyles.body,
+                      style: AppTextStyles.bodyOf(context),
                     ),
                     const SizedBox(height: 12),
                     if (gate.status != null) ...[
                       Text(
                         'الإصدار الحالي: ${gate.status!.currentVersion}',
-                        style: AppTextStyles.body.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: AppTextStyles.bodyOf(
+                          context,
+                        ).copyWith(fontWeight: FontWeight.w600),
                       ),
                       if (gate.status!.lastUpdated != null &&
                           gate.status!.lastUpdated!.isNotEmpty)
                         Text(
                           'آخر تحديث: ${gate.status!.lastUpdated}',
-                          style: AppTextStyles.body.copyWith(
-                            color: AppColors.textMuted,
-                          ),
+                          style: AppTextStyles.bodyOf(
+                            context,
+                          ).copyWith(color: AppColors.of(context).textMuted),
                         ),
                     ],
                   ],
@@ -104,8 +104,8 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
                 label: const Text('عرض الشروط والأحكام'),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 48),
-                  foregroundColor: AppColors.darkGold,
-                  side: const BorderSide(color: AppColors.darkGold),
+                  foregroundColor: AppColors.of(context).darkGold,
+                  side: BorderSide(color: AppColors.of(context).darkGold),
                 ),
               ),
               const SizedBox(height: 16),
@@ -128,7 +128,9 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
                 const SizedBox(height: 12),
                 Text(
                   gate.errorMessage!,
-                  style: AppTextStyles.body.copyWith(color: Colors.red),
+                  style: AppTextStyles.bodyOf(
+                    context,
+                  ).copyWith(color: Colors.red),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -136,9 +138,9 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
               if (document != null)
                 Text(
                   'النسخة المعروضة: ${document.version}',
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
-                    color: AppColors.textMuted,
+                    color: AppColors.of(context).textMuted,
                   ),
                   textAlign: TextAlign.center,
                 ),

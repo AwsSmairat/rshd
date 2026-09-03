@@ -65,7 +65,7 @@ class _AnnouncementsScreenState extends ConsumerState<AnnouncementsScreen> {
       backgroundColor: Colors.transparent,
       body: RefreshIndicator(
         onRefresh: _refresh,
-        color: AppColors.secondary,
+        color: AppColors.of(context).secondary,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
@@ -121,14 +121,14 @@ class _AnnouncementsScreenState extends ConsumerState<AnnouncementsScreen> {
                       width: 4,
                       height: 20,
                       decoration: BoxDecoration(
-                        color: AppColors.accent,
+                        color: AppColors.of(context).accent,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
                     const SizedBox(width: 10),
                     Text(
                       'آخر الإعلانات',
-                      style: AppTextStyles.subtitle.copyWith(
+                      style: AppTextStyles.subtitleOf(context).copyWith(
                         fontSize: metrics.sectionTitleFontSize,
                         fontWeight: FontWeight.w700,
                       ),
@@ -136,9 +136,9 @@ class _AnnouncementsScreenState extends ConsumerState<AnnouncementsScreen> {
                     const Spacer(),
                     Text(
                       '${state.announcements.length} إعلان',
-                      style: AppTextStyles.body.copyWith(
+                      style: AppTextStyles.bodyOf(context).copyWith(
                         fontSize: 12,
-                        color: AppColors.textMuted,
+                        color: AppColors.of(context).textMuted,
                       ),
                     ),
                   ],

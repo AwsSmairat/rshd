@@ -77,8 +77,11 @@ class ProfilePhotoCard extends StatelessWidget {
                 height: 110,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.background,
-                  border: Border.all(color: AppColors.accent, width: 2),
+                  color: AppColors.of(context).background,
+                  border: Border.all(
+                    color: AppColors.of(context).accent,
+                    width: 2,
+                  ),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: profile.avatarUrl != null
@@ -86,7 +89,9 @@ class ProfilePhotoCard extends StatelessWidget {
                     : Icon(
                         Icons.person_outline,
                         size: 48,
-                        color: AppColors.textMuted.withValues(alpha: 0.7),
+                        color: AppColors.of(
+                          context,
+                        ).textMuted.withValues(alpha: 0.7),
                       ),
               ),
               Positioned(
@@ -95,8 +100,8 @@ class ProfilePhotoCard extends StatelessWidget {
                 child: Container(
                   width: 32,
                   height: 32,
-                  decoration: const BoxDecoration(
-                    color: AppColors.darkGold,
+                  decoration: BoxDecoration(
+                    color: AppColors.of(context).darkGold,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -113,9 +118,9 @@ class ProfilePhotoCard extends StatelessWidget {
                       color: Colors.black.withValues(alpha: 0.35),
                       shape: BoxShape.circle,
                     ),
-                    child: const Center(
+                    child: Center(
                       child: CircularProgressIndicator(
-                        color: AppColors.accent,
+                        color: AppColors.of(context).accent,
                         strokeWidth: 2,
                       ),
                     ),
@@ -126,18 +131,17 @@ class ProfilePhotoCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             'يمكنك تغيير صورتك الشخصية',
-            style: AppTextStyles.body.copyWith(
-              fontSize: 13,
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
           OutlinedButton(
             onPressed: isUploading ? null : () => _showPicker(context),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.darkGold,
-              side: const BorderSide(color: AppColors.darkGold),
+              foregroundColor: AppColors.of(context).darkGold,
+              side: BorderSide(color: AppColors.of(context).darkGold),
               minimumSize: const Size(double.infinity, 44),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -241,14 +245,12 @@ class SecuritySettingsCard extends StatelessWidget {
     required this.onChangePassword,
     required this.onDevices,
     required this.onLogoutAllDevices,
-    required this.onTwoFactorTap,
   });
 
   final StudentProfileModel profile;
   final VoidCallback onChangePassword;
   final VoidCallback onDevices;
   final VoidCallback onLogoutAllDevices;
-  final VoidCallback onTwoFactorTap;
 
   @override
   Widget build(BuildContext context) {
@@ -261,12 +263,6 @@ class SecuritySettingsCard extends StatelessWidget {
             icon: Icons.vpn_key_outlined,
             label: 'تغيير كلمة المرور',
             onTap: onChangePassword,
-          ),
-          SettingsItemTile(
-            icon: Icons.security_outlined,
-            label: 'المصادقة الثنائية',
-            value: 'غير مفعّلة',
-            onTap: onTwoFactorTap,
           ),
           SettingsItemTile(
             icon: Icons.devices_outlined,
@@ -284,9 +280,9 @@ class SecuritySettingsCard extends StatelessWidget {
               padding: const EdgeInsets.only(top: 4, bottom: 4),
               child: Text(
                 'آخر تحديث لكلمة المرور: ${profile.passwordSetAt!.split('T').first.replaceAll('-', '/')}',
-                style: AppTextStyles.body.copyWith(
+                style: AppTextStyles.bodyOf(context).copyWith(
                   fontSize: 12,
-                  color: AppColors.textMuted,
+                  color: AppColors.of(context).textMuted,
                 ),
               ),
             ),
@@ -406,7 +402,11 @@ class AppPreferencesCard extends StatelessWidget {
             onTap: () => _pickLanguage(context),
           ),
           SettingsItemTile(
-            icon: Icons.light_mode_outlined,
+            icon: preferences.theme == 'dark'
+                ? Icons.dark_mode_outlined
+                : preferences.theme == 'system'
+                ? Icons.brightness_auto_outlined
+                : Icons.light_mode_outlined,
             label: 'الوضع',
             value: _themeLabel(preferences.theme),
             onTap: () => _pickTheme(context),
@@ -723,7 +723,7 @@ class _SupportChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.background,
+      color: AppColors.of(context).background,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -737,14 +737,13 @@ class _SupportChip extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Icon(icon, color: AppColors.darkGold, size: 24),
+              Icon(icon, color: AppColors.of(context).darkGold, size: 24),
               const SizedBox(height: 8),
               Text(
                 label,
-                style: AppTextStyles.body.copyWith(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: AppTextStyles.bodyOf(
+                  context,
+                ).copyWith(fontSize: 12, fontWeight: FontWeight.w600),
                 textAlign: TextAlign.center,
               ),
             ],

@@ -25,7 +25,7 @@ class NotificationCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       padding: const EdgeInsets.all(16),
       onTap: onTap,
-      tintColor: isUnread ? AppColors.accent : null,
+      tintColor: isUnread ? AppColors.of(context).accent : null,
       tintOpacity: isUnread ? 0.14 : 0.08,
       borderOpacity: isUnread ? 0.62 : 0.5,
       child: Row(
@@ -42,7 +42,7 @@ class NotificationCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         notification.title,
-                        style: AppTextStyles.title.copyWith(
+                        style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 16,
                           fontWeight: isUnread
                               ? FontWeight.w800
@@ -55,8 +55,8 @@ class NotificationCard extends StatelessWidget {
                         width: 8,
                         height: 8,
                         margin: const EdgeInsetsDirectional.only(start: 8),
-                        decoration: const BoxDecoration(
-                          color: AppColors.accent,
+                        decoration: BoxDecoration(
+                          color: AppColors.of(context).accent,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -65,8 +65,8 @@ class NotificationCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   notification.shortBody,
-                  style: AppTextStyles.body.copyWith(
-                    color: AppColors.textMuted,
+                  style: AppTextStyles.bodyOf(context).copyWith(
+                    color: AppColors.of(context).textMuted,
                     fontSize: 13,
                   ),
                   maxLines: 2,
@@ -77,23 +77,25 @@ class NotificationCard extends StatelessWidget {
                   children: [
                     Text(
                       notification.typeLabel,
-                      style: AppTextStyles.body.copyWith(fontSize: 12),
+                      style: AppTextStyles.bodyOf(
+                        context,
+                      ).copyWith(fontSize: 12),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       '•',
-                      style: AppTextStyles.body.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                      style: AppTextStyles.bodyOf(
+                        context,
+                      ).copyWith(color: AppColors.of(context).textMuted),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       isUnread ? 'غير مقروء' : 'مقروء',
-                      style: AppTextStyles.body.copyWith(
+                      style: AppTextStyles.bodyOf(context).copyWith(
                         fontSize: 12,
                         color: isUnread
-                            ? AppColors.primary
-                            : AppColors.textMuted,
+                            ? AppColors.of(context).primary
+                            : AppColors.of(context).textMuted,
                       ),
                     ),
                     if (notification.createdAt != null &&
@@ -101,9 +103,9 @@ class NotificationCard extends StatelessWidget {
                       const Spacer(),
                       Text(
                         _formatDate(notification.createdAt!),
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 11,
-                          color: AppColors.textMuted,
+                          color: AppColors.of(context).textMuted,
                         ),
                       ),
                     ],

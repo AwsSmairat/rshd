@@ -28,10 +28,9 @@ class AssignmentFilePickerCard extends StatelessWidget {
         children: [
           Text(
             'يمكنك رفع ملف PDF أو Word أو صورة أو ZIP',
-            style: AppTextStyles.body.copyWith(
-              fontSize: 13,
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
           ),
           const SizedBox(height: 14),
           OutlinedButton.icon(
@@ -39,8 +38,10 @@ class AssignmentFilePickerCard extends StatelessWidget {
             icon: const Icon(Icons.upload_file_outlined, size: 20),
             label: const Text('اختيار ملف'),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: BorderSide(color: AppColors.accent.withValues(alpha: 0.7)),
+              foregroundColor: AppColors.of(context).primary,
+              side: BorderSide(
+                color: AppColors.of(context).accent.withValues(alpha: 0.7),
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -58,15 +59,15 @@ class AssignmentFilePickerCard extends StatelessWidget {
               Icon(
                 Icons.info_outline,
                 size: 14,
-                color: AppColors.textMuted.withValues(alpha: 0.9),
+                color: AppColors.of(context).textMuted.withValues(alpha: 0.9),
               ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   'يجب كتابة إجابة أو رفع ملف واحد على الأقل',
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
-                    color: AppColors.textMuted,
+                    color: AppColors.of(context).textMuted,
                   ),
                 ),
               ),
@@ -86,23 +87,25 @@ class _EmptyFileBox extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.accent.withValues(alpha: 0.35),
+          color: AppColors.of(context).accent.withValues(alpha: 0.35),
           style: BorderStyle.solid,
           width: 1.2,
         ),
-        color: AppColors.cardWhite.withValues(alpha: 0.35),
+        color: AppColors.of(context).cardWhite.withValues(alpha: 0.35),
       ),
       child: Column(
         children: [
           Icon(
             Icons.folder_open_outlined,
             size: 32,
-            color: AppColors.darkGold.withValues(alpha: 0.8),
+            color: AppColors.of(context).darkGold.withValues(alpha: 0.8),
           ),
           const SizedBox(height: 8),
           Text(
             'لم يتم اختيار ملف بعد',
-            style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(color: AppColors.of(context).textMuted),
           ),
         ],
       ),
@@ -124,7 +127,7 @@ class _SelectedFileBox extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: AppColors.cardWhite.withValues(alpha: 0.55),
+        color: AppColors.of(context).cardWhite.withValues(alpha: 0.55),
         border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
       ),
       child: Row(
@@ -133,10 +136,10 @@ class _SelectedFileBox extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.16),
+              color: AppColors.of(context).accent.withValues(alpha: 0.16),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: AppColors.darkGold),
+            child: Icon(icon, color: AppColors.of(context).darkGold),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -145,9 +148,9 @@ class _SelectedFileBox extends StatelessWidget {
               children: [
                 Text(
                   file.name,
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
+                    color: AppColors.of(context).primary,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -155,9 +158,9 @@ class _SelectedFileBox extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   AssignmentFileHelper.formatSize(file.size),
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
-                    color: AppColors.textMuted,
+                    color: AppColors.of(context).textMuted,
                   ),
                 ),
               ],
@@ -167,7 +170,7 @@ class _SelectedFileBox extends StatelessWidget {
             onPressed: onRemove,
             child: Text(
               'إزالة',
-              style: AppTextStyles.body.copyWith(
+              style: AppTextStyles.bodyOf(context).copyWith(
                 color: const Color(0xFF991B1B),
                 fontWeight: FontWeight.w600,
               ),

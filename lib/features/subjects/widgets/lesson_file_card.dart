@@ -24,11 +24,13 @@ class LessonFileCard extends StatelessWidget {
           CircleAvatar(
             radius: 20,
             backgroundColor: locked
-                ? AppColors.textMuted.withValues(alpha: 0.12)
-                : AppColors.secondary.withValues(alpha: 0.12),
+                ? AppColors.of(context).textMuted.withValues(alpha: 0.12)
+                : AppColors.of(context).secondary.withValues(alpha: 0.12),
             child: Icon(
               locked ? Icons.lock_outline_rounded : file.fileIcon,
-              color: locked ? AppColors.textMuted : AppColors.secondary,
+              color: locked
+                  ? AppColors.of(context).textMuted
+                  : AppColors.of(context).secondary,
             ),
           ),
           const SizedBox(width: 12),
@@ -38,16 +40,15 @@ class LessonFileCard extends StatelessWidget {
               children: [
                 Text(
                   file.title,
-                  style: AppTextStyles.body.copyWith(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                  ),
+                  style: AppTextStyles.bodyOf(
+                    context,
+                  ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   locked ? 'متاح بعد تفعيل المادة' : file.fileTypeLabel,
-                  style: AppTextStyles.body.copyWith(
-                    color: AppColors.textMuted,
+                  style: AppTextStyles.bodyOf(context).copyWith(
+                    color: AppColors.of(context).textMuted,
                     fontSize: 12,
                   ),
                 ),
@@ -55,8 +56,8 @@ class LessonFileCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     'الحجم: ${file.formattedSize}',
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.secondary,
+                    style: AppTextStyles.bodyOf(context).copyWith(
+                      color: AppColors.of(context).secondary,
                       fontSize: 12,
                     ),
                   ),
@@ -67,7 +68,9 @@ class LessonFileCard extends StatelessWidget {
           Icon(
             locked ? Icons.lock_outline_rounded : Icons.arrow_back_ios_new,
             size: 16,
-            color: locked ? AppColors.textMuted : AppColors.primary,
+            color: locked
+                ? AppColors.of(context).textMuted
+                : AppColors.of(context).primary,
           ),
         ],
       ),

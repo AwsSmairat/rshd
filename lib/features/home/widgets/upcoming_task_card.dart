@@ -28,12 +28,12 @@ class UpcomingTaskCard extends StatelessWidget {
   final UpcomingTaskItem task;
   final bool isLast;
 
-  Color get _dotColor {
+  Color _dotColor(BuildContext context) {
     switch (task.type) {
       case UpcomingTaskType.assignment:
-        return AppColors.darkGold;
+        return AppColors.of(context).darkGold;
       case UpcomingTaskType.quiz:
-        return AppColors.primary;
+        return AppColors.of(context).primary;
       case UpcomingTaskType.lecture:
         return const Color(0xFF2563EB);
     }
@@ -99,16 +99,16 @@ class UpcomingTaskCard extends StatelessWidget {
                       children: [
                         Text(
                           _dayLabel(),
-                          style: AppTextStyles.title.copyWith(
+                          style: AppTextStyles.titleOf(context).copyWith(
                             fontSize: 18,
-                            color: AppColors.primary,
+                            color: AppColors.of(context).primary,
                           ),
                         ),
                         Text(
                           _monthLabel(),
-                          style: AppTextStyles.body.copyWith(
+                          style: AppTextStyles.bodyOf(context).copyWith(
                             fontSize: 10,
-                            color: AppColors.textMuted,
+                            color: AppColors.of(context).textMuted,
                           ),
                         ),
                       ],
@@ -120,7 +120,9 @@ class UpcomingTaskCard extends StatelessWidget {
                     child: Container(
                       width: 2,
                       margin: const EdgeInsets.symmetric(vertical: 6),
-                      color: AppColors.accent.withValues(alpha: 0.25),
+                      color: AppColors.of(
+                        context,
+                      ).accent.withValues(alpha: 0.25),
                     ),
                   ),
               ],
@@ -140,7 +142,7 @@ class UpcomingTaskCard extends StatelessWidget {
                       width: 10,
                       height: 10,
                       decoration: BoxDecoration(
-                        color: _dotColor,
+                        color: _dotColor(context),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -151,10 +153,10 @@ class UpcomingTaskCard extends StatelessWidget {
                         children: [
                           Text(
                             task.title,
-                            style: AppTextStyles.subtitle.copyWith(
+                            style: AppTextStyles.subtitleOf(context).copyWith(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.text,
+                              color: AppColors.of(context).text,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -162,9 +164,9 @@ class UpcomingTaskCard extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             task.subtitle,
-                            style: AppTextStyles.body.copyWith(
+                            style: AppTextStyles.bodyOf(context).copyWith(
                               fontSize: 12,
-                              color: AppColors.textMuted,
+                              color: AppColors.of(context).textMuted,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -183,7 +185,11 @@ class UpcomingTaskCard extends StatelessWidget {
                           color: Colors.white.withValues(alpha: 0.45),
                         ),
                       ),
-                      child: Icon(_icon, color: AppColors.primary, size: 20),
+                      child: Icon(
+                        _icon,
+                        color: AppColors.of(context).primary,
+                        size: 20,
+                      ),
                     ),
                   ],
                 ),

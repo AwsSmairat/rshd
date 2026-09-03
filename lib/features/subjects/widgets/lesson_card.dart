@@ -112,13 +112,13 @@ class _LessonCardState extends State<LessonCard>
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundColor: AppColors.secondary.withValues(
-                      alpha: 0.15,
-                    ),
+                    backgroundColor: AppColors.of(
+                      context,
+                    ).secondary.withValues(alpha: 0.15),
                     child: Text(
                       '${widget.displayOrder}',
-                      style: AppTextStyles.body.copyWith(
-                        color: AppColors.secondary,
+                      style: AppTextStyles.bodyOf(context).copyWith(
+                        color: AppColors.of(context).secondary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -130,19 +130,18 @@ class _LessonCardState extends State<LessonCard>
                       children: [
                         Text(
                           lesson.title,
-                          style: AppTextStyles.body.copyWith(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                          ),
+                          style: AppTextStyles.bodyOf(
+                            context,
+                          ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
                         ),
                         if (lesson.description != null &&
                             lesson.description!.isNotEmpty) ...[
                           const SizedBox(height: 4),
                           Text(
                             lesson.description!,
-                            style: AppTextStyles.body.copyWith(
-                              color: AppColors.textMuted,
-                            ),
+                            style: AppTextStyles.bodyOf(
+                              context,
+                            ).copyWith(color: AppColors.of(context).textMuted),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -150,8 +149,8 @@ class _LessonCardState extends State<LessonCard>
                         const SizedBox(height: 6),
                         Text(
                           _summaryLabel(lesson),
-                          style: AppTextStyles.body.copyWith(
-                            color: AppColors.secondary,
+                          style: AppTextStyles.bodyOf(context).copyWith(
+                            color: AppColors.of(context).secondary,
                             fontSize: 12,
                           ),
                         ),
@@ -165,7 +164,9 @@ class _LessonCardState extends State<LessonCard>
                     ).animate(_chevronController),
                     child: Icon(
                       Icons.keyboard_arrow_down_rounded,
-                      color: AppColors.primary.withValues(alpha: 0.7),
+                      color: AppColors.of(
+                        context,
+                      ).primary.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -240,21 +241,26 @@ class _ExpandedBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Divider(height: 1, color: AppColors.primary.withValues(alpha: 0.08)),
+          Divider(
+            height: 1,
+            color: AppColors.of(context).primary.withValues(alpha: 0.08),
+          ),
           const SizedBox(height: 12),
           if (!hasContent)
             Text(
               'لا يوجد محتوى في هذا الجزء بعد',
-              style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+              style: AppTextStyles.bodyOf(
+                context,
+              ).copyWith(color: AppColors.of(context).textMuted),
             )
           else ...[
             if (lesson.videos.isNotEmpty) ...[
               Text(
                 'الفيديوهات',
-                style: AppTextStyles.body.copyWith(
+                style: AppTextStyles.bodyOf(context).copyWith(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
-                  color: AppColors.textMuted,
+                  color: AppColors.of(context).textMuted,
                 ),
               ),
               const SizedBox(height: 8),
@@ -273,10 +279,10 @@ class _ExpandedBody extends StatelessWidget {
               if (lesson.videos.isNotEmpty) const SizedBox(height: 4),
               Text(
                 'الملفات',
-                style: AppTextStyles.body.copyWith(
+                style: AppTextStyles.bodyOf(context).copyWith(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
-                  color: AppColors.textMuted,
+                  color: AppColors.of(context).textMuted,
                 ),
               ),
               const SizedBox(height: 8),
@@ -296,10 +302,10 @@ class _ExpandedBody extends StatelessWidget {
                 const SizedBox(height: 4),
               Text(
                 'الواجبات',
-                style: AppTextStyles.body.copyWith(
+                style: AppTextStyles.bodyOf(context).copyWith(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
-                  color: AppColors.textMuted,
+                  color: AppColors.of(context).textMuted,
                 ),
               ),
               const SizedBox(height: 8),
@@ -320,10 +326,10 @@ class _ExpandedBody extends StatelessWidget {
                 const SizedBox(height: 4),
               Text(
                 'الاختبارات',
-                style: AppTextStyles.body.copyWith(
+                style: AppTextStyles.bodyOf(context).copyWith(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
-                  color: AppColors.textMuted,
+                  color: AppColors.of(context).textMuted,
                 ),
               ),
               const SizedBox(height: 8),

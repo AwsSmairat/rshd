@@ -115,7 +115,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
         return RefreshIndicator(
           onRefresh: _refresh,
-          color: AppColors.secondary,
+          color: AppColors.of(context).secondary,
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [

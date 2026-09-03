@@ -68,7 +68,7 @@ class SubmittedFileCard extends StatelessWidget {
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              color: AppColors.cardWhite.withValues(alpha: 0.55),
+              color: AppColors.of(context).cardWhite.withValues(alpha: 0.55),
               border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
             ),
             child: Row(
@@ -77,10 +77,14 @@ class SubmittedFileCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withValues(alpha: 0.16),
+                    color: AppColors.of(context).accent.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: AppColors.darkGold, size: 26),
+                  child: Icon(
+                    icon,
+                    color: AppColors.of(context).darkGold,
+                    size: 26,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -89,9 +93,9 @@ class SubmittedFileCard extends StatelessWidget {
                     children: [
                       Text(
                         fileName,
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.bodyOf(context).copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          color: AppColors.of(context).primary,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -99,9 +103,9 @@ class SubmittedFileCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         '$size • $mime',
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
-                          color: AppColors.textMuted,
+                          color: AppColors.of(context).textMuted,
                         ),
                       ),
                     ],
@@ -116,8 +120,10 @@ class SubmittedFileCard extends StatelessWidget {
             icon: const Icon(Icons.open_in_new_rounded, size: 18),
             label: const Text('فتح الملف'),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: BorderSide(color: AppColors.accent.withValues(alpha: 0.65)),
+              foregroundColor: AppColors.of(context).primary,
+              side: BorderSide(
+                color: AppColors.of(context).accent.withValues(alpha: 0.65),
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -213,7 +219,7 @@ class _DetailRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 16, color: AppColors.darkGold),
+          Icon(icon, size: 16, color: AppColors.of(context).darkGold),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -221,17 +227,17 @@ class _DetailRow extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
-                    color: AppColors.textMuted,
+                    color: AppColors.of(context).textMuted,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
-                  style: AppTextStyles.body.copyWith(
+                  style: AppTextStyles.bodyOf(context).copyWith(
                     fontWeight: FontWeight.w600,
-                    color: valueColor ?? AppColors.primary,
+                    color: valueColor ?? AppColors.of(context).primary,
                     height: 1.45,
                   ),
                 ),

@@ -22,7 +22,7 @@ class LuxuryLoginCard extends StatelessWidget {
           padding: EdgeInsets.zero,
           fillOpacity: 0.3,
           borderOpacity: 0.58,
-          tintColor: AppColors.accent,
+          tintColor: AppColors.of(context).accent,
           tintOpacity: 0.06,
           child: Column(
             children: [
@@ -32,8 +32,11 @@ class LuxuryLoginCard extends StatelessWidget {
                 height: metrics.isTablet ? 5 : 4,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
-                  gradient: const LinearGradient(
-                    colors: [AppColors.accent, AppColors.darkGold],
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.of(context).accent,
+                      AppColors.of(context).darkGold,
+                    ],
                   ),
                 ),
               ),
@@ -73,7 +76,7 @@ class LoginCardTitle extends StatelessWidget {
               style: TextStyle(
                 fontSize: metrics.titleFontSize,
                 fontWeight: FontWeight.w800,
-                color: AppColors.primary,
+                color: AppColors.of(context).primary,
               ),
             ),
             SizedBox(width: metrics.isTablet ? 12 : 10),
@@ -85,7 +88,7 @@ class LoginCardTitle extends StatelessWidget {
           'أهلاً بك في منصة RSHD التعليمية',
           style: TextStyle(
             fontSize: metrics.subtitleFontSize,
-            color: AppColors.textMuted.withValues(alpha: 0.95),
+            color: AppColors.of(context).textMuted.withValues(alpha: 0.95),
           ),
           textAlign: TextAlign.center,
         ),
@@ -107,7 +110,7 @@ class _Diamond extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: AppColors.accent.withValues(alpha: 0.85),
+          color: AppColors.of(context).accent.withValues(alpha: 0.85),
           borderRadius: BorderRadius.circular(1),
         ),
       ),
@@ -134,7 +137,9 @@ class LoginFooter extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Divider(color: AppColors.accent.withValues(alpha: 0.35)),
+                child: Divider(
+                  color: AppColors.of(context).accent.withValues(alpha: 0.35),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -143,12 +148,14 @@ class LoginFooter extends StatelessWidget {
                   child: Container(
                     width: 6,
                     height: 6,
-                    color: AppColors.accent.withValues(alpha: 0.7),
+                    color: AppColors.of(context).accent.withValues(alpha: 0.7),
                   ),
                 ),
               ),
               Expanded(
-                child: Divider(color: AppColors.accent.withValues(alpha: 0.35)),
+                child: Divider(
+                  color: AppColors.of(context).accent.withValues(alpha: 0.35),
+                ),
               ),
             ],
           ),
@@ -159,7 +166,7 @@ class LoginFooter extends StatelessWidget {
               fontSize: 11,
               letterSpacing: 2,
               fontWeight: FontWeight.w600,
-              color: AppColors.secondary.withValues(alpha: 0.65),
+              color: AppColors.of(context).secondary.withValues(alpha: 0.65),
             ),
           ),
         ],

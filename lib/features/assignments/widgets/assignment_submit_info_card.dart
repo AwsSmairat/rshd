@@ -27,21 +27,25 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
       fillOpacity: 0.38,
       borderOpacity: 0.7,
       blurSigma: 16,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.04,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(Icons.info_outline, size: 18, color: AppColors.darkGold),
+              Icon(
+                Icons.info_outline,
+                size: 18,
+                color: AppColors.of(context).darkGold,
+              ),
               const SizedBox(width: 8),
               Text(
                 'معلومات الواجب',
-                style: AppTextStyles.subtitle.copyWith(
+                style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
+                  color: AppColors.of(context).primary,
                 ),
               ),
             ],
@@ -56,9 +60,9 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
                   children: [
                     Text(
                       assignment.title,
-                      style: AppTextStyles.title.copyWith(
+                      style: AppTextStyles.titleOf(context).copyWith(
                         fontSize: 18,
-                        color: AppColors.primary,
+                        color: AppColors.of(context).primary,
                       ),
                     ),
                     if (assignment.subjectTitle != null &&
@@ -66,9 +70,9 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         assignment.subjectTitle!,
-                        style: AppTextStyles.body.copyWith(
-                          color: AppColors.textMuted,
-                        ),
+                        style: AppTextStyles.bodyOf(
+                          context,
+                        ).copyWith(color: AppColors.of(context).textMuted),
                       ),
                     ],
                     if (assignment.dueDate != null &&
@@ -76,9 +80,9 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
                       const SizedBox(height: 10),
                       Text(
                         'تاريخ التسليم: ${_formatDate(assignment.dueDate!)}',
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 13,
-                          color: AppColors.textMuted,
+                          color: AppColors.of(context).textMuted,
                         ),
                       ),
                     ],

@@ -18,11 +18,15 @@ class RegisterHeader extends StatelessWidget {
       clipper: LoginHeaderWaveClipper(),
       child: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF091729), AppColors.primary, AppColors.secondary],
+            colors: [
+              Color(0xFF091729),
+              AppColors.of(context).primary,
+              AppColors.of(context).secondary,
+            ],
           ),
         ),
         child: Stack(
@@ -45,13 +49,13 @@ class RegisterHeader extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.12),
+                    color: AppColors.of(context).accent.withValues(alpha: 0.12),
                   ),
                 ),
                 child: Icon(
                   Icons.menu_book_outlined,
                   size: 32,
-                  color: AppColors.accent.withValues(alpha: 0.35),
+                  color: AppColors.of(context).accent.withValues(alpha: 0.35),
                 ),
               ),
             ),
@@ -67,9 +71,9 @@ class RegisterHeader extends StatelessWidget {
                     context.go(AppRoutes.login);
                   }
                 },
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_back_ios_new,
-                  color: AppColors.accent,
+                  color: AppColors.of(context).accent,
                   size: 20,
                 ),
               ),
@@ -85,7 +89,9 @@ class RegisterHeader extends StatelessWidget {
                     return Icon(
                       Icons.school_outlined,
                       size: 56,
-                      color: AppColors.accent.withValues(alpha: 0.85),
+                      color: AppColors.of(
+                        context,
+                      ).accent.withValues(alpha: 0.85),
                     );
                   },
                 ),

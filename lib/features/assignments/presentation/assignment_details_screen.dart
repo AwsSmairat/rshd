@@ -153,10 +153,10 @@ class _AssignmentDetailsScreenState
                   icon: Icons.description_outlined,
                   child: Text(
                     assignment.description!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       height: 1.5,
-                      color: AppColors.primary,
+                      color: AppColors.of(context).primary,
                     ),
                   ),
                 ),

@@ -27,7 +27,9 @@ class GradesLoadingSkeleton extends StatelessWidget {
                   width: 96,
                   height: 14,
                   decoration: BoxDecoration(
-                    color: AppColors.textMuted.withValues(alpha: 0.18),
+                    color: AppColors.of(
+                      context,
+                    ).textMuted.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -36,7 +38,9 @@ class GradesLoadingSkeleton extends StatelessWidget {
                   width: double.infinity,
                   height: 18,
                   decoration: BoxDecoration(
-                    color: AppColors.textMuted.withValues(alpha: 0.14),
+                    color: AppColors.of(
+                      context,
+                    ).textMuted.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -45,7 +49,9 @@ class GradesLoadingSkeleton extends StatelessWidget {
                   width: 140,
                   height: 14,
                   decoration: BoxDecoration(
-                    color: AppColors.textMuted.withValues(alpha: 0.12),
+                    color: AppColors.of(
+                      context,
+                    ).textMuted.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),

@@ -114,8 +114,8 @@ class _MySubjectsScreenState extends ConsumerState<MySubjectsScreen> {
   Widget _buildBody(SubjectsListState state) {
     return RefreshIndicator(
       onRefresh: _refresh,
-      color: AppColors.darkGold,
-      backgroundColor: AppColors.cardWhite,
+      color: AppColors.of(context).darkGold,
+      backgroundColor: AppColors.of(context).cardWhite,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [

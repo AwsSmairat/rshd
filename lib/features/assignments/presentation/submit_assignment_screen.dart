@@ -233,7 +233,9 @@ class _SubmitAssignmentScreenState
               decoration: InputDecoration(
                 hintText: 'اكتب إجابتك هنا...',
                 filled: true,
-                fillColor: AppColors.cardWhite.withValues(alpha: 0.7),
+                fillColor: AppColors.of(
+                  context,
+                ).cardWhite.withValues(alpha: 0.7),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
                   borderSide: BorderSide(
@@ -248,8 +250,8 @@ class _SubmitAssignmentScreenState
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
-                  borderSide: const BorderSide(
-                    color: AppColors.darkGold,
+                  borderSide: BorderSide(
+                    color: AppColors.of(context).darkGold,
                     width: 1.4,
                   ),
                 ),

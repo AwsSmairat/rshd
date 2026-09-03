@@ -16,7 +16,14 @@ class RshdVideoPlayer extends StatefulWidget {
     required this.playbackUrl,
     this.expiresAt,
     this.initialPositionSeconds = 0,
+    this.autoPlay = false,
     this.blockPlayback = false,
+    this.existingController,
+    this.onControllerReady,
+    this.onWillReplaceController,
+    this.onPlayerDetached,
+    this.onRequestFloating,
+    this.onHandoffFloating,
     this.onPositionChanged,
     this.onPlaybackStateChanged,
     this.onRefreshPlayback,
@@ -25,21 +32,30 @@ class RshdVideoPlayer extends StatefulWidget {
   final String playbackUrl;
   final DateTime? expiresAt;
   final int initialPositionSeconds;
+  final bool autoPlay;
   final bool blockPlayback;
+  final VideoPlayerController? existingController;
+  final ValueChanged<VideoPlayerController>? onControllerReady;
+  final VoidCallback? onWillReplaceController;
+  final void Function({required bool keepPlaying})? onPlayerDetached;
+  final VoidCallback? onRequestFloating;
+  final VoidCallback? onHandoffFloating;
   final ValueChanged<Duration>? onPositionChanged;
   final ValueChanged<bool>? onPlaybackStateChanged;
   final Future<VideoPlaybackModel?> Function()? onRefreshPlayback;
 
   @override
-  State<RshdVideoPlayer> createState() => _RshdVideoPlayerState();
+  State<RshdVideoPlayer> createState() => RshdVideoPlayerState();
 }
 
-class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
+class RshdVideoPlayerState extends State<RshdVideoPlayer> {
   VideoPlayerController? _videoController;
   ChewieController? _chewieController;
   Timer? _refreshTimer;
   bool _isLoading = true;
   bool _isRefreshing = false;
+  bool _floatOnDispose = false;
+  bool _handedOff = false;
   String? _errorMessage;
   String _activePlaybackUrl = '';
   DateTime? _activeExpiresAt;
@@ -52,7 +68,18 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
     super.initState();
     _activePlaybackUrl = widget.playbackUrl;
     _activeExpiresAt = widget.expiresAt;
-    _initializePlayer();
+    final existing = widget.existingController;
+    if (existing != null && existing.value.isInitialized) {
+      _videoController = existing;
+      existing.addListener(_onVideoTick);
+      if (widget.autoPlay && !existing.value.isPlaying) {
+        unawaited(existing.play());
+      }
+      unawaited(_attachChewie(existing));
+      widget.onControllerReady?.call(existing);
+    } else {
+      _initializePlayer();
+    }
     _scheduleRefreshTimer();
   }
 
@@ -100,37 +127,11 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
       }
 
       controller.addListener(_onVideoTick);
-
-      _chewieController = ChewieController(
-        videoPlayerController: controller,
-        autoPlay: false,
-        looping: false,
-        allowFullScreen: true,
-        allowMuting: true,
-        allowPlaybackSpeedChanging: true,
-        aspectRatio: controller.value.aspectRatio > 0
-            ? controller.value.aspectRatio
-            : 16 / 9,
-        materialProgressColors: ChewieProgressColors(
-          playedColor: AppColors.accent,
-          handleColor: AppColors.accent,
-          bufferedColor: AppColors.textMuted.withValues(alpha: 0.35),
-          backgroundColor: AppColors.textMuted.withValues(alpha: 0.15),
-        ),
-        errorBuilder: (context, errorMessage) {
-          return _buildStatePanel(
-            icon: Icons.play_disabled_rounded,
-            title: 'تعذّر التشغيل',
-            message: _playbackErrorMessage,
-            showRetry: true,
-          );
-        },
-      );
-
-      setState(() {
-        _isLoading = false;
-        _errorMessage = null;
-      });
+      if (widget.autoPlay && !controller.value.isPlaying) {
+        await controller.play();
+      }
+      await _attachChewie(controller);
+      widget.onControllerReady?.call(controller);
     } catch (_) {
       await controller.dispose();
       _videoController = null;
@@ -142,6 +143,46 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
     }
   }
 
+  Future<void> _attachChewie(VideoPlayerController controller) async {
+    if (!mounted) {
+      return;
+    }
+
+    _chewieController?.dispose();
+    _chewieController = ChewieController(
+      videoPlayerController: controller,
+      autoPlay: widget.autoPlay || controller.value.isPlaying,
+      looping: false,
+      allowFullScreen: true,
+      allowMuting: true,
+      allowPlaybackSpeedChanging: true,
+      aspectRatio: controller.value.aspectRatio > 0
+          ? controller.value.aspectRatio
+          : 16 / 9,
+      materialProgressColors: ChewieProgressColors(
+        playedColor: AppColors.of(context).accent,
+        handleColor: AppColors.of(context).accent,
+        bufferedColor: AppColors.of(context).textMuted.withValues(alpha: 0.35),
+        backgroundColor: AppColors.of(
+          context,
+        ).textMuted.withValues(alpha: 0.15),
+      ),
+      errorBuilder: (context, errorMessage) {
+        return _buildStatePanel(
+          icon: Icons.play_disabled_rounded,
+          title: 'تعذّر التشغيل',
+          message: _playbackErrorMessage,
+          showRetry: true,
+        );
+      },
+    );
+
+    setState(() {
+      _isLoading = false;
+      _errorMessage = null;
+    });
+  }
+
   Future<void> _reloadPlayer({required bool preservePosition}) async {
     final currentPosition = preservePosition
         ? (_videoController?.value.position ?? Duration.zero)
@@ -150,6 +191,7 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
 
     _videoController?.removeListener(_onVideoTick);
     _chewieController?.dispose();
+    widget.onWillReplaceController?.call();
     await _videoController?.dispose();
     _chewieController = null;
     _videoController = null;
@@ -268,12 +310,59 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
     }
   }
 
+  /// Hands the playing video to the in-app mini player and leaves this screen.
+  Future<bool> startFloating() async {
+    if (_handedOff ||
+        widget.blockPlayback ||
+        widget.onRequestFloating == null) {
+      return false;
+    }
+
+    final controller = _videoController;
+    if (controller == null || !controller.value.isInitialized) {
+      return false;
+    }
+
+    _floatOnDispose = true;
+
+    final chewie = _chewieController;
+    if (chewie != null && chewie.isFullScreen) {
+      chewie.exitFullScreen();
+      await Future<void>.delayed(const Duration(milliseconds: 350));
+    }
+
+    if (!controller.value.isPlaying) {
+      await controller.play();
+    }
+
+    if (!mounted) {
+      return false;
+    }
+
+    _chewieController?.dispose();
+    _chewieController = null;
+    setState(() => _handedOff = true);
+    await WidgetsBinding.instance.endOfFrame;
+
+    widget.onHandoffFloating?.call();
+    widget.onRequestFloating!();
+    return true;
+  }
+
   @override
   void dispose() {
     _refreshTimer?.cancel();
     _videoController?.removeListener(_onVideoTick);
     _chewieController?.dispose();
-    _videoController?.dispose();
+    _chewieController = null;
+    final controller = _videoController;
+    final keepPlaying =
+        controller != null &&
+        controller.value.isInitialized &&
+        !widget.blockPlayback &&
+        (_handedOff || _floatOnDispose || controller.value.isPlaying);
+    _videoController = null;
+    widget.onPlayerDetached?.call(keepPlaying: keepPlaying);
     super.dispose();
   }
 
@@ -300,8 +389,8 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                AppColors.cardWhite,
-                AppColors.error.withValues(alpha: 0.06),
+                AppColors.of(context).cardWhite,
+                AppColors.of(context).error.withValues(alpha: 0.06),
               ],
             ),
           ),
@@ -313,20 +402,20 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
                 width: compact ? 40 : 48,
                 height: compact ? 40 : 48,
                 decoration: BoxDecoration(
-                  color: AppColors.error.withValues(alpha: 0.1),
+                  color: AppColors.of(context).error.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   icon,
                   size: compact ? 20 : 24,
-                  color: AppColors.error,
+                  color: AppColors.of(context).error,
                 ),
               ),
               SizedBox(height: compact ? 6 : 8),
               Text(
                 title,
-                style: AppTextStyles.subtitle.copyWith(
-                  color: AppColors.primary,
+                style: AppTextStyles.subtitleOf(context).copyWith(
+                  color: AppColors.of(context).primary,
                   fontWeight: FontWeight.w700,
                   fontSize: compact ? 14 : 15,
                 ),
@@ -337,8 +426,8 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
                 textAlign: TextAlign.center,
                 maxLines: compact ? 2 : 3,
                 overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.caption.copyWith(
-                  color: AppColors.textMuted,
+                style: AppTextStyles.captionOf(context).copyWith(
+                  color: AppColors.of(context).textMuted,
                   height: 1.3,
                   fontSize: compact ? 11 : 12,
                 ),
@@ -358,9 +447,11 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
                     _isRefreshing ? 'جاري التحديث...' : 'إعادة المحاولة',
                   ),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.secondary,
+                    foregroundColor: AppColors.of(context).secondary,
                     side: BorderSide(
-                      color: AppColors.secondary.withValues(alpha: 0.35),
+                      color: AppColors.of(
+                        context,
+                      ).secondary.withValues(alpha: 0.35),
                     ),
                     padding: EdgeInsets.symmetric(
                       horizontal: compact ? 12 : 16,
@@ -379,26 +470,35 @@ class _RshdVideoPlayerState extends State<RshdVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
+    if (_handedOff) {
+      return const ColoredBox(color: Colors.black);
+    }
+
     if (_isLoading) {
       return Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
-            colors: [AppColors.primary, AppColors.secondaryNavy],
+            colors: [
+              AppColors.of(context).primary,
+              AppColors.of(context).secondaryNavy,
+            ],
           ),
         ),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(color: AppColors.accent),
+            CircularProgressIndicator(color: AppColors.of(context).accent),
             const SizedBox(height: 12),
             Text(
               'جاري تجهيز الفيديو...',
-              style: AppTextStyles.body.copyWith(color: AppColors.white),
+              style: AppTextStyles.bodyOf(
+                context,
+              ).copyWith(color: AppColors.of(context).white),
             ),
           ],
         ),

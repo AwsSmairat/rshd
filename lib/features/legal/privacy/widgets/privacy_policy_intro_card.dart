@@ -14,12 +14,12 @@ class PrivacyPolicyIntroCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.cardWhite,
+        color: AppColors.of(context).cardWhite,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.05),
+            color: AppColors.of(context).primary.withValues(alpha: 0.05),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -30,20 +30,20 @@ class PrivacyPolicyIntroCard extends StatelessWidget {
         children: [
           Text(
             introText,
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 14,
               height: 1.65,
-              color: AppColors.text,
+              color: AppColors.of(context).text,
             ),
           ),
           const SizedBox(height: 14),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.12),
+              color: AppColors.of(context).accent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: AppColors.darkGold.withValues(alpha: 0.25),
+                color: AppColors.of(context).darkGold.withValues(alpha: 0.25),
               ),
             ),
             child: Row(
@@ -51,7 +51,7 @@ class PrivacyPolicyIntroCard extends StatelessWidget {
               children: [
                 Icon(
                   Icons.warning_amber_rounded,
-                  color: AppColors.darkGold,
+                  color: AppColors.of(context).darkGold,
                   size: 22,
                   semanticLabel: 'تنبيه',
                 ),
@@ -60,11 +60,11 @@ class PrivacyPolicyIntroCard extends StatelessWidget {
                   child: Text(
                     'باستخدامك للمنصة، فإنك تقر بأنك اطلعت على هذه السياسة '
                     'ووافقت عليها وفق الآليات المعتمدة في التطبيق.',
-                    style: AppTextStyles.body.copyWith(
+                    style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 13,
                       height: 1.55,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.text,
+                      color: AppColors.of(context).text,
                     ),
                   ),
                 ),

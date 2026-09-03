@@ -122,28 +122,28 @@ class _GradeDetailsScreenState extends ConsumerState<GradeDetailsScreen> {
             children: [
               GradeTypeBadge(sourceType: grade.sourceType),
               const SizedBox(height: 16),
-              Text(grade.displayTitle, style: AppTextStyles.title),
+              Text(grade.displayTitle, style: AppTextStyles.titleOf(context)),
               const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.accent.withValues(alpha: 0.12),
+                  color: AppColors.of(context).accent.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
                   children: [
                     Text(
                       'الدرجة',
-                      style: AppTextStyles.body.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                      style: AppTextStyles.bodyOf(
+                        context,
+                      ).copyWith(color: AppColors.of(context).textMuted),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       '${grade.grade}%',
-                      style: AppTextStyles.title.copyWith(
+                      style: AppTextStyles.titleOf(context).copyWith(
                         fontSize: 32,
-                        color: AppColors.primary,
+                        color: AppColors.of(context).primary,
                       ),
                     ),
                   ],
@@ -159,9 +159,9 @@ class _GradeDetailsScreenState extends ConsumerState<GradeDetailsScreen> {
                 ),
               if (grade.notes != null && grade.notes!.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                Text('الملاحظات', style: AppTextStyles.subtitle),
+                Text('الملاحظات', style: AppTextStyles.subtitleOf(context)),
                 const SizedBox(height: 8),
-                Text(grade.notes!, style: AppTextStyles.body),
+                Text(grade.notes!, style: AppTextStyles.bodyOf(context)),
               ],
             ],
           ),
@@ -193,13 +193,12 @@ class _InfoRow extends StatelessWidget {
         children: [
           Text(
             label,
-            style: AppTextStyles.body.copyWith(
-              color: AppColors.textMuted,
-              fontSize: 13,
-            ),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(color: AppColors.of(context).textMuted, fontSize: 13),
           ),
           const SizedBox(height: 4),
-          Text(value, style: AppTextStyles.body),
+          Text(value, style: AppTextStyles.bodyOf(context)),
         ],
       ),
     );

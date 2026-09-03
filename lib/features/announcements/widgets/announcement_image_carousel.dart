@@ -113,10 +113,12 @@ class _AnnouncementImageCarouselState extends State<AnnouncementImageCarousel> {
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.accent.withValues(alpha: 0.35)),
+          border: Border.all(
+            color: AppColors.of(context).accent.withValues(alpha: 0.35),
+          ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.08),
+              color: AppColors.of(context).primary.withValues(alpha: 0.08),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -168,7 +170,7 @@ class _AnnouncementImageCarouselState extends State<AnnouncementImageCarousel> {
                         margin: const EdgeInsets.symmetric(horizontal: 3),
                         decoration: BoxDecoration(
                           color: isActive
-                              ? AppColors.accent
+                              ? AppColors.of(context).accent
                               : Colors.white.withValues(alpha: 0.55),
                           borderRadius: BorderRadius.circular(999),
                         ),
@@ -192,7 +194,7 @@ class _AssetCarouselSlide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: AppColors.primary,
+      color: AppColors.of(context).primary,
       child: Image.asset(
         assetPath,
         fit: BoxFit.cover,
@@ -215,7 +217,7 @@ class _CarouselSlide extends StatelessWidget {
     final imageUrl = announcement.resolvedImageUrl;
 
     return ColoredBox(
-      color: AppColors.cardWhite,
+      color: AppColors.of(context).cardWhite,
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -230,9 +232,9 @@ class _CarouselSlide extends StatelessWidget {
                 if (loadingProgress == null) {
                   return child;
                 }
-                return const Center(
+                return Center(
                   child: CircularProgressIndicator(
-                    color: AppColors.darkGold,
+                    color: AppColors.of(context).darkGold,
                     strokeWidth: 2,
                   ),
                 );
@@ -254,7 +256,7 @@ class _PlaceholderSlide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.background,
+      color: AppColors.of(context).background,
       alignment: Alignment.center,
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -263,14 +265,14 @@ class _PlaceholderSlide extends StatelessWidget {
           Icon(
             Icons.image_outlined,
             size: 42,
-            color: AppColors.darkGold.withValues(alpha: 0.8),
+            color: AppColors.of(context).darkGold.withValues(alpha: 0.8),
           ),
           const SizedBox(height: 12),
           Text(
             title,
-            style: AppTextStyles.subtitle.copyWith(
+            style: AppTextStyles.subtitleOf(context).copyWith(
               fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+              color: AppColors.of(context).primary,
             ),
             textAlign: TextAlign.center,
             maxLines: 2,
@@ -297,14 +299,14 @@ class _CarouselOverlay extends StatelessWidget {
           end: Alignment.bottomCenter,
           colors: [
             Colors.transparent,
-            AppColors.primary.withValues(alpha: 0.82),
+            AppColors.of(context).primary.withValues(alpha: 0.82),
           ],
         ),
       ),
       child: Text(
         announcement.title,
-        style: AppTextStyles.subtitle.copyWith(
-          color: AppColors.white,
+        style: AppTextStyles.subtitleOf(context).copyWith(
+          color: AppColors.of(context).white,
           fontWeight: FontWeight.w700,
           fontSize: 15,
         ),

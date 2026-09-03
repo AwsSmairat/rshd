@@ -35,7 +35,9 @@ class RecentSubjectsSection extends StatelessWidget {
               padding: const EdgeInsets.all(18),
               child: Text(
                 'لا توجد مواد مفعلة حالياً',
-                style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                style: AppTextStyles.bodyOf(
+                  context,
+                ).copyWith(color: AppColors.of(context).textMuted),
                 textAlign: TextAlign.center,
               ),
             )

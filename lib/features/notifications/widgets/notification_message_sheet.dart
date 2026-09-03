@@ -64,12 +64,12 @@ class _NotificationMessageSheet extends StatelessWidget {
                   width: 52,
                   height: 52,
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withValues(alpha: 0.18),
+                    color: AppColors.of(context).accent.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(
                     isReply ? Icons.reply_rounded : Icons.mail_outline,
-                    color: AppColors.darkGold,
+                    color: AppColors.of(context).darkGold,
                     size: 26,
                   ),
                 ),
@@ -80,27 +80,26 @@ class _NotificationMessageSheet extends StatelessWidget {
                     children: [
                       Text(
                         isReply ? 'رد من المدرّس' : 'رسالة',
-                        style: AppTextStyles.body.copyWith(
+                        style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
-                          color: AppColors.darkGold,
+                          color: AppColors.of(context).darkGold,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         senderName,
-                        style: AppTextStyles.subtitle.copyWith(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 17,
-                        ),
+                        style: AppTextStyles.subtitleOf(
+                          context,
+                        ).copyWith(fontWeight: FontWeight.w800, fontSize: 17),
                       ),
                       if (subjectTitle.isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Text(
                           subjectTitle,
-                          style: AppTextStyles.body.copyWith(
+                          style: AppTextStyles.bodyOf(context).copyWith(
                             fontSize: 13,
-                            color: AppColors.textMuted,
+                            color: AppColors.of(context).textMuted,
                           ),
                         ),
                       ],
@@ -114,13 +113,15 @@ class _NotificationMessageSheet extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: AppColors.of(context).background,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFE8DFCF)),
               ),
               child: Text(
                 message,
-                style: AppTextStyles.body.copyWith(fontSize: 15, height: 1.7),
+                style: AppTextStyles.bodyOf(
+                  context,
+                ).copyWith(fontSize: 15, height: 1.7),
                 textAlign: TextAlign.right,
               ),
             ),
@@ -128,7 +129,7 @@ class _NotificationMessageSheet extends StatelessWidget {
             FilledButton(
               onPressed: () => Navigator.pop(context),
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.of(context).primary,
                 minimumSize: const Size(double.infinity, 48),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),

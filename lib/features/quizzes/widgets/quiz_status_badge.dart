@@ -11,7 +11,7 @@ class QuizStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = _resolveStyle();
+    final style = _resolveStyle(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -26,7 +26,7 @@ class QuizStatusBadge extends StatelessWidget {
           const SizedBox(width: 5),
           Text(
             style.label,
-            style: AppTextStyles.body.copyWith(
+            style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 12,
               color: style.foreground,
               fontWeight: FontWeight.w600,
@@ -37,7 +37,7 @@ class QuizStatusBadge extends StatelessWidget {
     );
   }
 
-  _StatusStyle _resolveStyle() {
+  _StatusStyle _resolveStyle(BuildContext context) {
     if (quiz.isCompleted) {
       return const _StatusStyle(
         label: 'تم الحل',
@@ -47,17 +47,17 @@ class QuizStatusBadge extends StatelessWidget {
       );
     }
     if (!quiz.isActive) {
-      return const _StatusStyle(
+      return _StatusStyle(
         label: 'غير متاح',
         background: Color(0xFFF3F4F6),
-        foreground: AppColors.textMuted,
+        foreground: AppColors.of(context).textMuted,
         icon: Icons.lock_outline,
       );
     }
-    return const _StatusStyle(
+    return _StatusStyle(
       label: 'متاح',
       background: Color(0xFFF8EED6),
-      foreground: AppColors.darkGold,
+      foreground: AppColors.of(context).darkGold,
       icon: Icons.hourglass_empty_rounded,
     );
   }

@@ -32,7 +32,7 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
       fillOpacity: 0.35,
       borderOpacity: 0.65,
       blurSigma: 16,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.04,
       onTap: onTap,
       child: Row(
@@ -48,10 +48,10 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         assignment.title,
-                        style: AppTextStyles.title.copyWith(
+                        style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 17,
                           height: 1.3,
-                          color: AppColors.primary,
+                          color: AppColors.of(context).primary,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -67,8 +67,10 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            AppColors.accent.withValues(alpha: 0.45),
-                            AppColors.darkGold,
+                            AppColors.of(
+                              context,
+                            ).accent.withValues(alpha: 0.45),
+                            AppColors.of(context).darkGold,
                           ],
                         ),
                       ),
@@ -80,9 +82,9 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     assignment.subjectTitle!,
-                    style: AppTextStyles.body.copyWith(
+                    style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 13,
-                      color: AppColors.textMuted,
+                      color: AppColors.of(context).textMuted,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -93,18 +95,18 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.calendar_today_outlined,
                         size: 14,
-                        color: AppColors.darkGold,
+                        color: AppColors.of(context).darkGold,
                       ),
                       const SizedBox(width: 6),
                       Flexible(
                         child: Text(
                           'تاريخ التسليم: ${_formatDate(assignment.dueDate!)}',
-                          style: AppTextStyles.body.copyWith(
+                          style: AppTextStyles.bodyOf(context).copyWith(
                             fontSize: 12,
-                            color: AppColors.textMuted,
+                            color: AppColors.of(context).textMuted,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -124,7 +126,7 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
           Icon(
             Icons.arrow_back_ios_new_rounded,
             size: 16,
-            color: AppColors.primary.withValues(alpha: 0.55),
+            color: AppColors.of(context).primary.withValues(alpha: 0.55),
           ),
         ],
       ),

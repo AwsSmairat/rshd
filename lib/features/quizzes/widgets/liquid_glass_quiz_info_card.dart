@@ -27,7 +27,7 @@ class LiquidGlassQuizInfoCard extends StatelessWidget {
       fillOpacity: 0.38,
       borderOpacity: 0.7,
       blurSigma: 16,
-      tintColor: AppColors.accent,
+      tintColor: AppColors.of(context).accent,
       tintOpacity: 0.04,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,10 +38,10 @@ class LiquidGlassQuizInfoCard extends StatelessWidget {
               children: [
                 Text(
                   quiz.title,
-                  style: AppTextStyles.title.copyWith(
+                  style: AppTextStyles.titleOf(context).copyWith(
                     fontSize: 20,
                     height: 1.3,
-                    color: AppColors.primary,
+                    color: AppColors.of(context).primary,
                   ),
                 ),
                 if (quiz.description != null &&
@@ -100,14 +100,14 @@ class _InfoLine extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(icon, size: 14, color: AppColors.darkGold),
+            Icon(icon, size: 14, color: AppColors.of(context).darkGold),
             const SizedBox(width: 6),
             Text(
               label,
-              style: AppTextStyles.body.copyWith(
+              style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppColors.darkGold,
+                color: AppColors.of(context).darkGold,
               ),
             ),
           ],
@@ -115,10 +115,10 @@ class _InfoLine extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           value,
-          style: AppTextStyles.body.copyWith(
+          style: AppTextStyles.bodyOf(context).copyWith(
             fontSize: 14,
             height: 1.45,
-            color: AppColors.primary,
+            color: AppColors.of(context).primary,
           ),
         ),
       ],

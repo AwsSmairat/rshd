@@ -8,25 +8,25 @@ class AnnouncementTypeBadge extends StatelessWidget {
 
   final String type;
 
-  Color get _backgroundColor {
+  Color _backgroundColor(BuildContext context) {
     switch (type) {
       case 'important':
-        return AppColors.error.withValues(alpha: 0.1);
+        return AppColors.of(context).error.withValues(alpha: 0.1);
       case 'subject':
-        return AppColors.secondary.withValues(alpha: 0.1);
+        return AppColors.of(context).secondary.withValues(alpha: 0.1);
       default:
-        return AppColors.accent.withValues(alpha: 0.16);
+        return AppColors.of(context).accent.withValues(alpha: 0.16);
     }
   }
 
-  Color get _textColor {
+  Color _textColor(BuildContext context) {
     switch (type) {
       case 'important':
-        return AppColors.error;
+        return AppColors.of(context).error;
       case 'subject':
-        return AppColors.secondary;
+        return AppColors.of(context).secondary;
       default:
-        return AppColors.primary;
+        return AppColors.of(context).primary;
     }
   }
 
@@ -48,16 +48,16 @@ class AnnouncementTypeBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: _backgroundColor,
+        color: _backgroundColor(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _textColor.withValues(alpha: 0.2)),
+        border: Border.all(color: _textColor(context).withValues(alpha: 0.2)),
       ),
       child: Text(
         _label,
-        style: AppTextStyles.body.copyWith(
+        style: AppTextStyles.bodyOf(context).copyWith(
           fontSize: 11,
           fontWeight: FontWeight.w700,
-          color: _textColor,
+          color: _textColor(context),
         ),
       ),
     );
@@ -81,14 +81,14 @@ class AnnouncementTypeIcon extends StatelessWidget {
     }
   }
 
-  Color get _color {
+  Color _color(BuildContext context) {
     switch (type) {
       case 'important':
-        return AppColors.error;
+        return AppColors.of(context).error;
       case 'subject':
-        return AppColors.secondary;
+        return AppColors.of(context).secondary;
       default:
-        return AppColors.darkGold;
+        return AppColors.of(context).darkGold;
     }
   }
 
@@ -98,10 +98,10 @@ class AnnouncementTypeIcon extends StatelessWidget {
       width: size + 18,
       height: size + 18,
       decoration: BoxDecoration(
-        color: _color.withValues(alpha: 0.12),
+        color: _color(context).withValues(alpha: 0.12),
         shape: BoxShape.circle,
       ),
-      child: Icon(_icon, color: _color, size: size),
+      child: Icon(_icon, color: _color(context), size: size),
     );
   }
 }

@@ -84,7 +84,7 @@ class _TermsAndConditionsPageState
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.of(context).background,
       body: switch (state.status) {
         TermsLoadStatus.initial || TermsLoadStatus.loading =>
           const LoadingWidget(message: 'جاري تحميل الشروط والأحكام...'),
@@ -125,7 +125,7 @@ class _TermsAndConditionsPageState
       onRefresh: () => ref
           .read(termsAndConditionsControllerProvider.notifier)
           .load(refresh: true),
-      color: AppColors.secondary,
+      color: AppColors.of(context).secondary,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
@@ -189,8 +189,10 @@ class _TermsAndConditionsPageState
                             icon: const Icon(Icons.privacy_tip_outlined),
                             label: const Text('فتح سياسة الخصوصية'),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: AppColors.darkGold,
-                              side: const BorderSide(color: AppColors.darkGold),
+                              foregroundColor: AppColors.of(context).darkGold,
+                              side: BorderSide(
+                                color: AppColors.of(context).darkGold,
+                              ),
                               minimumSize: const Size(double.infinity, 44),
                             ),
                           ),
@@ -225,8 +227,10 @@ class _TermsAndConditionsPageState
                             icon: const Icon(Icons.security_outlined),
                             label: const Text('إعدادات الأمان'),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: AppColors.darkGold,
-                              side: const BorderSide(color: AppColors.darkGold),
+                              foregroundColor: AppColors.of(context).darkGold,
+                              side: BorderSide(
+                                color: AppColors.of(context).darkGold,
+                              ),
                               minimumSize: const Size(double.infinity, 44),
                             ),
                           ),
@@ -275,9 +279,9 @@ class _TermsAndConditionsPageState
           children: [
             Text(
               'الأقسام',
-              style: AppTextStyles.subtitle.copyWith(
+              style: AppTextStyles.subtitleOf(context).copyWith(
                 fontWeight: FontWeight.w700,
-                color: AppColors.primary,
+                color: AppColors.of(context).primary,
               ),
             ),
             const Spacer(),
@@ -300,17 +304,19 @@ class _TermsAndConditionsPageState
                 child: LinearProgressIndicator(
                   minHeight: 5,
                   value: progress,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.08),
-                  color: AppColors.accent,
+                  backgroundColor: AppColors.of(
+                    context,
+                  ).primary.withValues(alpha: 0.08),
+                  color: AppColors.of(context).accent,
                 ),
               ),
             ),
             const SizedBox(width: 10),
             Text(
               '${(progress * 100).round()}%',
-              style: AppTextStyles.body.copyWith(
+              style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 12,
-                color: AppColors.textMuted,
+                color: AppColors.of(context).textMuted,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -319,10 +325,9 @@ class _TermsAndConditionsPageState
         const SizedBox(height: 4),
         Text(
           'مؤشر القراءة: الأقسام التي فتحتها',
-          style: AppTextStyles.body.copyWith(
-            fontSize: 11,
-            color: AppColors.textMuted,
-          ),
+          style: AppTextStyles.bodyOf(
+            context,
+          ).copyWith(fontSize: 11, color: AppColors.of(context).textMuted),
         ),
       ],
     );
@@ -337,22 +342,24 @@ class _OfflineBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.accent.withValues(alpha: 0.15),
+        color: AppColors.of(context).accent.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.darkGold.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: AppColors.of(context).darkGold.withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.cloud_off_outlined,
-            color: AppColors.darkGold,
+            color: AppColors.of(context).darkGold,
             size: 20,
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               'تعذر الاتصال — يتم عرض النسخة المحلية الاحتياطية.',
-              style: AppTextStyles.body.copyWith(fontSize: 13),
+              style: AppTextStyles.bodyOf(context).copyWith(fontSize: 13),
             ),
           ),
         ],

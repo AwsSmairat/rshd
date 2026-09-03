@@ -50,7 +50,7 @@ class LuxuryTextField extends StatelessWidget {
             style: TextStyle(
               fontSize: labelSize,
               fontWeight: FontWeight.w600,
-              color: AppColors.text,
+              color: AppColors.of(context).text,
             ),
           ),
         ),
@@ -62,37 +62,43 @@ class LuxuryTextField extends StatelessWidget {
           textInputAction: textInputAction,
           validator: validator,
           textAlign: TextAlign.right,
-          style: TextStyle(color: AppColors.text, fontSize: fieldSize),
+          style: TextStyle(
+            color: AppColors.of(context).text,
+            fontSize: fieldSize,
+          ),
           decoration: InputDecoration(
             hintText: hintText,
             errorText: errorText,
             filled: true,
-            fillColor: AppColors.background,
+            fillColor: AppColors.of(context).background,
             contentPadding: EdgeInsets.symmetric(
               horizontal: metrics.isTablet ? 14 : 12,
               vertical: verticalPadding,
             ),
             hintStyle: TextStyle(
-              color: AppColors.textMuted.withValues(alpha: 0.65),
+              color: AppColors.of(context).textMuted.withValues(alpha: 0.65),
               fontSize: fieldSize,
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide(
-                color: AppColors.accent.withValues(alpha: 0.45),
+                color: AppColors.of(context).accent.withValues(alpha: 0.45),
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
+              borderSide: BorderSide(
+                color: AppColors.of(context).accent,
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.error),
+              borderSide: BorderSide(color: AppColors.of(context).error),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.error),
+              borderSide: BorderSide(color: AppColors.of(context).error),
             ),
             prefixIcon: icon == null ? null : _FieldIcon(icon: icon!),
             prefixIconConstraints: const BoxConstraints(
@@ -120,7 +126,7 @@ class _FieldIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsetsDirectional.only(start: 12, end: 4),
-      child: Icon(icon, color: AppColors.accent, size: 22),
+      child: Icon(icon, color: AppColors.of(context).accent, size: 22),
     );
   }
 }

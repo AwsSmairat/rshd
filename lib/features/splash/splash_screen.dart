@@ -178,11 +178,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           scale: 0.85 + 0.15 * progress,
           child: Text(
             _letters[index],
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 56,
               fontWeight: FontWeight.w800,
               letterSpacing: 6,
-              color: AppColors.accent,
+              color: AppColors.of(context).accent,
               shadows: [
                 Shadow(
                   color: Color(0x33061526),
@@ -200,8 +200,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     if (_navigated) {
-      return const Scaffold(
-        backgroundColor: AppColors.background,
+      return Scaffold(
+        backgroundColor: AppColors.of(context).background,
         body: SizedBox.shrink(),
       );
     }
@@ -218,7 +218,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     final targetScale = (size.longestSide / 55).clamp(12.0, 20.0);
 
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.of(context).primary,
       body: AnimatedBuilder(
         animation: Listenable.merge([_introController, _zoomController]),
         builder: (context, _) {
@@ -241,20 +241,20 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 IgnorePointer(
                   child: Opacity(
                     opacity: appPreviewOpacity,
-                    child: const ColoredBox(color: AppColors.background),
+                    child: ColoredBox(color: AppColors.of(context).background),
                   ),
                 ),
                 IgnorePointer(
                   child: Opacity(
                     opacity: splashOpacity,
                     child: DecoratedBox(
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topRight,
                           end: Alignment.bottomLeft,
                           colors: [
-                            AppColors.primary,
-                            AppColors.secondaryNavy,
+                            AppColors.of(context).primary,
+                            AppColors.of(context).secondaryNavy,
                             Color(0xFF061526),
                           ],
                         ),
@@ -281,13 +281,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                             child: AnimatedOpacity(
                               duration: const Duration(milliseconds: 250),
                               opacity: waitingForAuth ? 1.0 : 0.0,
-                              child: const SizedBox(
+                              child: SizedBox(
                                 width: 22,
                                 height: 22,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                    AppColors.accent,
+                                    AppColors.of(context).accent,
                                   ),
                                 ),
                               ),

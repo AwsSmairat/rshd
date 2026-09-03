@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../data/models/video_model.dart';
 import '../utils/playback_refresh_scheduler.dart';
+import '../utils/playback_url_preferences.dart';
 
 /// Bunny Stream embed player (iframe.mediadelivery.net) for when CDN HLS is blocked.
 class RshdEmbedVideoPlayer extends StatefulWidget {
@@ -16,19 +17,27 @@ class RshdEmbedVideoPlayer extends StatefulWidget {
     required this.playbackUrl,
     this.expiresAt,
     this.blockPlayback = false,
+    this.autoPlay = false,
+    this.rememberPosition = true,
+    this.quality = 'auto',
     this.onRefreshPlayback,
+    this.onRequestFloating,
   });
 
   final String playbackUrl;
   final DateTime? expiresAt;
   final bool blockPlayback;
+  final bool autoPlay;
+  final bool rememberPosition;
+  final String quality;
   final Future<VideoPlaybackModel?> Function()? onRefreshPlayback;
+  final VoidCallback? onRequestFloating;
 
   @override
-  State<RshdEmbedVideoPlayer> createState() => _RshdEmbedVideoPlayerState();
+  State<RshdEmbedVideoPlayer> createState() => RshdEmbedVideoPlayerState();
 }
 
-class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
+class RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
   WebViewController? _controller;
   Timer? _refreshTimer;
   Timer? _loadingTimeoutTimer;
@@ -72,6 +81,12 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
     if (oldWidget.expiresAt != widget.expiresAt) {
       _activeExpiresAt = widget.expiresAt;
       _scheduleRefreshTimer();
+    }
+
+    if (oldWidget.autoPlay != widget.autoPlay ||
+        oldWidget.rememberPosition != widget.rememberPosition ||
+        oldWidget.quality != widget.quality) {
+      unawaited(_loadUrl(_activePlaybackUrl));
     }
   }
 
@@ -144,7 +159,16 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
     }
 
     _beginLoading();
-    await controller.loadRequest(Uri.parse(url));
+    await controller.loadRequest(
+      Uri.parse(
+        playbackUrlWithPreferences(
+          url,
+          autoPlay: widget.autoPlay,
+          rememberPosition: widget.rememberPosition,
+          quality: widget.quality,
+        ),
+      ),
+    );
   }
 
   void _scheduleRefreshTimer() {
@@ -225,7 +249,7 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     if (widget.blockPlayback) {
-      return const ColoredBox(color: AppColors.primary);
+      return ColoredBox(color: AppColors.of(context).primary);
     }
 
     if (_errorMessage != null) {
@@ -237,10 +261,12 @@ class _RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
       children: [
         if (_controller != null) WebViewWidget(controller: _controller!),
         if (_isLoading || _isRefreshing)
-          const ColoredBox(
+          ColoredBox(
             color: Colors.black87,
             child: Center(
-              child: CircularProgressIndicator(color: AppColors.darkGold),
+              child: CircularProgressIndicator(
+                color: AppColors.of(context).darkGold,
+              ),
             ),
           ),
       ],
@@ -268,21 +294,25 @@ class _PlaybackErrorState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.play_disabled_rounded,
-            color: AppColors.error,
+            color: AppColors.of(context).error,
             size: 48,
           ),
           const SizedBox(height: 16),
           Text(
             'تعذّر التشغيل',
-            style: AppTextStyles.subtitle.copyWith(color: AppColors.text),
+            style: AppTextStyles.subtitleOf(
+              context,
+            ).copyWith(color: AppColors.of(context).text),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
             message,
-            style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+            style: AppTextStyles.bodyOf(
+              context,
+            ).copyWith(color: AppColors.of(context).textMuted),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
