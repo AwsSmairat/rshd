@@ -71,7 +71,7 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::STYLES_AFTER,
                 fn (): HtmlString => new HtmlString(
-                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=27">'.
+                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=28">'.
                     '<link rel="preconnect" href="https://fonts.googleapis.com">'.
                     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'.
                     '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">'
@@ -124,6 +124,12 @@ class AdminPanelProvider extends PanelProvider
                     '<div class="rshd-sidebar-brand-caption" style="padding:0 1rem 0.85rem;color:rgba(214,181,109,.8);font-size:.75rem;font-weight:600;">'
                     .e($settings->platformSubtitle())
                     .'</div>'
+                ),
+            )
+            ->renderHook(
+                PanelsRenderHook::SCRIPTS_AFTER,
+                fn (): HtmlString => new HtmlString(
+                    '<script src="'.e(asset('js/rshd-filament-menus.js')).'?v=1"></script>'
                 ),
             )
             ->middleware([
