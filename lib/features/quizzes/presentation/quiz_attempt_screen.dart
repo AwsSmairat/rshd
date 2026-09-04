@@ -172,12 +172,13 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
 
     ref.listen(quizAttemptControllerProvider(widget.quizId), (previous, next) {
       _handleUnauthorized(next.errorMessage);
-      if (next.status == QuizAttemptStatus.error &&
-          next.errorMessage != null &&
+      final message = next.errorMessage;
+      if (message != null &&
+          message != previous?.errorMessage &&
           next.status != QuizAttemptStatus.submitting) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(next.errorMessage!))));
+        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(message))));
       }
     });
 

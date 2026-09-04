@@ -77,7 +77,8 @@ class _SettingsSectionCardState extends State<SettingsSectionCard> {
                           ),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: Text(AppStrings.of(context).t(widget.title),
+                            child: Text(
+                              AppStrings.of(context).t(widget.title),
                               style: AppTextStyles.subtitleOf(context).copyWith(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
@@ -161,7 +162,8 @@ class SettingsItemTile extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(AppStrings.of(context).t(label),
+            child: Text(
+              AppStrings.of(context).t(label),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -171,7 +173,8 @@ class SettingsItemTile extends StatelessWidget {
           ),
           if (value != null) ...[
             Flexible(
-              child: Text(AppStrings.of(context).t(value!),
+              child: Text(
+                AppStrings.of(context).t(value!),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   fontSize: 12,
                   color: valueColor ?? AppColors.of(context).textMuted,
@@ -238,7 +241,8 @@ Future<T?> showSettingsOptionPicker<T>({
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              child: Text(AppStrings.of(context).t(title),
+              child: Text(
+                AppStrings.of(context).t(title),
                 style: AppTextStyles.subtitleOf(
                   context,
                 ).copyWith(fontSize: 16, fontWeight: FontWeight.w700),
@@ -285,7 +289,8 @@ class SettingsSwitchTile extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: Text(AppStrings.of(context).t(label),
+                child: Text(
+                  AppStrings.of(context).t(label),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,

@@ -224,8 +224,10 @@ class StudentSettingsService
     protected function profilePayload(User $user): array
     {
         $avatarPath = $user->resolvedAvatarPath();
+        // Serve through the authenticated API so the app never depends on the
+        // public /storage symlink (staging currently 403s those URLs).
         $avatarUrl = $avatarPath !== null
-            ? Storage::disk('public')->url($avatarPath).'?v='.($user->updated_at?->timestamp ?? time())
+            ? url('/api/v1/student/avatar').'?v='.($user->updated_at?->timestamp ?? time())
             : null;
 
         return [

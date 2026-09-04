@@ -33,4 +33,29 @@ void main() {
     expect(prefs.toJson()['notify_assignments'], isTrue);
     expect(prefs.toJson()['theme'], 'light');
   });
+
+  test('StudentPreferencesModel reads Laravel 1/0 booleans', () {
+    final prefs = StudentPreferencesModel.fromJson({
+      'notify_lessons': 1,
+      'notify_assignments': 0,
+      'auto_play_video': '1',
+      'save_watch_position': 'false',
+      'two_factor_enabled': 1,
+    });
+
+    expect(prefs.notifyLessons, isTrue);
+    expect(prefs.notifyAssignments, isFalse);
+    expect(prefs.autoPlayVideo, isTrue);
+    expect(prefs.saveWatchPosition, isFalse);
+    expect(prefs.twoFactorEnabled, isTrue);
+    // Absent keys keep their documented defaults.
+    expect(prefs.notifyGrades, isTrue);
+  });
+
+  test('StudentSettingsModel tolerates a missing profile object', () {
+    final model = StudentSettingsModel.fromJson({'preferences': {}});
+
+    expect(model.profile.name, isEmpty);
+    expect(model.devices, isEmpty);
+  });
 }

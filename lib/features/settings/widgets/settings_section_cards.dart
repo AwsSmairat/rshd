@@ -7,17 +7,20 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../profile/widgets/profile_detail_row.dart';
 import '../data/models/student_settings_model.dart';
 import 'settings_shared_widgets.dart';
+import 'student_avatar_image.dart';
 
 class ProfilePhotoCard extends StatelessWidget {
   const ProfilePhotoCard({
     super.key,
     required this.profile,
+    this.localAvatarPath,
     required this.isUploading,
     required this.onPick,
     required this.onDelete,
   });
 
   final StudentProfileModel profile;
+  final String? localAvatarPath;
   final bool isUploading;
   final ValueChanged<ImageSource> onPick;
   final VoidCallback onDelete;
@@ -41,7 +44,7 @@ class ProfilePhotoCard extends StatelessWidget {
                 title: Text(AppStrings.of(context).t(strings.takePhoto)),
                 onTap: () => Navigator.pop(context, ImageSource.camera),
               ),
-              if (profile.avatarUrl != null)
+              if (profile.avatarUrl != null || localAvatarPath != null)
                 ListTile(
                   leading: const Icon(
                     Icons.delete_outline,
@@ -63,6 +66,12 @@ class ProfilePhotoCard extends StatelessWidget {
       onPick(source);
     }
   }
+
+  Widget _avatarPlaceholder(BuildContext context) => Icon(
+    Icons.person_outline,
+    size: 48,
+    color: AppColors.of(context).textMuted.withValues(alpha: 0.7),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -87,15 +96,11 @@ class ProfilePhotoCard extends StatelessWidget {
                   ),
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: profile.avatarUrl != null
-                    ? Image.network(profile.avatarUrl!, fit: BoxFit.cover)
-                    : Icon(
-                        Icons.person_outline,
-                        size: 48,
-                        color: AppColors.of(
-                          context,
-                        ).textMuted.withValues(alpha: 0.7),
-                      ),
+                child: StudentAvatarImage(
+                  size: 110,
+                  localPath: localAvatarPath,
+                  placeholder: _avatarPlaceholder(context),
+                ),
               ),
               Positioned(
                 bottom: 4,
@@ -132,7 +137,8 @@ class ProfilePhotoCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Text(AppStrings.of(context).t(strings.changePhotoHint),
+          Text(
+            AppStrings.of(context).t(strings.changePhotoHint),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
@@ -180,7 +186,10 @@ class PersonalInformationCard extends StatelessWidget {
     return SettingsSectionCard(
       title: strings.personalInfo,
       icon: Icons.person_outline,
-      trailing: TextButton(onPressed: onEdit, child: Text(AppStrings.of(context).t(strings.edit))),
+      trailing: TextButton(
+        onPressed: onEdit,
+        child: Text(AppStrings.of(context).t(strings.edit)),
+      ),
       child: Column(
         children: [
           ProfileDetailRow(
@@ -282,9 +291,15 @@ class SecuritySettingsCard extends StatelessWidget {
           if (profile.passwordSetAt != null)
             Padding(
               padding: const EdgeInsets.only(top: 4, bottom: 4),
-              child: Text(AppStrings.of(context).t(strings.passwordLastUpdated(
-                  profile.passwordSetAt!.split('T').first.replaceAll('-', '/'),
-                )),
+              child: Text(
+                AppStrings.of(context).t(
+                  strings.passwordLastUpdated(
+                    profile.passwordSetAt!
+                        .split('T')
+                        .first
+                        .replaceAll('-', '/'),
+                  ),
+                ),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   fontSize: 12,
                   color: AppColors.of(context).textMuted,
@@ -478,7 +493,11 @@ class NotificationSettingsCard extends StatelessWidget {
       icon: Icons.notifications_outlined,
       trailing: TextButton(
         onPressed: onToggleAll,
-        child: Text(AppStrings.of(context).t(_allEnabled ? strings.disableAll : strings.enableAll)),
+        child: Text(
+          AppStrings.of(
+            context,
+          ).t(_allEnabled ? strings.disableAll : strings.enableAll),
+        ),
       ),
       child: Column(
         children: [
@@ -729,7 +748,8 @@ class _SupportChip extends StatelessWidget {
             children: [
               Icon(icon, color: AppColors.of(context).darkGold, size: 24),
               const SizedBox(height: 8),
-              Text(AppStrings.of(context).t(label),
+              Text(
+                AppStrings.of(context).t(label),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(fontSize: 12, fontWeight: FontWeight.w600),
@@ -777,9 +797,12 @@ class SettingsLogoutButton extends StatelessWidget {
                 ),
               )
             : const Icon(Icons.logout_rounded),
-        label: Text(AppStrings.of(context).t(isLoading
-              ? AppStrings.of(context).loggingOut
-              : AppStrings.of(context).logout),
+        label: Text(
+          AppStrings.of(context).t(
+            isLoading
+                ? AppStrings.of(context).loggingOut
+                : AppStrings.of(context).logout,
+          ),
         ),
       ),
     );

@@ -108,6 +108,7 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:api-authenticated'])-
             Route::post('support/messages', [TechnicalSupportController::class, 'sendMessage']);
             Route::get('settings', [StudentSettingsController::class, 'show']);
             Route::patch('profile', [StudentSettingsController::class, 'updateProfile']);
+            Route::get('avatar', [StudentSettingsController::class, 'showAvatar']);
             Route::post('avatar', [StudentSettingsController::class, 'uploadAvatar']);
             Route::delete('avatar', [StudentSettingsController::class, 'deleteAvatar']);
             Route::patch('password', [StudentSettingsController::class, 'updatePassword']);

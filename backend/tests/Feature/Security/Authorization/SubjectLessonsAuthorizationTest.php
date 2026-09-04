@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Security\Authorization;
 
+use App\Enums\ContentStatus;
 use App\Enums\VideoStatus;
+use App\Models\Assignment;
 use App\Models\Video;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -65,6 +67,39 @@ class SubjectLessonsAuthorizationTest extends TestCase
         $videoPayload = collect($lesson['videos'] ?? [])->first();
         $this->assertTrue($videoPayload['is_locked'] ?? false);
         $this->assertNull($videoPayload['playback']['url'] ?? null);
+    }
+
+    public function test_non_enrolled_student_cannot_read_assignment_attachment_url(): void
+    {
+        [$enrolledStudent, $file] = $this->createEnrolledLessonFileScenario();
+        $lesson = $file->lesson;
+        $assignment = $this->attachAssignmentToLesson($lesson);
+
+        $foreignStudent = $this->createStudent(['email' => 'assignment-leak@rshd.test']);
+        Sanctum::actingAs($foreignStudent);
+
+        $preview = $this->getJson('/api/v1/subjects/'.$lesson->subject_id.'/lessons')->assertOk();
+        $previewLesson = collect($preview->json('data'))->firstWhere('id', $lesson->id);
+        $previewAssignment = collect($previewLesson['assignments'] ?? [])
+            ->firstWhere('id', $assignment->id);
+
+        $this->assertNotNull($previewAssignment);
+        $this->assertTrue($previewAssignment['is_locked'] ?? false);
+        $this->assertNull($previewAssignment['attachment_url'] ?? null);
+        $this->assertStringNotContainsString(
+            $assignment->attachment_path,
+            (string) json_encode($preview->json('data')),
+        );
+
+        Sanctum::actingAs($enrolledStudent);
+
+        $owned = $this->getJson('/api/v1/subjects/'.$lesson->subject_id.'/lessons')->assertOk();
+        $ownedLesson = collect($owned->json('data'))->firstWhere('id', $lesson->id);
+        $ownedAssignment = collect($ownedLesson['assignments'] ?? [])
+            ->firstWhere('id', $assignment->id);
+
+        $this->assertFalse($ownedAssignment['is_locked'] ?? true);
+        $this->assertNotNull($ownedAssignment['attachment_url'] ?? null);
     }
 
     public function test_expired_enrollment_student_sees_locked_protected_content(): void
@@ -132,6 +167,20 @@ class SubjectLessonsAuthorizationTest extends TestCase
 
         $this->assertStringNotContainsString($file->external_path, $payload);
         $this->assertStringNotContainsString('storage.bunnycdn.com', strtolower($payload));
+    }
+
+    private function attachAssignmentToLesson($lesson): Assignment
+    {
+        return Assignment::query()->create([
+            'subject_id' => $lesson->subject_id,
+            'lesson_id' => $lesson->id,
+            'title' => 'واجب تجريبي',
+            'description' => 'وصف',
+            'attachment_path' => 'assignments/secret-brief.pdf',
+            'original_file_name' => 'secret-brief.pdf',
+            'status' => ContentStatus::Active,
+            'due_date' => now()->addWeek(),
+        ]);
     }
 
     private function attachVideoToLesson($lesson): Video

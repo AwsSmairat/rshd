@@ -43,6 +43,10 @@ class LessonFileAccessService
 
     public function isReadyForDownload(LessonFile $lessonFile): bool
     {
+        if ($lessonFile->file_type?->needsPdfPreview()) {
+            return filled($lessonFile->file_path);
+        }
+
         if ($lessonFile->isBunnyStored()) {
             if ($lessonFile->storage_status !== LessonFileStorageStatus::Ready) {
                 return false;

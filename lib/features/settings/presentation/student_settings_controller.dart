@@ -4,6 +4,7 @@ import '../../../core/network/api_exception.dart';
 import '../../subjects/presentation/subjects_controller.dart';
 import '../data/models/student_settings_model.dart';
 import '../data/settings_repository.dart';
+import '../data/student_avatar_store.dart';
 
 class StudentSettingsState {
   const StudentSettingsState({
@@ -13,6 +14,7 @@ class StudentSettingsState {
     this.isSaving = false,
     this.isUploadingAvatar = false,
     this.actionMessage,
+    this.localAvatarPath,
   });
 
   final FeatureLoadStatus status;
@@ -21,6 +23,7 @@ class StudentSettingsState {
   final bool isSaving;
   final bool isUploadingAvatar;
   final String? actionMessage;
+  final String? localAvatarPath;
 
   StudentSettingsState copyWith({
     FeatureLoadStatus? status,
@@ -29,8 +32,10 @@ class StudentSettingsState {
     bool? isSaving,
     bool? isUploadingAvatar,
     String? actionMessage,
+    String? localAvatarPath,
     bool clearError = false,
     bool clearMessage = false,
+    bool clearLocalAvatar = false,
   }) {
     return StudentSettingsState(
       status: status ?? this.status,
@@ -41,6 +46,9 @@ class StudentSettingsState {
       actionMessage: clearMessage
           ? null
           : (actionMessage ?? this.actionMessage),
+      localAvatarPath: clearLocalAvatar
+          ? null
+          : (localAvatarPath ?? this.localAvatarPath),
     );
   }
 }
@@ -56,10 +64,39 @@ String mapSettingsError(ApiException error) {
 }
 
 class StudentSettingsController extends StateNotifier<StudentSettingsState> {
-  StudentSettingsController(this._repository)
-    : super(const StudentSettingsState());
+  StudentSettingsController(
+    this._repository, {
+    StudentAvatarStore? avatarStore,
+  }) : _avatarStore = avatarStore ?? StudentAvatarStore(),
+       super(const StudentSettingsState());
 
   final SettingsRepository _repository;
+  final StudentAvatarStore _avatarStore;
+
+  Future<String?> _resolveLocalAvatar(StudentSettingsModel settings) async {
+    final remoteUrl = settings.profile.avatarUrl;
+    if (remoteUrl == null || remoteUrl.isEmpty) {
+      await _avatarStore.clear();
+      return null;
+    }
+
+    final cached = await _avatarStore.existingPath();
+    if (cached != null) {
+      return cached;
+    }
+
+    final bytes = await _repository.downloadAvatar();
+    if (bytes != null) {
+      try {
+        return await _avatarStore.saveFromBytes(bytes);
+      } catch (_) {
+        return state.localAvatarPath;
+      }
+    }
+
+    // Keep a just-picked preview if a background settings reload races us.
+    return state.localAvatarPath;
+  }
 
   Future<void> load({bool refresh = false}) async {
     if (!refresh && state.status == FeatureLoadStatus.loading) {
@@ -74,9 +111,12 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
 
     try {
       final settings = await _repository.getSettings();
+      final localPath = await _resolveLocalAvatar(settings);
       state = state.copyWith(
         status: FeatureLoadStatus.loaded,
         settings: settings,
+        localAvatarPath: localPath,
+        clearLocalAvatar: localPath == null,
         clearError: true,
       );
     } on ApiException catch (error) {
@@ -123,8 +163,15 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
   }
 
   Future<bool> uploadAvatar(String path) async {
+    String? previewPath = path;
+    try {
+      previewPath = await _avatarStore.saveFromPath(path);
+    } catch (_) {
+      previewPath = path;
+    }
     state = state.copyWith(
       isUploadingAvatar: true,
+      localAvatarPath: previewPath,
       clearError: true,
       clearMessage: true,
     );
@@ -133,6 +180,7 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
       state = state.copyWith(
         isUploadingAvatar: false,
         settings: settings,
+        localAvatarPath: previewPath,
         actionMessage: 'تم تحديث الصورة الشخصية',
       );
       return true;
@@ -149,9 +197,11 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
     state = state.copyWith(isUploadingAvatar: true, clearMessage: true);
     try {
       final settings = await _repository.deleteAvatar();
+      await _avatarStore.clear();
       state = state.copyWith(
         isUploadingAvatar: false,
         settings: settings,
+        clearLocalAvatar: true,
         actionMessage: 'تم حذف الصورة الشخصية',
       );
       return true;

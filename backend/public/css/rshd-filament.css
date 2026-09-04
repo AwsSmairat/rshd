@@ -38,15 +38,19 @@
     padding-block: 1.25rem !important;
 }
 
-/* أزرار طي الشريط — مخفية للأدمن والمدرس */
-.fi-topbar-sidebar-toggle,
+/* زر طي الشريط أعلى القائمة */
 .fi-sidebar-header > .fi-icon-btn {
-    display: none !important;
+    display: inline-flex !important;
+}
+
+.fi-topbar-sidebar-toggle {
+    display: inline-flex !important;
 }
 
 @media (min-width: 1024px) {
     .fi-topbar-open-sidebar-btn,
-    .fi-topbar-close-sidebar-btn {
+    .fi-topbar-close-sidebar-btn,
+    .fi-topbar-sidebar-toggle {
         display: none !important;
     }
 }
@@ -104,6 +108,19 @@
         background-image: none !important;
         min-width: 2.25rem;
         min-height: 2.25rem;
+    }
+
+    .fi-sidebar:not(.fi-sidebar-open) .rshd-sidebar-brand-caption,
+    .fi-sidebar:not(.fi-sidebar-open) .rshd-sidebar-logout span {
+        display: none !important;
+    }
+
+    .fi-sidebar:not(.fi-sidebar-open) .rshd-sidebar-logout {
+        padding-inline: 0.4rem;
+    }
+
+    .fi-sidebar:not(.fi-sidebar-open) .rshd-sidebar-logout__btn {
+        padding: 0.55rem;
     }
 }
 
@@ -3202,4 +3219,45 @@
         font-family: "Cairo", "Tajawal", "Segoe UI", sans-serif;
         direction: rtl;
     }
+}
+
+/* Quiz builder: questions + circular correct-answer selector */
+.rshd-quiz-builder .fi-fo-repeater-item {
+    border: 1px solid #E7E1D6 !important;
+    border-radius: 1rem !important;
+    background: #FFFcf7 !important;
+    padding: 0.35rem 0.15rem;
+}
+
+.rshd-quiz-builder .fi-fo-repeater .fi-fo-repeater .fi-fo-repeater-item {
+    background: #fff !important;
+    border-radius: 0.85rem !important;
+    box-shadow: none !important;
+}
+
+.rshd-quiz-correct {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+}
+
+.rshd-quiz-correct .fi-fo-checkbox-input,
+.rshd-quiz-correct input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1.35rem;
+    height: 1.35rem;
+    margin: 0;
+    border: 2px solid #C4A574;
+    border-radius: 999px;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+.rshd-quiz-correct input[type="checkbox"]:checked {
+    background: #D6B56D;
+    border-color: #B08A4A;
+    box-shadow: inset 0 0 0 3px #fff;
 }

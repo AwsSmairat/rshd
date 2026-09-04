@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/rendering.dart';
 
 import '../models/pdf_editor_models.dart';
@@ -61,6 +63,10 @@ class PdfPageLayoutMetrics {
 
   Rect get pageRect => pageTopLeft & displaySize;
 
+  /// Page bounds relative to the page itself, for painters whose canvas
+  /// origin already sits at [pageTopLeft].
+  Rect get pageLocalRect => Offset.zero & displaySize;
+
   bool containsScreenPoint(Offset screenPoint) {
     return pageRect.contains(screenPoint);
   }
@@ -74,8 +80,11 @@ class PdfPageLayoutMetrics {
   }
 
   Offset normalizedToScreen(NormalizedPoint point) {
-    return pageTopLeft +
-        Offset(point.nx * displaySize.width, point.ny * displaySize.height);
+    return pageTopLeft + normalizedToPageLocal(point);
+  }
+
+  Offset normalizedToPageLocal(NormalizedPoint point) {
+    return Offset(point.nx * displaySize.width, point.ny * displaySize.height);
   }
 
   Rect normalizedRectToScreen({
@@ -85,6 +94,21 @@ class PdfPageLayoutMetrics {
     required double height,
   }) {
     final topLeft = normalizedToScreen(NormalizedPoint(x, y));
+    return Rect.fromLTWH(
+      topLeft.dx,
+      topLeft.dy,
+      width * displaySize.width,
+      height * displaySize.height,
+    );
+  }
+
+  Rect normalizedRectToPageLocal({
+    required double x,
+    required double y,
+    required double width,
+    required double height,
+  }) {
+    final topLeft = normalizedToPageLocal(NormalizedPoint(x, y));
     return Rect.fromLTWH(
       topLeft.dx,
       topLeft.dy,
@@ -113,11 +137,40 @@ class PdfCoordinateMapper {
     return points.map(metrics.normalizedToScreen).toList();
   }
 
+  static List<Offset> normalizedPointsToPageLocal(
+    List<NormalizedPoint> points,
+    PdfPageLayoutMetrics metrics,
+  ) {
+    return points.map(metrics.normalizedToPageLocal).toList();
+  }
+
   static List<NormalizedPoint> screenPointsToNormalized(
     List<Offset> points,
     PdfPageLayoutMetrics metrics,
   ) {
     return points.map(metrics.screenToNormalized).toList();
+  }
+
+  /// Largest box with the page's aspect ratio that fits inside [viewportSize].
+  ///
+  /// Hosting [SfPdfViewer] in a box of exactly this size makes the rendered
+  /// page fill it edge to edge, so the annotation overlay can be aligned to the
+  /// box instead of guessing where the viewer placed the page.
+  static Size fitPageInViewport({
+    required Size pageSize,
+    required Size viewportSize,
+  }) {
+    if (pageSize.width <= 0 ||
+        pageSize.height <= 0 ||
+        viewportSize.width <= 0 ||
+        viewportSize.height <= 0) {
+      return Size.zero;
+    }
+    final scale = math.min(
+      viewportSize.width / pageSize.width,
+      viewportSize.height / pageSize.height,
+    );
+    return Size(pageSize.width * scale, pageSize.height * scale);
   }
 
   /// Returns the page size as displayed by Syncfusion (accounts for 90°/270° rotation).

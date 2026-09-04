@@ -10,9 +10,11 @@ use App\Models\PdfAnnotation;
 use App\Models\User;
 use App\Services\LessonFileAccessService;
 use App\Services\LessonFileDownloadService;
+use App\Services\LessonFiles\LessonFilePdfPreviewService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LessonFileController extends Controller
@@ -47,7 +49,7 @@ class LessonFileController extends Controller
         ]);
     }
 
-    public function stream(Request $request, LessonFile $lessonFile): StreamedResponse
+    public function stream(Request $request, LessonFile $lessonFile): BinaryFileResponse|StreamedResponse
     {
         if (! $request->hasValidSignature()) {
             abort(403, 'Download link is invalid or expired.');
@@ -65,6 +67,24 @@ class LessonFileController extends Controller
 
         if ($path === '' || ! Storage::disk($diskName)->exists($path)) {
             abort(404, 'File was not found.');
+        }
+
+        $needsPdfPreview = $lessonFile->file_type?->needsPdfPreview() ?? false;
+
+        if ($needsPdfPreview) {
+            try {
+                $previewPath = app(LessonFilePdfPreviewService::class)
+                    ->absolutePdfPath($lessonFile);
+            } catch (\Throwable) {
+                abort(503, 'تعذر تجهيز الملف للعرض داخل التطبيق.');
+            }
+
+            return response()->file($previewPath, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="preview.pdf"',
+                'Cache-Control' => 'private, no-store, no-cache, must-revalidate',
+                'Pragma' => 'no-cache',
+            ]);
         }
 
         $mimeType = $lessonFile->file_mime_type ?: 'application/pdf';

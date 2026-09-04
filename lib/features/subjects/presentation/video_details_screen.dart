@@ -96,7 +96,7 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
 
       ref
           .read(videoDetailsControllerProvider(widget.videoId).notifier)
-          .load(widget.videoId);
+          .load(widget.videoId, silent: true);
     });
   }
 

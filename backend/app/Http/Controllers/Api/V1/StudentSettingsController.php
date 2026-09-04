@@ -12,6 +12,8 @@ use App\Models\User;
 use App\Services\StudentSettingsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StudentSettingsController extends Controller
 {
@@ -40,6 +42,26 @@ class StudentSettingsController extends Controller
             $settings->buildSettingsPayload($updated),
             'تم تحديث المعلومات الشخصية بنجاح.',
         );
+    }
+
+    public function showAvatar(Request $request): StreamedResponse|JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        if (! $user->isStudent()) {
+            return $this->forbiddenResponse('هذه الصفحة متاحة للطلاب فقط.');
+        }
+
+        $path = $user->resolvedAvatarPath();
+
+        if ($path === null || ! Storage::disk('public')->exists($path)) {
+            abort(404);
+        }
+
+        return Storage::disk('public')->response($path, headers: [
+            'Cache-Control' => 'private, no-store, no-cache, must-revalidate',
+        ]);
     }
 
     public function uploadAvatar(Request $request, StudentSettingsService $settings): JsonResponse

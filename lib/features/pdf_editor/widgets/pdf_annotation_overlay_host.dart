@@ -38,7 +38,7 @@ class PdfAnnotationOverlayHost extends StatefulWidget {
     required this.onMoveAnnotation,
     required this.onBatchBegin,
     required this.onBatchEnd,
-    required this.onTextAnnotationTap,
+    required this.onAnnotationTap,
   });
 
   final PdfViewerController pdfController;
@@ -70,7 +70,7 @@ class PdfAnnotationOverlayHost extends StatefulWidget {
   final void Function(String id, double x, double y) onMoveAnnotation;
   final VoidCallback onBatchBegin;
   final VoidCallback onBatchEnd;
-  final void Function(PdfEditorAnnotation annotation) onTextAnnotationTap;
+  final void Function(PdfEditorAnnotation annotation) onAnnotationTap;
 
   @override
   State<PdfAnnotationOverlayHost> createState() =>
@@ -79,13 +79,14 @@ class PdfAnnotationOverlayHost extends StatefulWidget {
 
 class _PdfAnnotationOverlayHostState extends State<PdfAnnotationOverlayHost> {
   final _transform = _ViewerTransformNotifier();
+  bool _syncScheduled = false;
 
   @override
   void initState() {
     super.initState();
     widget.pdfController.addListener(_onControllerChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startTransformSync();
+      _onControllerChanged();
     });
   }
 
@@ -107,20 +108,30 @@ class _PdfAnnotationOverlayHostState extends State<PdfAnnotationOverlayHost> {
   }
 
   void _onControllerChanged() {
-    _transform.update(
-      scroll: widget.pdfController.scrollOffset,
-      zoom: widget.pdfController.zoomLevel,
-    );
+    final zoom = widget.pdfController.zoomLevel;
+    _transform.update(scroll: widget.pdfController.scrollOffset, zoom: zoom);
+    // The viewer does not notify while panning, so the offset has to be polled.
+    // At zoom 1 the page exactly fills its box and cannot pan, so polling then
+    // would only keep the engine awake and drain the battery for nothing.
+    if (zoom > 1 && !_syncScheduled) {
+      _syncScheduled = true;
+      _scheduleTransformSync();
+    }
   }
 
-  void _startTransformSync() {
-    if (!mounted) return;
-    _transform.update(
-      scroll: widget.pdfController.scrollOffset,
-      zoom: widget.pdfController.zoomLevel,
-    );
+  void _scheduleTransformSync() {
     WidgetsBinding.instance.scheduleFrameCallback((_) {
-      if (mounted) _startTransformSync();
+      if (!mounted) {
+        _syncScheduled = false;
+        return;
+      }
+      final zoom = widget.pdfController.zoomLevel;
+      _transform.update(scroll: widget.pdfController.scrollOffset, zoom: zoom);
+      if (zoom > 1) {
+        _scheduleTransformSync();
+      } else {
+        _syncScheduled = false;
+      }
     });
   }
 
@@ -168,7 +179,7 @@ class _PdfAnnotationOverlayHostState extends State<PdfAnnotationOverlayHost> {
             onMoveAnnotation: widget.onMoveAnnotation,
             onBatchBegin: widget.onBatchBegin,
             onBatchEnd: widget.onBatchEnd,
-            onTextAnnotationTap: widget.onTextAnnotationTap,
+            onAnnotationTap: widget.onAnnotationTap,
           ),
         );
       },

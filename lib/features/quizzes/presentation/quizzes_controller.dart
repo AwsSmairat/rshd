@@ -383,27 +383,26 @@ class QuizAttemptController extends StateNotifier<QuizAttemptState> {
       );
       return result;
     } on ApiException catch (error) {
-      state = QuizAttemptState(
-        status: QuizAttemptStatus.error,
-        attemptId: state.attemptId,
-        quiz: state.quiz,
-        selectedAnswers: state.selectedAnswers,
-        currentQuestionIndex: state.currentQuestionIndex,
-        remainingSeconds: state.remainingSeconds,
-        errorMessage: mapQuizSubmitError(error),
-      );
+      _failSubmit(mapQuizSubmitError(error));
     } catch (_) {
-      state = QuizAttemptState(
-        status: QuizAttemptStatus.error,
-        attemptId: state.attemptId,
-        quiz: state.quiz,
-        selectedAnswers: state.selectedAnswers,
-        currentQuestionIndex: state.currentQuestionIndex,
-        remainingSeconds: state.remainingSeconds,
-        errorMessage: 'تعذر تسليم الاختبار',
-      );
+      _failSubmit('تعذر تسليم الاختبار');
     }
     return null;
+  }
+
+  /// A failed submit must leave the attempt intact. Switching to
+  /// [QuizAttemptStatus.error] would swap the questions for the "start quiz"
+  /// error screen, whose retry opens a brand new attempt and discards answers.
+  void _failSubmit(String message) {
+    state = QuizAttemptState(
+      status: QuizAttemptStatus.loaded,
+      attemptId: state.attemptId,
+      quiz: state.quiz,
+      selectedAnswers: state.selectedAnswers,
+      currentQuestionIndex: state.currentQuestionIndex,
+      remainingSeconds: state.remainingSeconds,
+      errorMessage: message,
+    );
   }
 }
 

@@ -77,6 +77,87 @@ void main() {
       expect(zoomed.screenToNormalized(zoomedScreen).nx, closeTo(0.25, 0.001));
     });
 
+    test('page-local mapping matches screen mapping minus page origin', () {
+      final metrics = PdfPageLayoutMetrics.fromViewport(
+        pdfPageSize: const Size(595, 842),
+        viewportSize: const Size(400, 800),
+        zoomLevel: 1,
+      );
+
+      const point = NormalizedPoint(0.3, 0.6);
+      final local = metrics.normalizedToPageLocal(point);
+      final screen = metrics.normalizedToScreen(point);
+
+      expect(local, screen - metrics.pageTopLeft);
+      expect(metrics.pageLocalRect.topLeft, Offset.zero);
+      expect(metrics.pageLocalRect.size, metrics.displaySize);
+    });
+
+    test('page-local rect keeps annotation size and drops page origin', () {
+      final metrics = PdfPageLayoutMetrics.fromViewport(
+        pdfPageSize: const Size(595, 842),
+        viewportSize: const Size(400, 800),
+        zoomLevel: 1,
+      );
+
+      final local = metrics.normalizedRectToPageLocal(
+        x: 0.1,
+        y: 0.2,
+        width: 0.5,
+        height: 0.25,
+      );
+      final screen = metrics.normalizedRectToScreen(
+        x: 0.1,
+        y: 0.2,
+        width: 0.5,
+        height: 0.25,
+      );
+
+      expect(local.size, screen.size);
+      expect(local.left, closeTo(screen.left - metrics.pageTopLeft.dx, 0.001));
+      expect(local.top, closeTo(screen.top - metrics.pageTopLeft.dy, 0.001));
+    });
+
+    test('fitted box keeps the page aspect ratio and stays inside', () {
+      for (final page in const [
+        Size(595, 842),
+        Size(842, 595),
+        Size(500, 500),
+      ]) {
+        for (final available in const [Size(400, 800), Size(900, 300)]) {
+          final box = PdfCoordinateMapper.fitPageInViewport(
+            pageSize: page,
+            viewportSize: available,
+          );
+          expect(box.width, lessThanOrEqualTo(available.width + 0.001));
+          expect(box.height, lessThanOrEqualTo(available.height + 0.001));
+          expect(
+            box.width / box.height,
+            closeTo(page.width / page.height, 0.001),
+          );
+        }
+      }
+    });
+
+    test('page hosted in a fitted box sits exactly at the box origin', () {
+      for (final page in const [Size(595, 842), Size(842, 595)]) {
+        final box = PdfCoordinateMapper.fitPageInViewport(
+          pageSize: page,
+          viewportSize: const Size(400, 800),
+        );
+        final metrics = PdfPageLayoutMetrics.fromViewport(
+          pdfPageSize: page,
+          viewportSize: box,
+          zoomLevel: 1,
+        );
+
+        expect(metrics.pageTopLeft.dx, closeTo(0, 0.001));
+        expect(metrics.pageTopLeft.dy, closeTo(0, 0.001));
+        expect(metrics.displaySize.width, closeTo(box.width, 0.001));
+        expect(metrics.displaySize.height, closeTo(box.height, 0.001));
+      }
+    });
+
     test('effective page size swaps dimensions for 90 degree rotation', () {
       final size = PdfCoordinateMapper.effectivePageSize(
         width: 595,

@@ -21,6 +21,19 @@ enum FileType: string
         };
     }
 
+    public function needsPdfPreview(): bool
+    {
+        return $this === self::Doc || $this === self::Ppt;
+    }
+
+    public function isInAppViewable(): bool
+    {
+        return $this === self::Pdf || $this->needsPdfPreview() || $this === self::Image;
+    }
+
+    /**
+     * @return array<string, string>
+     */
     public static function options(): array
     {
         return collect(self::cases())

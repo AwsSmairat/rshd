@@ -6,17 +6,18 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../../auth/presentation/widgets/login_header.dart';
+import 'student_avatar_image.dart';
 
 class StudentSettingsHeader extends StatelessWidget {
   const StudentSettingsHeader({
     super.key,
     required this.name,
-    this.avatarUrl,
+    this.localAvatarPath,
     required this.onBack,
   });
 
   final String name;
-  final String? avatarUrl;
+  final String? localAvatarPath;
   final VoidCallback onBack;
 
   @override
@@ -84,7 +85,10 @@ class StudentSettingsHeader extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Text(AppStrings.of(context).t(AppStrings.of(context).studentSettings),
+                  Text(
+                    AppStrings.of(
+                      context,
+                    ).t(AppStrings.of(context).studentSettings),
                     style: AppTextStyles.subtitleOf(context).copyWith(
                       fontSize: metrics.pageHeaderTitleFontSize,
                       fontWeight: FontWeight.w700,
@@ -94,13 +98,14 @@ class StudentSettingsHeader extends StatelessWidget {
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      _Avatar(url: avatarUrl),
+                      _Avatar(localPath: localAvatarPath),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(AppStrings.of(context).t(name),
+                            Text(
+                              AppStrings.of(context).t(name),
                               style: AppTextStyles.titleOf(context).copyWith(
                                 fontSize: metrics.isTablet ? 24 : 22,
                                 color: AppColors.of(context).white,
@@ -129,7 +134,10 @@ class StudentSettingsHeader extends StatelessWidget {
                                     color: AppColors.of(context).white,
                                   ),
                                   const SizedBox(width: 4),
-                                  Text(AppStrings.of(context).t(AppStrings.of(context).studentRole),
+                                  Text(
+                                    AppStrings.of(
+                                      context,
+                                    ).t(AppStrings.of(context).studentRole),
                                     style: AppTextStyles.bodyOf(context)
                                         .copyWith(
                                           fontSize: 12,
@@ -184,12 +192,18 @@ class StudentSettingsHeader extends StatelessWidget {
 }
 
 class _Avatar extends StatelessWidget {
-  const _Avatar({this.url});
+  const _Avatar({this.localPath});
 
-  final String? url;
+  final String? localPath;
 
   @override
   Widget build(BuildContext context) {
+    final placeholder = Icon(
+      Icons.person_outline,
+      color: AppColors.of(context).accent,
+      size: 36,
+    );
+
     return Container(
       width: 78,
       height: 78,
@@ -199,13 +213,11 @@ class _Avatar extends StatelessWidget {
         color: AppColors.of(context).primary.withValues(alpha: 0.35),
       ),
       clipBehavior: Clip.antiAlias,
-      child: url != null && url!.isNotEmpty
-          ? Image.network(url!, fit: BoxFit.cover)
-          : Icon(
-              Icons.person_outline,
-              color: AppColors.of(context).accent,
-              size: 36,
-            ),
+      child: StudentAvatarImage(
+        size: 78,
+        localPath: localPath,
+        placeholder: placeholder,
+      ),
     );
   }
 }

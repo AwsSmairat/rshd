@@ -219,6 +219,54 @@ class LessonFileDownloadTest extends TestCase
         $this->get($url)->assertForbidden();
     }
 
+    public function test_word_file_stream_is_converted_to_pdf_for_in_app_preview(): void
+    {
+        Storage::fake('public');
+        Storage::fake('lesson_files');
+
+        $this->mock(\App\Services\LessonFiles\OfficeToPdfConverter::class, function ($mock): void {
+            $mock->shouldReceive('convert')
+                ->once()
+                ->andReturnUsing(function (string $sourcePath, string $destinationPath): void {
+                    $this->assertFileExists($sourcePath);
+                    file_put_contents($destinationPath, '%PDF-1.4 office-preview');
+                });
+        });
+
+        [$student, $file] = $this->createEnrolledLessonFileScenario();
+        Storage::disk('public')->put('lesson-files/test1.docx', 'fake-docx-bytes');
+
+        $file->forceFill([
+            'title' => 'test1.1',
+            'file_type' => FileType::Doc,
+            'file_url' => '',
+            'file_path' => 'lesson-files/test1.docx',
+            'original_file_name' => 'test1.docx',
+            'file_size' => 12,
+            'file_mime_type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'storage_provider' => 'local',
+            'storage_disk' => 'public',
+            'external_path' => null,
+            'storage_status' => null,
+        ])->save();
+
+        Sanctum::actingAs($student);
+
+        $url = (string) $this->getJson('/api/v1/files/'.$file->id.'/download')
+            ->assertOk()
+            ->json('data.url');
+
+        $this->assertStringContainsString('/api/v1/files/'.$file->id.'/stream', $url);
+
+        $streamResponse = $this->get($url);
+        $streamResponse->assertOk();
+        $streamResponse->assertHeader('content-type', 'application/pdf');
+        $this->assertSame(
+            '%PDF-1.4 office-preview',
+            $streamResponse->baseResponse->getFile()->getContent(),
+        );
+    }
+
     /**
      * @return array{0: User, 1: LessonFile}
      */

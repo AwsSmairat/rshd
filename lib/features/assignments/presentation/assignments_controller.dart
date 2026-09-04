@@ -235,6 +235,10 @@ class AssignmentSubmitController extends StateNotifier<AssignmentSubmitState> {
     String? filePath,
     String? fileName,
   }) async {
+    if (state.status == AssignmentSubmitStatus.submitting) {
+      return null;
+    }
+
     state = state.copyWith(
       status: AssignmentSubmitStatus.submitting,
       clearError: true,

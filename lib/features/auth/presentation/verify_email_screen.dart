@@ -30,6 +30,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   Timer? _resendTimer;
   int _secondsRemaining = 60;
   bool _isResending = false;
+  bool _isSubmitting = false;
   String _code = '';
 
   @override
@@ -62,6 +63,11 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   }
 
   Future<void> _submit() async {
+    // `onCompleted` can fire while a manual submit is already in flight.
+    if (_isSubmitting) {
+      return;
+    }
+
     if (_code.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppStrings.of(context).t('يرجى إدخال رمز مكوّن من 6 أرقام'))),
@@ -69,12 +75,17 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       return;
     }
 
-    final success = await ref
-        .read(authControllerProvider.notifier)
-        .verifyEmail(email: widget.email, code: _code);
+    _isSubmitting = true;
+    try {
+      final success = await ref
+          .read(authControllerProvider.notifier)
+          .verifyEmail(email: widget.email, code: _code);
 
-    if (success && mounted) {
-      context.go(AppRoutes.home);
+      if (success && mounted) {
+        context.go(AppRoutes.home);
+      }
+    } finally {
+      _isSubmitting = false;
     }
   }
 

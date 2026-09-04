@@ -29,6 +29,14 @@ class LessonFileModel {
       !isLocked &&
       (requiresSignedDownload || (fileUrl?.trim().isNotEmpty ?? false));
 
+  bool get canViewInApp {
+    if (!canOpen) {
+      return false;
+    }
+
+    return fileType == 'pdf' || fileType == 'doc' || fileType == 'ppt';
+  }
+
   factory LessonFileModel.fromJson(Map<String, dynamic> json) {
     return LessonFileModel(
       id: _asInt(json['id']),

@@ -37,7 +37,7 @@ class PdfPageAnnotationLayer extends StatefulWidget {
     required this.onMoveAnnotation,
     required this.onBatchBegin,
     required this.onBatchEnd,
-    required this.onTextAnnotationTap,
+    required this.onAnnotationTap,
   });
 
   final PdfEditorTool tool;
@@ -65,7 +65,8 @@ class PdfPageAnnotationLayer extends StatefulWidget {
   final void Function(String id, double x, double y) onMoveAnnotation;
   final VoidCallback onBatchBegin;
   final VoidCallback onBatchEnd;
-  final void Function(PdfEditorAnnotation annotation) onTextAnnotationTap;
+  /// Fired once, on pointer up, when a lasso tap lands on an annotation.
+  final void Function(PdfEditorAnnotation annotation) onAnnotationTap;
 
   @override
   State<PdfPageAnnotationLayer> createState() => _PdfPageAnnotationLayerState();
@@ -255,9 +256,17 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
       final normalized = _viewportToNormalized(event.localPosition);
       final deltaX = normalized.nx - _moveStartNormalized!.dx;
       final deltaY = normalized.ny - _moveStartNormalized!.dy;
-      final annotation = widget.annotations.firstWhere(
+      // Undo or the eraser can drop the annotation mid-drag.
+      final index = widget.annotations.indexWhere(
         (item) => item.id == _movingAnnotationId,
       );
+      if (index < 0) {
+        _movingAnnotationId = null;
+        _moveStartNormalized = null;
+        _finishBatchIfNeeded();
+        return;
+      }
+      final annotation = widget.annotations[index];
       widget.onMoveAnnotation(
         _movingAnnotationId!,
         (annotation.x + deltaX).clamp(0.0, 1.0),
@@ -359,8 +368,9 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
     if (widget.tool == PdfEditorTool.lasso) {
       final selected = AnnotationHitTest.findAt(widget.annotations, point);
       widget.onSelectAnnotation(selected?.id);
-      if (selected?.type == AnnotationType.text) {
-        widget.onTextAnnotationTap(selected!);
+      // Note markers own their own tap handler, so skip them here.
+      if (selected != null && selected.type != AnnotationType.note) {
+        widget.onAnnotationTap(selected);
       }
     }
   }

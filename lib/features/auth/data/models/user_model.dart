@@ -30,7 +30,7 @@ class UserModel {
     final isEmailVerifiedRaw = json['is_email_verified'];
 
     return UserModel(
-      id: json['id'] as int,
+      id: _asInt(json['id']),
       name: json['name']?.toString() ?? '',
       email: json['email']?.toString() ?? '',
       role: json['role']?.toString() ?? '',
@@ -63,6 +63,12 @@ class UserModel {
   }
 
   bool get isStudent => role.toLowerCase() == 'student';
+
+  static int _asInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? 0;
+  }
 }
 
 class AuthSession {

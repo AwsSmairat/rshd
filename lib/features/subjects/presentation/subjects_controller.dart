@@ -464,9 +464,13 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
 
   final SubjectsRepository _repository;
 
-  Future<void> load(int videoId) async {
+  /// Set [silent] for background refreshes (status polling) so the loaded
+  /// video stays on screen instead of flashing back to a full-screen spinner.
+  Future<void> load(int videoId, {bool silent = false}) async {
     state = state.copyWith(
-      status: FeatureLoadStatus.loading,
+      status: silent && state.video != null
+          ? state.status
+          : FeatureLoadStatus.loading,
       clearError: true,
       clearProgressFeedback: true,
     );

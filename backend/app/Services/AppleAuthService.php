@@ -64,7 +64,12 @@ class AppleAuthService
 
         $audience = (string) ($payload['aud'] ?? '');
         $allowedClientIds = config('services.apple.client_ids', []);
-        if ($allowedClientIds !== [] && ! in_array($audience, $allowedClientIds, true)) {
+
+        if ($allowedClientIds === []) {
+            throw new RuntimeException('تسجيل الدخول عبر Apple غير مهيأ على الخادم.');
+        }
+
+        if (! in_array($audience, $allowedClientIds, true)) {
             throw new RuntimeException('رمز Apple غير مصرح به لهذا التطبيق.');
         }
 

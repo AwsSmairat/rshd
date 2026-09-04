@@ -37,7 +37,13 @@ class GoogleAuthService
         $audience = (string) ($payload['aud'] ?? '');
         $allowedClientIds = config('services.google.client_ids', []);
 
-        if ($allowedClientIds !== [] && ! in_array($audience, $allowedClientIds, true)) {
+        // Without an allowlist any Google ID token would be accepted, letting a
+        // token minted for another OAuth app take over the matching account.
+        if ($allowedClientIds === []) {
+            throw new RuntimeException('تسجيل الدخول عبر Google غير مهيأ على الخادم.');
+        }
+
+        if (! in_array($audience, $allowedClientIds, true)) {
             throw new RuntimeException('رمز Google غير مصرح به لهذا التطبيق.');
         }
 

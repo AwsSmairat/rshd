@@ -114,10 +114,13 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
   ) {
     final document = state.document!;
     final metrics = AppLayoutMetrics.of(context);
-    final introSection = document.sections.firstWhere(
-      (s) => s.id == 'introduction',
-      orElse: () => document.sections.first,
-    );
+    // A remote document may omit the intro section, or ship it without
+    // paragraphs; neither should take the whole screen down.
+    final introSection = document.sections
+        .where((s) => s.id == 'introduction')
+        .followedBy(document.sections)
+        .firstOrNull;
+    final introText = introSection?.paragraphs.firstOrNull ?? '';
     final bodySections = document.sections
         .where((s) => s.id != 'introduction')
         .toList();
@@ -158,14 +161,14 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
               child: metrics.isTablet
                   ? _buildTabletLayout(
                       document: document,
-                      introSection: introSection,
+                      introText: introText,
                       accordionSections: accordionSections,
                       contact: contact,
                       platformName: platformName,
                     )
                   : _buildPhoneLayout(
                       document: document,
-                      introSection: introSection,
+                      introText: introText,
                       accordionSections: accordionSections,
                       contact: contact,
                       platformName: platformName,
@@ -179,7 +182,7 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
 
   Widget _buildPhoneLayout({
     required PrivacyPolicyDocument document,
-    required PrivacyPolicySectionData introSection,
+    required String introText,
     required List<PrivacyPolicySectionData> accordionSections,
     required PrivacyContactInfo contact,
     required String platformName,
@@ -187,7 +190,7 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        PrivacyPolicyIntroCard(introText: introSection.paragraphs.first),
+        PrivacyPolicyIntroCard(introText: introText),
         const SizedBox(height: 12),
         _buildControls(accordionSections),
         const SizedBox(height: 8),
@@ -219,7 +222,7 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
 
   Widget _buildTabletLayout({
     required PrivacyPolicyDocument document,
-    required PrivacyPolicySectionData introSection,
+    required String introText,
     required List<PrivacyPolicySectionData> accordionSections,
     required PrivacyContactInfo contact,
     required String platformName,
@@ -227,7 +230,7 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        PrivacyPolicyIntroCard(introText: introSection.paragraphs.first),
+        PrivacyPolicyIntroCard(introText: introText),
         const SizedBox(height: 12),
         _buildControls(accordionSections),
         const SizedBox(height: 8),

@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\ContentStatus;
 use App\Filament\Concerns\ChecksPlatformInstructorSettings;
 use App\Filament\Concerns\HasInstructorScope;
+use App\Filament\Concerns\HasQuizQuestionsFormFields;
 use App\Filament\Concerns\HasSubjectLessonFormFields;
 use App\Filament\Resources\QuizResource\Pages;
 use App\Models\Quiz;
@@ -19,6 +20,7 @@ class QuizResource extends Resource
 {
     use ChecksPlatformInstructorSettings;
     use HasInstructorScope;
+    use HasQuizQuestionsFormFields;
     use HasSubjectLessonFormFields;
 
     protected static ?string $model = Quiz::class;
@@ -76,6 +78,7 @@ class QuizResource extends Resource
                             ->required(),
                     ])
                     ->columns(2),
+                ...static::quizQuestionsEditor(),
             ]);
     }
 

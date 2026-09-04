@@ -259,6 +259,7 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
 
     final profilePhoto = ProfilePhotoCard(
       profile: settings.profile,
+      localAvatarPath: state.localAvatarPath,
       isUploading: state.isUploadingAvatar,
       onPick: _pickAvatar,
       onDelete: () =>
@@ -459,7 +460,7 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
           SliverToBoxAdapter(
             child: StudentSettingsHeader(
               name: settings.profile.name,
-              avatarUrl: settings.profile.avatarUrl,
+              localAvatarPath: state.localAvatarPath,
               onBack: () {
                 if (context.canPop()) {
                   context.pop();

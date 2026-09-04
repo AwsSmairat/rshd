@@ -32,6 +32,7 @@ class _PasswordResetVerificationScreenState
   Timer? _resendTimer;
   int _secondsRemaining = 60;
   bool _isResending = false;
+  bool _isVerifying = false;
   String _code = '';
 
   @override
@@ -64,6 +65,11 @@ class _PasswordResetVerificationScreenState
   }
 
   Future<void> _verify() async {
+    // `onCompleted` can fire while a manual verify is already in flight.
+    if (_isVerifying) {
+      return;
+    }
+
     if (_code.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppStrings.of(context).t('يرجى إدخال رمز مكوّن من 6 أرقام'))),
@@ -71,9 +77,15 @@ class _PasswordResetVerificationScreenState
       return;
     }
 
-    final success = await ref
-        .read(passwordResetControllerProvider.notifier)
-        .verifyCode(email: widget.email, code: _code);
+    _isVerifying = true;
+    final bool success;
+    try {
+      success = await ref
+          .read(passwordResetControllerProvider.notifier)
+          .verifyCode(email: widget.email, code: _code);
+    } finally {
+      _isVerifying = false;
+    }
 
     if (!mounted || !success) return;
 

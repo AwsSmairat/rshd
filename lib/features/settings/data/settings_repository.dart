@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -56,6 +58,34 @@ class SettingsRepository {
     return _parseSettings(
       await _apiClient.delete<Map<String, dynamic>>(ApiEndpoints.studentAvatar),
     );
+  }
+
+  /// Authenticated download. Returns null when the endpoint is missing (405)
+  /// or the student has no photo (404) — never hits the public `/storage` URL.
+  Future<Uint8List?> downloadAvatar() async {
+    try {
+      final response = await _apiClient.dio.get<List<int>>(
+        ApiEndpoints.studentAvatar,
+        options: Options(
+          responseType: ResponseType.bytes,
+          followRedirects: false,
+          validateStatus: (status) => status != null && status < 500,
+          headers: const {
+            'Accept': 'image/*,application/octet-stream',
+            'Content-Type': 'application/octet-stream',
+          },
+        ),
+      );
+
+      final bytes = response.data;
+      if (response.statusCode != 200 || bytes == null || bytes.isEmpty) {
+        return null;
+      }
+
+      return Uint8List.fromList(bytes);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> updatePassword({

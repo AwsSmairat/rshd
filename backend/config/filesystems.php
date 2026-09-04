@@ -30,19 +30,27 @@ return [
 
     'disks' => [
 
+        // 'serve' is intentionally off: it would register a GET /storage/{path}
+        // route for this private disk that shadows every public disk URL and
+        // answers 403, since private disks demand a signed URL. Private content
+        // is served through its own controllers instead.
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],
 
+        // 'serve' lets Laravel answer /storage/{path} itself when the
+        // public/storage symlink is missing. Where the symlink exists the web
+        // server still serves the file first and never reaches PHP.
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
+            'serve' => true,
             'throw' => false,
             'report' => false,
         ],

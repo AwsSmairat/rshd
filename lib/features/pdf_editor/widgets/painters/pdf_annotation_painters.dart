@@ -27,7 +27,7 @@ class InkAnnotationPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     canvas.save();
-    canvas.clipRect(metrics.pageRect);
+    canvas.clipRect(metrics.pageLocalRect);
 
     for (final annotation in annotations) {
       if (annotation.type == AnnotationType.ink ||
@@ -61,7 +61,7 @@ class InkAnnotationPainter extends CustomPainter {
         .toList();
     if (points.length < 2) return;
 
-    final screenPoints = PdfCoordinateMapper.normalizedPointsToScreen(
+    final screenPoints = PdfCoordinateMapper.normalizedPointsToPageLocal(
       points,
       metrics,
     );
@@ -179,7 +179,7 @@ class ShapeAnnotationPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     canvas.save();
-    canvas.clipRect(metrics.pageRect);
+    canvas.clipRect(metrics.pageLocalRect);
 
     for (final annotation in annotations) {
       if (annotation.type == AnnotationType.highlighter &&
@@ -199,7 +199,7 @@ class ShapeAnnotationPainter extends CustomPainter {
   }
 
   void _paintHighlightRect(Canvas canvas, PdfEditorAnnotation annotation) {
-    final rect = metrics.normalizedRectToScreen(
+    final rect = metrics.normalizedRectToPageLocal(
       x: annotation.x,
       y: annotation.y,
       width: annotation.width,
@@ -215,7 +215,7 @@ class ShapeAnnotationPainter extends CustomPainter {
   }
 
   void _paintShape(Canvas canvas, PdfEditorAnnotation annotation) {
-    final rect = metrics.normalizedRectToScreen(
+    final rect = metrics.normalizedRectToPageLocal(
       x: annotation.x,
       y: annotation.y,
       width: annotation.width,

@@ -31,6 +31,10 @@ class LessonFileDownloadService
             return null;
         }
 
+        if ($lessonFile->file_type?->needsPdfPreview() && filled($lessonFile->file_path)) {
+            return $this->generateLocalSignedUrl($lessonFile, $user);
+        }
+
         if ($lessonFile->isBunnyStored()) {
             return $this->generateBunnySignedUrl($lessonFile);
         }

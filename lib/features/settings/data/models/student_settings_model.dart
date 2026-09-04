@@ -14,7 +14,7 @@ class StudentSettingsModel {
   factory StudentSettingsModel.fromJson(Map<String, dynamic> json) {
     return StudentSettingsModel(
       profile: StudentProfileModel.fromJson(
-        Map<String, dynamic>.from(json['profile'] as Map),
+        Map<String, dynamic>.from(json['profile'] as Map? ?? {}),
       ),
       preferences: StudentPreferencesModel.fromJson(
         Map<String, dynamic>.from(json['preferences'] as Map? ?? {}),
@@ -193,33 +193,45 @@ class StudentPreferencesModel {
 
   factory StudentPreferencesModel.fromJson(Map<String, dynamic> json) {
     return StudentPreferencesModel(
-      notifyLessons: json['notify_lessons'] == true,
-      notifyAssignments: json['notify_assignments'] != false,
-      notifyAssignmentReminders: json['notify_assignment_reminders'] != false,
-      notifyQuizzes: json['notify_quizzes'] != false,
-      notifyQuizReminders: json['notify_quiz_reminders'] != false,
-      notifyGrades: json['notify_grades'] != false,
-      notifyMessages: json['notify_messages'] != false,
-      notifyAnnouncements: json['notify_announcements'] != false,
-      notifyPlatformUpdates: json['notify_platform_updates'] != false,
-      notificationSound: json['notification_sound'] != false,
-      notificationVibration: json['notification_vibration'] != false,
+      notifyLessons: _asBool(json['notify_lessons'], defaultValue: false),
+      notifyAssignments: _asBool(json['notify_assignments']),
+      notifyAssignmentReminders: _asBool(json['notify_assignment_reminders']),
+      notifyQuizzes: _asBool(json['notify_quizzes']),
+      notifyQuizReminders: _asBool(json['notify_quiz_reminders']),
+      notifyGrades: _asBool(json['notify_grades']),
+      notifyMessages: _asBool(json['notify_messages']),
+      notifyAnnouncements: _asBool(json['notify_announcements']),
+      notifyPlatformUpdates: _asBool(json['notify_platform_updates']),
+      notificationSound: _asBool(json['notification_sound']),
+      notificationVibration: _asBool(json['notification_vibration']),
       language: json['language']?.toString() ?? 'ar',
       theme: json['theme']?.toString() ?? 'light',
       fontSize: json['font_size']?.toString() ?? 'medium',
-      downloadsWifiOnly: json['downloads_wifi_only'] != false,
-      autoPlayVideo: json['auto_play_video'] == true,
+      downloadsWifiOnly: _asBool(json['downloads_wifi_only']),
+      autoPlayVideo: _asBool(json['auto_play_video'], defaultValue: false),
       defaultVideoQuality: json['default_video_quality']?.toString() ?? 'auto',
-      saveWatchPosition: json['save_watch_position'] != false,
+      saveWatchPosition: _asBool(json['save_watch_position']),
       timezone: json['timezone']?.toString() ?? 'Asia/Amman',
       profileVisibility:
           json['profile_visibility']?.toString() ?? 'teachers_only',
       messagingPermission:
           json['messaging_permission']?.toString() ?? 'teachers_only',
-      showActivityStatus: json['show_activity_status'] != false,
-      allowProfilePhotoUse: json['allow_profile_photo_use'] != false,
-      twoFactorEnabled: json['two_factor_enabled'] == true,
+      showActivityStatus: _asBool(json['show_activity_status']),
+      allowProfilePhotoUse: _asBool(json['allow_profile_photo_use']),
+      twoFactorEnabled: _asBool(json['two_factor_enabled'], defaultValue: false),
     );
+  }
+
+  /// Laravel serializes booleans as `1`/`0` (and sometimes `"1"`/`"true"`),
+  /// which the plain `== true` / `!= false` checks silently misread.
+  static bool _asBool(dynamic value, {bool defaultValue = true}) {
+    if (value == null) return defaultValue;
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    final text = value.toString().toLowerCase();
+    if (text == 'true' || text == '1') return true;
+    if (text == 'false' || text == '0') return false;
+    return defaultValue;
   }
 
   Map<String, dynamic> toJson() {

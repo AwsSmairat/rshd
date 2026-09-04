@@ -43,5 +43,9 @@ class PdfViewerSourceLoader {
     return _cacheService.cacheFromUrl(fileId, download.url);
   }
 
+  Future<void> saveConverted(int fileId, Uint8List bytes) {
+    return _cacheService.save(fileId, bytes);
+  }
+
   Future<bool> hasCached(int fileId) => _cacheService.hasCached(fileId);
 }

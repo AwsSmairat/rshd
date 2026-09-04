@@ -125,7 +125,7 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
       );
     }
 
-    if (file.fileType == 'pdf' && file.canOpen) {
+    if (file.canViewInApp) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -155,16 +155,13 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
       );
     }
 
-    final fileUrl = file.fileUrl?.trim() ?? '';
-
     return _FileStatusCard(
       icon: Icons.info_outline_rounded,
-      title: fileUrl.isEmpty ? 'الملف غير جاهز' : 'عرض غير متاح',
-      message: fileUrl.isEmpty
-          ? 'تعذر الوصول للملف حالياً. تأكد من اتصالك ثم حاول التحديث.'
-          : 'هذا النوع من الملفات غير متاح للعرض حالياً داخل التطبيق.',
+      title: AppStrings.of(context).t('عرض غير متاح'),
+      message: AppStrings.of(context).t(
+        'هذا النوع من الملفات غير متاح للعرض حالياً داخل التطبيق.',
+      ),
       tone: _FileStatusTone.pending,
-      onRetry: fileUrl.isEmpty ? _reloadFile : null,
     );
   }
 }
