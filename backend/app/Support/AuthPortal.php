@@ -33,8 +33,6 @@ class AuthPortal
      *     emailHref: string,
      *     vendorName: string,
      *     vendorLogoUrl: ?string,
-     *     vendorWebsiteUrl: string,
-     *     vendorWebsiteLabel: string,
      *     vendorInstagramUrl: string,
      *     vendorInstagramHandle: string
      * }
@@ -72,9 +70,9 @@ class AuthPortal
             'email' => $email,
             'emailHref' => $email !== '' ? 'mailto:'.$email : '#',
             'vendorName' => (string) config('auth_portal.vendor.name', 'DOLLARIX'),
-            'vendorLogoUrl' => is_file($vendorLogo) ? asset((string) config('auth_portal.vendor.logo')) : null,
-            'vendorWebsiteUrl' => (string) config('auth_portal.vendor.website_url'),
-            'vendorWebsiteLabel' => (string) config('auth_portal.vendor.website_label'),
+            'vendorLogoUrl' => is_file($vendorLogo)
+                ? asset((string) config('auth_portal.vendor.logo')).'?v='.filemtime($vendorLogo)
+                : null,
             'vendorInstagramUrl' => (string) config('auth_portal.vendor.instagram_url'),
             'vendorInstagramHandle' => (string) config('auth_portal.vendor.instagram_handle'),
         ];
@@ -96,7 +94,7 @@ class AuthPortal
                 'whatsappLabel' => 'Contact via WhatsApp',
                 'emailLabel' => 'Contact via email',
                 'quote' => 'Together we build a more knowledgeable generation. Join the RSHD Academy instructors.',
-                'footerCredit' => 'Prepared by DOLLARIX',
+                'footerCredit' => 'Prepared by',
                 'copyright' => 'All rights reserved © '.date('Y').' RSHD Academy',
                 'footerSlogan' => 'Together for a better future',
                 'phoneFallback' => 'Number coming soon',
@@ -112,9 +110,9 @@ class AuthPortal
             'newTeacherBody' => 'تواصل مع الدعم الفني لإنشاء حسابك والانضمام إلى فريق التدريس.',
             'whatsappLabel' => 'التواصل عبر واتساب',
             'emailLabel' => 'التواصل عبر البريد الإلكتروني',
-            'quote' => 'معاً نصنع جيلاً أكثر معرفة .. انضم إلى نخبة المدرسين في رشاد الأكاديمية',
-            'footerCredit' => 'من إعداد شركة DOLLARIX',
-            'copyright' => 'جميع الحقوق محفوظة © '.date('Y').' منصة رشاد الأكاديمية',
+            'quote' => 'معاً نصنع جيلاً أكثر معرفة .. انضم إلى نخبة المدرسين في أكاديمية RSHD',
+            'footerCredit' => 'من إعداد شركة',
+            'copyright' => 'جميع الحقوق محفوظة © '.date('Y').' منصة RSHD الأكاديمية',
             'footerSlogan' => 'معاً لبناء مستقبل أفضل',
             'phoneFallback' => 'يُضاف الرقم لاحقاً',
         ];

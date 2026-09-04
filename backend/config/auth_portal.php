@@ -9,9 +9,7 @@ return [
     'vendor' => [
         'name' => 'DOLLARIX',
         'logo' => 'images/dollarix-logo.png',
-        'website_url' => 'https://www.dollarix.co',
-        'website_label' => 'www.dollarix.co',
-        'instagram_url' => 'https://www.instagram.com/dollarix',
-        'instagram_handle' => '@dollarix',
+        'instagram_url' => 'https://www.instagram.com/dollarix.studio/',
+        'instagram_handle' => '@dollarix.studio',
     ],
 ];

@@ -17,13 +17,7 @@
     <div class="rshd-auth-portal__grid">
         <section class="rshd-auth-portal__info">
             <div class="rshd-auth-portal__info-icon" aria-hidden="true">
-                <svg viewBox="0 0 64 64" width="54" height="54">
-                    <path fill="#C4A574" d="M32 8c-1.2 0-6.2 3.4-8.8 5.2-.7.5-.7 1.5 0 2L32 21l8.8-5.8c.7-.5.7-1.5 0-2C38.2 11.4 33.2 8 32 8Z"/>
-                    <path fill="#B08A4A" d="M14 24h36v4H14z"/>
-                    <path fill="#C4A574" d="M16 28h32l-2 18H18L16 28z"/>
-                    <path fill="#E9D7B2" d="M22 32h20v3H22zm0 7h16v3H22z"/>
-                    <path fill="#8A6A32" d="M30 46h4v8h-4z"/>
-                </svg>
+                <img src="{{ asset('images/auth-graduation-cap.png') }}?v=1" alt="">
             </div>
             <h1>{{ $portal['portalTitle'] }}</h1>
             <p class="rshd-auth-portal__lead">{{ $portal['portalSubtitle'] }}</p>
@@ -92,8 +86,6 @@
         </div>
         <div class="rshd-auth-portal__social">
             <a href="{{ $portal['vendorInstagramUrl'] }}" target="_blank" rel="noopener noreferrer">{{ $portal['vendorInstagramHandle'] }}</a>
-            <span aria-hidden="true">·</span>
-            <a href="{{ $portal['vendorWebsiteUrl'] }}" target="_blank" rel="noopener noreferrer">{{ $portal['vendorWebsiteLabel'] }}</a>
         </div>
         <p>{{ $portal['copyright'] }}</p>
         <p class="rshd-auth-portal__footer-slogan">{{ $portal['footerSlogan'] }}</p>

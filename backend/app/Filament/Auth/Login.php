@@ -25,7 +25,7 @@ class Login extends BaseLogin
     {
         return app()->getLocale() === 'en'
             ? 'RSHD Academy platform for instructors'
-            : 'منصة رشاد الأكاديمية للمدرسين';
+            : 'منصة RSHD الأكاديمية للمدرسين';
     }
 
     /**

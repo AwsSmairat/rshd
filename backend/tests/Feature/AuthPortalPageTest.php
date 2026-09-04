@@ -16,7 +16,7 @@ class AuthPortalPageTest extends TestCase
             ->assertOk()
             ->assertSee('بوابة خاصة بالمدرسين', false)
             ->assertSee('الدخول إلى حسابك', false)
-            ->assertSee('منصة رشاد الأكاديمية للمدرسين', false)
+            ->assertSee('منصة RSHD الأكاديمية للمدرسين', false)
             ->assertSee('هل أنت مدرس جديد؟', false)
             ->assertSee('التواصل عبر واتساب', false)
             ->assertSee('+962 799532264', false)
@@ -26,8 +26,11 @@ class AuthPortalPageTest extends TestCase
             ->assertSee('نسيت كلمة المرور؟', false)
             ->assertSee('تذكرني', false)
             ->assertSee('تسجيل الدخول', false)
-            ->assertSee('من إعداد شركة DOLLARIX', false)
-            ->assertSee('www.dollarix.co', false)
+            ->assertSee('من إعداد شركة', false)
+            ->assertSee('images/dollarix-logo.png', false)
+            ->assertSee('https://www.instagram.com/dollarix.studio/', false)
+            ->assertSee('@dollarix.studio', false)
+            ->assertDontSee('www.dollarix.co', false)
             ->assertSee('التعليم يبدأ من هنا', false);
     }
 
@@ -53,7 +56,8 @@ class AuthPortalPageTest extends TestCase
             ->assertOk()
             ->assertSee('بوابة خاصة بالمدرسين', false)
             ->assertSee('نسيت كلمة المرور؟', false)
-            ->assertSee('من إعداد شركة DOLLARIX', false);
+            ->assertSee('من إعداد شركة', false)
+            ->assertSee('images/dollarix-logo.png', false);
     }
 
     public function test_format_phone_displays_jordan_number(): void

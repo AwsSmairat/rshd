@@ -8,14 +8,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/rshd-auth-portal.css') }}?v=2">
+    <link rel="stylesheet" href="{{ asset('css/rshd-auth-portal.css') }}?v=4">
 </head>
 <body>
     <x-auth-portal-shell>
         <div class="rshd-auth-set-form">
             <img class="brand-mark" src="{{ $logoUrl }}" alt="{{ $platformName }}">
             <h2>{{ $isArabic ? 'تعيين كلمة المرور' : 'Set your password' }}</h2>
-            <p class="sub">{{ $isArabic ? 'منصة رشاد الأكاديمية للمدرسين' : 'RSHD Academy platform for instructors' }}</p>
+            <p class="sub">{{ $isArabic ? 'منصة RSHD الأكاديمية للمدرسين' : 'RSHD Academy platform for instructors' }}</p>
 
             @if (! $tokenValid)
                 <div class="alert" role="alert">
