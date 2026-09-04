@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\InstructorInvitationService;
 use App\Services\PlatformSettingsService;
+use App\Support\AuthPortal;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -74,8 +75,8 @@ class InstructorSetPasswordController extends Controller
      *     email: string,
      *     token: string,
      *     tokenValid: bool,
+     *     isArabic: bool,
      *     platformName: string,
-     *     platformSubtitle: string,
      *     logoUrl: string,
      *     faviconUrl: string,
      *     passwordHints: list<string>,
@@ -88,18 +89,17 @@ class InstructorSetPasswordController extends Controller
         string $token,
         bool $tokenValid,
     ): array {
-        $logoUrl = $settings->logoUrl() ?? asset('images/rshd_logo_no_bg.png');
-        $version = (string) (@filemtime(public_path('images/rshd_logo_no_bg.png')) ?: 3);
+        $portal = AuthPortal::data();
 
         return [
             'email' => $email,
             'token' => $token,
             'tokenValid' => $tokenValid,
-            'platformName' => $settings->platformName(),
-            'platformSubtitle' => $settings->platformSubtitle(),
-            'logoUrl' => $logoUrl.(str_contains($logoUrl, '?') ? '&' : '?').'v='.$version,
-            'faviconUrl' => $settings->faviconUrl().'?v=1',
-            'passwordHints' => $this->passwordHints($settings),
+            'isArabic' => $portal['isArabic'],
+            'platformName' => $portal['platformName'],
+            'logoUrl' => $portal['logoUrl'],
+            'faviconUrl' => $portal['faviconUrl'],
+            'passwordHints' => $this->passwordHints($settings, $portal['isArabic']),
             'loginUrl' => url('/admin/login'),
         ];
     }
@@ -107,22 +107,25 @@ class InstructorSetPasswordController extends Controller
     /**
      * @return list<string>
      */
-    protected function passwordHints(PlatformSettingsService $settings): array
+    protected function passwordHints(PlatformSettingsService $settings, bool $isArabic): array
     {
+        $min = $settings->integer('password_min_length', 8, 'security');
         $hints = [
-            $settings->integer('password_min_length', 8, 'security').' أحرف على الأقل',
+            $isArabic ? $min.' أحرف على الأقل' : 'At least '.$min.' characters',
         ];
 
         if ($settings->enabled('password_require_uppercase', 'security')) {
-            $hints[] = 'حرف إنجليزي كبير واحد على الأقل';
+            $hints[] = $isArabic
+                ? 'حرف إنجليزي كبير واحد على الأقل'
+                : 'At least one uppercase letter';
         }
 
         if ($settings->enabled('password_require_number', 'security')) {
-            $hints[] = 'رقم واحد على الأقل';
+            $hints[] = $isArabic ? 'رقم واحد على الأقل' : 'At least one number';
         }
 
         if ($settings->enabled('password_require_special', 'security')) {
-            $hints[] = 'رمز خاص واحد على الأقل';
+            $hints[] = $isArabic ? 'رمز خاص واحد على الأقل' : 'At least one special character';
         }
 
         return $hints;

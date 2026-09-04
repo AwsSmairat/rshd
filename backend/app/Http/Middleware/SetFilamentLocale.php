@@ -13,7 +13,13 @@ class SetFilamentLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        app()->setLocale('ar');
+        $locale = $request->session()->get('filament_locale', 'ar');
+
+        if (! in_array($locale, ['ar', 'en'], true)) {
+            $locale = 'ar';
+        }
+
+        app()->setLocale($locale);
 
         return $next($request);
     }

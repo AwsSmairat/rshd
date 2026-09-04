@@ -38,6 +38,8 @@ class InstructorSetPasswordPageTest extends TestCase
             ->assertSee('تأكيد كلمة المرور', false)
             ->assertSee('حفظ كلمة المرور', false)
             ->assertSee('شروط كلمة المرور', false)
+            ->assertSee('بوابة خاصة بالمدرسين', false)
+            ->assertSee('من إعداد شركة DOLLARIX', false)
             ->assertDontSee('الرابط غير صالح', false);
     }
 

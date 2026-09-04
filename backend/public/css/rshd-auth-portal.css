@@ -1,0 +1,542 @@
+/* RSHD admin/instructor auth portal */
+
+.rshd-auth-portal {
+    --portal-bg: #F5F2EA;
+    --portal-gold: #C4A574;
+    --portal-gold-dark: #B08A4A;
+    --portal-ink: #2B2B2B;
+    --portal-muted: #7A746A;
+    --portal-card: #FFFFFF;
+    --portal-line: #E7E1D6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--portal-bg);
+    color: var(--portal-ink);
+    position: relative;
+    overflow: hidden;
+    font-family: "Cairo", sans-serif;
+}
+
+.rshd-auth-portal__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.15rem 1.5rem 0.35rem;
+    position: relative;
+    z-index: 2;
+    direction: ltr;
+}
+
+.rshd-auth-portal__slogan {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--portal-ink);
+    font-weight: 600;
+}
+
+.rshd-auth-portal__lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.38rem 0.8rem;
+    border: 1px solid #D9D1C4;
+    border-radius: 999px;
+    color: var(--portal-ink);
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.72);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.rshd-auth-portal__lang:hover {
+    border-color: var(--portal-gold);
+}
+
+.rshd-auth-portal__grid {
+    direction: ltr;
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(20rem, 0.92fr);
+    gap: 2rem;
+    align-items: center;
+    width: min(1180px, calc(100% - 2.5rem));
+    margin: 0.5rem auto 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.rshd-auth-portal__info,
+.rshd-auth-portal__card {
+    direction: inherit;
+}
+
+html[dir="rtl"] .rshd-auth-portal__info,
+html[dir="rtl"] .rshd-auth-portal__card,
+.rshd-auth-portal[dir="rtl"] .rshd-auth-portal__info,
+.rshd-auth-portal[dir="rtl"] .rshd-auth-portal__card {
+    direction: rtl;
+}
+
+.rshd-auth-portal__info-icon {
+    margin-bottom: 0.7rem;
+}
+
+.rshd-auth-portal__info h1 {
+    margin: 0 0 0.55rem;
+    font-size: clamp(1.55rem, 2.4vw, 2.05rem);
+    font-weight: 800;
+    color: #1A1A1A;
+    line-height: 1.35;
+}
+
+.rshd-auth-portal__lead {
+    margin: 0 0 1.2rem;
+    max-width: 36rem;
+    color: var(--portal-muted);
+    line-height: 1.85;
+    font-size: 0.95rem;
+}
+
+.rshd-auth-portal__notice {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    padding: 1rem 1.05rem;
+    background: #EFEBE3;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+}
+
+.rshd-auth-portal__notice-icon {
+    color: var(--portal-gold-dark);
+    margin-top: 0.15rem;
+}
+
+.rshd-auth-portal__notice strong {
+    display: block;
+    margin-bottom: 0.2rem;
+    font-size: 0.95rem;
+}
+
+.rshd-auth-portal__notice span {
+    color: var(--portal-muted);
+    font-size: 0.86rem;
+    line-height: 1.7;
+}
+
+.rshd-auth-portal__contacts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.15rem;
+}
+
+.rshd-auth-contact {
+    display: flex;
+    gap: 0.7rem;
+    align-items: center;
+    padding: 0.9rem 0.85rem;
+    background: #fff;
+    border: 1px solid var(--portal-line);
+    border-radius: 1rem;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 8px 22px rgba(43, 43, 43, 0.04);
+}
+
+.rshd-auth-contact strong,
+.rshd-auth-contact em {
+    display: block;
+    font-style: normal;
+}
+
+.rshd-auth-contact strong {
+    font-size: 0.78rem;
+    margin-bottom: 0.15rem;
+}
+
+.rshd-auth-contact em {
+    font-size: 0.78rem;
+    color: var(--portal-muted);
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+.rshd-auth-contact__icon {
+    width: 2.35rem;
+    height: 2.35rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.rshd-auth-contact--whatsapp .rshd-auth-contact__icon {
+    color: #16A34A;
+    background: rgba(22, 163, 74, 0.12);
+}
+
+.rshd-auth-contact--email .rshd-auth-contact__icon {
+    color: #2563EB;
+    background: rgba(37, 99, 235, 0.12);
+}
+
+.rshd-auth-portal__quote {
+    display: flex;
+    gap: 0.55rem;
+    align-items: flex-start;
+    margin: 0;
+    color: var(--portal-muted);
+    font-size: 0.88rem;
+    line-height: 1.8;
+}
+
+.rshd-auth-portal__quote svg {
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+    color: var(--portal-gold-dark);
+}
+
+.rshd-auth-portal__card {
+    background: var(--portal-card);
+    border-radius: 1.6rem;
+    box-shadow: 0 18px 50px rgba(43, 43, 43, 0.08);
+    padding: 2rem 1.7rem 1.7rem;
+}
+
+.rshd-auth-portal__card .fi-simple-page,
+.rshd-auth-portal__card .fi-simple-header,
+.rshd-auth-portal__card .fi-form {
+    width: 100%;
+}
+
+.rshd-auth-portal__card .fi-simple-header .fi-logo,
+.rshd-auth-portal__card .fi-simple-header .fi-logo img {
+    height: 4.6rem !important;
+    max-height: 4.6rem !important;
+    margin-bottom: 0.85rem;
+}
+
+.rshd-auth-portal__card .fi-simple-header-heading {
+    font-size: 1.45rem !important;
+    font-weight: 800 !important;
+    color: #1A1A1A !important;
+}
+
+.rshd-auth-portal__card .fi-simple-header-subheading {
+    color: var(--portal-muted) !important;
+    font-size: 0.9rem !important;
+}
+
+.rshd-auth-portal__card .fi-input,
+.rshd-auth-portal__card input[type="email"],
+.rshd-auth-portal__card input[type="password"],
+.rshd-auth-portal__card input[type="text"] {
+    border-radius: 0.85rem !important;
+    min-height: 2.85rem;
+    border-color: #E4DDD2 !important;
+    background: #fff !important;
+}
+
+.rshd-auth-portal__card .fi-input:focus,
+.rshd-auth-portal__card input:focus {
+    border-color: var(--portal-gold) !important;
+    box-shadow: 0 0 0 3px rgba(196, 165, 116, 0.2) !important;
+}
+
+.rshd-auth-portal__card .fi-fo-field-wrp-label {
+    font-weight: 700 !important;
+    color: #3A3A3A !important;
+}
+
+.rshd-auth-portal__card .fi-link,
+.rshd-auth-portal__card a.fi-link {
+    color: var(--portal-gold-dark) !important;
+    font-weight: 700 !important;
+}
+
+.rshd-auth-portal__card .fi-btn-primary,
+.rshd-auth-set-form .submit {
+    width: 100%;
+    background: var(--portal-gold) !important;
+    background-image: none !important;
+    color: #fff !important;
+    border: 0 !important;
+    border-radius: 0.9rem !important;
+    min-height: 2.95rem;
+    font-weight: 800 !important;
+    box-shadow: none !important;
+}
+
+.rshd-auth-portal__card .fi-btn-primary:hover,
+.rshd-auth-set-form .submit:hover {
+    background: var(--portal-gold-dark) !important;
+    color: #fff !important;
+}
+
+.rshd-auth-portal__footer {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 0.5rem 1rem 1.2rem;
+    color: var(--portal-muted);
+    font-size: 0.8rem;
+}
+
+.rshd-auth-portal__vendor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    margin-bottom: 0.35rem;
+    color: var(--portal-ink);
+    font-weight: 700;
+}
+
+.rshd-auth-portal__vendor img {
+    height: 1.35rem;
+    width: auto;
+}
+
+.rshd-auth-portal__vendor-mark {
+    letter-spacing: 0.08em;
+    font-size: 0.95rem;
+}
+
+.rshd-auth-portal__social {
+    display: flex;
+    justify-content: center;
+    gap: 0.45rem;
+    margin-bottom: 0.35rem;
+}
+
+.rshd-auth-portal__social a {
+    color: var(--portal-muted);
+    text-decoration: none;
+}
+
+.rshd-auth-portal__social a:hover {
+    color: var(--portal-gold-dark);
+}
+
+.rshd-auth-portal__footer p {
+    margin: 0.15rem 0;
+}
+
+.rshd-auth-portal__footer-slogan {
+    color: var(--portal-gold-dark) !important;
+    font-weight: 700;
+}
+
+.rshd-auth-portal__art {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    pointer-events: none;
+    opacity: 0.55;
+    z-index: 0;
+}
+
+.rshd-auth-set-form .brand-mark {
+    display: block;
+    height: 4.6rem;
+    width: auto;
+    margin: 0 auto 0.85rem;
+    object-fit: contain;
+}
+
+.rshd-auth-set-form h2 {
+    margin: 0;
+    text-align: center;
+    font-size: 1.45rem;
+    font-weight: 800;
+}
+
+.rshd-auth-set-form .sub {
+    margin: 0.4rem 0 1.2rem;
+    text-align: center;
+    color: var(--portal-muted);
+    font-size: 0.9rem;
+}
+
+.rshd-auth-set-form .email-chip,
+.rshd-auth-set-form .hints,
+.rshd-auth-set-form .alert,
+.rshd-auth-set-form .field {
+    margin-bottom: 0.9rem;
+}
+
+.rshd-auth-set-form label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 700;
+    font-size: 0.86rem;
+}
+
+.rshd-auth-set-form .input-wrap {
+    position: relative;
+}
+
+.rshd-auth-set-form input {
+    width: 100%;
+    min-height: 2.85rem;
+    border: 1px solid #E4DDD2;
+    border-radius: 0.85rem;
+    padding: 0 2.6rem 0 0.9rem;
+    font: inherit;
+}
+
+.rshd-auth-set-form .toggle-visibility {
+    position: absolute;
+    inset-inline-start: 0.35rem;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 0;
+    background: transparent;
+    color: var(--portal-muted);
+    cursor: pointer;
+}
+
+.rshd-auth-set-form .alert {
+    background: #FEF2F2;
+    color: #991B1B;
+    border-radius: 0.85rem;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.86rem;
+}
+
+.rshd-auth-set-form .hints {
+    background: #F7F1E6;
+    border-radius: 0.85rem;
+    padding: 0.75rem 0.9rem;
+    color: var(--portal-muted);
+    font-size: 0.8rem;
+}
+
+.rshd-auth-set-form .footer-link {
+    display: block;
+    text-align: center;
+    margin-top: 0.9rem;
+    color: var(--portal-gold-dark);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.rshd-auth-set-form .submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.rshd-auth-set-form .email-chip {
+    padding: 0.75rem 0.9rem;
+    background: #F7F1E6;
+    border-radius: 0.9rem;
+}
+
+.rshd-auth-set-form .email-chip strong {
+    display: block;
+    font-size: 0.72rem;
+    color: #7A746A;
+}
+
+.rshd-auth-set-form .email-chip span {
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+.rshd-auth-set-form .hints p {
+    margin: 0 0 0.35rem;
+    font-weight: 800;
+    color: #2B2B2B;
+}
+
+.rshd-auth-set-form .hints ul,
+.rshd-auth-set-form .alert ul {
+    margin: 0;
+    padding-inline-start: 1.1rem;
+}
+
+html.fi:has(.rshd-auth-portal),
+html.fi:has(.rshd-auth-portal) body,
+html.fi:has(.rshd-auth-portal) .fi-body {
+    background: var(--portal-bg, #F5F2EA) !important;
+}
+
+body:has(.rshd-auth-portal) {
+    margin: 0;
+    background: #F5F2EA;
+}
+
+.rshd-auth-portal__card .fi-simple-page,
+.rshd-auth-portal__card .fi-simple-page > section {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: none !important;
+}
+
+.rshd-auth-portal__card .fi-input-wrp svg,
+.rshd-auth-portal__card .fi-fo-field-wrp-prefix svg {
+    color: var(--portal-gold-dark) !important;
+}
+
+.rshd-auth-forgot {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.4rem;
+    color: var(--portal-gold-dark);
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.86rem;
+}
+
+.rshd-auth-forgot:hover {
+    color: #8A6A32;
+}
+
+.rshd-auth-portal__card .fi-fo-component-ctn:has(.rshd-auth-forgot) {
+    direction: ltr;
+    align-items: center;
+    grid-template-columns: 1fr auto !important;
+    gap: 0.5rem !important;
+}
+
+.rshd-auth-portal__card .fi-fo-field-wrp:has(.fi-checkbox-input),
+.rshd-auth-portal__card .fi-fo-field-wrp:has(input[type="checkbox"]) {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0;
+}
+
+.rshd-auth-portal__card .fi-checkbox-input:checked,
+.rshd-auth-portal__card input[type="checkbox"]:checked {
+    background-color: var(--portal-gold) !important;
+    border-color: var(--portal-gold) !important;
+}
+
+@media (max-width: 960px) {
+    .rshd-auth-portal__grid {
+        grid-template-columns: 1fr;
+        width: min(34rem, calc(100% - 1.5rem));
+    }
+
+    .rshd-auth-portal__info {
+        order: 2;
+    }
+
+    .rshd-auth-portal__card {
+        order: 1;
+    }
+
+    .rshd-auth-portal__contacts {
+        grid-template-columns: 1fr;
+    }
+
+    .rshd-auth-portal__art {
+        display: none;
+    }
+}

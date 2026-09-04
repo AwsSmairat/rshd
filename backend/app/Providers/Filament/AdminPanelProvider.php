@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Auth\Login;
+use App\Filament\Auth\RequestPasswordReset;
+use App\Filament\Auth\ResetPassword;
 use App\Http\Middleware\CheckPlatformMaintenance;
 use App\Http\Middleware\RefreshAuthenticatedUser;
 use App\Http\Middleware\SetFilamentLocale;
@@ -34,8 +37,8 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
-            ->passwordReset()
+            ->login(Login::class)
+            ->passwordReset(RequestPasswordReset::class, ResetPassword::class)
             ->brandName(fn (): string => $settings->platformName())
             ->brandLogo(function () use ($settings): string {
                 $url = $settings->logoUrl() ?? asset('images/rshd_logo_no_bg.png');
@@ -76,7 +79,8 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::STYLES_AFTER,
                 fn (): HtmlString => new HtmlString(
-                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=29">'.
+                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=30">'.
+                    '<link rel="stylesheet" href="'.e(asset('css/rshd-auth-portal.css')).'?v=2">'.
                     '<link rel="preconnect" href="https://fonts.googleapis.com">'.
                     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'.
                     '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">'
