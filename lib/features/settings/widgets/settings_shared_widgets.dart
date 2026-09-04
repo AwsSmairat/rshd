@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class SettingsSectionCard extends StatefulWidget {
   const SettingsSectionCard({
@@ -76,8 +77,7 @@ class _SettingsSectionCardState extends State<SettingsSectionCard> {
                           ),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: Text(
-                              widget.title,
+                            child: Text(AppStrings.of(context).t(widget.title),
                               style: AppTextStyles.subtitleOf(context).copyWith(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
@@ -161,8 +161,7 @@ class SettingsItemTile extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              label,
+            child: Text(AppStrings.of(context).t(label),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -172,8 +171,7 @@ class SettingsItemTile extends StatelessWidget {
           ),
           if (value != null) ...[
             Flexible(
-              child: Text(
-                value!,
+              child: Text(AppStrings.of(context).t(value!),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   fontSize: 12,
                   color: valueColor ?? AppColors.of(context).textMuted,
@@ -188,7 +186,9 @@ class SettingsItemTile extends StatelessWidget {
           ],
           if (onTap != null)
             Icon(
-              Icons.chevron_left,
+              Directionality.of(context) == TextDirection.rtl
+                  ? Icons.chevron_left
+                  : Icons.chevron_right,
               color: AppColors.of(context).textMuted.withValues(alpha: 0.8),
               size: 18,
             ),
@@ -238,8 +238,7 @@ Future<T?> showSettingsOptionPicker<T>({
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              child: Text(
-                title,
+              child: Text(AppStrings.of(context).t(title),
                 style: AppTextStyles.subtitleOf(
                   context,
                 ).copyWith(fontSize: 16, fontWeight: FontWeight.w700),
@@ -248,7 +247,7 @@ Future<T?> showSettingsOptionPicker<T>({
             ...options.map((option) {
               final selected = option.value == current;
               return ListTile(
-                title: Text(option.label),
+                title: Text(AppStrings.of(context).t(option.label)),
                 trailing: selected
                     ? Icon(Icons.check, color: AppColors.of(context).darkGold)
                     : null,
@@ -286,8 +285,7 @@ class SettingsSwitchTile extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: Text(
-                  label,
+                child: Text(AppStrings.of(context).t(label),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,

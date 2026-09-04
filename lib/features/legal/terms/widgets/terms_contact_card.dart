@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../data/terms_and_conditions_config.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class TermsContactInfo {
   const TermsContactInfo({
@@ -52,7 +53,7 @@ Future<void> launchTermsEmail({
     if (context != null && context.mounted) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('بريد التواصل غير متوفر')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('بريد التواصل غير متوفر'))));
     }
     return;
   }
@@ -64,7 +65,7 @@ Future<void> launchTermsEmail({
   );
   final launched = await launchUrl(uri);
   if (!launched && context != null && context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(email)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(email))));
   }
 }
 
@@ -99,8 +100,7 @@ class TermsContactCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            'التواصل',
+          Text(AppStrings.of(context).t('التواصل'),
             style: AppTextStyles.subtitleOf(
               context,
             ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
@@ -137,14 +137,14 @@ class TermsContactCard extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onContact,
             icon: const Icon(Icons.mail_outline),
-            label: const Text('تواصل معنا'),
+            label: Text(AppStrings.of(context).t('تواصل معنا')),
             style: _style(context),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: onReport,
             icon: const Icon(Icons.report_outlined),
-            label: const Text('الإبلاغ عن مخالفة'),
+            label: Text(AppStrings.of(context).t('الإبلاغ عن مخالفة')),
             style: _style(context),
           ),
         ],
@@ -172,16 +172,14 @@ class TermsContactCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  label,
+                Text(AppStrings.of(context).t(label),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
                     color: AppColors.of(context).textMuted,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                Text(
-                  value,
+                Text(AppStrings.of(context).t(value),
                   style: AppTextStyles.bodyOf(context).copyWith(fontSize: 14),
                 ),
               ],
@@ -221,8 +219,7 @@ class TermsAcceptanceCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            'مطلوب: موافقة على النسخة الجديدة',
+          Text(AppStrings.of(context).t('مطلوب: موافقة على النسخة الجديدة'),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontWeight: FontWeight.w700,
               color: AppColors.of(context).primary,
@@ -234,7 +231,7 @@ class TermsAcceptanceCard extends StatelessWidget {
             onChanged: isLoading ? null : (v) => onCheckedChanged(v ?? false),
             controlAffinity: ListTileControlAffinity.leading,
             contentPadding: EdgeInsets.zero,
-            title: const Text('قرأت الشروط والأحكام وأوافق عليها'),
+            title: Text(AppStrings.of(context).t('قرأت الشروط والأحكام وأوافق عليها')),
           ),
           const SizedBox(height: 8),
           FilledButton(
@@ -255,7 +252,7 @@ class TermsAcceptanceCard extends StatelessWidget {
                       color: Colors.white,
                     ),
                   )
-                : const Text('موافقة ومتابعة'),
+                : Text(AppStrings.of(context).t('موافقة ومتابعة')),
           ),
         ],
       ),
@@ -294,7 +291,7 @@ class TermsFooter extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onPrivacy,
             icon: const Icon(Icons.privacy_tip_outlined),
-            label: const Text('سياسة الخصوصية'),
+            label: Text(AppStrings.of(context).t('سياسة الخصوصية')),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.of(context).darkGold,
               side: BorderSide(color: AppColors.of(context).darkGold),
@@ -308,8 +305,7 @@ class TermsFooter extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onDeleteAccount,
             icon: const Icon(Icons.delete_outline, color: Color(0xFF991B1B)),
-            label: const Text(
-              'طلب حذف الحساب',
+            label: Text(AppStrings.of(context).t('طلب حذف الحساب'),
               style: TextStyle(color: Color(0xFF991B1B)),
             ),
             style: OutlinedButton.styleFrom(
@@ -321,23 +317,20 @@ class TermsFooter extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          Text(
-            platformName,
+          Text(AppStrings.of(context).t(platformName),
             textAlign: TextAlign.center,
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontWeight: FontWeight.w700,
               color: AppColors.of(context).primary,
             ),
           ),
-          Text(
-            'إصدار الشروط: $version',
+          Text(AppStrings.of(context).t('إصدار الشروط: $version'),
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
           ),
-          Text(
-            'آخر تحديث: $lastUpdated',
+          Text(AppStrings.of(context).t('آخر تحديث: $lastUpdated'),
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyOf(
               context,

@@ -15,6 +15,7 @@ import '../widgets/grades_empty_state.dart';
 import '../widgets/grades_header.dart';
 import '../widgets/grades_summary_card.dart';
 import 'grades_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class GradesScreen extends ConsumerStatefulWidget {
   const GradesScreen({super.key});
@@ -72,10 +73,10 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
-        return const SliverToBoxAdapter(
+        return SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.only(top: 24),
-            child: LoadingWidget(message: 'جاري تحميل الدرجات...'),
+            child: LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الدرجات...')),
           ),
         );
       case FeatureLoadStatus.empty:
@@ -103,8 +104,7 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
             if (index == 1) {
               return Padding(
                 padding: const EdgeInsets.only(top: 20, bottom: 12),
-                child: Text(
-                  'سجل الدرجات',
+                child: Text(AppStrings.of(context).t('سجل الدرجات'),
                   style: AppTextStyles.subtitleOf(context).copyWith(
                     color: AppColors.of(context).primary,
                     fontWeight: FontWeight.w700,

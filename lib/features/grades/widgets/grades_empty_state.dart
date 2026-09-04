@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class GradesEmptyState extends StatelessWidget {
   const GradesEmptyState({super.key});
@@ -34,8 +35,7 @@ class GradesEmptyState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-            'لا توجد درجات حالياً',
+          Text(AppStrings.of(context).t('لا توجد درجات حالياً'),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -44,8 +44,7 @@ class GradesEmptyState extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-          Text(
-            'ستظهر درجاتك هنا بعد تقييم الواجبات والاختبارات',
+          Text(AppStrings.of(context).t('ستظهر درجاتك هنا بعد تقييم الواجبات والاختبارات'),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 13,
               height: 1.5,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class LoginRememberRow extends StatelessWidget {
   const LoginRememberRow({
@@ -33,8 +34,7 @@ class LoginRememberRow extends StatelessWidget {
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: Text(
-                'نسيت كلمة المرور؟',
+              child: Text(AppStrings.of(context).t('نسيت كلمة المرور؟'),
                 style: TextStyle(
                   fontSize: fontSize,
                   fontWeight: FontWeight.w600,
@@ -51,8 +51,7 @@ class LoginRememberRow extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'تذكرني',
+                Text(AppStrings.of(context).t('تذكرني'),
                   style: TextStyle(
                     fontSize: fontSize,
                     fontWeight: FontWeight.w600,

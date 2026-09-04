@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class AssignmentSectionCard extends StatelessWidget {
   const AssignmentSectionCard({
@@ -33,8 +34,7 @@ class AssignmentSectionCard extends StatelessWidget {
             children: [
               Icon(icon, size: 18, color: AppColors.of(context).darkGold),
               const SizedBox(width: 8),
-              Text(
-                title,
+              Text(AppStrings.of(context).t(title),
                 style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,

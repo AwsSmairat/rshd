@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 import '../data/models/notification_model.dart';
+import '../../../core/l10n/app_strings.dart';
 
 Future<void> showNotificationMessageSheet({
   required BuildContext context,
@@ -78,8 +79,7 @@ class _NotificationMessageSheet extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        isReply ? 'رد من المدرّس' : 'رسالة',
+                      Text(AppStrings.of(context).t(isReply ? 'رد من المدرّس' : 'رسالة'),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
                           color: AppColors.of(context).darkGold,
@@ -87,16 +87,14 @@ class _NotificationMessageSheet extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        senderName,
+                      Text(AppStrings.of(context).t(senderName),
                         style: AppTextStyles.subtitleOf(
                           context,
                         ).copyWith(fontWeight: FontWeight.w800, fontSize: 17),
                       ),
                       if (subjectTitle.isNotEmpty) ...[
                         const SizedBox(height: 4),
-                        Text(
-                          subjectTitle,
+                        Text(AppStrings.of(context).t(subjectTitle),
                           style: AppTextStyles.bodyOf(context).copyWith(
                             fontSize: 13,
                             color: AppColors.of(context).textMuted,
@@ -117,8 +115,7 @@ class _NotificationMessageSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFE8DFCF)),
               ),
-              child: Text(
-                message,
+              child: Text(AppStrings.of(context).t(message),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(fontSize: 15, height: 1.7),
@@ -135,7 +132,7 @@ class _NotificationMessageSheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: const Text('إغلاق'),
+              child: Text(AppStrings.of(context).t('إغلاق')),
             ),
           ],
         ),

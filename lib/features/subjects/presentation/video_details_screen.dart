@@ -20,6 +20,7 @@ import '../widgets/floating_playback_launch_button.dart';
 import '../widgets/rshd_embed_video_player.dart';
 import '../widgets/rshd_video_player.dart';
 import 'subjects_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 /// Secure playback via temporary signed URLs from backend.
 class VideoDetailsScreen extends ConsumerStatefulWidget {
@@ -118,7 +119,7 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     }
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(message))));
   }
 
   void _ensureProgressTracker(VideoModel video) {
@@ -244,7 +245,7 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
-        return const LoadingWidget(message: 'جاري تحميل الفيديو...');
+        return LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الفيديو...'));
       case FeatureLoadStatus.error:
         return ErrorView(
           message: state.errorMessage ?? 'تعذر تحميل الفيديو',
@@ -254,7 +255,7 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
       case FeatureLoadStatus.loaded:
         final video = state.video;
         if (video == null) {
-          return const ErrorView(message: 'المحتوى غير موجود');
+          return ErrorView(message: AppStrings.of(context).t('المحتوى غير موجود'));
         }
 
         _ensureProgressTracker(video);
@@ -364,7 +365,7 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
         title: video.isLocked ? 'فيديو مقفل' : _pendingTitle(video.status),
         message: video.isLocked
             ? 'فعّل المادة لمشاهدة هذا الفيديو.'
-            : video.pendingPlaybackMessage,
+            : AppStrings.of(context).t(video.pendingPlaybackMessage),
         tone: video.isLocked
             ? _PlaceholderTone.locked
             : _PlaceholderTone.pending,
@@ -375,8 +376,8 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     if (video.status != 'ready') {
       return _PlayerPlaceholder(
         icon: Icons.info_outline_rounded,
-        title: 'غير جاهز',
-        message: 'الفيديو غير جاهز للمشاهدة حالياً.',
+        title: AppStrings.of(context).t('غير جاهز'),
+        message: AppStrings.of(context).t('الفيديو غير جاهز للمشاهدة حالياً.'),
         tone: _PlaceholderTone.pending,
         onRetry: _reloadVideo,
       );
@@ -485,8 +486,7 @@ class _VideoDetailsHero extends StatelessWidget {
       scrolledUnderElevation: 0,
       backgroundColor: AppColors.of(context).primary,
       foregroundColor: AppColors.of(context).white,
-      title: Text(
-        title,
+      title: Text(AppStrings.of(context).t(title),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
@@ -494,7 +494,7 @@ class _VideoDetailsHero extends StatelessWidget {
       actions: [
         if (onFloat != null)
           IconButton(
-            tooltip: 'تشغيل عائم',
+            tooltip: AppStrings.of(context).t('تشغيل عائم'),
             onPressed: onFloat,
             icon: const Icon(Icons.picture_in_picture_alt_rounded),
           ),
@@ -566,8 +566,7 @@ class _PlayerPlaceholder extends StatelessWidget {
             child: Icon(icon, size: 24, color: accent),
           ),
           const SizedBox(height: 10),
-          Text(
-            title,
+          Text(AppStrings.of(context).t(title),
             style: AppTextStyles.subtitleOf(context).copyWith(
               color: AppColors.of(context).primary,
               fontWeight: FontWeight.w700,
@@ -575,8 +574,7 @@ class _PlayerPlaceholder extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            message,
+          Text(AppStrings.of(context).t(message),
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -589,7 +587,7 @@ class _PlayerPlaceholder extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded, size: 16),
-              label: const Text('تحديث'),
+              label: Text(AppStrings.of(context).t('تحديث')),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.of(context).secondary,
                 side: BorderSide(
@@ -622,13 +620,12 @@ class _VideoInfoSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionHeading(
+          _SectionHeading(
             icon: Icons.info_outline_rounded,
-            title: 'معلومات الفيديو',
+            title: AppStrings.of(context).t('معلومات الفيديو'),
           ),
           const SizedBox(height: 14),
-          Text(
-            video.title,
+          Text(AppStrings.of(context).t(video.title),
             style: AppTextStyles.titleOf(
               context,
             ).copyWith(fontSize: 22, height: 1.25),
@@ -638,16 +635,16 @@ class _VideoInfoSection extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              _StatusChip(label: video.statusLabel, status: video.status),
+              _StatusChip(label: AppStrings.of(context).t(video.statusLabel), status: video.status),
               _InfoPill(
                 icon: Icons.schedule_rounded,
                 label: video.formattedDuration,
                 caption: 'المدة',
               ),
               if (video.isFree)
-                const _InfoPill(
+                _InfoPill(
                   icon: Icons.visibility_outlined,
-                  label: 'مجاني',
+                  label: AppStrings.of(context).t('مجاني'),
                   caption: 'الوصول',
                 ),
             ],
@@ -679,10 +676,10 @@ class _ProgressSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: _SectionHeading(
                   icon: Icons.auto_graph_rounded,
-                  title: 'تقدم المشاهدة',
+                  title: AppStrings.of(context).t('تقدم المشاهدة'),
                 ),
               ),
               _ProgressBadge(percentage: percentage),
@@ -702,15 +699,13 @@ class _ProgressSection extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  positionSeconds > 0
+                child: Text(AppStrings.of(context).t(positionSeconds > 0
                       ? 'توقفت عند $positionSeconds ثانية'
-                      : 'لم تبدأ المشاهدة بعد',
+                      : 'لم تبدأ المشاهدة بعد'),
                   style: AppTextStyles.captionOf(context),
                 ),
               ),
-              Text(
-                'من $durationLabel',
+              Text(AppStrings.of(context).t('من $durationLabel'),
                 style: AppTextStyles.captionOf(context).copyWith(
                   color: AppColors.of(context).secondary,
                   fontWeight: FontWeight.w600,
@@ -771,8 +766,7 @@ class _SectionHeading extends StatelessWidget {
           child: Icon(icon, size: 18, color: AppColors.of(context).darkGold),
         ),
         const SizedBox(width: 10),
-        Text(
-          title,
+        Text(AppStrings.of(context).t(title),
           style: AppTextStyles.bodyOf(context).copyWith(
             fontWeight: FontWeight.w700,
             color: AppColors.of(context).primary,
@@ -796,8 +790,7 @@ class _ProgressBadge extends StatelessWidget {
         color: AppColors.of(context).background,
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(
-        '$percentage%',
+      child: Text(AppStrings.of(context).t('$percentage%'),
         style: AppTextStyles.captionOf(context).copyWith(
           color: AppColors.of(context).secondary,
           fontWeight: FontWeight.w800,
@@ -839,8 +832,7 @@ class _StatusChip extends StatelessWidget {
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 7),
-          Text(
-            label,
+          Text(AppStrings.of(context).t(label),
             style: AppTextStyles.captionOf(
               context,
             ).copyWith(color: color, fontWeight: FontWeight.w700),
@@ -878,12 +870,10 @@ class _InfoPill extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                caption,
+              Text(AppStrings.of(context).t(caption),
                 style: AppTextStyles.captionOf(context).copyWith(fontSize: 10),
               ),
-              Text(
-                label,
+              Text(AppStrings.of(context).t(label),
                 style: AppTextStyles.captionOf(context).copyWith(
                   color: AppColors.of(context).primary,
                   fontWeight: FontWeight.w700,

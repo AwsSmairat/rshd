@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class GradeTypeBadge extends StatelessWidget {
   const GradeTypeBadge({super.key, required this.sourceType});
@@ -18,8 +19,7 @@ class GradeTypeBadge extends StatelessWidget {
         color: colors.background,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(
-        _label(),
+      child: Text(AppStrings.of(context).t(_label()),
         style: AppTextStyles.bodyOf(context).copyWith(
           fontSize: 12,
           color: colors.foreground,

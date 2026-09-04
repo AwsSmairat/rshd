@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/presentation/widgets/login_header.dart';
@@ -87,8 +88,7 @@ class AssignmentsHeader extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Text(
-                      'الواجبات',
+                    Text(AppStrings.of(context).t(AppStrings.of(context).assignments),
                       style: TextStyle(
                         fontSize: metrics.pageHeaderTitleFontSize,
                         fontWeight: FontWeight.w700,

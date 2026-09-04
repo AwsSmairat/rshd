@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
+import '../l10n/app_strings.dart';
 
 /// Full-screen shield shown during capture or App Switcher privacy.
 class ProtectedContentOverlay extends StatelessWidget {
@@ -44,8 +45,7 @@ class ProtectedContentOverlay extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Text(
-                    'المحتوى محمي',
+                  Text(AppStrings.of(context).t('المحتوى محمي'),
                     textAlign: TextAlign.center,
                     style: AppTextStyles.titleOf(context).copyWith(
                       color: AppColors.of(context).white,
@@ -54,10 +54,9 @@ class ProtectedContentOverlay extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    showScreenshotNotice
+                  Text(AppStrings.of(context).t(showScreenshotNotice
                         ? 'تم التقاط لقطة شاشة. المحتوى التعليمي محمي ولا يجوز مشاركته.'
-                        : 'أوقف تسجيل أو مشاركة الشاشة لعرض المحتوى.',
+                        : 'أوقف تسجيل أو مشاركة الشاشة لعرض المحتوى.'),
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodyOf(context).copyWith(
                       color: AppColors.of(

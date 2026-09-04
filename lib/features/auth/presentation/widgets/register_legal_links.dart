@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class RegisterLegalLinks extends StatelessWidget {
   const RegisterLegalLinks({super.key});
@@ -18,9 +19,9 @@ class RegisterLegalLinks extends StatelessWidget {
           color: AppColors.of(context).textMuted.withValues(alpha: 0.95),
         ),
         children: [
-          const TextSpan(text: 'بإنشاء الحساب أنت توافق على '),
+          TextSpan(text: AppStrings.of(context).t('بإنشاء الحساب أنت توافق على ')),
           TextSpan(
-            text: 'شروط الاستخدام',
+            text: AppStrings.of(context).t('شروط الاستخدام'),
             style: TextStyle(
               fontWeight: FontWeight.w700,
               color: AppColors.of(context).darkGold,
@@ -28,9 +29,9 @@ class RegisterLegalLinks extends StatelessWidget {
             recognizer: TapGestureRecognizer()
               ..onTap = () => context.push(AppRoutes.termsAndConditions),
           ),
-          const TextSpan(text: ' و'),
+          TextSpan(text: AppStrings.of(context).t(' و')),
           TextSpan(
-            text: 'سياسة الخصوصية',
+            text: AppStrings.of(context).t('سياسة الخصوصية'),
             style: TextStyle(
               fontWeight: FontWeight.w700,
               color: AppColors.of(context).darkGold,

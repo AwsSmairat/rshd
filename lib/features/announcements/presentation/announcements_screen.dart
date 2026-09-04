@@ -15,6 +15,7 @@ import '../../subjects/widgets/subjects_header.dart';
 import '../data/models/announcement_model.dart';
 import '../widgets/announcement_card.dart';
 import 'announcements_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class AnnouncementsScreen extends ConsumerStatefulWidget {
   const AnnouncementsScreen({super.key});
@@ -69,9 +70,9 @@ class _AnnouncementsScreenState extends ConsumerState<AnnouncementsScreen> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: SubjectsHeader(
-                title: 'الإعلانات',
+                title: AppStrings.of(context).t('الإعلانات'),
                 backgroundIcon: Icons.campaign_outlined,
               ),
             ),
@@ -86,13 +87,13 @@ class _AnnouncementsScreenState extends ConsumerState<AnnouncementsScreen> {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
-        return const SliverFillRemaining(
-          child: LoadingWidget(message: 'جاري تحميل الإعلانات...'),
+        return SliverFillRemaining(
+          child: LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الإعلانات...')),
         );
       case FeatureLoadStatus.empty:
-        return const SliverFillRemaining(
+        return SliverFillRemaining(
           hasScrollBody: false,
-          child: Center(child: Text('لا توجد إعلانات حالياً')),
+          child: Center(child: Text(AppStrings.of(context).t('لا توجد إعلانات حالياً'))),
         );
       case FeatureLoadStatus.error:
         return SliverFillRemaining(
@@ -126,16 +127,14 @@ class _AnnouncementsScreenState extends ConsumerState<AnnouncementsScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    Text(
-                      'آخر الإعلانات',
+                    Text(AppStrings.of(context).t('آخر الإعلانات'),
                       style: AppTextStyles.subtitleOf(context).copyWith(
                         fontSize: metrics.sectionTitleFontSize,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     const Spacer(),
-                    Text(
-                      '${state.announcements.length} إعلان',
+                    Text(AppStrings.of(context).t('${state.announcements.length} إعلان'),
                       style: AppTextStyles.bodyOf(context).copyWith(
                         fontSize: 12,
                         color: AppColors.of(context).textMuted,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../profile/widgets/profile_detail_row.dart';
@@ -22,6 +23,7 @@ class ProfilePhotoCard extends StatelessWidget {
   final VoidCallback onDelete;
 
   Future<void> _showPicker(BuildContext context) async {
+    final strings = AppStrings.of(context);
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
       builder: (context) {
@@ -31,12 +33,12 @@ class ProfilePhotoCard extends StatelessWidget {
             children: [
               ListTile(
                 leading: const Icon(Icons.photo_library_outlined),
-                title: const Text('اختيار من المعرض'),
+                title: Text(AppStrings.of(context).t(strings.pickFromGallery)),
                 onTap: () => Navigator.pop(context, ImageSource.gallery),
               ),
               ListTile(
                 leading: const Icon(Icons.photo_camera_outlined),
-                title: const Text('التقاط صورة'),
+                title: Text(AppStrings.of(context).t(strings.takePhoto)),
                 onTap: () => Navigator.pop(context, ImageSource.camera),
               ),
               if (profile.avatarUrl != null)
@@ -45,7 +47,7 @@ class ProfilePhotoCard extends StatelessWidget {
                     Icons.delete_outline,
                     color: Color(0xFF991B1B),
                   ),
-                  title: const Text('حذف الصورة'),
+                  title: Text(AppStrings.of(context).t(strings.deletePhoto)),
                   onTap: () {
                     Navigator.pop(context);
                     onDelete();
@@ -64,8 +66,9 @@ class ProfilePhotoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return SettingsSectionCard(
-      title: 'الصورة الشخصية',
+      title: strings.profilePhoto,
       icon: Icons.account_circle_outlined,
       child: Column(
         children: [
@@ -129,8 +132,7 @@ class ProfilePhotoCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            'يمكنك تغيير صورتك الشخصية',
+          Text(AppStrings.of(context).t(strings.changePhotoHint),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
@@ -147,7 +149,7 @@ class ProfilePhotoCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('تغيير الصورة'),
+            child: Text(AppStrings.of(context).t(strings.changePhoto)),
           ),
         ],
       ),
@@ -174,59 +176,60 @@ class PersonalInformationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return SettingsSectionCard(
-      title: 'المعلومات الشخصية',
+      title: strings.personalInfo,
       icon: Icons.person_outline,
-      trailing: TextButton(onPressed: onEdit, child: const Text('تعديل')),
+      trailing: TextButton(onPressed: onEdit, child: Text(AppStrings.of(context).t(strings.edit))),
       child: Column(
         children: [
           ProfileDetailRow(
             dense: true,
             icon: Icons.badge_outlined,
-            label: 'الاسم الكامل',
+            label: strings.fullName,
             value: profile.name,
           ),
           ProfileDetailRow(
             dense: true,
             icon: Icons.email_outlined,
-            label: 'البريد الإلكتروني',
+            label: strings.email,
             value: profile.email,
           ),
           ProfileDetailRow(
             dense: true,
             icon: Icons.phone_outlined,
-            label: 'رقم الهاتف',
+            label: strings.phone,
             value: profile.phone ?? '—',
           ),
           ProfileDetailRow(
             dense: true,
             icon: Icons.cake_outlined,
-            label: 'تاريخ الميلاد',
+            label: strings.birthDate,
             value: _formatDate(profile.birthDate),
           ),
           ProfileDetailRow(
             dense: true,
             icon: Icons.wc_outlined,
-            label: 'الجنس',
-            value: profile.genderLabel,
+            label: strings.gender,
+            value: strings.genderLabel(profile.gender),
           ),
           ProfileDetailRow(
             dense: true,
             icon: Icons.flag_outlined,
-            label: 'الدولة',
+            label: strings.country,
             value: profile.country ?? '—',
           ),
           ProfileDetailRow(
             dense: true,
             icon: Icons.numbers_outlined,
-            label: 'الرقم التعريفي',
+            label: strings.studentId,
             value: profile.studentNumber ?? '—',
           ),
           ProfileDetailRow(
             dense: true,
             icon: Icons.verified_user_outlined,
-            label: 'حالة الحساب',
-            value: profile.statusLabel,
+            label: strings.accountStatus,
+            value: strings.statusLabel(profile.status),
             valueColor: profile.status == 'active'
                 ? const Color(0xFF166534)
                 : const Color(0xFF991B1B),
@@ -254,32 +257,34 @@ class SecuritySettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return SettingsSectionCard(
-      title: 'الأمان وكلمة المرور',
+      title: strings.securityPassword,
       icon: Icons.lock_outline,
       child: Column(
         children: [
           SettingsItemTile(
             icon: Icons.vpn_key_outlined,
-            label: 'تغيير كلمة المرور',
+            label: strings.changePassword,
             onTap: onChangePassword,
           ),
           SettingsItemTile(
             icon: Icons.devices_outlined,
-            label: 'الجلسات والأجهزة',
+            label: strings.sessionsDevices,
             onTap: onDevices,
           ),
           SettingsItemTile(
             icon: Icons.logout_outlined,
-            label: 'تسجيل الخروج من جميع الأجهزة',
+            label: strings.logoutAllDevices,
             onTap: onLogoutAllDevices,
             showDivider: false,
           ),
           if (profile.passwordSetAt != null)
             Padding(
               padding: const EdgeInsets.only(top: 4, bottom: 4),
-              child: Text(
-                'آخر تحديث لكلمة المرور: ${profile.passwordSetAt!.split('T').first.replaceAll('-', '/')}',
+              child: Text(AppStrings.of(context).t(strings.passwordLastUpdated(
+                  profile.passwordSetAt!.split('T').first.replaceAll('-', '/'),
+                )),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   fontSize: 12,
                   color: AppColors.of(context).textMuted,
@@ -303,13 +308,14 @@ class AppPreferencesCard extends StatelessWidget {
   final void Function(String key, dynamic value) onChanged;
 
   Future<void> _pickLanguage(BuildContext context) async {
+    final strings = AppStrings.of(context);
     final picked = await showSettingsOptionPicker<String>(
       context: context,
-      title: 'اللغة',
+      title: strings.language,
       current: preferences.language,
-      options: const [
-        SettingsPickerOption(value: 'ar', label: 'العربية'),
-        SettingsPickerOption(value: 'en', label: 'English'),
+      options: [
+        SettingsPickerOption(value: 'ar', label: strings.arabic),
+        SettingsPickerOption(value: 'en', label: strings.english),
       ],
     );
     if (picked != null && picked != preferences.language) {
@@ -318,14 +324,15 @@ class AppPreferencesCard extends StatelessWidget {
   }
 
   Future<void> _pickTheme(BuildContext context) async {
+    final strings = AppStrings.of(context);
     final picked = await showSettingsOptionPicker<String>(
       context: context,
-      title: 'الوضع',
+      title: strings.appearance,
       current: preferences.theme,
-      options: const [
-        SettingsPickerOption(value: 'light', label: 'الوضع الفاتح'),
-        SettingsPickerOption(value: 'dark', label: 'الوضع الداكن'),
-        SettingsPickerOption(value: 'system', label: 'حسب النظام'),
+      options: [
+        SettingsPickerOption(value: 'light', label: strings.lightMode),
+        SettingsPickerOption(value: 'dark', label: strings.darkMode),
+        SettingsPickerOption(value: 'system', label: strings.systemMode),
       ],
     );
     if (picked != null && picked != preferences.theme) {
@@ -334,14 +341,15 @@ class AppPreferencesCard extends StatelessWidget {
   }
 
   Future<void> _pickFontSize(BuildContext context) async {
+    final strings = AppStrings.of(context);
     final picked = await showSettingsOptionPicker<String>(
       context: context,
-      title: 'حجم الخط',
+      title: strings.fontSize,
       current: preferences.fontSize,
-      options: const [
-        SettingsPickerOption(value: 'small', label: 'صغير'),
-        SettingsPickerOption(value: 'medium', label: 'متوسط'),
-        SettingsPickerOption(value: 'large', label: 'كبير'),
+      options: [
+        SettingsPickerOption(value: 'small', label: strings.fontSmall),
+        SettingsPickerOption(value: 'medium', label: strings.fontMedium),
+        SettingsPickerOption(value: 'large', label: strings.fontLarge),
       ],
     );
     if (picked != null && picked != preferences.fontSize) {
@@ -350,15 +358,16 @@ class AppPreferencesCard extends StatelessWidget {
   }
 
   Future<void> _pickVideoQuality(BuildContext context) async {
+    final strings = AppStrings.of(context);
     final picked = await showSettingsOptionPicker<String>(
       context: context,
-      title: 'جودة الفيديو',
+      title: strings.videoQuality,
       current: preferences.defaultVideoQuality,
-      options: const [
-        SettingsPickerOption(value: 'auto', label: 'تلقائية'),
-        SettingsPickerOption(value: 'low', label: 'منخفضة'),
-        SettingsPickerOption(value: 'medium', label: 'متوسطة'),
-        SettingsPickerOption(value: 'high', label: 'عالية'),
+      options: [
+        SettingsPickerOption(value: 'auto', label: strings.qualityAuto),
+        SettingsPickerOption(value: 'low', label: strings.qualityLow),
+        SettingsPickerOption(value: 'medium', label: strings.qualityMedium),
+        SettingsPickerOption(value: 'high', label: strings.qualityHigh),
       ],
     );
     if (picked != null && picked != preferences.defaultVideoQuality) {
@@ -379,7 +388,7 @@ class AppPreferencesCard extends StatelessWidget {
         : zones.first.value;
     final picked = await showSettingsOptionPicker<String>(
       context: context,
-      title: 'المنطقة الزمنية',
+      title: AppStrings.of(context).timezone,
       current: current,
       options: zones,
     );
@@ -390,15 +399,16 @@ class AppPreferencesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return SettingsSectionCard(
-      title: 'تفضيلات التطبيق',
+      title: strings.appPreferences,
       icon: Icons.tune_outlined,
       child: Column(
         children: [
           SettingsItemTile(
             icon: Icons.language_outlined,
-            label: 'اللغة',
-            value: preferences.language == 'ar' ? 'العربية' : 'English',
+            label: strings.language,
+            value: strings.languageLabel(preferences.language),
             onTap: () => _pickLanguage(context),
           ),
           SettingsItemTile(
@@ -407,35 +417,35 @@ class AppPreferencesCard extends StatelessWidget {
                 : preferences.theme == 'system'
                 ? Icons.brightness_auto_outlined
                 : Icons.light_mode_outlined,
-            label: 'الوضع',
-            value: _themeLabel(preferences.theme),
+            label: strings.appearance,
+            value: strings.themeLabel(preferences.theme),
             onTap: () => _pickTheme(context),
           ),
           SettingsItemTile(
             icon: Icons.format_size_outlined,
-            label: 'حجم الخط',
-            value: _fontLabel(preferences.fontSize),
+            label: strings.fontSize,
+            value: strings.fontLabel(preferences.fontSize),
             onTap: () => _pickFontSize(context),
           ),
           SettingsSwitchTile(
-            label: 'التشغيل التلقائي للفيديو',
+            label: strings.autoPlayVideo,
             value: preferences.autoPlayVideo,
             onChanged: (v) => onChanged('auto_play_video', v),
           ),
           SettingsItemTile(
             icon: Icons.high_quality_outlined,
-            label: 'جودة الفيديو',
-            value: _qualityLabel(preferences.defaultVideoQuality),
+            label: strings.videoQuality,
+            value: strings.qualityLabel(preferences.defaultVideoQuality),
             onTap: () => _pickVideoQuality(context),
           ),
           SettingsSwitchTile(
-            label: 'حفظ آخر موضع مشاهدة',
+            label: strings.saveWatchPosition,
             value: preferences.saveWatchPosition,
             onChanged: (v) => onChanged('save_watch_position', v),
           ),
           SettingsItemTile(
             icon: Icons.schedule_outlined,
-            label: 'المنطقة الزمنية',
+            label: strings.timezone,
             value: preferences.timezone,
             onTap: () => _pickTimezone(context),
             showDivider: false,
@@ -444,25 +454,6 @@ class AppPreferencesCard extends StatelessWidget {
       ),
     );
   }
-
-  String _themeLabel(String theme) => switch (theme) {
-    'dark' => 'الوضع الداكن',
-    'system' => 'حسب النظام',
-    _ => 'الوضع الفاتح',
-  };
-
-  String _fontLabel(String size) => switch (size) {
-    'small' => 'صغير',
-    'large' => 'كبير',
-    _ => 'متوسط',
-  };
-
-  String _qualityLabel(String quality) => switch (quality) {
-    'low' => 'منخفضة',
-    'medium' => 'متوسطة',
-    'high' => 'عالية',
-    _ => 'تلقائية',
-  };
 }
 
 class NotificationSettingsCard extends StatelessWidget {
@@ -481,67 +472,68 @@ class NotificationSettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return SettingsSectionCard(
-      title: 'الإشعارات',
+      title: strings.notifications,
       icon: Icons.notifications_outlined,
       trailing: TextButton(
         onPressed: onToggleAll,
-        child: Text(_allEnabled ? 'تعطيل الكل' : 'تفعيل الكل'),
+        child: Text(AppStrings.of(context).t(_allEnabled ? strings.disableAll : strings.enableAll)),
       ),
       child: Column(
         children: [
           SettingsSwitchTile(
-            label: 'إشعارات الدروس الجديدة',
+            label: strings.notifyNewLessons,
             value: preferences.notifyLessons,
             onChanged: (v) => onChanged('notify_lessons', v),
           ),
           SettingsSwitchTile(
-            label: 'إشعارات الواجبات',
+            label: strings.notifyAssignments,
             value: preferences.notifyAssignments,
             onChanged: (v) => onChanged('notify_assignments', v),
           ),
           SettingsSwitchTile(
-            label: 'تذكير موعد تسليم الواجب',
+            label: strings.notifyAssignmentReminders,
             value: preferences.notifyAssignmentReminders,
             onChanged: (v) => onChanged('notify_assignment_reminders', v),
           ),
           SettingsSwitchTile(
-            label: 'إشعارات الاختبارات',
+            label: strings.notifyQuizzes,
             value: preferences.notifyQuizzes,
             onChanged: (v) => onChanged('notify_quizzes', v),
           ),
           SettingsSwitchTile(
-            label: 'تذكير موعد الاختبار',
+            label: strings.notifyQuizReminders,
             value: preferences.notifyQuizReminders,
             onChanged: (v) => onChanged('notify_quiz_reminders', v),
           ),
           SettingsSwitchTile(
-            label: 'إشعارات الدرجات',
+            label: strings.notifyGrades,
             value: preferences.notifyGrades,
             onChanged: (v) => onChanged('notify_grades', v),
           ),
           SettingsSwitchTile(
-            label: 'إشعارات الرسائل',
+            label: strings.notifyMessages,
             value: preferences.notifyMessages,
             onChanged: (v) => onChanged('notify_messages', v),
           ),
           SettingsSwitchTile(
-            label: 'إشعارات الإعلانات',
+            label: strings.notifyAnnouncements,
             value: preferences.notifyAnnouncements,
             onChanged: (v) => onChanged('notify_announcements', v),
           ),
           SettingsSwitchTile(
-            label: 'تحديثات المنصة',
+            label: strings.notifyPlatformUpdates,
             value: preferences.notifyPlatformUpdates,
             onChanged: (v) => onChanged('notify_platform_updates', v),
           ),
           SettingsSwitchTile(
-            label: 'الصوت',
+            label: strings.sound,
             value: preferences.notificationSound,
             onChanged: (v) => onChanged('notification_sound', v),
           ),
           SettingsSwitchTile(
-            label: 'الاهتزاز',
+            label: strings.vibration,
             value: preferences.notificationVibration,
             onChanged: (v) => onChanged('notification_vibration', v),
             showDivider: false,
@@ -563,14 +555,18 @@ class PrivacySettingsCard extends StatelessWidget {
   final void Function(String key, dynamic value) onChanged;
 
   Future<void> _pickProfileVisibility(BuildContext context) async {
+    final strings = AppStrings.of(context);
     final picked = await showSettingsOptionPicker<String>(
       context: context,
-      title: 'من يمكنه رؤية الملف',
+      title: strings.whoCanSeeProfile,
       current: preferences.profileVisibility,
-      options: const [
-        SettingsPickerOption(value: 'everyone', label: 'الجميع'),
-        SettingsPickerOption(value: 'teachers_only', label: 'المدرسون فقط'),
-        SettingsPickerOption(value: 'private', label: 'خاص'),
+      options: [
+        SettingsPickerOption(value: 'everyone', label: strings.everyone),
+        SettingsPickerOption(
+          value: 'teachers_only',
+          label: strings.teachersOnly,
+        ),
+        SettingsPickerOption(value: 'private', label: strings.private),
       ],
     );
     if (picked != null && picked != preferences.profileVisibility) {
@@ -579,14 +575,18 @@ class PrivacySettingsCard extends StatelessWidget {
   }
 
   Future<void> _pickMessagingPermission(BuildContext context) async {
+    final strings = AppStrings.of(context);
     final picked = await showSettingsOptionPicker<String>(
       context: context,
-      title: 'من يمكنه مراسلتي',
+      title: strings.whoCanMessage,
       current: preferences.messagingPermission,
-      options: const [
-        SettingsPickerOption(value: 'everyone', label: 'الجميع'),
-        SettingsPickerOption(value: 'teachers_only', label: 'المدرسون فقط'),
-        SettingsPickerOption(value: 'nobody', label: 'لا أحد'),
+      options: [
+        SettingsPickerOption(value: 'everyone', label: strings.everyone),
+        SettingsPickerOption(
+          value: 'teachers_only',
+          label: strings.teachersOnly,
+        ),
+        SettingsPickerOption(value: 'nobody', label: strings.nobody),
       ],
     );
     if (picked != null && picked != preferences.messagingPermission) {
@@ -596,30 +596,31 @@ class PrivacySettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return SettingsSectionCard(
-      title: 'الخصوصية',
+      title: strings.privacy,
       icon: Icons.shield_outlined,
       child: Column(
         children: [
           SettingsItemTile(
             icon: Icons.visibility_outlined,
-            label: 'من يمكنه رؤية الملف',
-            value: _visibilityLabel(preferences.profileVisibility),
+            label: strings.whoCanSeeProfile,
+            value: strings.visibilityLabel(preferences.profileVisibility),
             onTap: () => _pickProfileVisibility(context),
           ),
           SettingsItemTile(
             icon: Icons.chat_outlined,
-            label: 'من يمكنه مراسلتي',
-            value: _messagingLabel(preferences.messagingPermission),
+            label: strings.whoCanMessage,
+            value: strings.messagingLabel(preferences.messagingPermission),
             onTap: () => _pickMessagingPermission(context),
           ),
           SettingsSwitchTile(
-            label: 'إظهار حالة النشاط',
+            label: strings.showActivityStatus,
             value: preferences.showActivityStatus,
             onChanged: (v) => onChanged('show_activity_status', v),
           ),
           SettingsSwitchTile(
-            label: 'السماح باستخدام الصورة الشخصية',
+            label: strings.allowProfilePhotoUse,
             value: preferences.allowProfilePhotoUse,
             onChanged: (v) => onChanged('allow_profile_photo_use', v),
             showDivider: false,
@@ -628,18 +629,6 @@ class PrivacySettingsCard extends StatelessWidget {
       ),
     );
   }
-
-  String _visibilityLabel(String value) => switch (value) {
-    'everyone' => 'الجميع',
-    'private' => 'خاص',
-    _ => 'المدرسون فقط',
-  };
-
-  String _messagingLabel(String value) => switch (value) {
-    'everyone' => 'الجميع',
-    'nobody' => 'لا أحد',
-    _ => 'المدرسون فقط',
-  };
 }
 
 bool _allNotificationsEnabled(StudentPreferencesModel prefs) =>
@@ -675,8 +664,9 @@ class SupportLegalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return SettingsSectionCard(
-      title: 'الدعم والمعلومات',
+      title: strings.supportAndInfo,
       icon: Icons.help_outline,
       child: Wrap(
         spacing: 10,
@@ -684,27 +674,27 @@ class SupportLegalCard extends StatelessWidget {
         children: [
           _SupportChip(
             icon: Icons.help_center_outlined,
-            label: 'مركز المساعدة',
+            label: strings.helpCenter,
             onTap: onHelp,
           ),
           _SupportChip(
             icon: Icons.contact_support_outlined,
-            label: 'تواصل معنا',
+            label: strings.contactUs,
             onTap: onContact,
           ),
           _SupportChip(
             icon: Icons.description_outlined,
-            label: 'الشروط والأحكام',
+            label: strings.terms,
             onTap: onTerms,
           ),
           _SupportChip(
             icon: Icons.privacy_tip_outlined,
-            label: 'سياسة الخصوصية',
+            label: strings.privacyPolicy,
             onTap: onPrivacy,
           ),
           _SupportChip(
             icon: Icons.info_outline,
-            label: 'حول التطبيق • $appVersion',
+            label: strings.aboutApp(appVersion),
             onTap: onAbout,
           ),
         ],
@@ -739,8 +729,7 @@ class _SupportChip extends StatelessWidget {
             children: [
               Icon(icon, color: AppColors.of(context).darkGold, size: 24),
               const SizedBox(height: 8),
-              Text(
-                label,
+              Text(AppStrings.of(context).t(label),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(fontSize: 12, fontWeight: FontWeight.w600),
@@ -788,7 +777,10 @@ class SettingsLogoutButton extends StatelessWidget {
                 ),
               )
             : const Icon(Icons.logout_rounded),
-        label: Text(isLoading ? 'جارٍ تسجيل الخروج...' : 'تسجيل خروج'),
+        label: Text(AppStrings.of(context).t(isLoading
+              ? AppStrings.of(context).loggingOut
+              : AppStrings.of(context).logout),
+        ),
       ),
     );
   }

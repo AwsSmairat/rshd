@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../data/privacy_policy_config.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class PrivacyContactInfo {
   const PrivacyContactInfo({
@@ -61,8 +62,7 @@ class PrivacyPolicyContactCard extends StatelessWidget {
                 size: 22,
               ),
               const SizedBox(width: 8),
-              Text(
-                'بيانات التواصل',
+              Text(AppStrings.of(context).t('بيانات التواصل'),
                 style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -74,29 +74,29 @@ class PrivacyPolicyContactCard extends StatelessWidget {
           const SizedBox(height: 14),
           _ContactRow(
             icon: Icons.privacy_tip_outlined,
-            label: 'بريد الخصوصية',
+            label: AppStrings.of(context).t('بريد الخصوصية'),
             value: contact.privacyEmail,
           ),
           _ContactRow(
             icon: Icons.support_agent_outlined,
-            label: 'بريد الدعم',
+            label: AppStrings.of(context).t('بريد الدعم'),
             value: contact.supportEmail,
           ),
           if (contact.supportPhone.isNotEmpty)
             _ContactRow(
               icon: Icons.phone_outlined,
-              label: 'الهاتف',
+              label: AppStrings.of(context).t('الهاتف'),
               value: contact.supportPhone,
             ),
           if (contact.companyAddress.isNotEmpty)
             _ContactRow(
               icon: Icons.location_on_outlined,
-              label: 'العنوان',
+              label: AppStrings.of(context).t('العنوان'),
               value: contact.companyAddress,
             ),
           _ContactRow(
             icon: Icons.access_time_outlined,
-            label: 'ساعات الدعم',
+            label: AppStrings.of(context).t('ساعات الدعم'),
             value: contact.supportHours,
           ),
           const SizedBox(height: 16),
@@ -138,8 +138,7 @@ class _ContactRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  label,
+                Text(AppStrings.of(context).t(label),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
                     color: AppColors.of(context).textMuted,
@@ -147,8 +146,7 @@ class _ContactRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  value,
+                Text(AppStrings.of(context).t(value),
                   style: AppTextStyles.bodyOf(
                     context,
                   ).copyWith(fontSize: 14, height: 1.4),
@@ -183,7 +181,7 @@ class PrivacyActionButtons extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: onPrivacyContact,
               icon: const Icon(Icons.mail_outline, size: 18),
-              label: const Text('الخصوصية'),
+              label: Text(AppStrings.of(context).t('الخصوصية')),
               style: _outlineStyle(context),
             ),
           ),
@@ -192,7 +190,7 @@ class PrivacyActionButtons extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: onReportIssue,
               icon: const Icon(Icons.report_outlined, size: 18),
-              label: const Text('إبلاغ'),
+              label: Text(AppStrings.of(context).t('إبلاغ')),
               style: _outlineStyle(context),
             ),
           ),
@@ -204,23 +202,23 @@ class PrivacyActionButtons extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Semantics(
-          label: 'التواصل بخصوص الخصوصية',
+          label: AppStrings.of(context).t('التواصل بخصوص الخصوصية'),
           button: true,
           child: OutlinedButton.icon(
             onPressed: onPrivacyContact,
             icon: const Icon(Icons.mail_outline),
-            label: const Text('التواصل بخصوص الخصوصية'),
+            label: Text(AppStrings.of(context).t('التواصل بخصوص الخصوصية')),
             style: _outlineStyle(context),
           ),
         ),
         const SizedBox(height: 10),
         Semantics(
-          label: 'الإبلاغ عن مشكلة',
+          label: AppStrings.of(context).t('الإبلاغ عن مشكلة'),
           button: true,
           child: OutlinedButton.icon(
             onPressed: onReportIssue,
             icon: const Icon(Icons.report_outlined),
-            label: const Text('الإبلاغ عن مشكلة'),
+            label: Text(AppStrings.of(context).t('الإبلاغ عن مشكلة')),
             style: _outlineStyle(context),
           ),
         ),
@@ -249,7 +247,7 @@ class DeleteAccountButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: 'طلب حذف الحساب',
+      label: AppStrings.of(context).t('طلب حذف الحساب'),
       button: true,
       child: SizedBox(
         width: double.infinity,
@@ -263,8 +261,7 @@ class DeleteAccountButton extends StatelessWidget {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.delete_outline, color: Color(0xFF991B1B)),
-          label: Text(
-            isLoading ? 'جارٍ المعالجة...' : 'طلب حذف الحساب',
+          label: Text(AppStrings.of(context).t(isLoading ? 'جارٍ المعالجة...' : 'طلب حذف الحساب'),
             style: const TextStyle(
               color: Color(0xFF991B1B),
               fontWeight: FontWeight.w700,
@@ -290,7 +287,7 @@ Future<void> launchPrivacyEmail({
   if (email.isEmpty) {
     if (context != null && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('بريد التواصل غير متوفر حالياً')),
+        SnackBar(content: Text(AppStrings.of(context).t('بريد التواصل غير متوفر حالياً'))),
       );
     }
     return;
@@ -304,7 +301,7 @@ Future<void> launchPrivacyEmail({
 
   final launched = await launchUrl(uri);
   if (!launched && context != null && context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(email)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(email))));
   }
 }
 

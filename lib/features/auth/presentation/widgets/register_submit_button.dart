@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class RegisterSubmitButton extends StatelessWidget {
   const RegisterSubmitButton({
@@ -54,8 +55,7 @@ class RegisterSubmitButton extends StatelessWidget {
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        label,
+                      Text(AppStrings.of(context).t(label),
                         style: TextStyle(
                           color: AppColors.of(context).accent,
                           fontSize: 16,

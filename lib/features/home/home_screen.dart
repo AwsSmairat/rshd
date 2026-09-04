@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/l10n/app_strings.dart';
 import '../../core/router/app_router.dart';
 import '../../core/layout/app_layout_metrics.dart';
 import '../../core/theme/app_colors.dart';
@@ -70,7 +71,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildBody(HomeState state) {
     if (state.status == HomeLoadStatus.error && state.dashboard == null) {
       return ErrorView(
-        message: state.errorMessage ?? 'تعذر تحميل الصفحة الرئيسية',
+        message: state.errorMessage ?? AppStrings.of(context).loadingHome,
         onRetry: () => _loadDashboard(),
       );
     }
@@ -83,7 +84,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final userName =
         dashboard?.studentName ??
         ref.watch(authControllerProvider).user?.name ??
-        'طالب RSHD';
+        AppStrings.of(context).rshdStudentFallback;
 
     final metrics = AppLayoutMetrics.of(context);
     final sectionGap = metrics.sectionSpacing;

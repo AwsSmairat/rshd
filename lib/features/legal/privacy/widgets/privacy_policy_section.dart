@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../data/privacy_policy_model.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class PrivacyPolicySection extends StatelessWidget {
   const PrivacyPolicySection({super.key, required this.section});
@@ -17,8 +18,7 @@ class PrivacyPolicySection extends StatelessWidget {
         ...section.paragraphs.map(
           (paragraph) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: Text(
-              paragraph,
+            child: Text(AppStrings.of(context).t(paragraph),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 14,
                 height: 1.65,
@@ -56,8 +56,7 @@ class PrivacyPolicySection extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              item,
+            child: Text(AppStrings.of(context).t(item),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 14,
                 height: 1.6,
@@ -76,8 +75,7 @@ class PrivacyPolicySection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            subsection.title,
+          Text(AppStrings.of(context).t(subsection.title),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 14,
               fontWeight: FontWeight.w700,

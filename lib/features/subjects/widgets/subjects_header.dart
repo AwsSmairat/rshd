@@ -5,6 +5,7 @@ import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/presentation/widgets/login_header.dart';
 import '../../../core/widgets/responsive_content.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class SubjectsHeader extends StatelessWidget {
   const SubjectsHeader({
@@ -64,8 +65,7 @@ class SubjectsHeader extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Text(
-                      title,
+                    Text(AppStrings.of(context).t(title),
                       style: TextStyle(
                         fontSize: metrics.pageHeaderTitleFontSize,
                         fontWeight: FontWeight.w700,

@@ -14,6 +14,7 @@ import 'widgets/gold_gradient_button.dart';
 import 'widgets/login_header.dart';
 import 'widgets/luxury_login_card.dart';
 import 'widgets/otp_input_row.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class PasswordResetVerificationScreen extends ConsumerStatefulWidget {
   const PasswordResetVerificationScreen({super.key, required this.email});
@@ -65,7 +66,7 @@ class _PasswordResetVerificationScreenState
   Future<void> _verify() async {
     if (_code.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى إدخال رمز مكوّن من 6 أرقام')),
+        SnackBar(content: Text(AppStrings.of(context).t('يرجى إدخال رمز مكوّن من 6 أرقام'))),
       );
       return;
     }
@@ -98,7 +99,7 @@ class _PasswordResetVerificationScreenState
       _startResendTimer();
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('تم إرسال رمز جديد')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تم إرسال رمز جديد'))));
     }
   }
 
@@ -117,22 +118,20 @@ class _PasswordResetVerificationScreenState
               Align(
                 alignment: AlignmentDirectional.centerStart,
                 child: IconButton(
-                  tooltip: 'رجوع',
+                  tooltip: AppStrings.of(context).t('رجوع'),
                   onPressed: () => context.pop(),
                   icon: const Icon(Icons.arrow_back_ios_new_rounded),
                   color: AppColors.of(context).primary,
                 ),
               ),
-              Text(
-                'تحقق من الرمز',
+              Text(AppStrings.of(context).t('تحقق من الرمز'),
                 style: AppTextStyles.titleOf(
                   context,
                 ).copyWith(color: AppColors.of(context).primary),
                 textAlign: TextAlign.right,
               ),
               SizedBox(height: metrics.fieldSpacing * 0.5),
-              Text(
-                'أدخل رمز الاستعادة المرسل إلى\n${widget.email}',
+              Text(AppStrings.of(context).t('أدخل رمز الاستعادة المرسل إلى\n${widget.email}'),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(color: AppColors.of(context).textMuted),
@@ -153,15 +152,14 @@ class _PasswordResetVerificationScreenState
               ),
               if (state.errorMessage != null) ...[
                 SizedBox(height: metrics.fieldSpacing),
-                Text(
-                  state.errorMessage!,
+                Text(AppStrings.of(context).t(state.errorMessage!),
                   style: AppTextStyles.errorOf(context),
                   textAlign: TextAlign.center,
                 ),
               ],
               SizedBox(height: metrics.sectionSpacing),
               GoldGradientButton(
-                label: 'تحقق',
+                label: AppStrings.of(context).t('تحقق'),
                 isLoading: state.isLoading,
                 onPressed: state.isLoading ? null : _verify,
               ),
@@ -170,10 +168,9 @@ class _PasswordResetVerificationScreenState
                 onPressed: (_secondsRemaining > 0 || _isResending)
                     ? null
                     : _resend,
-                child: Text(
-                  _secondsRemaining > 0
+                child: Text(AppStrings.of(context).t(_secondsRemaining > 0
                       ? 'إعادة الإرسال بعد $_secondsRemaining ث'
-                      : 'إعادة إرسال الرمز',
+                      : 'إعادة إرسال الرمز'),
                 ),
               ),
             ],

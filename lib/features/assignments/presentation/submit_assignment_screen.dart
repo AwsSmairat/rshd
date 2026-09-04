@@ -19,6 +19,7 @@ import '../widgets/assignment_submit_info_card.dart';
 import '../widgets/assignments_state_views.dart';
 import '../widgets/luxury_assignment_header.dart';
 import 'assignments_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class SubmitAssignmentScreen extends ConsumerStatefulWidget {
   const SubmitAssignmentScreen({super.key, required this.assignmentId});
@@ -78,7 +79,7 @@ class _SubmitAssignmentScreenState
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(validationError)));
+        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(validationError))));
       }
       return;
     }
@@ -93,7 +94,7 @@ class _SubmitAssignmentScreenState
 
     if (answerText.isEmpty && !hasFile) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى كتابة إجابة أو رفع ملف الحل.')),
+        SnackBar(content: Text(AppStrings.of(context).t('يرجى كتابة إجابة أو رفع ملف الحل.'))),
       );
       return;
     }
@@ -107,7 +108,7 @@ class _SubmitAssignmentScreenState
       if (validationError != null) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(validationError)));
+        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(validationError))));
         return;
       }
     }
@@ -149,7 +150,7 @@ class _SubmitAssignmentScreenState
 
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('تم تسليم الواجب بنجاح')));
+    ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تم تسليم الواجب بنجاح'))));
 
     context.pop();
   }
@@ -182,7 +183,7 @@ class _SubmitAssignmentScreenState
           next.errorMessage != null) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
+        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(next.errorMessage!))));
       }
     });
 
@@ -192,7 +193,7 @@ class _SubmitAssignmentScreenState
       content = const AssignmentsLoadingSkeleton(count: 2);
     } else if (assignment == null) {
       content = AssignmentsErrorState(
-        message: 'تعذر تحميل معلومات الواجب',
+        message: AppStrings.of(context).t('تعذر تحميل معلومات الواجب'),
         onRetry: () {
           final cached = ref
               .read(assignmentsListControllerProvider.notifier)
@@ -214,7 +215,7 @@ class _SubmitAssignmentScreenState
           if (assignment.hasAttachment) ...[
             const SizedBox(height: 16),
             AssignmentDownloadFileCard(
-              title: 'ملف الواجب من المدرس',
+              title: AppStrings.of(context).t('ملف الواجب من المدرس'),
               fileUrl: assignment.resolvedAttachmentUrl!,
               fileName: assignment.originalFileName,
               fileSize: assignment.fileSize,
@@ -224,14 +225,14 @@ class _SubmitAssignmentScreenState
           ],
           const SizedBox(height: 16),
           AssignmentSectionCard(
-            title: 'نص الإجابة',
+            title: AppStrings.of(context).t('نص الإجابة'),
             icon: Icons.edit_outlined,
             child: TextFormField(
               controller: _answerController,
               maxLines: 8,
               maxLength: 2000,
               decoration: InputDecoration(
-                hintText: 'اكتب إجابتك هنا...',
+                hintText: AppStrings.of(context).t('اكتب إجابتك هنا...'),
                 filled: true,
                 fillColor: AppColors.of(
                   context,
@@ -279,8 +280,8 @@ class _SubmitAssignmentScreenState
       backgroundColor: Colors.transparent,
       body: CustomScrollView(
         slivers: [
-          const SliverToBoxAdapter(
-            child: LuxuryAssignmentHeader(title: 'تسليم الواجب'),
+          SliverToBoxAdapter(
+            child: LuxuryAssignmentHeader(title: AppStrings.of(context).t('تسليم الواجب')),
           ),
           ResponsiveSliverContent(
             padding: AppLayoutMetrics.of(

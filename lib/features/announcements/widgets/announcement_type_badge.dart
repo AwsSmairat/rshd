@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class AnnouncementTypeBadge extends StatelessWidget {
   const AnnouncementTypeBadge({super.key, required this.type});
@@ -52,8 +53,7 @@ class AnnouncementTypeBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: _textColor(context).withValues(alpha: 0.2)),
       ),
-      child: Text(
-        _label,
+      child: Text(AppStrings.of(context).t(_label),
         style: AppTextStyles.bodyOf(context).copyWith(
           fontSize: 11,
           fontWeight: FontWeight.w700,

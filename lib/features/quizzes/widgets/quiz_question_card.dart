@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import 'quiz_answer_option.dart';
 import '../data/models/quiz_question_model.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class QuizQuestionCard extends StatelessWidget {
   const QuizQuestionCard({
@@ -26,15 +27,13 @@ class QuizQuestionCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'السؤال $questionNumber من $totalQuestions',
+        Text(AppStrings.of(context).t('السؤال $questionNumber من $totalQuestions'),
           style: AppTextStyles.bodyOf(
             context,
           ).copyWith(color: AppColors.of(context).textMuted, fontSize: 13),
         ),
         const SizedBox(height: 12),
-        Text(
-          question.questionText,
+        Text(AppStrings.of(context).t(question.questionText),
           style: AppTextStyles.titleOf(context).copyWith(fontSize: 18),
         ),
         const SizedBox(height: 20),

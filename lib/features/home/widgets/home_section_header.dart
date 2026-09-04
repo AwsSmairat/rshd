@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/layout/app_layout_metrics.dart';
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
@@ -28,8 +29,7 @@ class HomeSectionHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              Text(
-                title,
+              Text(AppStrings.of(context).t(title),
                 style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: metrics.sectionTitleFontSize,
                   fontWeight: FontWeight.w700,
@@ -48,9 +48,8 @@ class HomeSectionHeader extends StatelessWidget {
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            child: const Text(
-              'عرض الكل >',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+            child: Text(AppStrings.of(context).t(AppStrings.of(context).viewAll),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
             ),
           ),
       ],

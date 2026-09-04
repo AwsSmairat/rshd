@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 import 'quiz_icon_helper.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class QuizzesEmptyState extends StatelessWidget {
   const QuizzesEmptyState({super.key});
@@ -35,8 +36,7 @@ class QuizzesEmptyState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-            'لا توجد اختبارات حالياً',
+          Text(AppStrings.of(context).t('لا توجد اختبارات حالياً'),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -45,8 +45,7 @@ class QuizzesEmptyState extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-          Text(
-            'ستظهر الاختبارات هنا عند إضافتها من المدرّس',
+          Text(AppStrings.of(context).t('ستظهر الاختبارات هنا عند إضافتها من المدرّس'),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 13,
               height: 1.5,
@@ -139,8 +138,7 @@ class QuizzesErrorState extends StatelessWidget {
             size: 36,
           ),
           const SizedBox(height: 12),
-          Text(
-            message,
+          Text(AppStrings.of(context).t(message),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.of(context).text,
@@ -151,7 +149,7 @@ class QuizzesErrorState extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh, size: 18),
-            label: const Text('إعادة المحاولة'),
+            label: Text(AppStrings.of(context).t('إعادة المحاولة')),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.of(context).primary,
               side: BorderSide(

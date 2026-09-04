@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/layout/auth_layout_metrics.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/liquid_glass_surface.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class LuxuryLoginCard extends StatelessWidget {
   const LuxuryLoginCard({super.key, required this.child});
@@ -71,8 +72,7 @@ class LoginCardTitle extends StatelessWidget {
           children: [
             _Diamond(size: metrics.isTablet ? 8 : 7),
             SizedBox(width: metrics.isTablet ? 12 : 10),
-            Text(
-              'تسجيل الدخول',
+            Text(AppStrings.of(context).t('تسجيل الدخول'),
               style: TextStyle(
                 fontSize: metrics.titleFontSize,
                 fontWeight: FontWeight.w800,
@@ -84,8 +84,7 @@ class LoginCardTitle extends StatelessWidget {
           ],
         ),
         SizedBox(height: metrics.isTablet ? 10 : 8),
-        Text(
-          'أهلاً بك في منصة RSHD التعليمية',
+        Text(AppStrings.of(context).t('أهلاً بك في منصة RSHD التعليمية'),
           style: TextStyle(
             fontSize: metrics.subtitleFontSize,
             color: AppColors.of(context).textMuted.withValues(alpha: 0.95),
@@ -160,8 +159,7 @@ class LoginFooter extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Text(
-            'RSHD LEARNING PLATFORM',
+          Text(AppStrings.of(context).t('RSHD LEARNING PLATFORM'),
             style: TextStyle(
               fontSize: 11,
               letterSpacing: 2,

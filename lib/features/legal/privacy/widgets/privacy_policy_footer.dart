@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class PrivacyPolicyFooter extends StatelessWidget {
   const PrivacyPolicyFooter({
@@ -35,7 +36,7 @@ class PrivacyPolicyFooter extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Semantics(
-            label: 'طلب حذف الحساب',
+            label: AppStrings.of(context).t('طلب حذف الحساب'),
             button: true,
             child: OutlinedButton.icon(
               onPressed: isDeleting ? null : onDeleteAccount,
@@ -46,8 +47,7 @@ class PrivacyPolicyFooter extends StatelessWidget {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.delete_outline, color: Color(0xFF991B1B)),
-              label: Text(
-                isDeleting ? 'جارٍ المعالجة...' : 'طلب حذف الحساب',
+              label: Text(AppStrings.of(context).t(isDeleting ? 'جارٍ المعالجة...' : 'طلب حذف الحساب'),
                 style: const TextStyle(
                   color: Color(0xFF991B1B),
                   fontWeight: FontWeight.w700,
@@ -64,12 +64,12 @@ class PrivacyPolicyFooter extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Semantics(
-            label: 'التواصل بخصوص الخصوصية',
+            label: AppStrings.of(context).t('التواصل بخصوص الخصوصية'),
             button: true,
             child: OutlinedButton.icon(
               onPressed: onPrivacyContact,
               icon: const Icon(Icons.mail_outline),
-              label: const Text('التواصل بخصوص الخصوصية'),
+              label: Text(AppStrings.of(context).t('التواصل بخصوص الخصوصية')),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.of(context).darkGold,
                 side: BorderSide(color: AppColors.of(context).darkGold),
@@ -85,8 +85,7 @@ class PrivacyPolicyFooter extends StatelessWidget {
             color: AppColors.of(context).textMuted.withValues(alpha: 0.2),
           ),
           const SizedBox(height: 12),
-          Text(
-            platformName,
+          Text(AppStrings.of(context).t(platformName),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontWeight: FontWeight.w700,
               color: AppColors.of(context).primary,
@@ -94,15 +93,13 @@ class PrivacyPolicyFooter extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
-          Text(
-            'إصدار السياسة: $version',
+          Text(AppStrings.of(context).t('إصدار السياسة: $version'),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
             textAlign: TextAlign.center,
           ),
-          Text(
-            'آخر تحديث: $lastUpdated',
+          Text(AppStrings.of(context).t('آخر تحديث: $lastUpdated'),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -42,8 +43,7 @@ class DashboardSummaryCard extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          Text(
-            value,
+          Text(AppStrings.of(context).t(value),
             style: AppTextStyles.titleOf(context).copyWith(
               fontSize: metrics.isTablet ? 28 : 24,
               color: AppColors.of(context).text,
@@ -58,8 +58,7 @@ class DashboardSummaryCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(999),
             ),
           ),
-          Text(
-            label,
+          Text(AppStrings.of(context).t(label),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: metrics.isTablet ? 12 : 11,
               height: 1.3,
@@ -92,20 +91,21 @@ class DashboardSummaryGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final metrics = AppLayoutMetrics.of(context);
+    final strings = AppStrings.of(context);
     final cards = [
       DashboardSummaryCard(
         icon: Icons.menu_book_outlined,
-        label: 'المواد المفعلة',
+        label: strings.activatedCourses,
         value: '$subjectsCount',
       ),
       DashboardSummaryCard(
         icon: Icons.assignment_outlined,
-        label: 'واجبات غير مسلّمة',
+        label: strings.unsubmittedAssignments,
         value: '$unsubmittedAssignmentsCount',
       ),
       DashboardSummaryCard(
         icon: Icons.quiz_outlined,
-        label: 'اختبارات متاحة',
+        label: strings.availableQuizzes,
         value: '$availableQuizzesCount',
       ),
     ];

@@ -17,6 +17,7 @@ import '../widgets/subjects_header.dart';
 import '../widgets/subjects_state_views.dart';
 import '../widgets/video_card.dart';
 import 'subjects_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class LessonDetailsScreen extends ConsumerStatefulWidget {
   const LessonDetailsScreen({super.key, required this.lessonId});
@@ -98,9 +99,9 @@ class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
       case FeatureLoadStatus.loaded:
         final lesson = state.lesson;
         if (lesson == null) {
-          return const SliverFillRemaining(
+          return SliverFillRemaining(
             hasScrollBody: false,
-            child: ErrorView(message: 'الدرس غير موجود'),
+            child: ErrorView(message: AppStrings.of(context).t('الدرس غير موجود')),
           );
         }
 
@@ -108,10 +109,9 @@ class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(lesson.title, style: AppTextStyles.titleOf(context)),
+              Text(AppStrings.of(context).t(lesson.title), style: AppTextStyles.titleOf(context)),
               const SizedBox(height: 8),
-              Text(
-                lesson.isActive ? 'الحالة: متاح' : 'الحالة: ${lesson.status}',
+              Text(AppStrings.of(context).t(lesson.isActive ? 'الحالة: متاح' : 'الحالة: ${lesson.status}'),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(color: AppColors.of(context).secondary),
@@ -119,12 +119,12 @@ class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
               if (lesson.description != null &&
                   lesson.description!.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                Text(lesson.description!, style: AppTextStyles.bodyOf(context)),
+                Text(AppStrings.of(context).t(lesson.description!), style: AppTextStyles.bodyOf(context)),
               ],
               const SizedBox(height: 24),
               _ContentSection(
-                title: 'الفيديوهات',
-                emptyMessage: 'لا توجد فيديوهات لهذا الدرس حالياً',
+                title: AppStrings.of(context).t('الفيديوهات'),
+                emptyMessage: AppStrings.of(context).t('لا توجد فيديوهات لهذا الدرس حالياً'),
                 children: lesson.videos
                     .map(
                       (video) => Padding(
@@ -134,9 +134,8 @@ class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
                           onTap: () {
                             if (video.isLocked) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'هذا الفيديو مقفل. فعّل المادة لمشاهدته.',
+                                SnackBar(
+                                  content: Text(AppStrings.of(context).t('هذا الفيديو مقفل. فعّل المادة لمشاهدته.'),
                                   ),
                                 ),
                               );
@@ -151,8 +150,8 @@ class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
               ),
               const SizedBox(height: 16),
               _ContentSection(
-                title: 'الملفات',
-                emptyMessage: 'لا توجد ملفات لهذا الدرس حالياً',
+                title: AppStrings.of(context).t('الملفات'),
+                emptyMessage: AppStrings.of(context).t('لا توجد ملفات لهذا الدرس حالياً'),
                 children: lesson.files
                     .map(
                       (file) => Padding(
@@ -162,9 +161,8 @@ class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
                           onTap: () {
                             if (file.isLocked) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'الملف مقفل. فعّل المادة لفتحه.',
+                                SnackBar(
+                                  content: Text(AppStrings.of(context).t('الملف مقفل. فعّل المادة لفتحه.'),
                                   ),
                                 ),
                               );
@@ -179,8 +177,8 @@ class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
               ),
               const SizedBox(height: 16),
               _ContentSection(
-                title: 'الواجبات',
-                emptyMessage: 'لا توجد واجبات لهذا الجزء حالياً',
+                title: AppStrings.of(context).t('الواجبات'),
+                emptyMessage: AppStrings.of(context).t('لا توجد واجبات لهذا الجزء حالياً'),
                 children: lesson.assignments
                     .map(
                       (AssignmentModel assignment) => Padding(
@@ -197,8 +195,8 @@ class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
               ),
               const SizedBox(height: 16),
               _ContentSection(
-                title: 'الاختبارات',
-                emptyMessage: 'لا توجد اختبارات لهذا الجزء حالياً',
+                title: AppStrings.of(context).t('الاختبارات'),
+                emptyMessage: AppStrings.of(context).t('لا توجد اختبارات لهذا الجزء حالياً'),
                 children: lesson.quizzes
                     .map(
                       (QuizModel quiz) => Padding(
@@ -235,8 +233,7 @@ class _ContentSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
+        Text(AppStrings.of(context).t(title),
           style: AppTextStyles.bodyOf(
             context,
           ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
@@ -251,8 +248,7 @@ class _ContentSection extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: const Color(0xFFE5E7EB)),
             ),
-            child: Text(
-              emptyMessage,
+            child: Text(AppStrings.of(context).t(emptyMessage),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(color: AppColors.of(context).textMuted),

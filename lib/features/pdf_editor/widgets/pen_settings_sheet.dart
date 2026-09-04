@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../controllers/pdf_editor_controller.dart';
 import '../models/annotation_enums.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class PenSettingsSheet extends StatefulWidget {
   const PenSettingsSheet({
@@ -95,8 +96,7 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              _title,
+            Text(AppStrings.of(context).t(_title),
               style: AppTextStyles.subtitleOf(
                 context,
               ).copyWith(color: AppColors.of(context).primary),
@@ -122,7 +122,7 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
                     final selected =
                         (_currentStrokeWidth - preset.$2).abs() < 0.0005;
                     return ChoiceChip(
-                      label: Text(preset.$1),
+                      label: Text(AppStrings.of(context).t(preset.$1)),
                       selected: selected,
                       onSelected: (_) => _updateStrokeWidth(preset.$2),
                     );
@@ -130,7 +130,7 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
                 ),
                 const SizedBox(height: 12),
               ],
-              Text('السماكة', style: AppTextStyles.captionOf(context)),
+              Text(AppStrings.of(context).t('السماكة'), style: AppTextStyles.captionOf(context)),
               Slider(
                 value: _currentStrokeWidth.clamp(
                   widget.tool == PdfEditorTool.highlighter ? 0.01 : 0.002,
@@ -141,7 +141,7 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
                 activeColor: AppColors.of(context).primary,
                 onChanged: _updateStrokeWidth,
               ),
-              Text('الشفافية', style: AppTextStyles.captionOf(context)),
+              Text(AppStrings.of(context).t('الشفافية'), style: AppTextStyles.captionOf(context)),
               Slider(
                 value: _currentOpacity.clamp(0.1, 1),
                 min: 0.1,
@@ -156,9 +156,9 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
             ],
             if (widget.tool == PdfEditorTool.eraser) ...[
               SegmentedButton<EraserMode>(
-                segments: const [
-                  ButtonSegment(value: EraserMode.whole, label: Text('عنصر')),
-                  ButtonSegment(value: EraserMode.partial, label: Text('جزء')),
+                segments: [
+                  ButtonSegment(value: EraserMode.whole, label: Text(AppStrings.of(context).t('عنصر'))),
+                  ButtonSegment(value: EraserMode.partial, label: Text(AppStrings.of(context).t('جزء'))),
                 ],
                 selected: {_eraserMode},
                 onSelectionChanged: (values) {
@@ -167,7 +167,7 @@ class _PenSettingsSheetState extends State<PenSettingsSheet> {
                 },
               ),
               const SizedBox(height: 12),
-              Text('حجم الممحاة', style: AppTextStyles.captionOf(context)),
+              Text(AppStrings.of(context).t('حجم الممحاة'), style: AppTextStyles.captionOf(context)),
               Slider(
                 value: _eraserSize.clamp(0.005, 0.04),
                 min: 0.005,

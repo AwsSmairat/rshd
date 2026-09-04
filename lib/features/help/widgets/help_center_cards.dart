@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 import '../data/help_center_model.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class HelpSupportCard extends StatelessWidget {
   const HelpSupportCard({super.key, required this.onContact});
@@ -37,14 +38,12 @@ class HelpSupportCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'الدعم الفني',
+                    Text(AppStrings.of(context).t('الدعم الفني'),
                       style: AppTextStyles.subtitleOf(
                         context,
                       ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
                     ),
-                    Text(
-                      'تواصل مع إدارة المنصة للمساعدة التقنية',
+                    Text(AppStrings.of(context).t('تواصل مع إدارة المنصة للمساعدة التقنية'),
                       style: AppTextStyles.bodyOf(context).copyWith(
                         fontSize: 12,
                         color: AppColors.of(context).textMuted,
@@ -59,7 +58,7 @@ class HelpSupportCard extends StatelessWidget {
           FilledButton.icon(
             onPressed: onContact,
             icon: const Icon(Icons.chat_bubble_outline, size: 18),
-            label: const Text('بدء محادثة الدعم الفني'),
+            label: Text(AppStrings.of(context).t('بدء محادثة الدعم الفني')),
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.of(context).primary,
               minimumSize: const Size(double.infinity, 46),
@@ -110,23 +109,20 @@ class HelpTeacherContactTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  teacher.subjectTitle,
+                Text(AppStrings.of(context).t(teacher.subjectTitle),
                   style: AppTextStyles.bodyOf(
                     context,
                   ).copyWith(fontWeight: FontWeight.w800, fontSize: 14),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  teacher.instructorName,
+                Text(AppStrings.of(context).t(teacher.instructorName),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
                     color: AppColors.of(context).textMuted,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  'رسالة داخل المنصة',
+                Text(AppStrings.of(context).t('رسالة داخل المنصة'),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 11,
                     color: AppColors.of(context).darkGold,
@@ -147,7 +143,7 @@ class HelpTeacherContactTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text('تواصل', style: TextStyle(fontSize: 12)),
+            child: Text(AppStrings.of(context).t('تواصل'), style: TextStyle(fontSize: 12)),
           ),
         ],
       ),

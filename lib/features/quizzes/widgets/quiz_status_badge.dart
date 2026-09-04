@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../data/models/quiz_model.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class QuizStatusBadge extends StatelessWidget {
   const QuizStatusBadge({super.key, required this.quiz});
@@ -24,8 +25,7 @@ class QuizStatusBadge extends StatelessWidget {
         children: [
           Icon(style.icon, size: 14, color: style.foreground),
           const SizedBox(width: 5),
-          Text(
-            style.label,
+          Text(AppStrings.of(context).t(style.label),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 12,
               color: style.foreground,
@@ -39,8 +39,8 @@ class QuizStatusBadge extends StatelessWidget {
 
   _StatusStyle _resolveStyle(BuildContext context) {
     if (quiz.isCompleted) {
-      return const _StatusStyle(
-        label: 'تم الحل',
+      return _StatusStyle(
+        label: AppStrings.of(context).t('تم الحل'),
         background: Color(0xFFDCFCE7),
         foreground: Color(0xFF15803D),
         icon: Icons.check_circle_outline,
@@ -48,14 +48,14 @@ class QuizStatusBadge extends StatelessWidget {
     }
     if (!quiz.isActive) {
       return _StatusStyle(
-        label: 'غير متاح',
+        label: AppStrings.of(context).t('غير متاح'),
         background: Color(0xFFF3F4F6),
         foreground: AppColors.of(context).textMuted,
         icon: Icons.lock_outline,
       );
     }
     return _StatusStyle(
-      label: 'متاح',
+      label: AppStrings.of(context).t('متاح'),
       background: Color(0xFFF8EED6),
       foreground: AppColors.of(context).darkGold,
       icon: Icons.hourglass_empty_rounded,

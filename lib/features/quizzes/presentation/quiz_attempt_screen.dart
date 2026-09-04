@@ -14,6 +14,7 @@ import '../../auth/presentation/auth_controller.dart';
 import '../data/models/quiz_model.dart';
 import '../widgets/quiz_question_card.dart';
 import 'quizzes_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class QuizAttemptScreen extends ConsumerStatefulWidget {
   const QuizAttemptScreen({super.key, required this.quizId});
@@ -78,7 +79,7 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
     _timeExpiredSubmitting = true;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('انتهى وقت الاختبار، جاري التسليم...')),
+      SnackBar(content: Text(AppStrings.of(context).t('انتهى وقت الاختبار، جاري التسليم...'))),
     );
 
     await _submit(force: true);
@@ -91,18 +92,17 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('أسئلة غير مجابة'),
-          content: const Text(
-            'لم تجب على جميع الأسئلة. هل تريد تسليم الاختبار؟',
+          title: Text(AppStrings.of(context).t('أسئلة غير مجابة')),
+          content: Text(AppStrings.of(context).t('لم تجب على جميع الأسئلة. هل تريد تسليم الاختبار؟'),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('إكمال الإجابات'),
+              child: Text(AppStrings.of(context).t('إكمال الإجابات')),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('تسليم الآن'),
+              child: Text(AppStrings.of(context).t('تسليم الآن')),
             ),
           ],
         ),
@@ -177,20 +177,19 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
           next.status != QuizAttemptStatus.submitting) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
+        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(next.errorMessage!))));
       }
     });
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(state.quiz?.title ?? 'الاختبار'),
+        title: Text(AppStrings.of(context).t(state.quiz?.title ?? 'الاختبار')),
         actions: [
           if (state.remainingSeconds != null)
             Padding(
               padding: const EdgeInsetsDirectional.only(end: 16),
               child: Center(
-                child: Text(
-                  _formatTime(state.remainingSeconds!),
+                child: Text(AppStrings.of(context).t(_formatTime(state.remainingSeconds!)),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     color: state.remainingSeconds! <= 60
                         ? AppColors.of(context).error
@@ -209,7 +208,7 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
   Widget _buildBody(QuizAttemptState state, QuizAttemptController controller) {
     switch (state.status) {
       case QuizAttemptStatus.loading:
-        return const LoadingWidget(message: 'جاري بدء الاختبار...');
+        return LoadingWidget(message: AppStrings.of(context).t('جاري بدء الاختبار...'));
       case QuizAttemptStatus.error:
         final isRetakeBlocked =
             state.errorMessage?.contains('إعادة الاختبار غير مسموحة') ?? false;
@@ -235,7 +234,7 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
         final quiz = state.quiz;
         if (question == null || quiz == null) {
           return ErrorView(
-            message: 'لا توجد أسئلة في هذا الاختبار',
+            message: AppStrings.of(context).t('لا توجد أسئلة في هذا الاختبار'),
             onRetry: () => context.pop(),
           );
         }
@@ -270,14 +269,14 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
                             isSubmitting || state.currentQuestionIndex <= 0
                             ? null
                             : controller.goToPreviousQuestion,
-                        child: const Text('السابق'),
+                        child: Text(AppStrings.of(context).t('السابق')),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: state.isLastQuestion
                           ? AppButton(
-                              label: 'تسليم',
+                              label: AppStrings.of(context).t('تسليم'),
                               isLoading: isSubmitting,
                               onPressed: isSubmitting ? null : _submit,
                             )
@@ -285,7 +284,7 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
                               onPressed: isSubmitting
                                   ? null
                                   : controller.goToNextQuestion,
-                              child: const Text('التالي'),
+                              child: Text(AppStrings.of(context).t('التالي')),
                             ),
                     ),
                   ],
@@ -295,7 +294,7 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
           ),
         );
       case QuizAttemptStatus.submitted:
-        return const LoadingWidget(message: 'جاري عرض النتيجة...');
+        return LoadingWidget(message: AppStrings.of(context).t('جاري عرض النتيجة...'));
     }
   }
 }

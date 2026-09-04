@@ -8,6 +8,7 @@ import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../auth/presentation/auth_controller.dart';
 import '../../../settings/presentation/student_settings_controller.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class DeleteAccountScreen extends ConsumerStatefulWidget {
   const DeleteAccountScreen({super.key});
@@ -32,7 +33,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
   Future<void> _submit() async {
     if (!_acknowledged) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى تأكيد فهمك لعواقب حذف الحساب')),
+        SnackBar(content: Text(AppStrings.of(context).t('يرجى تأكيد فهمك لعواقب حذف الحساب'))),
       );
       return;
     }
@@ -40,33 +41,31 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     if (_confirmationController.text.trim() != 'حذف') {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('اكتب «حذف» للتأكيد')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('اكتب «حذف» للتأكيد'))));
       return;
     }
 
     if (_passwordController.text.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('كلمة المرور مطلوبة')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('كلمة المرور مطلوبة'))));
       return;
     }
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('تأكيد حذف الحساب'),
-        content: const Text(
-          'هل أنت متأكد؟ قد يكون هذا الإجراء نهائياً ولا يمكن التراجع عنه.',
+        title: Text(AppStrings.of(context).t('تأكيد حذف الحساب')),
+        content: Text(AppStrings.of(context).t('هل أنت متأكد؟ قد يكون هذا الإجراء نهائياً ولا يمكن التراجع عنه.'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(AppStrings.of(context).t('إلغاء')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'حذف نهائي',
+            child: Text(AppStrings.of(context).t('حذف نهائي'),
               style: TextStyle(color: Color(0xFF991B1B)),
             ),
           ),
@@ -99,7 +98,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
           next.errorMessage != previous?.errorMessage) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.errorMessage!),
+            content: Text(AppStrings.of(context).t(next.errorMessage!)),
             backgroundColor: const Color(0xFF991B1B),
           ),
         );
@@ -109,7 +108,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     return Scaffold(
       backgroundColor: AppColors.of(context).background,
       appBar: AppBar(
-        title: const Text('حذف الحساب'),
+        title: Text(AppStrings.of(context).t('حذف الحساب')),
         backgroundColor: AppColors.of(context).primary,
         foregroundColor: AppColors.of(context).white,
       ),
@@ -123,9 +122,8 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: const Color(0xFFFECACA)),
             ),
-            child: const Text(
-              'تحذير: عند حذف حسابك، قد تُزال بياناتك الشخصية والتفضيلات '
-              'والجلسات. قد نحتفظ ببعض السجلات إذا فرض القانون ذلك.',
+            child: Text(AppStrings.of(context).t('تحذير: عند حذف حسابك، قد تُزال بياناتك الشخصية والتفضيلات '
+              'والجلسات. قد نحتفظ ببعض السجلات إذا فرض القانون ذلك.'),
               style: TextStyle(height: 1.55, color: Color(0xFF991B1B)),
             ),
           ),
@@ -134,16 +132,16 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
             value: _acknowledged,
             onChanged: (value) =>
                 setState(() => _acknowledged = value ?? false),
-            title: const Text('أفهم أن حذف الحساب قد يكون نهائياً'),
+            title: Text(AppStrings.of(context).t('أفهم أن حذف الحساب قد يكون نهائياً')),
             controlAffinity: ListTileControlAffinity.leading,
             contentPadding: EdgeInsets.zero,
           ),
           const SizedBox(height: 8),
-          AppTextField(controller: _confirmationController, label: 'اكتب: حذف'),
+          AppTextField(controller: _confirmationController, label: AppStrings.of(context).t('اكتب: حذف')),
           const SizedBox(height: 16),
           AppTextField(
             controller: _passwordController,
-            label: 'كلمة المرور',
+            label: AppStrings.of(context).t('كلمة المرور'),
             obscureText: true,
           ),
           const SizedBox(height: 24),

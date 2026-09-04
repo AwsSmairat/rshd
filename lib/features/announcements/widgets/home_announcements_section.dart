@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/responsive_content.dart';
@@ -46,8 +47,7 @@ class HomeAnnouncementsSection extends StatelessWidget {
           if (loadFailed)
             Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: Text(
-                'تعذر تحميل بعض الإعلانات',
+              child: Text(AppStrings.of(context).t(AppStrings.of(context).announcementsLoadFailed),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   color: AppColors.of(context).textMuted,
                   fontSize: 12,

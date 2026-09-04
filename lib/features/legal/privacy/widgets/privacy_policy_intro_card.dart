@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class PrivacyPolicyIntroCard extends StatelessWidget {
   const PrivacyPolicyIntroCard({super.key, required this.introText});
@@ -28,8 +29,7 @@ class PrivacyPolicyIntroCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            introText,
+          Text(AppStrings.of(context).t(introText),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 14,
               height: 1.65,
@@ -53,13 +53,12 @@ class PrivacyPolicyIntroCard extends StatelessWidget {
                   Icons.warning_amber_rounded,
                   color: AppColors.of(context).darkGold,
                   size: 22,
-                  semanticLabel: 'تنبيه',
+                  semanticLabel: AppStrings.of(context).t('تنبيه'),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(
-                    'باستخدامك للمنصة، فإنك تقر بأنك اطلعت على هذه السياسة '
-                    'ووافقت عليها وفق الآليات المعتمدة في التطبيق.',
+                  child: Text(AppStrings.of(context).t('باستخدامك للمنصة، فإنك تقر بأنك اطلعت على هذه السياسة '
+                    'ووافقت عليها وفق الآليات المعتمدة في التطبيق.'),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 13,
                       height: 1.55,

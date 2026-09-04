@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/presentation/auth_controller.dart';
@@ -63,12 +64,11 @@ class _MySubjectsScreenState extends ConsumerState<MySubjectsScreen> {
 
   String get _screenTitle {
     final category = widget.category;
+    final strings = AppStrings.of(context);
     if (category == null || category.isEmpty) {
-      return 'موادي';
+      return strings.navSubjects;
     }
-    return SubjectGroupingHelper.sectionTitles[category] ??
-        SubjectModel.departmentSectionTitles[category] ??
-        'موادي';
+    return strings.departmentTitle(category);
   }
 
   void _openSubject(SubjectModel subject) {
@@ -87,12 +87,12 @@ class _MySubjectsScreenState extends ConsumerState<MySubjectsScreen> {
 
     final messenger = ScaffoldMessenger.of(context);
     if (error != null) {
-      messenger.showSnackBar(SnackBar(content: Text(error)));
+      messenger.showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(error))));
       return;
     }
     messenger.showSnackBar(
-      const SnackBar(
-        content: Text('تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.'),
+      SnackBar(
+        content: Text(AppStrings.of(context).t('تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.')),
       ),
     );
   }
@@ -210,7 +210,9 @@ class _MySubjectsScreenState extends ConsumerState<MySubjectsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SubjectSectionHeader(
-                    title: section.title,
+                    title: AppStrings.of(
+                      context,
+                    ).departmentTitle(section.categoryKey),
                     categoryKey: section.categoryKey,
                   ),
                   const SizedBox(height: 14),

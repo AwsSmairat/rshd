@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import 'login_header.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class RegisterHeader extends StatelessWidget {
   const RegisterHeader({super.key});
@@ -63,7 +64,7 @@ class RegisterHeader extends StatelessWidget {
               top: topInset + 4,
               left: 4,
               child: IconButton(
-                tooltip: 'رجوع',
+                tooltip: AppStrings.of(context).t('رجوع'),
                 onPressed: () {
                   if (context.canPop()) {
                     context.pop();

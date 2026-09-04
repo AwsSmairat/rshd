@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import 'assignment_file_helper.dart';
 import 'assignment_section_card.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class AssignmentDownloadFileCard extends StatelessWidget {
   const AssignmentDownloadFileCard({
@@ -31,7 +32,7 @@ class AssignmentDownloadFileCard extends StatelessWidget {
     if (uri == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('تعذر فتح الملف')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تعذر فتح الملف'))));
       return;
     }
 
@@ -45,7 +46,7 @@ class AssignmentDownloadFileCard extends StatelessWidget {
     if (!launched) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('تعذر فتح الملف')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تعذر فتح الملف'))));
     }
   }
 
@@ -92,8 +93,7 @@ class AssignmentDownloadFileCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        displayName,
+                      Text(AppStrings.of(context).t(displayName),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontWeight: FontWeight.w700,
                           color: AppColors.of(context).primary,
@@ -102,8 +102,7 @@ class AssignmentDownloadFileCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        '$size • $mime',
+                      Text(AppStrings.of(context).t('$size • $mime'),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
                           color: AppColors.of(context).textMuted,
@@ -119,7 +118,7 @@ class AssignmentDownloadFileCard extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: () => _openFile(context),
             icon: const Icon(Icons.download_rounded, size: 18),
-            label: const Text('تحميل الملف'),
+            label: Text(AppStrings.of(context).t('تحميل الملف')),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.of(context).primary,
               side: BorderSide(

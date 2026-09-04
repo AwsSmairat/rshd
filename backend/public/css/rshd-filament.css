@@ -109,7 +109,21 @@
 
 .fi-logo,
 .fi-logo img {
-    max-height: 2.75rem !important;
+    width: auto !important;
+    object-fit: contain;
+}
+
+.fi-sidebar-header .fi-logo,
+.fi-sidebar-header .fi-logo img {
+    max-height: 3.4rem !important;
+    height: 3.4rem !important;
+}
+
+.fi-simple-header .fi-logo,
+.fi-simple-header .fi-logo img {
+    max-height: 7rem !important;
+    height: 7rem !important;
+    margin-bottom: 0.35rem;
 }
 
 .fi-sidebar-nav-groups {

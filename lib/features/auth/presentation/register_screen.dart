@@ -13,6 +13,7 @@ import 'widgets/register_legal_links.dart';
 import 'widgets/register_login_link.dart';
 import 'widgets/register_submit_button.dart';
 import 'widgets/security_notice_card.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -63,9 +64,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     switch (result) {
       case RegisterResult.requiresEmailVerification:
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'تم إنشاء الحساب وإرسال رمز التحقق إلى بريدك الإلكتروني',
+          SnackBar(
+            content: Text(AppStrings.of(context).t('تم إنشاء الحساب وإرسال رمز التحقق إلى بريدك الإلكتروني'),
             ),
           ),
         );
@@ -123,8 +123,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        'إنشاء حساب طالب جديد',
+                      Text(AppStrings.of(context).t('إنشاء حساب طالب جديد'),
                         style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 22,
                           color: AppColors.of(context).primary,
@@ -132,8 +131,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        'أنشئ حسابك ثم أكد بريدك الإلكتروني للوصول إلى التطبيق',
+                      Text(AppStrings.of(context).t('أنشئ حسابك ثم أكد بريدك الإلكتروني للوصول إلى التطبيق'),
                         style: AppTextStyles.subtitleOf(
                           context,
                         ).copyWith(height: 1.5, fontSize: 13),
@@ -150,8 +148,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               color: AppColors.of(context).accent,
                             ),
                           ),
-                          child: Text(
-                            'التسجيل الذاتي للطلاب غير مفعّل حالياً.',
+                          child: Text(AppStrings.of(context).t('التسجيل الذاتي للطلاب غير مفعّل حالياً.'),
                             style: AppTextStyles.subtitleOf(context),
                             textAlign: TextAlign.center,
                           ),
@@ -172,8 +169,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               ).error.withValues(alpha: 0.2),
                             ),
                           ),
-                          child: Text(
-                            authState.errorMessage!,
+                          child: Text(AppStrings.of(context).t(authState.errorMessage!),
                             style: AppTextStyles.errorOf(context),
                             textAlign: TextAlign.center,
                           ),
@@ -182,13 +178,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ],
                       RegisterFormField(
                         controller: _nameController,
-                        hintText: 'الاسم الكامل',
+                        hintText: AppStrings.of(context).t('الاسم الكامل'),
                         textInputAction: TextInputAction.next,
                         icon: Icons.person_outline,
                         errorText: fieldErrors['name'],
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'الاسم مطلوب';
+                            return AppStrings.of(context).t('الاسم مطلوب');
                           }
                           return null;
                         },
@@ -196,17 +192,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       const SizedBox(height: 14),
                       RegisterFormField(
                         controller: _emailController,
-                        hintText: 'البريد الإلكتروني',
+                        hintText: AppStrings.of(context).t('البريد الإلكتروني'),
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         icon: Icons.mail_outline,
                         errorText: fieldErrors['email'],
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'البريد الإلكتروني مطلوب';
+                            return AppStrings.of(context).t('البريد الإلكتروني مطلوب');
                           }
                           if (!value.contains('@')) {
-                            return 'أدخل بريداً إلكترونياً صالحاً';
+                            return AppStrings.of(context).t('أدخل بريداً إلكترونياً صالحاً');
                           }
                           return null;
                         },
@@ -214,7 +210,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       const SizedBox(height: 14),
                       RegisterFormField(
                         controller: _phoneController,
-                        hintText: 'رقم الهاتف (اختياري)',
+                        hintText: AppStrings.of(context).t('رقم الهاتف (اختياري)'),
                         keyboardType: TextInputType.phone,
                         textInputAction: TextInputAction.next,
                         icon: Icons.phone_outlined,
@@ -223,7 +219,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       const SizedBox(height: 14),
                       RegisterFormField(
                         controller: _passwordController,
-                        hintText: 'كلمة المرور',
+                        hintText: AppStrings.of(context).t('كلمة المرور'),
                         obscureText: _obscurePassword,
                         textInputAction: TextInputAction.next,
                         icon: Icons.lock_outline,
@@ -238,7 +234,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         errorText: fieldErrors['password'],
                         validator: (value) {
                           if (value == null || value.length < 8) {
-                            return 'كلمة المرور 8 أحرف على الأقل';
+                            return AppStrings.of(context).t('كلمة المرور 8 أحرف على الأقل');
                           }
                           return null;
                         },
@@ -246,7 +242,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       const SizedBox(height: 14),
                       RegisterFormField(
                         controller: _confirmPasswordController,
-                        hintText: 'تأكيد كلمة المرور',
+                        hintText: AppStrings.of(context).t('تأكيد كلمة المرور'),
                         obscureText: _obscureConfirmPassword,
                         textInputAction: TextInputAction.done,
                         icon: Icons.lock_outline,
@@ -262,7 +258,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         errorText: fieldErrors['password_confirmation'],
                         validator: (value) {
                           if (value != _passwordController.text) {
-                            return 'كلمة المرور غير متطابقة';
+                            return AppStrings.of(context).t('كلمة المرور غير متطابقة');
                           }
                           return null;
                         },
@@ -273,7 +269,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       const RegisterLegalLinks(),
                       const SizedBox(height: 20),
                       RegisterSubmitButton(
-                        label: 'إنشاء حساب',
+                        label: AppStrings.of(context).t('إنشاء حساب'),
                         isLoading: authState.status == AuthStatus.loading,
                         onPressed: registrationEnabled ? _submit : null,
                       ),

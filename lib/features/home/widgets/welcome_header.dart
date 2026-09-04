@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -21,6 +22,7 @@ class WelcomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final topInset = MediaQuery.paddingOf(context).top;
     final metrics = AppLayoutMetrics.of(context);
 
@@ -93,7 +95,7 @@ class WelcomeHeader extends StatelessWidget {
                             ),
                             children: [
                               TextSpan(
-                                text: 'مرحباً، ',
+                                text: strings.welcomeGreeting,
                                 style: TextStyle(
                                   color: AppColors.of(context).accent,
                                 ),
@@ -110,7 +112,7 @@ class WelcomeHeader extends StatelessWidget {
                       ),
                       _HeaderIconButton(
                         icon: Icons.person_outline,
-                        tooltip: 'الملف الشخصي',
+                        tooltip: strings.profileTooltip,
                         onTap: () => context.push(AppRoutes.profile),
                       ),
                       const SizedBox(width: 4),
@@ -131,8 +133,7 @@ class WelcomeHeader extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'تابع تعلمك اليوم من منصة RSHD',
+                  Text(AppStrings.of(context).t(strings.continueLearningToday),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: metrics.isTablet ? 15 : 14,
                       color: AppColors.of(

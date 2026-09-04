@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 import '../presentation/grades_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class GradesSummaryCard extends StatelessWidget {
   const GradesSummaryCard({super.key, required this.state});
@@ -66,8 +67,7 @@ class GradesSummaryCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    Text(
-                      'ملخص الدرجات',
+                    Text(AppStrings.of(context).t('ملخص الدرجات'),
                       style: AppTextStyles.subtitleOf(context).copyWith(
                         color: AppColors.of(context).white,
                         fontWeight: FontWeight.w700,
@@ -76,8 +76,7 @@ class GradesSummaryCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 18),
-                Text(
-                  average != null ? '${average.toStringAsFixed(1)}%' : '—',
+                Text(AppStrings.of(context).t(average != null ? '${average.toStringAsFixed(1)}%' : '—'),
                   style: AppTextStyles.titleOf(context).copyWith(
                     fontSize: 42,
                     fontWeight: FontWeight.w800,
@@ -86,8 +85,7 @@ class GradesSummaryCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  'المتوسط العام',
+                Text(AppStrings.of(context).t('المتوسط العام'),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 13,
                     color: AppColors.of(context).white.withValues(alpha: 0.72),
@@ -103,7 +101,7 @@ class GradesSummaryCard extends StatelessWidget {
                 Expanded(
                   child: _SummaryStatTile(
                     icon: Icons.list_alt_rounded,
-                    label: 'عدد الدرجات',
+                    label: AppStrings.of(context).t('عدد الدرجات'),
                     value: '${state.count}',
                   ),
                 ),
@@ -115,7 +113,7 @@ class GradesSummaryCard extends StatelessWidget {
                 Expanded(
                   child: _SummaryStatTile(
                     icon: Icons.trending_up_rounded,
-                    label: 'الأعلى',
+                    label: AppStrings.of(context).t('الأعلى'),
                     value: highest != null
                         ? '${highest.toStringAsFixed(1)}%'
                         : '—',
@@ -147,8 +145,7 @@ class _SummaryStatTile extends StatelessWidget {
       children: [
         Icon(icon, size: 18, color: AppColors.of(context).darkGold),
         const SizedBox(height: 6),
-        Text(
-          value,
+        Text(AppStrings.of(context).t(value),
           style: AppTextStyles.titleOf(context).copyWith(
             fontSize: 20,
             color: AppColors.of(context).primary,
@@ -156,8 +153,7 @@ class _SummaryStatTile extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
+        Text(AppStrings.of(context).t(label),
           style: AppTextStyles.bodyOf(
             context,
           ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),

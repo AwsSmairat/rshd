@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
@@ -58,26 +59,12 @@ class UpcomingTaskCard extends StatelessWidget {
     return '${date.day}';
   }
 
-  String _monthLabel() {
-    const months = [
-      'يناير',
-      'فبراير',
-      'مارس',
-      'أبريل',
-      'مايو',
-      'يونيو',
-      'يوليو',
-      'أغسطس',
-      'سبتمبر',
-      'أكتوبر',
-      'نوفمبر',
-      'ديسمبر',
-    ];
+  String _monthLabel(BuildContext context) {
     final date = task.date;
     if (date == null) {
       return '';
     }
-    return months[date.month - 1];
+    return AppStrings.of(context).monthName(date.month);
   }
 
   @override
@@ -97,15 +84,13 @@ class UpcomingTaskCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Column(
                       children: [
-                        Text(
-                          _dayLabel(),
+                        Text(AppStrings.of(context).t(_dayLabel()),
                           style: AppTextStyles.titleOf(context).copyWith(
                             fontSize: 18,
                             color: AppColors.of(context).primary,
                           ),
                         ),
-                        Text(
-                          _monthLabel(),
+                        Text(AppStrings.of(context).t(_monthLabel(context)),
                           style: AppTextStyles.bodyOf(context).copyWith(
                             fontSize: 10,
                             color: AppColors.of(context).textMuted,
@@ -151,8 +136,7 @@ class UpcomingTaskCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            task.title,
+                          Text(AppStrings.of(context).t(task.title),
                             style: AppTextStyles.subtitleOf(context).copyWith(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -162,8 +146,7 @@ class UpcomingTaskCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            task.subtitle,
+                          Text(AppStrings.of(context).t(task.subtitle),
                             style: AppTextStyles.bodyOf(context).copyWith(
                               fontSize: 12,
                               color: AppColors.of(context).textMuted,

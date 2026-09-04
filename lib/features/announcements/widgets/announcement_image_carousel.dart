@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../data/models/announcement_model.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class AnnouncementImageCarousel extends StatefulWidget {
   const AnnouncementImageCarousel({
@@ -268,8 +269,7 @@ class _PlaceholderSlide extends StatelessWidget {
             color: AppColors.of(context).darkGold.withValues(alpha: 0.8),
           ),
           const SizedBox(height: 12),
-          Text(
-            title,
+          Text(AppStrings.of(context).t(title),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontWeight: FontWeight.w700,
               color: AppColors.of(context).primary,
@@ -303,8 +303,7 @@ class _CarouselOverlay extends StatelessWidget {
           ],
         ),
       ),
-      child: Text(
-        announcement.title,
+      child: Text(AppStrings.of(context).t(announcement.title),
         style: AppTextStyles.subtitleOf(context).copyWith(
           color: AppColors.of(context).white,
           fontWeight: FontWeight.w700,

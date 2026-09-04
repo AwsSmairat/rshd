@@ -16,6 +16,7 @@ import '../presentation/terms_and_conditions_controller.dart';
 import '../widgets/terms_contact_card.dart';
 import '../widgets/terms_header.dart';
 import '../widgets/terms_section_tile.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class TermsAndConditionsPage extends ConsumerStatefulWidget {
   const TermsAndConditionsPage({super.key});
@@ -70,7 +71,7 @@ class _TermsAndConditionsPageState
           next.errorMessage != prev?.errorMessage) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.errorMessage!),
+            content: Text(AppStrings.of(context).t(next.errorMessage!)),
             backgroundColor: const Color(0xFF991B1B),
           ),
         );
@@ -79,7 +80,7 @@ class _TermsAndConditionsPageState
           next.acceptanceMessage != prev?.acceptanceMessage) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(next.acceptanceMessage!)));
+        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(next.acceptanceMessage!))));
       }
     });
 
@@ -87,7 +88,7 @@ class _TermsAndConditionsPageState
       backgroundColor: AppColors.of(context).background,
       body: switch (state.status) {
         TermsLoadStatus.initial || TermsLoadStatus.loading =>
-          const LoadingWidget(message: 'جاري تحميل الشروط والأحكام...'),
+          LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الشروط والأحكام...')),
         TermsLoadStatus.error => ErrorView(
           message: state.errorMessage ?? 'تعذر تحميل الشروط',
           onRetry: () => ref
@@ -187,7 +188,7 @@ class _TermsAndConditionsPageState
                             onPressed: () =>
                                 context.push(AppRoutes.privacyPolicy),
                             icon: const Icon(Icons.privacy_tip_outlined),
-                            label: const Text('فتح سياسة الخصوصية'),
+                            label: Text(AppStrings.of(context).t('فتح سياسة الخصوصية')),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.of(context).darkGold,
                               side: BorderSide(
@@ -208,8 +209,7 @@ class _TermsAndConditionsPageState
                               Icons.delete_outline,
                               color: Color(0xFF991B1B),
                             ),
-                            label: const Text(
-                              'طلب حذف الحساب',
+                            label: Text(AppStrings.of(context).t('طلب حذف الحساب'),
                               style: TextStyle(color: Color(0xFF991B1B)),
                             ),
                             style: OutlinedButton.styleFrom(
@@ -225,7 +225,7 @@ class _TermsAndConditionsPageState
                           child: OutlinedButton.icon(
                             onPressed: () => context.push(AppRoutes.profile),
                             icon: const Icon(Icons.security_outlined),
-                            label: const Text('إعدادات الأمان'),
+                            label: Text(AppStrings.of(context).t('إعدادات الأمان')),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.of(context).darkGold,
                               side: BorderSide(
@@ -277,8 +277,7 @@ class _TermsAndConditionsPageState
       children: [
         Row(
           children: [
-            Text(
-              'الأقسام',
+            Text(AppStrings.of(context).t('الأقسام'),
               style: AppTextStyles.subtitleOf(context).copyWith(
                 fontWeight: FontWeight.w700,
                 color: AppColors.of(context).primary,
@@ -287,11 +286,11 @@ class _TermsAndConditionsPageState
             const Spacer(),
             TextButton(
               onPressed: () => _expandAll(sections),
-              child: const Text('فتح جميع الأقسام'),
+              child: Text(AppStrings.of(context).t('فتح جميع الأقسام')),
             ),
             TextButton(
               onPressed: _expandedIds.isNotEmpty ? _collapseAll : null,
-              child: const Text('إغلاق جميع الأقسام'),
+              child: Text(AppStrings.of(context).t('إغلاق جميع الأقسام')),
             ),
           ],
         ),
@@ -312,8 +311,7 @@ class _TermsAndConditionsPageState
               ),
             ),
             const SizedBox(width: 10),
-            Text(
-              '${(progress * 100).round()}%',
+            Text(AppStrings.of(context).t('${(progress * 100).round()}%'),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 12,
                 color: AppColors.of(context).textMuted,
@@ -323,8 +321,7 @@ class _TermsAndConditionsPageState
           ],
         ),
         const SizedBox(height: 4),
-        Text(
-          'مؤشر القراءة: الأقسام التي فتحتها',
+        Text(AppStrings.of(context).t('مؤشر القراءة: الأقسام التي فتحتها'),
           style: AppTextStyles.bodyOf(
             context,
           ).copyWith(fontSize: 11, color: AppColors.of(context).textMuted),
@@ -357,8 +354,7 @@ class _OfflineBanner extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              'تعذر الاتصال — يتم عرض النسخة المحلية الاحتياطية.',
+            child: Text(AppStrings.of(context).t('تعذر الاتصال — يتم عرض النسخة المحلية الاحتياطية.'),
               style: AppTextStyles.bodyOf(context).copyWith(fontSize: 13),
             ),
           ),

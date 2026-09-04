@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
@@ -13,7 +14,7 @@ class DeviceInfoCard extends StatelessWidget {
 
   final DeviceModel? device;
 
-  String _formatDate(String? raw) {
+  String _formatDate(BuildContext context, String? raw) {
     if (raw == null || raw.isEmpty) {
       return '—';
     }
@@ -21,11 +22,15 @@ class DeviceInfoCard extends StatelessWidget {
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd – HH:mm', 'ar').format(parsed.toLocal());
+    return DateFormat(
+      'yyyy/MM/dd – HH:mm',
+      AppStrings.of(context).dateLocale,
+    ).format(parsed.toLocal());
   }
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return LiquidGlassSurface(
       borderRadius: BorderRadius.circular(22),
       padding: const EdgeInsets.all(20),
@@ -48,8 +53,7 @@ class DeviceInfoCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              Text(
-                'الجهاز المرتبط',
+              Text(AppStrings.of(context).t(strings.linkedDevice),
                 style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
@@ -73,8 +77,7 @@ class DeviceInfoCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Text(
-                      'لا يوجد جهاز مرتبط حالياً',
+                    child: Text(AppStrings.of(context).t(strings.noLinkedDevice),
                       style: AppTextStyles.bodyOf(
                         context,
                       ).copyWith(color: AppColors.of(context).textMuted),
@@ -86,20 +89,20 @@ class DeviceInfoCard extends StatelessWidget {
           ] else ...[
             ProfileDetailRow(
               icon: Icons.smartphone_outlined,
-              label: 'اسم الجهاز',
+              label: strings.deviceName,
               value: device!.deviceName?.isNotEmpty == true
                   ? device!.deviceName!
                   : '—',
             ),
             ProfileDetailRow(
               icon: Icons.layers_outlined,
-              label: 'نوع النظام',
+              label: strings.systemType,
               value: device!.platformLabel,
             ),
             ProfileDetailRow(
               icon: Icons.schedule_outlined,
-              label: 'آخر تسجيل دخول',
-              value: _formatDate(device!.lastLoginAt),
+              label: strings.lastLogin,
+              value: _formatDate(context, device!.lastLoginAt),
               showDivider: false,
             ),
             const SizedBox(height: 16),

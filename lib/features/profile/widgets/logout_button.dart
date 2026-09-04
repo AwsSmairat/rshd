@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
+
 class ProfileLogoutButton extends StatelessWidget {
   const ProfileLogoutButton({
     super.key,
@@ -47,11 +49,10 @@ class ProfileLogoutButton extends StatelessWidget {
                       color: Colors.white,
                     ),
                   )
-                : const Row(
+                : Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        'تسجيل خروج',
+                      Text(AppStrings.of(context).t(AppStrings.of(context).logout),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,

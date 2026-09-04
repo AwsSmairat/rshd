@@ -7,6 +7,7 @@ import '../data/models/quiz_model.dart';
 import 'quiz_icon_helper.dart';
 import 'quiz_icon_panel.dart';
 import 'quiz_status_badge.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class LiquidGlassQuizCard extends StatelessWidget {
   const LiquidGlassQuizCard({
@@ -45,8 +46,7 @@ class LiquidGlassQuizCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: Text(
-                        quiz.title,
+                      child: Text(AppStrings.of(context).t(quiz.title),
                         style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 17,
                           height: 1.3,
@@ -86,7 +86,7 @@ class LiquidGlassQuizCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   _MetaRow(
                     icon: Icons.school_outlined,
-                    text: 'الدرس: ${quiz.lessonTitle!}',
+                    text: AppStrings.of(context).t('الدرس: ${quiz.lessonTitle!}'),
                   ),
                 ],
                 if (quiz.questionsCount != null ||
@@ -129,8 +129,7 @@ class _MetaRow extends StatelessWidget {
         Icon(icon, size: 14, color: AppColors.of(context).darkGold),
         const SizedBox(width: 6),
         Expanded(
-          child: Text(
-            text,
+          child: Text(AppStrings.of(context).t(text),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
@@ -168,12 +167,12 @@ class _QuizStatsBar extends StatelessWidget {
           if (questionsCount != null)
             _StatChip(
               icon: Icons.format_list_numbered_rounded,
-              label: '$questionsCount أسئلة',
+              label: AppStrings.of(context).t('$questionsCount أسئلة'),
             ),
           if (durationMinutes != null)
             _StatChip(
               icon: Icons.schedule_outlined,
-              label: 'المدة: $durationMinutes دقيقة',
+              label: AppStrings.of(context).t('المدة: $durationMinutes دقيقة'),
             ),
         ],
       ),
@@ -194,8 +193,7 @@ class _StatChip extends StatelessWidget {
       children: [
         Icon(icon, size: 13, color: AppColors.of(context).darkGold),
         const SizedBox(width: 4),
-        Text(
-          label,
+        Text(AppStrings.of(context).t(label),
           style: AppTextStyles.bodyOf(
             context,
           ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),

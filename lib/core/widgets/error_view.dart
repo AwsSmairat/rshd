@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import 'app_button.dart';
@@ -19,6 +20,7 @@ class ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return Center(
       child: ResponsiveContent(
         child: Padding(
@@ -33,13 +35,13 @@ class ErrorView extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                message,
+                strings.t(message),
                 style: AppTextStyles.errorOf(context),
                 textAlign: TextAlign.center,
               ),
               if (onRetry != null) ...[
                 const SizedBox(height: 24),
-                AppButton(label: retryLabel, onPressed: onRetry),
+                AppButton(label: strings.t(retryLabel), onPressed: onRetry),
               ],
             ],
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -25,7 +26,7 @@ class RecentSubjectsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           HomeSectionHeader(
-            title: 'موادي الحالية',
+            title: AppStrings.of(context).currentCourses,
             onViewAll: () => context.push(AppRoutes.subjects),
           ),
           const SizedBox(height: 8),
@@ -33,8 +34,7 @@ class RecentSubjectsSection extends StatelessWidget {
             LiquidGlassSurface(
               borderRadius: BorderRadius.circular(16),
               padding: const EdgeInsets.all(18),
-              child: Text(
-                'لا توجد مواد مفعلة حالياً',
+              child: Text(AppStrings.of(context).t(AppStrings.of(context).noActiveCourses),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(color: AppColors.of(context).textMuted),

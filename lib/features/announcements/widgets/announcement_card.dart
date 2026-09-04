@@ -6,6 +6,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 import '../data/models/announcement_model.dart';
 import 'announcement_type_badge.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class AnnouncementCard extends StatelessWidget {
   const AnnouncementCard({
@@ -39,8 +40,7 @@ class AnnouncementCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  announcement.title,
+                Text(AppStrings.of(context).t(announcement.title),
                   style: AppTextStyles.titleOf(
                     context,
                   ).copyWith(fontSize: 16, fontWeight: FontWeight.w800),
@@ -50,8 +50,7 @@ class AnnouncementCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 if (announcement.body != null &&
                     announcement.body!.trim().isNotEmpty)
-                  Text(
-                    announcement.shortBody,
+                  Text(AppStrings.of(context).t(announcement.shortBody),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       color: AppColors.of(context).textMuted,
                       fontSize: 13,
@@ -69,8 +68,7 @@ class AnnouncementCard extends StatelessWidget {
                     AnnouncementTypeBadge(type: announcement.type),
                     if (announcement.subjectTitle != null &&
                         announcement.subjectTitle!.isNotEmpty)
-                      Text(
-                        announcement.subjectTitle!,
+                      Text(AppStrings.of(context).t(announcement.subjectTitle!),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
                           color: AppColors.of(context).secondary,
@@ -79,8 +77,7 @@ class AnnouncementCard extends StatelessWidget {
                       ),
                     if (announcement.createdAt != null &&
                         announcement.createdAt!.isNotEmpty)
-                      Text(
-                        _formatDate(announcement.createdAt!),
+                      Text(AppStrings.of(context).t(_formatDate(context, announcement.createdAt!)),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 11,
                           color: AppColors.of(context).textMuted,
@@ -102,12 +99,12 @@ class AnnouncementCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(String raw) {
+  String _formatDate(BuildContext context, String raw) {
     final parsed = DateTime.tryParse(raw);
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd', 'ar').format(parsed.toLocal());
+    return DateFormat('yyyy/MM/dd', AppStrings.of(context).dateLocale).format(parsed.toLocal());
   }
 }
 

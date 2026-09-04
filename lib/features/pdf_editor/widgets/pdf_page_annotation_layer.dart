@@ -10,6 +10,7 @@ import '../services/pdf_coordinate_mapper.dart';
 import '../utils/annotation_hit_test.dart';
 import '../utils/path_smoother.dart';
 import 'painters/pdf_annotation_painters.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class PdfPageAnnotationLayer extends StatefulWidget {
   const PdfPageAnnotationLayer({
@@ -460,8 +461,7 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
                     : const BoxDecoration(),
                 child: Padding(
                   padding: const EdgeInsets.all(2),
-                  child: Text(
-                    textBox.data['text']?.toString() ?? '',
+                  child: Text(AppStrings.of(context).t(textBox.data['text']?.toString() ?? ''),
                     textAlign: TextAlign.right,
                     textDirection: textDirection,
                     style: TextStyle(

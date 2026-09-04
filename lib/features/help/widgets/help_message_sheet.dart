@@ -4,6 +4,7 @@ import '../../../core/network/api_exception.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../data/help_center_model.dart';
+import '../../../core/l10n/app_strings.dart';
 
 Future<bool> showHelpMessageSheet({
   required BuildContext context,
@@ -109,15 +110,13 @@ class _HelpMessageSheetState extends State<_HelpMessageSheet> {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-            'رسالة إلى ${widget.teacher.instructorName}',
+          Text(AppStrings.of(context).t('رسالة إلى ${widget.teacher.instructorName}'),
             style: AppTextStyles.subtitleOf(
               context,
             ).copyWith(fontWeight: FontWeight.w800, fontSize: 17),
           ),
           const SizedBox(height: 4),
-          Text(
-            widget.teacher.subjectTitle,
+          Text(AppStrings.of(context).t(widget.teacher.subjectTitle),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
@@ -132,7 +131,7 @@ class _HelpMessageSheetState extends State<_HelpMessageSheet> {
             maxLength: 2000,
             textAlign: TextAlign.right,
             decoration: InputDecoration(
-              hintText: 'اكتب رسالتك هنا...',
+              hintText: AppStrings.of(context).t('اكتب رسالتك هنا...'),
               hintTextDirection: TextDirection.rtl,
               filled: true,
               fillColor: AppColors.of(context).background,
@@ -153,8 +152,7 @@ class _HelpMessageSheetState extends State<_HelpMessageSheet> {
           ),
           if (_error != null) ...[
             const SizedBox(height: 8),
-            Text(
-              _error!,
+            Text(AppStrings.of(context).t(_error!),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(fontSize: 12, color: AppColors.of(context).error),
@@ -172,7 +170,7 @@ class _HelpMessageSheetState extends State<_HelpMessageSheet> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('إلغاء'),
+                  child: Text(AppStrings.of(context).t('إلغاء')),
                 ),
               ),
               const SizedBox(width: 10),
@@ -195,7 +193,7 @@ class _HelpMessageSheetState extends State<_HelpMessageSheet> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('إرسال'),
+                      : Text(AppStrings.of(context).t('إرسال')),
                 ),
               ),
             ],

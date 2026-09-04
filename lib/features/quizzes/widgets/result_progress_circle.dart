@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class ResultProgressCircle extends StatelessWidget {
   const ResultProgressCircle({
@@ -38,8 +39,7 @@ class ResultProgressCircle extends StatelessWidget {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                centerText,
+              Text(AppStrings.of(context).t(centerText),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -47,8 +47,7 @@ class ResultProgressCircle extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              Text(
-                subtitle,
+              Text(AppStrings.of(context).t(subtitle),
                 style: TextStyle(
                   fontSize: 11,
                   color: AppColors.of(context).accent.withValues(alpha: 0.85),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -10,6 +11,7 @@ class StudentBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final location = GoRouterState.of(context).matchedLocation;
     final currentIndex = _indexForLocation(location);
 
@@ -30,13 +32,13 @@ class StudentBottomNav extends StatelessWidget {
       child: Row(
         children: [
           _NavItem(
-            label: 'موادي',
+            label: strings.navSubjects,
             icon: Icons.menu_book_outlined,
             isActive: currentIndex == 0,
             onTap: () => _navigate(context, AppRoutes.subjects, 0),
           ),
           _NavItem(
-            label: 'واجباتي',
+            label: strings.navAssignments,
             icon: Icons.assignment_outlined,
             isActive: currentIndex == 1,
             onTap: () => _navigate(context, AppRoutes.assignments, 1),
@@ -46,13 +48,13 @@ class StudentBottomNav extends StatelessWidget {
             onTap: () => _navigate(context, AppRoutes.home, 2),
           ),
           _NavItem(
-            label: 'درجاتي',
+            label: strings.navGrades,
             icon: Icons.star_outline,
             isActive: currentIndex == 3,
             onTap: () => _navigate(context, AppRoutes.grades, 3),
           ),
           _NavItem(
-            label: 'المزيد',
+            label: strings.navMore,
             icon: Icons.person_outline,
             isActive: currentIndex == 4,
             onTap: () => _navigate(context, AppRoutes.profile, 4),
@@ -122,8 +124,7 @@ class _NavItem extends StatelessWidget {
                     : AppColors.of(context).white.withValues(alpha: 0.75),
               ),
               const SizedBox(height: 4),
-              Text(
-                label,
+              Text(AppStrings.of(context).t(label),
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
@@ -194,8 +195,7 @@ class _HomeNavItem extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              Text(
-                'الرئيسية',
+              Text(AppStrings.of(context).t(AppStrings.of(context).navHome),
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,

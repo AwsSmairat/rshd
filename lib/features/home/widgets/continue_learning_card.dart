@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -33,7 +34,7 @@ class ContinueLearningSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const HomeSectionHeader(title: 'تابع من حيث توقفت'),
+          HomeSectionHeader(title: AppStrings.of(context).continueWhereYouLeft),
           const SizedBox(height: 12),
           if (subjects.length == 1)
             ContinueLearningCard(
@@ -106,8 +107,7 @@ class ContinueLearningCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      subject.title,
+                    Text(AppStrings.of(context).t(subject.title),
                       style: AppTextStyles.bodyOf(context).copyWith(
                         fontWeight: FontWeight.w800,
                         fontSize: compact ? 14 : 15,
@@ -118,8 +118,7 @@ class ContinueLearningCard extends StatelessWidget {
                     if (instructorName != null &&
                         instructorName.isNotEmpty) ...[
                       const SizedBox(height: 4),
-                      Text(
-                        instructorName,
+                      Text(AppStrings.of(context).t(instructorName),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
                           color: AppColors.of(context).textMuted,
@@ -152,8 +151,7 @@ class ContinueLearningCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          Text(
-            '${progress.round()}% مكتمل',
+          Text(AppStrings.of(context).t('${progress.round()}% مكتمل'),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 11, color: AppColors.of(context).secondary),
@@ -178,8 +176,7 @@ class ContinueLearningCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
-              child: Text(
-                'متابعة التعلم',
+              child: Text(AppStrings.of(context).t(AppStrings.of(context).continueLearning),
                 style: TextStyle(fontSize: compact ? 13 : 14),
               ),
             ),

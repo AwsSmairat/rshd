@@ -8,6 +8,7 @@ import '../data/models/assignment_model.dart';
 import 'assignment_icon_helper.dart';
 import 'assignment_icon_panel.dart';
 import 'submission_status_badge.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class AssignmentHeroCard extends StatelessWidget {
   const AssignmentHeroCard({super.key, required this.assignment});
@@ -36,8 +37,7 @@ class AssignmentHeroCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  assignment.title,
+                Text(AppStrings.of(context).t(assignment.title),
                   style: AppTextStyles.titleOf(context).copyWith(
                     fontSize: 20,
                     height: 1.3,
@@ -47,8 +47,7 @@ class AssignmentHeroCard extends StatelessWidget {
                 if (assignment.subjectTitle != null &&
                     assignment.subjectTitle!.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text(
-                    assignment.subjectTitle!,
+                  Text(AppStrings.of(context).t(assignment.subjectTitle!),
                     style: AppTextStyles.bodyOf(
                       context,
                     ).copyWith(color: AppColors.of(context).textMuted),
@@ -83,22 +82,22 @@ class AssignmentInfoGrid extends StatelessWidget {
     final stats = [
       _GridItem(
         icon: Icons.menu_book_outlined,
-        label: 'المادة',
+        label: AppStrings.of(context).t('المادة'),
         value: assignment.subjectTitle ?? '—',
       ),
       _GridItem(
         icon: Icons.school_outlined,
-        label: 'الدرس',
+        label: AppStrings.of(context).t('الدرس'),
         value: assignment.lessonTitle ?? '—',
       ),
       _GridItem(
         icon: Icons.calendar_today_outlined,
-        label: 'تاريخ التسليم',
-        value: _formatDate(assignment.dueDate),
+        label: AppStrings.of(context).t('تاريخ التسليم'),
+        value: _formatDate(context, assignment.dueDate),
       ),
       _GridItem(
         icon: Icons.fact_check_outlined,
-        label: 'حالة التسليم',
+        label: AppStrings.of(context).t('حالة التسليم'),
         value: submissionStatus,
         valueColor: assignment.isSubmitted
             ? const Color(0xFF15803D)
@@ -126,8 +125,7 @@ class AssignmentInfoGrid extends StatelessWidget {
                   color: AppColors.of(context).darkGold,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  'معلومات الواجب',
+                Text(AppStrings.of(context).t('معلومات الواجب'),
                   style: AppTextStyles.subtitleOf(context).copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -196,16 +194,14 @@ class AssignmentInfoGrid extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              item.label,
+            Text(AppStrings.of(context).t(item.label),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
-            Text(
-              item.value,
+            Text(AppStrings.of(context).t(item.value),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
@@ -221,7 +217,7 @@ class AssignmentInfoGrid extends StatelessWidget {
     );
   }
 
-  String _formatDate(String? raw) {
+  String _formatDate(BuildContext context, String? raw) {
     if (raw == null || raw.isEmpty) {
       return '—';
     }
@@ -229,7 +225,7 @@ class AssignmentInfoGrid extends StatelessWidget {
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd', 'ar').format(parsed.toLocal());
+    return DateFormat('yyyy/MM/dd', AppStrings.of(context).dateLocale).format(parsed.toLocal());
   }
 }
 

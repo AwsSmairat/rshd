@@ -9,6 +9,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../data/models/video_model.dart';
 import '../utils/playback_refresh_scheduler.dart';
 import '../utils/playback_url_preferences.dart';
+import '../../../core/l10n/app_strings.dart';
 
 /// Bunny Stream embed player (iframe.mediadelivery.net) for when CDN HLS is blocked.
 class RshdEmbedVideoPlayer extends StatefulWidget {
@@ -300,16 +301,14 @@ class _PlaybackErrorState extends StatelessWidget {
             size: 48,
           ),
           const SizedBox(height: 16),
-          Text(
-            'تعذّر التشغيل',
+          Text(AppStrings.of(context).t('تعذّر التشغيل'),
             style: AppTextStyles.subtitleOf(
               context,
             ).copyWith(color: AppColors.of(context).text),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-          Text(
-            message,
+          Text(AppStrings.of(context).t(message),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(color: AppColors.of(context).textMuted),
@@ -319,7 +318,7 @@ class _PlaybackErrorState extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh_rounded),
-            label: const Text('إعادة المحاولة'),
+            label: Text(AppStrings.of(context).t('إعادة المحاولة')),
           ),
         ],
       ),

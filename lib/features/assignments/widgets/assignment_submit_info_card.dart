@@ -8,6 +8,7 @@ import '../data/models/assignment_model.dart';
 import 'assignment_icon_helper.dart';
 import 'assignment_icon_panel.dart';
 import 'submission_status_badge.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class AssignmentSubmitInfoCard extends StatelessWidget {
   const AssignmentSubmitInfoCard({super.key, required this.assignment});
@@ -40,8 +41,7 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
                 color: AppColors.of(context).darkGold,
               ),
               const SizedBox(width: 8),
-              Text(
-                'معلومات الواجب',
+              Text(AppStrings.of(context).t('معلومات الواجب'),
                 style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -58,8 +58,7 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      assignment.title,
+                    Text(AppStrings.of(context).t(assignment.title),
                       style: AppTextStyles.titleOf(context).copyWith(
                         fontSize: 18,
                         color: AppColors.of(context).primary,
@@ -68,8 +67,7 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
                     if (assignment.subjectTitle != null &&
                         assignment.subjectTitle!.isNotEmpty) ...[
                       const SizedBox(height: 8),
-                      Text(
-                        assignment.subjectTitle!,
+                      Text(AppStrings.of(context).t(assignment.subjectTitle!),
                         style: AppTextStyles.bodyOf(
                           context,
                         ).copyWith(color: AppColors.of(context).textMuted),
@@ -78,8 +76,7 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
                     if (assignment.dueDate != null &&
                         assignment.dueDate!.isNotEmpty) ...[
                       const SizedBox(height: 10),
-                      Text(
-                        'تاريخ التسليم: ${_formatDate(assignment.dueDate!)}',
+                      Text(AppStrings.of(context).t('تاريخ التسليم: ${_formatDate(context, assignment.dueDate!)}'),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 13,
                           color: AppColors.of(context).textMuted,
@@ -100,11 +97,11 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(String raw) {
+  String _formatDate(BuildContext context, String raw) {
     final parsed = DateTime.tryParse(raw);
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd', 'ar').format(parsed.toLocal());
+    return DateFormat('yyyy/MM/dd', AppStrings.of(context).dateLocale).format(parsed.toLocal());
   }
 }

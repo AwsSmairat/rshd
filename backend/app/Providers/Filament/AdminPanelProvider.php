@@ -37,8 +37,13 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->passwordReset()
             ->brandName(fn (): string => $settings->platformName())
-            ->brandLogo(fn (): string => $settings->logoUrl() ?? asset('images/rshd_logo_no_bg.png'))
-            ->brandLogoHeight('2.6rem')
+            ->brandLogo(function () use ($settings): string {
+                $url = $settings->logoUrl() ?? asset('images/rshd_logo_no_bg.png');
+                $version = (string) (@filemtime(public_path('images/rshd_logo_no_bg.png')) ?: 3);
+
+                return $url.(str_contains($url, '?') ? '&' : '?').'v='.$version;
+            })
+            ->brandLogoHeight('3.4rem')
             ->favicon(fn (): string => $settings->faviconUrl().'?v=1')
             ->font('Cairo')
             ->colors([
@@ -71,7 +76,7 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::STYLES_AFTER,
                 fn (): HtmlString => new HtmlString(
-                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=28">'.
+                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=29">'.
                     '<link rel="preconnect" href="https://fonts.googleapis.com">'.
                     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'.
                     '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">'

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -21,7 +22,7 @@ class AvailableQuizzesSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           HomeSectionHeader(
-            title: 'الاختبارات',
+            title: AppStrings.of(context).quizzes,
             onViewAll: () => context.push(AppRoutes.quizzes),
           ),
           const SizedBox(height: 14),
@@ -34,8 +35,7 @@ class AvailableQuizzesSection extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFE5E7EB)),
               ),
-              child: Text(
-                'لا توجد اختبارات حالياً',
+              child: Text(AppStrings.of(context).t(AppStrings.of(context).noQuizzesYet),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(color: AppColors.of(context).textMuted),

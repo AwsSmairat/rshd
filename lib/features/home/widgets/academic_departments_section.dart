@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -24,28 +25,17 @@ class AcademicDepartmentsSection extends StatelessWidget {
         .length;
   }
 
-  String _subjectCountLabel(int count) {
-    if (count == 0) {
-      return '0 مواد';
-    }
-    if (count == 1) {
-      return '1 مادة';
-    }
-    if (count == 2) {
-      return '2 مادتان';
-    }
-    if (count >= 3 && count <= 10) {
-      return '$count مواد';
-    }
-    return '$count مادة';
+  String _subjectCountLabel(BuildContext context, int count) {
+    return AppStrings.of(context).subjectCountLabel(count);
   }
 
   List<DepartmentCard> _buildCards(BuildContext context) {
+    final strings = AppStrings.of(context);
     return [
       DepartmentCard(
-        title: 'تكنولوجيا المعلومات',
-        subtitle: 'برمج، ابتكر، وكن جزءاً من مستقبل التقنية',
-        countLabel: _subjectCountLabel(_countForCategory('it')),
+        title: strings.informationTechnology,
+        subtitle: strings.itDepartmentSubtitle,
+        countLabel: _subjectCountLabel(context, _countForCategory('it')),
         icon: Icons.code_outlined,
         titleColor: AppColors.of(context).primary,
         badgeColor: AppColors.of(context).primary,
@@ -53,9 +43,12 @@ class AcademicDepartmentsSection extends StatelessWidget {
         onTap: () => context.push(AppRoutes.subjectsByCategory('it')),
       ),
       DepartmentCard(
-        title: 'الهندسة',
-        subtitle: 'تعلم وطور مهاراتك الهندسية',
-        countLabel: _subjectCountLabel(_countForCategory('engineering')),
+        title: strings.engineering,
+        subtitle: strings.engineeringSubtitle,
+        countLabel: _subjectCountLabel(
+          context,
+          _countForCategory('engineering'),
+        ),
         icon: Icons.architecture_outlined,
         titleColor: AppColors.of(context).darkGold,
         badgeColor: AppColors.of(context).darkGold,
@@ -63,9 +56,9 @@ class AcademicDepartmentsSection extends StatelessWidget {
         onTap: () => context.push(AppRoutes.subjectsByCategory('engineering')),
       ),
       DepartmentCard(
-        title: 'الطب',
-        subtitle: 'كل ما تحتاجه لدراستك في مجال الطب',
-        countLabel: _subjectCountLabel(_countForCategory('medicine')),
+        title: strings.medicine,
+        subtitle: strings.medicineSubtitle,
+        countLabel: _subjectCountLabel(context, _countForCategory('medicine')),
         icon: Icons.medical_services_outlined,
         titleColor: const Color(0xFF991B1B),
         badgeColor: const Color(0xFF991B1B),
@@ -85,7 +78,7 @@ class AcademicDepartmentsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           HomeSectionHeader(
-            title: 'الأقسام الأكاديمية',
+            title: AppStrings.of(context).academicDepartments,
             onViewAll: () => context.push(AppRoutes.subjects),
           ),
           const SizedBox(height: 8),

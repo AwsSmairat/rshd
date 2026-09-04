@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/router/app_router.dart';
 import '../../core/startup/startup_coordinator.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/l10n/app_strings.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -176,8 +177,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         offset: Offset(0, 14 * (1 - progress)),
         child: Transform.scale(
           scale: 0.85 + 0.15 * progress,
-          child: Text(
-            _letters[index],
+          child: Text(AppStrings.of(context).t(_letters[index]),
             style: TextStyle(
               fontSize: 56,
               fontWeight: FontWeight.w800,
@@ -265,8 +265,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                             alignment: const Alignment(0, 0.28),
                             child: Opacity(
                               opacity: holdProgress,
-                              child: const Text(
-                                'منصة تعليمية ذكية',
+                              child: Text(AppStrings.of(context).t('منصة تعليمية ذكية'),
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,

@@ -19,6 +19,7 @@ import '../../pdf_editor/widgets/pdf_annotation_overlay_host.dart';
 import '../../pdf_editor/widgets/pdf_editor_toolbar.dart';
 import '../../pdf_editor/widgets/pen_settings_sheet.dart';
 import '../../pdf_editor/widgets/text_settings_sheet.dart';
+import '../../../core/l10n/app_strings.dart';
 
 /// Professional in-app PDF editor with page-bound annotations.
 class PdfViewerScreen extends ConsumerStatefulWidget {
@@ -125,7 +126,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     if (!mounted) return;
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(message))));
   }
 
   Future<void> _showNoteDialog(double x, double y) async {
@@ -134,22 +135,22 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
       final text = await showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('إضافة ملاحظة'),
+          title: Text(AppStrings.of(context).t('إضافة ملاحظة')),
           content: TextField(
             controller: controller,
             autofocus: true,
             maxLines: 4,
             textDirection: TextDirection.rtl,
-            decoration: const InputDecoration(hintText: 'اكتب ملاحظتك هنا'),
+            decoration: InputDecoration(hintText: AppStrings.of(context).t('اكتب ملاحظتك هنا')),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: Text(AppStrings.of(context).t('إلغاء')),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, controller.text),
-              child: const Text('حفظ'),
+              child: Text(AppStrings.of(context).t('حفظ')),
             ),
           ],
         ),
@@ -168,22 +169,22 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
       final text = await showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('إضافة نص'),
+          title: Text(AppStrings.of(context).t('إضافة نص')),
           content: TextField(
             controller: controller,
             autofocus: true,
             maxLines: 3,
             textDirection: TextDirection.rtl,
-            decoration: const InputDecoration(hintText: 'اكتب النص'),
+            decoration: InputDecoration(hintText: AppStrings.of(context).t('اكتب النص')),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: Text(AppStrings.of(context).t('إلغاء')),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, controller.text),
-              child: const Text('إضافة'),
+              child: Text(AppStrings.of(context).t('إضافة')),
             ),
           ],
         ),
@@ -211,7 +212,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
       final text = await showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('تعديل النص'),
+          title: Text(AppStrings.of(context).t('تعديل النص')),
           content: TextField(
             controller: controller,
             autofocus: true,
@@ -225,18 +226,17 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                 _editor.selectAnnotation(null);
                 Navigator.pop(context);
               },
-              child: Text(
-                'حذف',
+              child: Text(AppStrings.of(context).t('حذف'),
                 style: TextStyle(color: AppColors.of(context).error),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء'),
+              child: Text(AppStrings.of(context).t('إلغاء')),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, controller.text),
-              child: const Text('حفظ'),
+              child: Text(AppStrings.of(context).t('حفظ')),
             ),
           ],
         ),
@@ -270,7 +270,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               if (annotation.type == AnnotationType.text)
                 ListTile(
                   leading: const Icon(Icons.edit_outlined),
-                  title: const Text('تعديل النص'),
+                  title: Text(AppStrings.of(context).t('تعديل النص')),
                   onTap: () {
                     Navigator.pop(context);
                     _showTextEditDialog(annotation);
@@ -279,7 +279,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               if (annotation.type == AnnotationType.note)
                 ListTile(
                   leading: const Icon(Icons.sticky_note_2_outlined),
-                  title: const Text('فتح الملاحظة'),
+                  title: Text(AppStrings.of(context).t('فتح الملاحظة')),
                   onTap: () {
                     Navigator.pop(context);
                     _showExistingNote(annotation);
@@ -290,7 +290,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                   Icons.delete_outline,
                   color: AppColors.of(context).error,
                 ),
-                title: const Text('حذف'),
+                title: Text(AppStrings.of(context).t('حذف')),
                 onTap: () {
                   _editor.deleteSelectedAnnotation();
                   Navigator.pop(context);
@@ -310,7 +310,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('ملاحظة'),
+        title: Text(AppStrings.of(context).t('ملاحظة')),
         content: TextField(
           controller: controller,
           maxLines: 5,
@@ -322,21 +322,20 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               _editor.deleteAnnotation(note.id, note.pageNumber);
               Navigator.pop(context);
             },
-            child: Text(
-              'حذف',
+            child: Text(AppStrings.of(context).t('حذف'),
               style: TextStyle(color: AppColors.of(context).error),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إغلاق'),
+            child: Text(AppStrings.of(context).t('إغلاق')),
           ),
           FilledButton(
             onPressed: () {
               _editor.updateNoteText(note.id, note.pageNumber, controller.text);
               Navigator.pop(context);
             },
-            child: const Text('حفظ'),
+            child: Text(AppStrings.of(context).t('حفظ')),
           ),
         ],
       ),
@@ -355,20 +354,19 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(saveAsCopy ? 'حفظ نسخة جديدة' : 'تصدير PDF'),
-        content: Text(
-          saveAsCopy
+        title: Text(AppStrings.of(context).t(saveAsCopy ? 'حفظ نسخة جديدة' : 'تصدير PDF')),
+        content: Text(AppStrings.of(context).t(saveAsCopy
               ? 'سيتم إنشاء نسخة PDF جديدة تحتوي على التعليقات مع الاحتفاظ بالملف الأصلي.'
-              : 'سيتم تصدير نسخة PDF تحتوي على التعليقات المدمجة.',
+              : 'سيتم تصدير نسخة PDF تحتوي على التعليقات المدمجة.'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(AppStrings.of(context).t('إلغاء')),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('متابعة'),
+            child: Text(AppStrings.of(context).t('متابعة')),
           ),
         ],
       ),
@@ -390,7 +388,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               valueListenable: messageNotifier,
               builder: (context, message, child) {
                 return AlertDialog(
-                  title: const Text('تصدير PDF'),
+                  title: Text(AppStrings.of(context).t('تصدير PDF')),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -399,7 +397,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                         value: progress > 0 && progress < 1 ? progress : null,
                       ),
                       const SizedBox(height: 12),
-                      Text(message, textAlign: TextAlign.center),
+                      Text(AppStrings.of(context).t(message), textAlign: TextAlign.center),
                     ],
                   ),
                 );
@@ -440,12 +438,12 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('نجاح التصدير'),
-        content: Text('تم إنشاء الملف:\n${result.fileName}'),
+        title: Text(AppStrings.of(context).t('نجاح التصدير')),
+        content: Text(AppStrings.of(context).t('تم إنشاء الملف:\n${result.fileName}')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إغلاق'),
+            child: Text(AppStrings.of(context).t('إغلاق')),
           ),
           FilledButton.icon(
             onPressed: () async {
@@ -461,7 +459,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               }
             },
             icon: const Icon(Icons.share_outlined),
-            label: const Text('مشاركة'),
+            label: Text(AppStrings.of(context).t('مشاركة')),
           ),
         ],
       ),
@@ -472,21 +470,20 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('تعذر التصدير'),
-        content: const Text(
-          'حدث خطأ أثناء إنشاء ملف PDF. يمكنك المحاولة مرة أخرى.',
+        title: Text(AppStrings.of(context).t('تعذر التصدير')),
+        content: Text(AppStrings.of(context).t('حدث خطأ أثناء إنشاء ملف PDF. يمكنك المحاولة مرة أخرى.'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إغلاق'),
+            child: Text(AppStrings.of(context).t('إغلاق')),
           ),
           FilledButton(
             onPressed: () {
               Navigator.pop(context);
               onRetry();
             },
-            child: const Text('إعادة المحاولة'),
+            child: Text(AppStrings.of(context).t('إعادة المحاولة')),
           ),
         ],
       ),
@@ -507,7 +504,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
             children: [
               ListTile(
                 leading: const Icon(Icons.save_as_outlined),
-                title: const Text('حفظ التعديلات'),
+                title: Text(AppStrings.of(context).t('حفظ التعديلات')),
                 onTap: () {
                   Navigator.pop(context);
                   _handleSave();
@@ -515,7 +512,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               ),
               ListTile(
                 leading: const Icon(Icons.file_copy_outlined),
-                title: const Text('حفظ نسخة جديدة'),
+                title: Text(AppStrings.of(context).t('حفظ نسخة جديدة')),
                 onTap: () {
                   Navigator.pop(context);
                   _handleExport(saveAsCopy: true);
@@ -523,7 +520,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               ),
               ListTile(
                 leading: const Icon(Icons.picture_as_pdf_outlined),
-                title: const Text('تصدير PDF مدمج'),
+                title: Text(AppStrings.of(context).t('تصدير PDF مدمج')),
                 onTap: () {
                   Navigator.pop(context);
                   _handleExport(saveAsCopy: false);
@@ -531,14 +528,14 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               ),
               SwitchListTile(
                 secondary: const Icon(Icons.touch_app_outlined),
-                title: const Text('الرسم بالإصبع'),
+                title: Text(AppStrings.of(context).t('الرسم بالإصبع')),
                 value: _state.allowFingerDrawing,
                 onChanged: (value) => _editor.setAllowFingerDrawing(value),
               ),
               ListTile(
                 leading: const Icon(Icons.view_carousel_outlined),
-                title: const Text('صور الصفحات'),
-                subtitle: const Text('الانتقال السريع بين الصفحات'),
+                title: Text(AppStrings.of(context).t('صور الصفحات')),
+                subtitle: Text(AppStrings.of(context).t('الانتقال السريع بين الصفحات')),
                 onTap: () {
                   Navigator.pop(context);
                   _openPagePicker();
@@ -568,7 +565,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               itemBuilder: (context, index) {
                 final page = index + 1;
                 return ListTile(
-                  title: Text('الصفحة $page'),
+                  title: Text(AppStrings.of(context).t('الصفحة $page')),
                   trailing: _state.currentPage == page
                       ? Icon(Icons.check, color: AppColors.of(context).accent)
                       : null,
@@ -648,8 +645,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'اختر الشكل',
+                Text(AppStrings.of(context).t('اختر الشكل'),
                   style: AppTextStyles.subtitleOf(
                     context,
                   ).copyWith(color: AppColors.of(context).primary),
@@ -662,7 +658,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                   alignment: WrapAlignment.end,
                   children: [
                     _ShapeOption(
-                      label: 'مستطيل',
+                      label: AppStrings.of(context).t('مستطيل'),
                       icon: Icons.crop_square_outlined,
                       onTap: () {
                         _editor.setShapeTool(PdfEditorShapeTool.rectangle);
@@ -670,7 +666,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                       },
                     ),
                     _ShapeOption(
-                      label: 'دائرة',
+                      label: AppStrings.of(context).t('دائرة'),
                       icon: Icons.circle_outlined,
                       onTap: () {
                         _editor.setShapeTool(PdfEditorShapeTool.circle);
@@ -678,7 +674,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                       },
                     ),
                     _ShapeOption(
-                      label: 'خط',
+                      label: AppStrings.of(context).t('خط'),
                       icon: Icons.remove,
                       onTap: () {
                         _editor.setShapeTool(PdfEditorShapeTool.line);
@@ -686,7 +682,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                       },
                     ),
                     _ShapeOption(
-                      label: 'سهم',
+                      label: AppStrings.of(context).t('سهم'),
                       icon: Icons.arrow_right_alt,
                       onTap: () {
                         _editor.setShapeTool(PdfEditorShapeTool.arrow);
@@ -796,7 +792,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     }
 
     if (_isLoading || _pdfBytes == null) {
-      return const LoadingWidget(message: 'جاري تحميل ملف PDF...');
+      return LoadingWidget(message: AppStrings.of(context).t('جاري تحميل ملف PDF...'));
     }
 
     return LayoutBuilder(
@@ -946,7 +942,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                 onTextAnnotationTap: _showTextEditDialog,
               ),
             if (_isLoading)
-              const LoadingWidget(message: 'جاري تحميل ملف PDF...'),
+              LoadingWidget(message: AppStrings.of(context).t('جاري تحميل ملف PDF...')),
             if (MediaQuery.sizeOf(context).shortestSide >= 600 &&
                 MediaQuery.orientationOf(context) == Orientation.landscape)
               PdfEditorToolbar(
@@ -1030,8 +1026,7 @@ class _ShapeOption extends StatelessWidget {
             children: [
               Icon(icon, color: AppColors.of(context).primary, size: 20),
               const SizedBox(width: 6),
-              Text(
-                label,
+              Text(AppStrings.of(context).t(label),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   color: AppColors.of(context).primary,
                   fontWeight: FontWeight.w600,

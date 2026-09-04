@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import 'quiz_score_helper.dart';
 import 'result_progress_circle.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class QuizResultSummaryCard extends StatelessWidget {
   const QuizResultSummaryCard({
@@ -19,7 +20,7 @@ class QuizResultSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final grade = QuizScoreHelper.gradeLabel(score);
+    final grade = AppStrings.of(context).t(QuizScoreHelper.gradeLabel(score));
     final gradeColor = QuizScoreHelper.gradeColor(score);
 
     return Container(
@@ -52,8 +53,7 @@ class QuizResultSummaryCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
+                Text(AppStrings.of(context).t(title),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -61,8 +61,7 @@ class QuizResultSummaryCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  grade,
+                Text(AppStrings.of(context).t(grade),
                   style: AppTextStyles.titleOf(
                     context,
                   ).copyWith(fontSize: 24, color: gradeColor),
@@ -70,7 +69,7 @@ class QuizResultSummaryCard extends StatelessWidget {
                 if (showEncouragement) ...[
                   const SizedBox(height: 6),
                   Text(
-                    QuizScoreHelper.encouragement(score),
+                    AppStrings.of(context).t(QuizScoreHelper.encouragement(score)),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 12,
                       height: 1.4,

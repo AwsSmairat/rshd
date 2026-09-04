@@ -10,6 +10,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../playback/floating_playback_controller.dart';
 import 'rshd_embed_video_player.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class FloatingVideoOverlay extends ConsumerWidget {
   const FloatingVideoOverlay({super.key});
@@ -165,8 +166,7 @@ class _DraggableMiniPlayer extends StatelessWidget {
                     Expanded(
                       child: GestureDetector(
                         onTap: onOpen,
-                        child: Text(
-                          title,
+                        child: Text(AppStrings.of(context).t(title),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.captionOf(context).copyWith(

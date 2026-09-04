@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -13,24 +14,24 @@ import 'home_section_header.dart';
 class QuickActionGrid extends StatelessWidget {
   const QuickActionGrid({super.key});
 
-  static const _actions = [
+  List<_QuickAction> _actions(AppStrings strings) => [
     _QuickAction(
-      label: 'المحاضرات',
+      label: strings.lectures,
       icon: Icons.smart_display_outlined,
       route: AppRoutes.subjects,
     ),
     _QuickAction(
-      label: 'موادي',
+      label: strings.navSubjects,
       icon: Icons.menu_book_outlined,
       route: AppRoutes.subjects,
     ),
     _QuickAction(
-      label: 'الواجبات',
+      label: strings.assignments,
       icon: Icons.assignment_outlined,
       route: AppRoutes.assignments,
     ),
     _QuickAction(
-      label: 'الاختبارات',
+      label: strings.quizzes,
       icon: QuizIconHelper.sectionIcon,
       route: AppRoutes.quizzes,
     ),
@@ -38,13 +39,15 @@ class QuickActionGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
+    final actions = _actions(strings);
     final metrics = AppLayoutMetrics.of(context);
     final crossAxisCount = metrics.quickActionColumns;
     final cellHeight = metrics.quickActionCellHeight;
     final spacing = metrics.isTablet ? 14.0 : 10.0;
 
     final rows = <Widget>[];
-    for (var i = 0; i < _actions.length; i += crossAxisCount) {
+    for (var i = 0; i < actions.length; i += crossAxisCount) {
       if (rows.isNotEmpty) {
         rows.add(SizedBox(height: spacing));
       }
@@ -55,10 +58,10 @@ class QuickActionGrid extends StatelessWidget {
             for (var j = 0; j < crossAxisCount; j++) ...[
               if (j > 0) SizedBox(width: spacing),
               Expanded(
-                child: i + j < _actions.length
+                child: i + j < actions.length
                     ? SizedBox(
                         height: cellHeight,
-                        child: _QuickActionTile(action: _actions[i + j]),
+                        child: _QuickActionTile(action: actions[i + j]),
                       )
                     : const SizedBox.shrink(),
               ),
@@ -72,7 +75,7 @@ class QuickActionGrid extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const HomeSectionHeader(title: 'اختصارات سريعة'),
+          HomeSectionHeader(title: strings.quickShortcuts),
           const SizedBox(height: 8),
           ...rows,
         ],
@@ -129,8 +132,7 @@ class _QuickActionTile extends StatelessWidget {
             ),
           ),
           SizedBox(height: metrics.isTablet ? 10 : 8),
-          Text(
-            action.label,
+          Text(AppStrings.of(context).t(action.label),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: metrics.quickActionLabelFontSize,
               height: 1.25,

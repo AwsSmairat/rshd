@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -28,7 +29,7 @@ class GradesSummarySection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           HomeSectionHeader(
-            title: 'ملخص الدرجات',
+            title: AppStrings.of(context).gradesSummary,
             onViewAll: () => context.push(AppRoutes.grades),
           ),
           const SizedBox(height: 14),
@@ -41,8 +42,7 @@ class GradesSummarySection extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFE5E7EB)),
               ),
-              child: Text(
-                'لا توجد درجات حالياً',
+              child: Text(AppStrings.of(context).t(AppStrings.of(context).noGradesYet),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(color: AppColors.of(context).textMuted),
@@ -61,7 +61,7 @@ class GradesSummarySection extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _SummaryStat(
-                      label: 'المتوسط',
+                      label: AppStrings.of(context).average,
                       value: averageGrade != null
                           ? '${averageGrade!.toStringAsFixed(1)}%'
                           : '—',
@@ -69,7 +69,7 @@ class GradesSummarySection extends StatelessWidget {
                   ),
                   Expanded(
                     child: _SummaryStat(
-                      label: 'الأعلى',
+                      label: AppStrings.of(context).highest,
                       value: highestGrade != null
                           ? '${highestGrade!.toStringAsFixed(1)}%'
                           : '—',
@@ -105,15 +105,13 @@ class _SummaryStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          value,
+        Text(AppStrings.of(context).t(value),
           style: AppTextStyles.titleOf(
             context,
           ).copyWith(fontSize: 20, color: AppColors.of(context).primary),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
+        Text(AppStrings.of(context).t(label),
           style: AppTextStyles.bodyOf(
             context,
           ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),

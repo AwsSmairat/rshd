@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/layout/auth_layout_metrics.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class LuxuryTextField extends StatelessWidget {
   const LuxuryTextField({
@@ -45,8 +46,7 @@ class LuxuryTextField extends StatelessWidget {
       children: [
         Align(
           alignment: AlignmentDirectional.centerStart,
-          child: Text(
-            label,
+          child: Text(AppStrings.of(context).t(label),
             style: TextStyle(
               fontSize: labelSize,
               fontWeight: FontWeight.w600,

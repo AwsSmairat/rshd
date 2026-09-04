@@ -6,6 +6,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 import '../data/models/grade_model.dart';
 import 'grade_type_badge.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class GradeCard extends StatelessWidget {
   const GradeCard({super.key, required this.grade, required this.onTap});
@@ -38,8 +39,7 @@ class GradeCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: Text(
-                        grade.displayTitle,
+                      child: Text(AppStrings.of(context).t(grade.displayTitle),
                         style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 17,
                           height: 1.3,
@@ -70,8 +70,7 @@ class GradeCard extends StatelessWidget {
                 if (grade.subjectTitle != null &&
                     grade.subjectTitle!.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text(
-                    grade.subjectTitle!,
+                  Text(AppStrings.of(context).t(grade.subjectTitle!),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 13,
                       color: AppColors.of(context).textMuted,
@@ -95,8 +94,7 @@ class GradeCard extends StatelessWidget {
                         ).textMuted.withValues(alpha: 0.85),
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        _formatDate(grade.createdAt!),
+                      Text(AppStrings.of(context).t(_formatDate(context, grade.createdAt!)),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
                           color: AppColors.of(context).textMuted,
@@ -128,12 +126,12 @@ class GradeCard extends StatelessWidget {
     return AppColors.of(context).error.withValues(alpha: 0.85);
   }
 
-  String _formatDate(String raw) {
+  String _formatDate(BuildContext context, String raw) {
     final parsed = DateTime.tryParse(raw);
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd', 'ar').format(parsed.toLocal());
+    return DateFormat('yyyy/MM/dd', AppStrings.of(context).dateLocale).format(parsed.toLocal());
   }
 }
 
@@ -169,8 +167,7 @@ class _GradeScoreRing extends StatelessWidget {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                value % 1 == 0 ? '${value.toInt()}' : value.toStringAsFixed(1),
+              Text(AppStrings.of(context).t(value % 1 == 0 ? '${value.toInt()}' : value.toStringAsFixed(1)),
                 style: AppTextStyles.titleOf(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
@@ -178,8 +175,7 @@ class _GradeScoreRing extends StatelessWidget {
                   height: 1,
                 ),
               ),
-              Text(
-                '%',
+              Text(AppStrings.of(context).t('%'),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   fontSize: 10,
                   color: AppColors.of(context).textMuted,

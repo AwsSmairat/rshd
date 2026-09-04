@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../controllers/pdf_editor_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class TextSettingsSheet extends StatefulWidget {
   const TextSettingsSheet({
@@ -72,8 +73,7 @@ class _TextSettingsSheetState extends State<TextSettingsSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              'إعدادات النص',
+            Text(AppStrings.of(context).t('إعدادات النص'),
               style: AppTextStyles.subtitleOf(
                 context,
               ).copyWith(color: AppColors.of(context).primary),
@@ -124,7 +124,7 @@ class _TextSettingsSheetState extends State<TextSettingsSheet> {
                 final selected =
                     (_settings.fontSize - preset.$2).abs() < 0.0005;
                 return ChoiceChip(
-                  label: Text(preset.$1),
+                  label: Text(AppStrings.of(context).t(preset.$1)),
                   selected: selected,
                   onSelected: (_) =>
                       _apply(_settings.copyWith(fontSize: preset.$2)),

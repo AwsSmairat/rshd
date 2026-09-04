@@ -8,6 +8,7 @@ import '../data/models/assignment_model.dart';
 import 'assignment_icon_helper.dart';
 import 'assignment_icon_panel.dart';
 import 'submission_status_badge.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class LiquidGlassAssignmentCard extends StatelessWidget {
   const LiquidGlassAssignmentCard({
@@ -46,8 +47,7 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: Text(
-                        assignment.title,
+                      child: Text(AppStrings.of(context).t(assignment.title),
                         style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 17,
                           height: 1.3,
@@ -80,8 +80,7 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
                 if (assignment.subjectTitle != null &&
                     assignment.subjectTitle!.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text(
-                    assignment.subjectTitle!,
+                  Text(AppStrings.of(context).t(assignment.subjectTitle!),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 13,
                       color: AppColors.of(context).textMuted,
@@ -102,8 +101,7 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Flexible(
-                        child: Text(
-                          'تاريخ التسليم: ${_formatDate(assignment.dueDate!)}',
+                        child: Text(AppStrings.of(context).t('تاريخ التسليم: ${_formatDate(context, assignment.dueDate!)}'),
                           style: AppTextStyles.bodyOf(context).copyWith(
                             fontSize: 12,
                             color: AppColors.of(context).textMuted,
@@ -133,11 +131,11 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(String raw) {
+  String _formatDate(BuildContext context, String raw) {
     final parsed = DateTime.tryParse(raw);
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd', 'ar').format(parsed.toLocal());
+    return DateFormat('yyyy/MM/dd', AppStrings.of(context).dateLocale).format(parsed.toLocal());
   }
 }

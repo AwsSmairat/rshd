@@ -20,6 +20,7 @@ import '../widgets/quiz_stats_grid.dart';
 import '../widgets/result_action_buttons.dart';
 import '../widgets/quizzes_state_views.dart';
 import 'quizzes_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class QuizDetailsScreen extends ConsumerStatefulWidget {
   const QuizDetailsScreen({super.key, required this.quizId});
@@ -96,8 +97,8 @@ class _QuizDetailsScreenState extends ConsumerState<QuizDetailsScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SubjectsHeader(
-            title: 'تفاصيل الاختبار',
+          SubjectsHeader(
+            title: AppStrings.of(context).t('تفاصيل الاختبار'),
             backgroundIcon: Icons.quiz_outlined,
           ),
           Expanded(
@@ -148,7 +149,7 @@ class _QuizDetailsScreenState extends ConsumerState<QuizDetailsScreen> {
             hasScrollBody: false,
             child: Center(
               child: QuizzesErrorState(
-                message: 'الاختبار غير موجود',
+                message: AppStrings.of(context).t('الاختبار غير موجود'),
                 onRetry: _loadDetails,
               ),
             ),

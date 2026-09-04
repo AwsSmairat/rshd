@@ -14,6 +14,7 @@ import 'widgets/gold_gradient_button.dart';
 import 'widgets/login_header.dart';
 import 'widgets/luxury_login_card.dart';
 import 'widgets/otp_input_row.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class VerifyEmailScreen extends ConsumerStatefulWidget {
   const VerifyEmailScreen({super.key, required this.email});
@@ -63,7 +64,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   Future<void> _submit() async {
     if (_code.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى إدخال رمز مكوّن من 6 أرقام')),
+        SnackBar(content: Text(AppStrings.of(context).t('يرجى إدخال رمز مكوّن من 6 أرقام'))),
       );
       return;
     }
@@ -100,7 +101,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       _startResendTimer();
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('تم إرسال رمز جديد')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تم إرسال رمز جديد'))));
     }
   }
 
@@ -121,22 +122,20 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
               Align(
                 alignment: AlignmentDirectional.centerStart,
                 child: IconButton(
-                  tooltip: 'رجوع',
+                  tooltip: AppStrings.of(context).t('رجوع'),
                   onPressed: () => context.go(AppRoutes.login),
                   icon: const Icon(Icons.arrow_back_ios_new_rounded),
                   color: AppColors.of(context).primary,
                 ),
               ),
-              Text(
-                'تأكيد البريد الإلكتروني',
+              Text(AppStrings.of(context).t('تأكيد البريد الإلكتروني'),
                 style: AppTextStyles.titleOf(
                   context,
                 ).copyWith(color: AppColors.of(context).primary),
                 textAlign: TextAlign.right,
               ),
               SizedBox(height: metrics.fieldSpacing * 0.5),
-              Text(
-                'أدخل رمز التحقق المرسل إلى\n${widget.email}',
+              Text(AppStrings.of(context).t('أدخل رمز التحقق المرسل إلى\n${widget.email}'),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(color: AppColors.of(context).textMuted),
@@ -165,8 +164,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                     ),
                     SizedBox(width: metrics.fieldSpacing * 0.75),
                     Expanded(
-                      child: Text(
-                        widget.email,
+                      child: Text(AppStrings.of(context).t(widget.email),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppColors.of(context).primary,
@@ -202,8 +200,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                       color: AppColors.of(context).error.withValues(alpha: 0.2),
                     ),
                   ),
-                  child: Text(
-                    authState.errorMessage!,
+                  child: Text(AppStrings.of(context).t(authState.errorMessage!),
                     style: AppTextStyles.errorOf(context),
                     textAlign: TextAlign.center,
                   ),
@@ -211,7 +208,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
               ],
               SizedBox(height: metrics.sectionSpacing),
               GoldGradientButton(
-                label: 'تأكيد الرمز',
+                label: AppStrings.of(context).t('تأكيد الرمز'),
                 isLoading: isVerifying,
                 onPressed: isVerifying ? null : _submit,
               ),
@@ -220,16 +217,15 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                 onPressed: (_secondsRemaining > 0 || _isResending)
                     ? null
                     : _resend,
-                child: Text(
-                  _secondsRemaining > 0
+                child: Text(AppStrings.of(context).t(_secondsRemaining > 0
                       ? 'إعادة الإرسال بعد $_secondsRemaining ث'
-                      : 'إعادة إرسال الرمز',
+                      : 'إعادة إرسال الرمز'),
                 ),
               ),
               SizedBox(height: metrics.fieldSpacing * 0.5),
               TextButton(
                 onPressed: () => context.go(AppRoutes.login),
-                child: const Text('العودة لتسجيل الدخول'),
+                child: Text(AppStrings.of(context).t('العودة لتسجيل الدخول')),
               ),
             ],
           ),

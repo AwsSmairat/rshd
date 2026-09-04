@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../data/privacy_policy_model.dart';
 import 'privacy_policy_section.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class PrivacyPolicySectionTile extends StatelessWidget {
   const PrivacyPolicySectionTile({
@@ -71,8 +72,7 @@ class PrivacyPolicySectionTile extends StatelessWidget {
                 size: 18,
               ),
             ),
-            title: Text(
-              section.title,
+            title: Text(AppStrings.of(context).t(section.title),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,

@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 import '../data/models/video_model.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class VideoCard extends StatelessWidget {
   const VideoCard({super.key, required this.video, required this.onTap});
@@ -38,15 +39,13 @@ class VideoCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  video.title,
+                Text(AppStrings.of(context).t(video.title),
                   style: AppTextStyles.bodyOf(
                     context,
                   ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  'المدة: ${video.formattedDuration}',
+                Text(AppStrings.of(context).t('المدة: ${video.formattedDuration}'),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     color: AppColors.of(context).textMuted,
                     fontSize: 12,
@@ -59,17 +58,17 @@ class VideoCard extends StatelessWidget {
                   children: [
                     if (video.isFree)
                       _Badge(
-                        label: 'مجاني',
+                        label: AppStrings.of(context).t('مجاني'),
                         color: AppColors.of(context).secondary,
                       ),
                     if (locked)
                       _Badge(
-                        label: 'مقفل',
+                        label: AppStrings.of(context).t('مقفل'),
                         color: AppColors.of(context).textMuted,
                       )
                     else
                       _Badge(
-                        label: video.statusLabel,
+                        label: AppStrings.of(context).t(video.statusLabel),
                         color: AppColors.of(context).secondary,
                       ),
                   ],
@@ -104,8 +103,7 @@ class _Badge extends StatelessWidget {
         color: color.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(
-        label,
+      child: Text(AppStrings.of(context).t(label),
         style: AppTextStyles.bodyOf(
           context,
         ).copyWith(color: color, fontSize: 11, fontWeight: FontWeight.w700),

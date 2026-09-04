@@ -23,6 +23,7 @@ import '../widgets/privacy_policy_footer.dart';
 import '../widgets/privacy_policy_header.dart';
 import '../widgets/privacy_policy_intro_card.dart';
 import '../widgets/privacy_policy_section_tile.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class PrivacyPolicyPage extends ConsumerStatefulWidget {
   const PrivacyPolicyPage({super.key});
@@ -89,7 +90,7 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
       backgroundColor: AppColors.of(context).background,
       body: switch (state.status) {
         PrivacyPolicyLoadStatus.initial || PrivacyPolicyLoadStatus.loading =>
-          const LoadingWidget(message: 'جاري تحميل سياسة الخصوصية...'),
+          LoadingWidget(message: AppStrings.of(context).t('جاري تحميل سياسة الخصوصية...')),
         PrivacyPolicyLoadStatus.error => ErrorView(
           message: state.errorMessage ?? 'تعذر تحميل سياسة الخصوصية',
           onRetry: () => ref
@@ -261,8 +262,7 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
 
     return Row(
       children: [
-        Text(
-          'الأقسام',
+        Text(AppStrings.of(context).t('الأقسام'),
           style: AppTextStyles.subtitleOf(context).copyWith(
             fontWeight: FontWeight.w700,
             color: AppColors.of(context).primary,
@@ -271,11 +271,11 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
         const Spacer(),
         TextButton(
           onPressed: () => _expandAll(sections),
-          child: const Text('فتح جميع الأقسام'),
+          child: Text(AppStrings.of(context).t('فتح جميع الأقسام')),
         ),
         TextButton(
           onPressed: allExpanded ? _collapseAll : null,
-          child: const Text('إغلاق جميع الأقسام'),
+          child: Text(AppStrings.of(context).t('إغلاق جميع الأقسام')),
         ),
       ],
     );
@@ -307,10 +307,9 @@ class _OfflineBanner extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              isLocal
+            child: Text(AppStrings.of(context).t(isLocal
                   ? 'يتم عرض النسخة المحلية من سياسة الخصوصية.'
-                  : 'تعذر الاتصال — يتم عرض النسخة المحلية الاحتياطية.',
+                  : 'تعذر الاتصال — يتم عرض النسخة المحلية الاحتياطية.'),
               style: AppTextStyles.bodyOf(context).copyWith(fontSize: 13),
             ),
           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'data/help_center_model.dart';
+import '../../core/l10n/app_strings.dart';
 
 Future<void> launchHelpEmail({
   required String email,
@@ -13,7 +14,7 @@ Future<void> launchHelpEmail({
     if (context != null && context.mounted) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('بريد التواصل غير متوفر')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('بريد التواصل غير متوفر'))));
     }
     return;
   }
@@ -26,7 +27,7 @@ Future<void> launchHelpEmail({
   final uri = Uri(scheme: 'mailto', path: email, queryParameters: params);
   final launched = await launchUrl(uri);
   if (!launched && context != null && context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(email)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(email))));
   }
 }
 

@@ -12,6 +12,7 @@ import 'widgets/gold_gradient_button.dart';
 import 'widgets/login_header.dart';
 import 'widgets/luxury_login_card.dart';
 import 'widgets/luxury_text_field.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key, this.initialEmail});
@@ -72,22 +73,20 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 Align(
                   alignment: AlignmentDirectional.centerStart,
                   child: IconButton(
-                    tooltip: 'رجوع',
+                    tooltip: AppStrings.of(context).t('رجوع'),
                     onPressed: () => context.pop(),
                     icon: const Icon(Icons.arrow_back_ios_new_rounded),
                     color: AppColors.of(context).primary,
                   ),
                 ),
-                Text(
-                  'نسيت كلمة المرور؟',
+                Text(AppStrings.of(context).t('نسيت كلمة المرور؟'),
                   style: AppTextStyles.titleOf(
                     context,
                   ).copyWith(color: AppColors.of(context).primary),
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: metrics.fieldSpacing * 0.5),
-                Text(
-                  'أدخل بريدك الإلكتروني وسنساعدك في استعادة الوصول إلى حسابك.',
+                Text(AppStrings.of(context).t('أدخل بريدك الإلكتروني وسنساعدك في استعادة الوصول إلى حسابك.'),
                   style: AppTextStyles.bodyOf(
                     context,
                   ).copyWith(color: AppColors.of(context).textMuted),
@@ -96,30 +95,29 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 SizedBox(height: metrics.sectionSpacing),
                 LuxuryTextField(
                   controller: _emailController,
-                  label: 'البريد الإلكتروني',
+                  label: AppStrings.of(context).t('البريد الإلكتروني'),
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.done,
                   errorText: state.fieldErrors['email'],
                   validator: (value) {
                     final trimmed = value?.trim() ?? '';
-                    if (trimmed.isEmpty) return 'البريد الإلكتروني مطلوب';
+                    if (trimmed.isEmpty) return AppStrings.of(context).t('البريد الإلكتروني مطلوب');
                     if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(trimmed)) {
-                      return 'صيغة البريد غير صحيحة';
+                      return AppStrings.of(context).t('صيغة البريد غير صحيحة');
                     }
                     return null;
                   },
                 ),
                 if (state.errorMessage != null) ...[
                   SizedBox(height: metrics.fieldSpacing),
-                  Text(
-                    state.errorMessage!,
+                  Text(AppStrings.of(context).t(state.errorMessage!),
                     style: AppTextStyles.errorOf(context),
                     textAlign: TextAlign.right,
                   ),
                 ],
                 SizedBox(height: metrics.sectionSpacing),
                 GoldGradientButton(
-                  label: 'إرسال رمز الاستعادة',
+                  label: AppStrings.of(context).t('إرسال رمز الاستعادة'),
                   isLoading: state.isLoading,
                   onPressed: state.isLoading ? null : _submit,
                 ),

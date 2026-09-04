@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class SubjectSectionHeader extends StatelessWidget {
   const SubjectSectionHeader({
@@ -63,8 +64,7 @@ class SubjectSectionHeader extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: Text(
-            title,
+          child: Text(AppStrings.of(context).t(title),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 19,
               fontWeight: FontWeight.w800,

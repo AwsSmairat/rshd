@@ -13,5 +13,6 @@ class StorageKeys {
   static const legalTermsCache = 'legal_terms_cache';
   static const onboardingCompleted = 'rshd_onboarding_completed_v1';
   static const appTheme = 'rshd_app_theme_v1';
+  static const appLocale = 'rshd_app_locale_v1';
   static const appDisplayPreferences = 'rshd_app_display_preferences_v1';
 }

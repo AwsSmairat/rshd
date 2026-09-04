@@ -10,6 +10,7 @@ import '../contact_launcher.dart';
 import '../data/contact_channels.dart';
 import '../widgets/contact_channel_card.dart';
 import '../widgets/contact_us_header.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class ContactChannelDefinition {
   const ContactChannelDefinition({
@@ -29,61 +30,64 @@ class ContactChannelDefinition {
   final Color? iconColor;
 }
 
-List<ContactChannelDefinition> buildContactChannels(ContactChannels channels) {
+List<ContactChannelDefinition> buildContactChannels(
+  BuildContext context,
+  ContactChannels channels,
+) {
   final launcher = ContactLauncher(channels);
 
   return [
     ContactChannelDefinition(
-      title: 'البريد الإلكتروني',
+      title: AppStrings.of(context).t('البريد الإلكتروني'),
       value: channels.displayFor(channels.email),
       icon: Icons.email_outlined,
       isEnabled: channels.hasEmail,
       onTap: launcher.openEmail,
     ),
     ContactChannelDefinition(
-      title: 'رابط الموقع',
+      title: AppStrings.of(context).t('رابط الموقع'),
       value: channels.websiteDisplay,
       icon: Icons.language_outlined,
       isEnabled: channels.hasWebsite,
       onTap: launcher.openWebsite,
     ),
     ContactChannelDefinition(
-      title: 'فيسبوك',
+      title: AppStrings.of(context).t('فيسبوك'),
       value: channels.facebookDisplay,
       icon: Icons.facebook_outlined,
       isEnabled: channels.hasFacebook,
       onTap: launcher.openFacebook,
     ),
     ContactChannelDefinition(
-      title: 'إنستغرام',
+      title: AppStrings.of(context).t('إنستغرام'),
       value: channels.instagramDisplay,
       icon: Icons.camera_alt_outlined,
       isEnabled: channels.hasInstagram,
       onTap: launcher.openInstagram,
     ),
     ContactChannelDefinition(
-      title: 'يوتيوب',
+      title: AppStrings.of(context).t('يوتيوب'),
       value: channels.youtubeDisplay,
       icon: Icons.play_circle_outline,
       isEnabled: channels.hasYoutube,
       onTap: launcher.openYoutube,
     ),
     ContactChannelDefinition(
-      title: 'لينكدإن',
+      title: AppStrings.of(context).t('لينكدإن'),
       value: channels.linkedinDisplay,
       icon: Icons.work_outline,
       isEnabled: channels.hasLinkedin,
       onTap: launcher.openLinkedin,
     ),
     ContactChannelDefinition(
-      title: 'اتصل بنا',
+      title: AppStrings.of(context).t('اتصل بنا'),
       value: channels.phoneDisplay,
       icon: Icons.phone_outlined,
       isEnabled: channels.hasPhone,
       onTap: launcher.openPhone,
     ),
     ContactChannelDefinition(
-      title: 'واتساب',
+      title: AppStrings.of(context).t('واتساب'),
       value: channels.whatsappDisplay,
       icon: Icons.chat_outlined,
       isEnabled: channels.hasWhatsapp,
@@ -116,8 +120,8 @@ class _ContactUsScreenState extends ConsumerState<ContactUsScreen> {
     final settings = ref.watch(platformSettingsProvider);
     final metrics = AppLayoutMetrics.of(context);
     final channels = settings.maybeWhen(
-      data: (value) => buildContactChannels(value.contact),
-      orElse: () => buildContactChannels(ContactChannels.empty),
+      data: (value) => buildContactChannels(context, value.contact),
+      orElse: () => buildContactChannels(context, ContactChannels.empty),
     );
     final columns = metrics.isTablet ? 2 : 1;
     final isRefreshing = settings.isLoading;
@@ -141,16 +145,14 @@ class _ContactUsScreenState extends ConsumerState<ContactUsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      'وسائل التواصل',
+                    Text(AppStrings.of(context).t('وسائل التواصل'),
                       style: AppTextStyles.subtitleOf(context).copyWith(
                         fontWeight: FontWeight.w700,
                         color: AppColors.of(context).primary,
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      'اضغط على أي بطاقة للتواصل مع فريق RSHD',
+                    Text(AppStrings.of(context).t('اضغط على أي بطاقة للتواصل مع فريق RSHD'),
                       style: AppTextStyles.bodyOf(context).copyWith(
                         fontSize: 13,
                         color: AppColors.of(context).textMuted,

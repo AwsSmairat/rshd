@@ -13,6 +13,7 @@ import '../../subjects/widgets/subjects_header.dart';
 import '../notification_navigation.dart';
 import '../widgets/notification_card.dart';
 import 'notifications_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
@@ -54,7 +55,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         if (error != null) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text(error)));
+          ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(error))));
         }
       }
     }
@@ -92,9 +93,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: SubjectsHeader(
-                title: 'الإشعارات',
+                title: AppStrings.of(context).t('الإشعارات'),
                 backgroundIcon: Icons.notifications_outlined,
               ),
             ),
@@ -109,13 +110,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
-        return const SliverFillRemaining(
-          child: LoadingWidget(message: 'جاري تحميل الإشعارات...'),
+        return SliverFillRemaining(
+          child: LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الإشعارات...')),
         );
       case FeatureLoadStatus.empty:
-        return const SliverFillRemaining(
+        return SliverFillRemaining(
           hasScrollBody: false,
-          child: Center(child: Text('لا توجد إشعارات حالياً')),
+          child: Center(child: Text(AppStrings.of(context).t('لا توجد إشعارات حالياً'))),
         );
       case FeatureLoadStatus.error:
         return SliverFillRemaining(

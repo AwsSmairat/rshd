@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -44,22 +45,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Future<void> _confirmLogout() async {
+    final strings = AppStrings.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('تسجيل الخروج'),
-          content: const Text('هل أنت متأكد أنك تريد تسجيل الخروج؟'),
+          title: Text(AppStrings.of(context).t(strings.logoutTitle)),
+          content: Text(AppStrings.of(context).t(strings.logoutConfirm)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('إلغاء'),
+              child: Text(AppStrings.of(context).t(strings.cancel)),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text(
-                'تسجيل خروج',
-                style: TextStyle(color: Color(0xFF991B1B)),
+              child: Text(AppStrings.of(context).t(strings.logout),
+                style: const TextStyle(color: Color(0xFF991B1B)),
               ),
             ),
           ],
@@ -95,10 +96,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
-        return const LoadingWidget(message: 'جاري تحميل الملف الشخصي...');
+        return LoadingWidget(message: AppStrings.of(context).loadingProfile);
       case FeatureLoadStatus.error:
         return ErrorView(
-          message: state.errorMessage ?? 'حدث خطأ غير متوقع',
+          message: state.errorMessage ?? AppStrings.of(context).unexpectedError,
           onRetry: () => ref.read(profileControllerProvider.notifier).load(),
         );
       case FeatureLoadStatus.empty:
@@ -106,7 +107,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         final profile = state.profile;
         if (profile == null) {
           return ErrorView(
-            message: 'تعذر تحميل الملف الشخصي',
+            message: AppStrings.of(context).failedProfile,
             onRetry: _refresh,
           );
         }

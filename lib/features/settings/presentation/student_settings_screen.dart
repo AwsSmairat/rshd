@@ -9,6 +9,8 @@ import '../../../core/platform/platform_settings_controller.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme_controller.dart';
+import '../../../core/l10n/app_locale_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/preferences/app_display_preferences.dart';
 import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/loading_widget.dart';
@@ -67,21 +69,21 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
   }
 
   Future<void> _confirmLogout() async {
+    final strings = AppStrings.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('تسجيل الخروج'),
-        content: const Text('هل أنت متأكد أنك تريد تسجيل الخروج؟'),
+        title: Text(AppStrings.of(context).t(strings.logoutTitle)),
+        content: Text(AppStrings.of(context).t(strings.logoutConfirm)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('إلغاء'),
+            child: Text(AppStrings.of(context).t(strings.cancel)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'تسجيل خروج',
-              style: TextStyle(color: Color(0xFF991B1B)),
+            child: Text(AppStrings.of(context).t(strings.logout),
+              style: const TextStyle(color: Color(0xFF991B1B)),
             ),
           ),
         ],
@@ -133,15 +135,16 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
     required String title,
     required String message,
   }) {
+    final strings = AppStrings.of(context);
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
+        title: Text(AppStrings.of(context).t(title)),
+        content: Text(AppStrings.of(context).t(message)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('حسناً'),
+            child: Text(AppStrings.of(context).t(strings.ok)),
           ),
         ],
       ),
@@ -159,6 +162,7 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
       if (prefs != null &&
           (previousPrefs == null ||
               prefs.theme != previousPrefs.theme ||
+              prefs.language != previousPrefs.language ||
               prefs.fontSize != previousPrefs.fontSize ||
               prefs.autoPlayVideo != previousPrefs.autoPlayVideo ||
               prefs.saveWatchPosition != previousPrefs.saveWatchPosition ||
@@ -169,6 +173,11 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
           }
           if (prefs.theme != previousPrefs?.theme) {
             ref.read(appThemeControllerProvider.notifier).setTheme(prefs.theme);
+          }
+          if (prefs.language != previousPrefs?.language) {
+            ref
+                .read(appLocaleControllerProvider.notifier)
+                .setLocale(prefs.language);
           }
           ref
               .read(appDisplayPreferencesProvider.notifier)
@@ -191,14 +200,14 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
           next.actionMessage != previous?.actionMessage) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(next.actionMessage!)));
+        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(next.actionMessage!))));
       }
       if (next.errorMessage != null &&
           next.errorMessage != previous?.errorMessage &&
           next.status != FeatureLoadStatus.error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.errorMessage!),
+            content: Text(AppStrings.of(context).t(next.errorMessage!)),
             backgroundColor: const Color(0xFF991B1B),
           ),
         );
@@ -214,10 +223,10 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
-        return const LoadingWidget(message: 'جاري تحميل الإعدادات...');
+        return LoadingWidget(message: AppStrings.of(context).loadingSettings);
       case FeatureLoadStatus.error:
         return ErrorView(
-          message: state.errorMessage ?? 'تعذر تحميل الإعدادات',
+          message: state.errorMessage ?? AppStrings.of(context).failedSettings,
           onRetry: () =>
               ref.read(studentSettingsControllerProvider.notifier).load(),
         );
@@ -226,7 +235,7 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
         final settings = state.settings;
         if (settings == null) {
           return ErrorView(
-            message: 'تعذر تحميل الإعدادات',
+            message: AppStrings.of(context).failedSettings,
             onRetry: () =>
                 ref.read(studentSettingsControllerProvider.notifier).load(),
           );
@@ -284,21 +293,20 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
         );
       },
       onLogoutAllDevices: () async {
+        final strings = AppStrings.of(context);
         final ok = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('تسجيل الخروج من جميع الأجهزة'),
-            content: const Text(
-              'سيتم إنهاء جميع الجلسات الأخرى. هل تريد المتابعة؟',
-            ),
+            title: Text(AppStrings.of(context).t(strings.logoutAllTitle)),
+            content: Text(AppStrings.of(context).t(strings.logoutAllConfirm)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('إلغاء'),
+                child: Text(AppStrings.of(context).t(strings.cancel)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('متابعة'),
+                child: Text(AppStrings.of(context).t(strings.continueAction)),
               ),
             ],
           ),
@@ -320,6 +328,14 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
               return;
             }
             ref.read(appThemeControllerProvider.notifier).setTheme(value);
+          });
+        }
+        if (key == 'language' && value is String) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) {
+              return;
+            }
+            ref.read(appLocaleControllerProvider.notifier).setLocale(value);
           });
         }
         final display = ref.read(appDisplayPreferencesProvider.notifier);
@@ -360,12 +376,17 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
       onContact: () => context.push(AppRoutes.contactUs),
       onTerms: () => context.push(AppRoutes.termsAndConditions),
       onPrivacy: () => context.push(AppRoutes.privacyPolicy),
-      onAbout: () => _showInfoDialog(
-        context,
-        title: 'حول التطبيق',
-        message:
-            '${platformSettings?.platformName ?? 'RSHD'}\nالإصدار: ${_appVersion.isEmpty ? '—' : _appVersion}',
-      ),
+      onAbout: () {
+        final strings = AppStrings.of(context);
+        _showInfoDialog(
+          context,
+          title: strings.aboutAppTitle,
+          message: strings.aboutAppMessage(
+            platformSettings?.platformName ?? 'RSHD',
+            _appVersion.isEmpty ? '—' : _appVersion,
+          ),
+        );
+      },
     );
 
     final logout = SettingsLogoutButton(

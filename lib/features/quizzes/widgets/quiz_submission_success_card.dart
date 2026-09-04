@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class QuizSubmissionSuccessCard extends StatelessWidget {
   const QuizSubmissionSuccessCard({super.key, required this.quizTitle});
@@ -35,16 +36,14 @@ class QuizSubmissionSuccessCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          Text(
-            'تم تسليم الاختبار',
+          Text(AppStrings.of(context).t('تم تسليم الاختبار'),
             style: AppTextStyles.titleOf(
               context,
             ).copyWith(fontSize: 20, color: AppColors.of(context).primary),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
-          Text(
-            quizTitle,
+          Text(AppStrings.of(context).t(quizTitle),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(color: AppColors.of(context).textMuted),

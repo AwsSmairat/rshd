@@ -6,6 +6,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 import '../data/models/notification_model.dart';
 import 'notification_type_icon.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class NotificationCard extends StatelessWidget {
   const NotificationCard({
@@ -40,8 +41,7 @@ class NotificationCard extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        notification.title,
+                      child: Text(AppStrings.of(context).t(notification.title),
                         style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 16,
                           fontWeight: isUnread
@@ -63,8 +63,7 @@ class NotificationCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  notification.shortBody,
+                Text(AppStrings.of(context).t(notification.shortBody),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     color: AppColors.of(context).textMuted,
                     fontSize: 13,
@@ -76,21 +75,19 @@ class NotificationCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      notification.typeLabel,
+                      AppStrings.of(context).t(notification.typeLabel),
                       style: AppTextStyles.bodyOf(
                         context,
                       ).copyWith(fontSize: 12),
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      '•',
+                    Text(AppStrings.of(context).t('•'),
                       style: AppTextStyles.bodyOf(
                         context,
                       ).copyWith(color: AppColors.of(context).textMuted),
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      isUnread ? 'غير مقروء' : 'مقروء',
+                    Text(AppStrings.of(context).t(isUnread ? 'غير مقروء' : 'مقروء'),
                       style: AppTextStyles.bodyOf(context).copyWith(
                         fontSize: 12,
                         color: isUnread
@@ -101,8 +98,7 @@ class NotificationCard extends StatelessWidget {
                     if (notification.createdAt != null &&
                         notification.createdAt!.isNotEmpty) ...[
                       const Spacer(),
-                      Text(
-                        _formatDate(notification.createdAt!),
+                      Text(AppStrings.of(context).t(_formatDate(context, notification.createdAt!)),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 11,
                           color: AppColors.of(context).textMuted,
@@ -119,11 +115,11 @@ class NotificationCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(String raw) {
+  String _formatDate(BuildContext context, String raw) {
     final parsed = DateTime.tryParse(raw);
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd', 'ar').format(parsed.toLocal());
+    return DateFormat('yyyy/MM/dd', AppStrings.of(context).dateLocale).format(parsed.toLocal());
   }
 }

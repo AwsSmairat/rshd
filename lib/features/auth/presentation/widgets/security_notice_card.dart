@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/liquid_glass_surface.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class SecurityNoticeCard extends StatelessWidget {
   const SecurityNoticeCard({super.key});
@@ -34,8 +35,7 @@ class SecurityNoticeCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'بياناتك آمنة',
+                Text(AppStrings.of(context).t('بياناتك آمنة'),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -43,8 +43,7 @@ class SecurityNoticeCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 4),
-                Text(
-                  'نحن نلتزم بحماية بياناتك ولن نشاركها مع أي جهة خارجية',
+                Text(AppStrings.of(context).t('نحن نلتزم بحماية بياناتك ولن نشاركها مع أي جهة خارجية'),
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.5,

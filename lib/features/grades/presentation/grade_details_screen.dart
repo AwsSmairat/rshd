@@ -16,6 +16,7 @@ import '../data/models/grade_model.dart';
 import '../widgets/grade_type_badge.dart';
 import '../widgets/grades_state_views.dart';
 import 'grades_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class GradeDetailsScreen extends ConsumerStatefulWidget {
   const GradeDetailsScreen({
@@ -73,9 +74,9 @@ class _GradeDetailsScreenState extends ConsumerState<GradeDetailsScreen> {
       backgroundColor: Colors.transparent,
       body: CustomScrollView(
         slivers: [
-          const SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: SubjectsHeader(
-              title: 'تفاصيل الدرجة',
+              title: AppStrings.of(context).t('تفاصيل الدرجة'),
               backgroundIcon: Icons.grade_outlined,
             ),
           ),
@@ -110,7 +111,7 @@ class _GradeDetailsScreenState extends ConsumerState<GradeDetailsScreen> {
           return SliverFillRemaining(
             hasScrollBody: false,
             child: ErrorView(
-              message: 'الدرجة غير موجودة',
+              message: AppStrings.of(context).t('الدرجة غير موجودة'),
               onRetry: _loadDetails,
             ),
           );
@@ -122,7 +123,7 @@ class _GradeDetailsScreenState extends ConsumerState<GradeDetailsScreen> {
             children: [
               GradeTypeBadge(sourceType: grade.sourceType),
               const SizedBox(height: 16),
-              Text(grade.displayTitle, style: AppTextStyles.titleOf(context)),
+              Text(AppStrings.of(context).t(grade.displayTitle), style: AppTextStyles.titleOf(context)),
               const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.all(20),
@@ -132,15 +133,13 @@ class _GradeDetailsScreenState extends ConsumerState<GradeDetailsScreen> {
                 ),
                 child: Column(
                   children: [
-                    Text(
-                      'الدرجة',
+                    Text(AppStrings.of(context).t('الدرجة'),
                       style: AppTextStyles.bodyOf(
                         context,
                       ).copyWith(color: AppColors.of(context).textMuted),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      '${grade.grade}%',
+                    Text(AppStrings.of(context).t('${grade.grade}%'),
                       style: AppTextStyles.titleOf(context).copyWith(
                         fontSize: 32,
                         color: AppColors.of(context).primary,
@@ -150,18 +149,18 @@ class _GradeDetailsScreenState extends ConsumerState<GradeDetailsScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              _InfoRow(label: 'نوع الدرجة', value: grade.sourceTypeLabel),
-              _InfoRow(label: 'المادة', value: grade.subjectTitle ?? '—'),
+              _InfoRow(label: AppStrings.of(context).t('نوع الدرجة'), value: grade.sourceTypeLabel),
+              _InfoRow(label: AppStrings.of(context).t('المادة'), value: grade.subjectTitle ?? '—'),
               if (grade.createdAt != null && grade.createdAt!.isNotEmpty)
                 _InfoRow(
-                  label: 'التاريخ',
-                  value: _formatDate(grade.createdAt!),
+                  label: AppStrings.of(context).t('التاريخ'),
+                  value: _formatDate(context, grade.createdAt!),
                 ),
               if (grade.notes != null && grade.notes!.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                Text('الملاحظات', style: AppTextStyles.subtitleOf(context)),
+                Text(AppStrings.of(context).t('الملاحظات'), style: AppTextStyles.subtitleOf(context)),
                 const SizedBox(height: 8),
-                Text(grade.notes!, style: AppTextStyles.bodyOf(context)),
+                Text(AppStrings.of(context).t(grade.notes!), style: AppTextStyles.bodyOf(context)),
               ],
             ],
           ),
@@ -169,12 +168,12 @@ class _GradeDetailsScreenState extends ConsumerState<GradeDetailsScreen> {
     }
   }
 
-  String _formatDate(String raw) {
+  String _formatDate(BuildContext context, String raw) {
     final parsed = DateTime.tryParse(raw);
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd – HH:mm', 'ar').format(parsed.toLocal());
+    return DateFormat('yyyy/MM/dd – HH:mm', AppStrings.of(context).dateLocale).format(parsed.toLocal());
   }
 }
 
@@ -191,14 +190,13 @@ class _InfoRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
+          Text(AppStrings.of(context).t(label),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(color: AppColors.of(context).textMuted, fontSize: 13),
           ),
           const SizedBox(height: 4),
-          Text(value, style: AppTextStyles.bodyOf(context)),
+          Text(AppStrings.of(context).t(value), style: AppTextStyles.bodyOf(context)),
         ],
       ),
     );

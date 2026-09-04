@@ -14,6 +14,7 @@ import 'widgets/login_header.dart';
 import 'widgets/luxury_login_card.dart';
 import 'widgets/luxury_text_field.dart';
 import 'widgets/password_strength_indicator.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key, required this.email});
@@ -47,8 +48,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     if (!mounted) return;
     if (session == null || session.email != widget.email.trim().toLowerCase()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('انتهت جلسة الاستعادة. يرجى البدء من جديد.'),
+        SnackBar(
+          content: Text(AppStrings.of(context).t('انتهت جلسة الاستعادة. يرجى البدء من جديد.')),
         ),
       );
       context.go(AppRoutes.forgotPassword);
@@ -80,7 +81,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('تم تغيير كلمة المرور بنجاح')));
+    ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تم تغيير كلمة المرور بنجاح'))));
 
     context.go(
       '${AppRoutes.login}?email=${Uri.encodeComponent(widget.email.trim())}',
@@ -104,22 +105,20 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 Align(
                   alignment: AlignmentDirectional.centerStart,
                   child: IconButton(
-                    tooltip: 'رجوع',
+                    tooltip: AppStrings.of(context).t('رجوع'),
                     onPressed: () => context.pop(),
                     icon: const Icon(Icons.arrow_back_ios_new_rounded),
                     color: AppColors.of(context).primary,
                   ),
                 ),
-                Text(
-                  'كلمة مرور جديدة',
+                Text(AppStrings.of(context).t('كلمة مرور جديدة'),
                   style: AppTextStyles.titleOf(
                     context,
                   ).copyWith(color: AppColors.of(context).primary),
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: metrics.fieldSpacing * 0.5),
-                Text(
-                  'اختر كلمة مرور قوية لحسابك (8 أحرف على الأقل، حرف كبير، ورقم).',
+                Text(AppStrings.of(context).t('اختر كلمة مرور قوية لحسابك (8 أحرف على الأقل، حرف كبير، ورقم).'),
                   style: AppTextStyles.bodyOf(
                     context,
                   ).copyWith(color: AppColors.of(context).textMuted),
@@ -128,7 +127,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 SizedBox(height: metrics.sectionSpacing),
                 LuxuryTextField(
                   controller: _passwordController,
-                  label: 'كلمة المرور الجديدة',
+                  label: AppStrings.of(context).t('كلمة المرور الجديدة'),
                   obscureText: _obscurePassword,
                   textInputAction: TextInputAction.next,
                   errorText: state.fieldErrors['password'],
@@ -143,13 +142,13 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.length < 8) {
-                      return 'يجب أن تكون كلمة المرور 8 أحرف على الأقل';
+                      return AppStrings.of(context).t('يجب أن تكون كلمة المرور 8 أحرف على الأقل');
                     }
                     if (!RegExp(r'[A-Z]').hasMatch(value)) {
-                      return 'يجب أن تحتوي على حرف كبير واحد على الأقل';
+                      return AppStrings.of(context).t('يجب أن تحتوي على حرف كبير واحد على الأقل');
                     }
                     if (!RegExp(r'[0-9]').hasMatch(value)) {
-                      return 'يجب أن تحتوي على رقم واحد على الأقل';
+                      return AppStrings.of(context).t('يجب أن تحتوي على رقم واحد على الأقل');
                     }
                     return null;
                   },
@@ -159,7 +158,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 SizedBox(height: metrics.fieldSpacing),
                 LuxuryTextField(
                   controller: _confirmController,
-                  label: 'تأكيد كلمة المرور',
+                  label: AppStrings.of(context).t('تأكيد كلمة المرور'),
                   obscureText: _obscureConfirm,
                   textInputAction: TextInputAction.done,
                   errorText: state.fieldErrors['password_confirmation'],
@@ -172,22 +171,21 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   ),
                   validator: (value) {
                     if (value != _passwordController.text) {
-                      return 'كلمتا المرور غير متطابقتين';
+                      return AppStrings.of(context).t('كلمتا المرور غير متطابقتين');
                     }
                     return null;
                   },
                 ),
                 if (state.errorMessage != null) ...[
                   SizedBox(height: metrics.fieldSpacing),
-                  Text(
-                    state.errorMessage!,
+                  Text(AppStrings.of(context).t(state.errorMessage!),
                     style: AppTextStyles.errorOf(context),
                     textAlign: TextAlign.right,
                   ),
                 ],
                 SizedBox(height: metrics.sectionSpacing),
                 GoldGradientButton(
-                  label: 'تغيير كلمة المرور',
+                  label: AppStrings.of(context).t('تغيير كلمة المرور'),
                   isLoading: state.isLoading || _resetToken == null,
                   onPressed: state.isLoading || _resetToken == null
                       ? null

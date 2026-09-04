@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../models/annotation_enums.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class PdfEditorHeader extends StatelessWidget implements PreferredSizeWidget {
   const PdfEditorHeader({
@@ -43,7 +44,7 @@ class PdfEditorHeader extends StatelessWidget implements PreferredSizeWidget {
           child: Row(
             children: [
               IconButton(
-                tooltip: 'رجوع',
+                tooltip: AppStrings.of(context).t('رجوع'),
                 onPressed: onBack,
                 icon: const Icon(Icons.arrow_back_ios_new_rounded),
                 color: AppColors.of(context).primary,
@@ -53,8 +54,7 @@ class PdfEditorHeader extends StatelessWidget implements PreferredSizeWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      fileName,
+                    Text(AppStrings.of(context).t(fileName),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.subtitleOf(context).copyWith(
@@ -63,10 +63,9 @@ class PdfEditorHeader extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      totalPages > 0
+                    Text(AppStrings.of(context).t(totalPages > 0
                           ? 'الصفحة: $currentPage من $totalPages'
-                          : 'الصفحة: $currentPage',
+                          : 'الصفحة: $currentPage'),
                       style: AppTextStyles.captionOf(
                         context,
                       ).copyWith(color: AppColors.of(context).textMuted),
@@ -76,19 +75,19 @@ class PdfEditorHeader extends StatelessWidget implements PreferredSizeWidget {
               ),
               _SaveStatusChip(status: saveStatus, onRetry: onRetrySave),
               IconButton(
-                tooltip: 'بحث',
+                tooltip: AppStrings.of(context).t('بحث'),
                 onPressed: onSearch,
                 icon: const Icon(Icons.search_rounded),
                 color: AppColors.of(context).primary,
               ),
               IconButton(
-                tooltip: 'حفظ',
+                tooltip: AppStrings.of(context).t('حفظ'),
                 onPressed: saveStatus == PdfSaveStatus.saving ? null : onSave,
                 icon: const Icon(Icons.save_rounded),
                 color: AppColors.of(context).primary,
               ),
               IconButton(
-                tooltip: 'المزيد',
+                tooltip: AppStrings.of(context).t('المزيد'),
                 onPressed: onMore,
                 icon: const Icon(Icons.more_vert_rounded),
                 color: AppColors.of(context).primary,
@@ -151,8 +150,7 @@ class _SaveStatusChip extends StatelessWidget {
           children: [
             Icon(icon, size: 14, color: color),
             const SizedBox(width: 4),
-            Text(
-              label,
+            Text(AppStrings.of(context).t(label),
               style: AppTextStyles.captionOf(
                 context,
               ).copyWith(color: color, fontSize: 11),
@@ -236,7 +234,9 @@ class PdfEditorToolbar extends StatelessWidget {
         bottom: !isTabletLandscape,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: isTabletLandscape ? _buildTabletLayout() : _buildPhoneLayout(),
+          child: isTabletLandscape
+              ? _buildTabletLayout(context)
+              : _buildPhoneLayout(context),
         ),
       ),
     );
@@ -247,14 +247,16 @@ class PdfEditorToolbar extends StatelessWidget {
     return content;
   }
 
-  Widget _buildPhoneLayout() {
+  Widget _buildPhoneLayout(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           children: [
             IconButton(
-              tooltip: expanded ? 'طي الأدوات' : 'إظهار الأدوات',
+              tooltip: expanded
+                  ? AppStrings.of(context).t('طي الأدوات')
+                  : AppStrings.of(context).t('إظهار الأدوات'),
               onPressed: onToggleExpanded,
               icon: Icon(
                 expanded
@@ -270,7 +272,7 @@ class PdfEditorToolbar extends StatelessWidget {
                   children: _primaryTools
                       .map(
                         (item) => _ToolButton(
-                          label: item.$2,
+                          label: AppStrings.of(context).t(item.$2),
                           icon: item.$3,
                           selected: currentTool == item.$1,
                           onTap: () => onToolSelected(item.$1),
@@ -290,21 +292,21 @@ class PdfEditorToolbar extends StatelessWidget {
               children: [
                 ..._secondaryTools.map(
                   (item) => _ToolButton(
-                    label: item.$2,
+                    label: AppStrings.of(context).t(item.$2),
                     icon: item.$3,
                     selected: currentTool == item.$1,
                     onTap: () => onToolSelected(item.$1),
                   ),
                 ),
                 _ToolButton(
-                  label: 'تراجع',
+                  label: AppStrings.of(context).t('تراجع'),
                   icon: Icons.undo_rounded,
                   selected: false,
                   enabled: canUndo,
                   onTap: onUndo,
                 ),
                 _ToolButton(
-                  label: 'إعادة',
+                  label: AppStrings.of(context).t('إعادة'),
                   icon: Icons.redo_rounded,
                   selected: false,
                   enabled: canRedo,
@@ -317,13 +319,13 @@ class PdfEditorToolbar extends StatelessWidget {
     );
   }
 
-  Widget _buildTabletLayout() {
+  Widget _buildTabletLayout(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         ..._primaryTools.map(
           (item) => _ToolButton(
-            label: item.$2,
+            label: AppStrings.of(context).t(item.$2),
             icon: item.$3,
             selected: currentTool == item.$1,
             onTap: () => onToolSelected(item.$1),
@@ -333,21 +335,21 @@ class PdfEditorToolbar extends StatelessWidget {
           const Divider(height: 16),
           ..._secondaryTools.map(
             (item) => _ToolButton(
-              label: item.$2,
+              label: AppStrings.of(context).t(item.$2),
               icon: item.$3,
               selected: currentTool == item.$1,
               onTap: () => onToolSelected(item.$1),
             ),
           ),
           _ToolButton(
-            label: 'تراجع',
+            label: AppStrings.of(context).t('تراجع'),
             icon: Icons.undo_rounded,
             selected: false,
             enabled: canUndo,
             onTap: onUndo,
           ),
           _ToolButton(
-            label: 'إعادة',
+            label: AppStrings.of(context).t('إعادة'),
             icon: Icons.redo_rounded,
             selected: false,
             enabled: canRedo,
@@ -441,8 +443,7 @@ class _ToolButton extends StatelessWidget {
                 children: [
                   Icon(icon, size: 22, color: iconColor),
                   const SizedBox(height: 4),
-                  Text(
-                    label,
+                  Text(AppStrings.of(context).t(label),
                     style: AppTextStyles.captionOf(context).copyWith(
                       fontSize: 10,
                       color: labelColor,

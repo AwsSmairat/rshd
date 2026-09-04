@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -151,7 +152,7 @@ class OnboardingLearningPage extends StatelessWidget {
                 alignment: AlignmentDirectional.centerStart,
                 child: Semantics(
                   button: true,
-                  label: 'تخطي صفحات التعريف',
+                  label: AppStrings.of(context).t('تخطي صفحات التعريف'),
                   child: TextButton(
                     onPressed: onSkip,
                     style: TextButton.styleFrom(
@@ -162,7 +163,7 @@ class OnboardingLearningPage extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    child: const Text('تخطي'),
+                    child: Text(AppStrings.of(context).t('تخطي')),
                   ),
                 ),
               ),
@@ -178,8 +179,7 @@ class OnboardingLearningPage extends StatelessWidget {
               const SizedBox(height: 2),
               Directionality(
                 textDirection: TextDirection.ltr,
-                child: Text(
-                  'LEARN | ACHIEVE | GROW',
+                child: Text(AppStrings.of(context).t('LEARN | ACHIEVE | GROW'),
                   maxLines: 1,
                   style: TextStyle(
                     color: AppColors.of(context).darkGold,
@@ -190,8 +190,7 @@ class OnboardingLearningPage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: compact ? 8 : 14),
-              Text(
-                'تعلّم بطريقة أذكى',
+              Text(AppStrings.of(context).t('تعلّم بطريقة أذكى'),
                 textAlign: TextAlign.center,
                 textDirection: TextDirection.rtl,
                 style: TextStyle(
@@ -202,8 +201,7 @@ class OnboardingLearningPage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: compact ? 4 : 7),
-              Text(
-                'دروسك، ملفاتك ومتابعة تقدّمك في مكان واحد.',
+              Text(AppStrings.of(context).t('دروسك، ملفاتك ومتابعة تقدّمك في مكان واحد.'),
                 textAlign: TextAlign.center,
                 textDirection: TextDirection.rtl,
                 style: TextStyle(
@@ -218,7 +216,7 @@ class OnboardingLearningPage extends StatelessWidget {
                 child: Semantics(
                   image: true,
                   label:
-                      'طالب يتعلّم باستخدام جهاز لوحي أمام منصة رشد التعليمية',
+                      AppStrings.of(context).t('طالب يتعلّم باستخدام جهاز لوحي أمام منصة رشد التعليمية'),
                   child: _LearningIllustration(
                     asset: illustrationAsset,
                     availableWidth: media.size.width,
@@ -230,7 +228,7 @@ class OnboardingLearningPage extends StatelessWidget {
               SizedBox(height: compact ? 11 : 18),
               Semantics(
                 button: true,
-                label: 'الانتقال إلى صفحة التعريف التالية',
+                label: AppStrings.of(context).t('الانتقال إلى صفحة التعريف التالية'),
                 child: SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -258,7 +256,7 @@ class OnboardingLearningPage extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      child: const Text('التالي'),
+                      child: Text(AppStrings.of(context).t('التالي')),
                     ),
                   ),
                 ),
@@ -307,7 +305,7 @@ class OnboardingStudyToolsPage extends StatelessWidget {
               alignment: AlignmentDirectional.centerStart,
               child: Semantics(
                 button: true,
-                label: 'تخطي المقدمة',
+                label: AppStrings.of(context).t('تخطي المقدمة'),
                 child: TextButton(
                   onPressed: onSkip,
                   style: TextButton.styleFrom(
@@ -318,7 +316,7 @@ class OnboardingStudyToolsPage extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  child: const Text('تخطي'),
+                  child: Text(AppStrings.of(context).t('تخطي')),
                 ),
               ),
             ),
@@ -334,8 +332,7 @@ class OnboardingStudyToolsPage extends StatelessWidget {
             const SizedBox(height: 2),
             Directionality(
               textDirection: TextDirection.ltr,
-              child: Text(
-                'LEARN | ACHIEVE | GROW',
+              child: Text(AppStrings.of(context).t('LEARN | ACHIEVE | GROW'),
                 maxLines: 1,
                 style: TextStyle(
                   color: AppColors.of(context).darkGold,
@@ -346,8 +343,7 @@ class OnboardingStudyToolsPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: compact ? 8 : 14),
-            Text(
-              'كل أدواتك للدراسة… بمكان واحد',
+            Text(AppStrings.of(context).t('كل أدواتك للدراسة… بمكان واحد'),
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
               style: TextStyle(
@@ -358,8 +354,7 @@ class OnboardingStudyToolsPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: compact ? 4 : 7),
-            Text(
-              'شاهد، اقرأ، ظلّل ودوّن ملاحظاتك، وكمّل تعلّمك بالطريقة اللي تناسبك.',
+            Text(AppStrings.of(context).t('شاهد، اقرأ، ظلّل ودوّن ملاحظاتك، وكمّل تعلّمك بالطريقة اللي تناسبك.'),
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
               style: TextStyle(
@@ -379,7 +374,7 @@ class OnboardingStudyToolsPage extends StatelessWidget {
                 child: Semantics(
                   image: true,
                   label:
-                      'طالب يستخدم أدوات RSHD للدراسة ومشاهدة الدروس وتدوين الملاحظات',
+                      AppStrings.of(context).t('طالب يستخدم أدوات RSHD للدراسة ومشاهدة الدروس وتدوين الملاحظات'),
                   child: _StudyToolsIllustration(
                     asset: illustrationAsset,
                     availableWidth: media.size.width,
@@ -390,7 +385,7 @@ class OnboardingStudyToolsPage extends StatelessWidget {
                 child: Semantics(
                   image: true,
                   label:
-                      'طالب يستخدم أدوات RSHD للدراسة ومشاهدة الدروس وتدوين الملاحظات',
+                      AppStrings.of(context).t('طالب يستخدم أدوات RSHD للدراسة ومشاهدة الدروس وتدوين الملاحظات'),
                   child: _StudyToolsIllustration(
                     asset: illustrationAsset,
                     availableWidth: media.size.width,
@@ -422,7 +417,7 @@ class OnboardingStudyToolsPage extends StatelessWidget {
               SizedBox(height: compact ? 11 : 18),
               Semantics(
                 button: true,
-                label: 'الانتقال إلى صفحة التعريف التالية',
+                label: AppStrings.of(context).t('الانتقال إلى صفحة التعريف التالية'),
                 child: SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -450,7 +445,7 @@ class OnboardingStudyToolsPage extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      child: const Text('التالي'),
+                      child: Text(AppStrings.of(context).t('التالي')),
                     ),
                   ),
                 ),
@@ -544,25 +539,25 @@ class _LearningIllustration extends StatelessWidget {
                   ),
                 ),
                 _IllustrationBadgeLabel(
-                  text: 'محاضرات',
+                  text: AppStrings.of(context).t('محاضرات'),
                   left: 0,
                   top: 139 * scale,
                   width: 180 * scale,
                 ),
                 _IllustrationBadgeLabel(
-                  text: 'ملفات تعليمية',
+                  text: AppStrings.of(context).t('ملفات تعليمية'),
                   left: 0,
                   top: 319 * scale,
                   width: 190 * scale,
                 ),
                 _IllustrationBadgeLabel(
-                  text: 'واجبات',
+                  text: AppStrings.of(context).t('واجبات'),
                   left: 697 * scale,
                   top: 205 * scale,
                   width: 180 * scale,
                 ),
                 _IllustrationBadgeLabel(
-                  text: 'اختبارات\nودرجات',
+                  text: AppStrings.of(context).t('اختبارات\nودرجات'),
                   left: 697 * scale,
                   top: 405 * scale,
                   width: 180 * scale,
@@ -595,8 +590,7 @@ class _IllustrationBadgeLabel extends StatelessWidget {
       left: left,
       top: top,
       width: width,
-      child: Text(
-        text,
+      child: Text(AppStrings.of(context).t(text),
         maxLines: 2,
         textAlign: TextAlign.center,
         textDirection: TextDirection.rtl,
@@ -624,7 +618,7 @@ class OnboardingPageIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: 'صفحة ${currentPage + 1} من $pageCount',
+      label: AppStrings.of(context).t('صفحة ${currentPage + 1} من $pageCount'),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         textDirection: TextDirection.ltr,
@@ -691,7 +685,7 @@ class OnboardingProgressPage extends StatelessWidget {
               alignment: AlignmentDirectional.centerStart,
               child: Semantics(
                 button: true,
-                label: 'تخطي المقدمة',
+                label: AppStrings.of(context).t('تخطي المقدمة'),
                 child: TextButton(
                   onPressed: onSkip,
                   style: TextButton.styleFrom(
@@ -702,7 +696,7 @@ class OnboardingProgressPage extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  child: const Text('تخطي'),
+                  child: Text(AppStrings.of(context).t('تخطي')),
                 ),
               ),
             ),
@@ -718,8 +712,7 @@ class OnboardingProgressPage extends StatelessWidget {
             const SizedBox(height: 2),
             Directionality(
               textDirection: TextDirection.ltr,
-              child: Text(
-                'LEARN | ACHIEVE | GROW',
+              child: Text(AppStrings.of(context).t('LEARN | ACHIEVE | GROW'),
                 maxLines: 1,
                 style: TextStyle(
                   color: AppColors.of(context).darkGold,
@@ -730,8 +723,7 @@ class OnboardingProgressPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: compact ? 8 : 14),
-            Text(
-              'تقدّمك قدامك… وهدفك أقرب',
+            Text(AppStrings.of(context).t('تقدّمك قدامك… وهدفك أقرب'),
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
               style: TextStyle(
@@ -742,8 +734,7 @@ class OnboardingProgressPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: compact ? 4 : 7),
-            Text(
-              'تابع إنجازك، اختباراتك ودرجاتك، وخليك دائمًا عارف وين وصلت.',
+            Text(AppStrings.of(context).t('تابع إنجازك، اختباراتك ودرجاتك، وخليك دائمًا عارف وين وصلت.'),
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
               style: TextStyle(
@@ -762,7 +753,7 @@ class OnboardingProgressPage extends StatelessWidget {
                 height: illustrationHeight,
                 child: Semantics(
                   image: true,
-                  label: 'طالب يتابع تقدمه الدراسي وإنجازاته في RSHD',
+                  label: AppStrings.of(context).t('طالب يتابع تقدمه الدراسي وإنجازاته في RSHD'),
                   child: _ProgressIllustration(
                     asset: illustrationAsset,
                     availableWidth: media.size.width,
@@ -772,7 +763,7 @@ class OnboardingProgressPage extends StatelessWidget {
             : Expanded(
                 child: Semantics(
                   image: true,
-                  label: 'طالب يتابع تقدمه الدراسي وإنجازاته في RSHD',
+                  label: AppStrings.of(context).t('طالب يتابع تقدمه الدراسي وإنجازاته في RSHD'),
                   child: _ProgressIllustration(
                     asset: illustrationAsset,
                     availableWidth: media.size.width,
@@ -804,7 +795,7 @@ class OnboardingProgressPage extends StatelessWidget {
               SizedBox(height: compact ? 11 : 16),
               Semantics(
                 button: true,
-                label: 'ابدأ الآن',
+                label: AppStrings.of(context).t('ابدأ الآن'),
                 child: SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -832,7 +823,7 @@ class OnboardingProgressPage extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      child: const Text('ابدأ الآن'),
+                      child: Text(AppStrings.of(context).t('ابدأ الآن')),
                     ),
                   ),
                 ),
@@ -840,7 +831,7 @@ class OnboardingProgressPage extends StatelessWidget {
               SizedBox(height: compact ? 6 : 10),
               Semantics(
                 button: true,
-                label: 'تسجيل الدخول',
+                label: AppStrings.of(context).t('تسجيل الدخول'),
                 child: TextButton(
                   onPressed: onLogin,
                   style: TextButton.styleFrom(
@@ -852,8 +843,7 @@ class OnboardingProgressPage extends StatelessWidget {
                     alignment: WrapAlignment.center,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Text(
-                        'لديك حساب؟ ',
+                      Text(AppStrings.of(context).t('لديك حساب؟ '),
                         style: TextStyle(
                           fontSize: compact ? 14 : 15,
                           color: AppColors.of(
@@ -861,8 +851,7 @@ class OnboardingProgressPage extends StatelessWidget {
                           ).textMuted.withValues(alpha: 0.95),
                         ),
                       ),
-                      Text(
-                        'تسجيل الدخول',
+                      Text(AppStrings.of(context).t('تسجيل الدخول'),
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,

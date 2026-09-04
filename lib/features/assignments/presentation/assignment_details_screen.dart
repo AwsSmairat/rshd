@@ -16,6 +16,7 @@ import '../widgets/assignments_state_views.dart';
 import '../widgets/luxury_assignment_header.dart';
 import '../widgets/submitted_file_card.dart';
 import 'assignments_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class AssignmentDetailsScreen extends ConsumerStatefulWidget {
   const AssignmentDetailsScreen({super.key, required this.assignmentId});
@@ -81,8 +82,8 @@ class _AssignmentDetailsScreenState
       backgroundColor: Colors.transparent,
       body: CustomScrollView(
         slivers: [
-          const SliverToBoxAdapter(
-            child: LuxuryAssignmentHeader(title: 'تفاصيل الواجب'),
+          SliverToBoxAdapter(
+            child: LuxuryAssignmentHeader(title: AppStrings.of(context).t('تفاصيل الواجب')),
           ),
           ResponsiveSliverContent(
             padding: AppLayoutMetrics.of(
@@ -120,7 +121,7 @@ class _AssignmentDetailsScreenState
             hasScrollBody: false,
             child: Center(
               child: AssignmentsErrorState(
-                message: 'الواجب غير موجود',
+                message: AppStrings.of(context).t('الواجب غير موجود'),
                 onRetry: _loadDetails,
               ),
             ),
@@ -137,7 +138,7 @@ class _AssignmentDetailsScreenState
               const SizedBox(height: 16),
               if (assignment.hasAttachment) ...[
                 AssignmentDownloadFileCard(
-                  title: 'ملف الواجب',
+                  title: AppStrings.of(context).t('ملف الواجب'),
                   fileUrl: assignment.resolvedAttachmentUrl!,
                   fileName: assignment.originalFileName,
                   fileSize: assignment.fileSize,
@@ -149,10 +150,9 @@ class _AssignmentDetailsScreenState
               if (assignment.description != null &&
                   assignment.description!.isNotEmpty) ...[
                 AssignmentSectionCard(
-                  title: 'الوصف',
+                  title: AppStrings.of(context).t('الوصف'),
                   icon: Icons.description_outlined,
-                  child: Text(
-                    assignment.description!,
+                  child: Text(AppStrings.of(context).t(assignment.description!),
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.5,
@@ -170,13 +170,13 @@ class _AssignmentDetailsScreenState
                 SubmittedFileCard(submission: submission),
                 const SizedBox(height: 24),
                 AssignmentActionButton(
-                  label: 'تعديل التسليم',
+                  label: AppStrings.of(context).t('تعديل التسليم'),
                   icon: Icons.refresh_rounded,
                   onPressed: _openSubmitScreen,
                 ),
                 const SizedBox(height: 12),
                 AssignmentActionButton(
-                  label: 'العودة إلى الواجبات',
+                  label: AppStrings.of(context).t('العودة إلى الواجبات'),
                   icon: Icons.list_alt_outlined,
                   isPrimary: false,
                   onPressed: () => context.go(AppRoutes.assignments),
@@ -184,7 +184,7 @@ class _AssignmentDetailsScreenState
               ] else ...[
                 const SizedBox(height: 24),
                 AssignmentActionButton(
-                  label: 'تسليم الواجب',
+                  label: AppStrings.of(context).t('تسليم الواجب'),
                   icon: Icons.upload_file_outlined,
                   onPressed: _openSubmitScreen,
                 ),

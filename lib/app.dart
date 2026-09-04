@@ -7,6 +7,8 @@ import 'core/router/app_router.dart';
 import 'core/startup/startup_coordinator.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_theme_controller.dart';
+import 'core/l10n/app_locale_controller.dart';
+import 'core/l10n/app_strings.dart';
 import 'core/preferences/app_display_preferences.dart';
 import 'core/widgets/liquid_glass_background.dart';
 import 'features/subjects/widgets/floating_video_overlay.dart';
@@ -34,7 +36,11 @@ class _RshdAppState extends ConsumerState<RshdApp> {
   Widget build(BuildContext context) {
     final router = ref.watch(appRouterProvider);
     final themePreference = ref.watch(appThemeControllerProvider);
+    final localePreference = ref.watch(appLocaleControllerProvider);
     final displayPreferences = ref.watch(appDisplayPreferencesProvider);
+    final locale = localeFromPreference(localePreference);
+    final textDirection = textDirectionFromPreference(localePreference);
+    final strings = AppStrings(localePreference);
 
     return MaterialApp.router(
       title: 'RSHD',
@@ -42,7 +48,7 @@ class _RshdAppState extends ConsumerState<RshdApp> {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: themeModeFromPreference(themePreference),
-      locale: const Locale('ar'),
+      locale: locale,
       supportedLocales: const [Locale('ar'), Locale('en')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -59,14 +65,17 @@ class _RshdAppState extends ConsumerState<RshdApp> {
             ),
           ),
           child: Directionality(
-            textDirection: TextDirection.rtl,
-            child: LiquidGlassBackground(
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  child ?? const SizedBox.shrink(),
-                  const FloatingVideoOverlay(),
-                ],
+            textDirection: textDirection,
+            child: AppStringsScope(
+              strings: strings,
+              child: LiquidGlassBackground(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    child ?? const SizedBox.shrink(),
+                    const FloatingVideoOverlay(),
+                  ],
+                ),
               ),
             ),
           ),

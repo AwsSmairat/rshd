@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../auth/presentation/widgets/login_header.dart';
 import '../../../core/widgets/responsive_content.dart';
 import 'quiz_icon_helper.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class QuizzesHeader extends StatelessWidget {
   const QuizzesHeader({super.key});
@@ -88,8 +89,7 @@ class QuizzesHeader extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Text(
-                      'الاختبارات',
+                    Text(AppStrings.of(context).t('الاختبارات'),
                       style: TextStyle(
                         fontSize: metrics.pageHeaderTitleFontSize,
                         fontWeight: FontWeight.w700,

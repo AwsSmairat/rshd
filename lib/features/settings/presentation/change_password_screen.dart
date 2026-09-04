@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_button.dart';
 import 'student_settings_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class ChangePasswordScreen extends ConsumerStatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -102,7 +103,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
           next.errorMessage != previous?.errorMessage) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.errorMessage!),
+            content: Text(AppStrings.of(context).t(next.errorMessage!)),
             backgroundColor: const Color(0xFF991B1B),
           ),
         );
@@ -110,20 +111,20 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('تغيير كلمة المرور')),
+      appBar: AppBar(title: Text(AppStrings.of(context).t('تغيير كلمة المرور'))),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           _passwordField(
             controller: _currentController,
-            label: 'كلمة المرور الحالية',
+            label: AppStrings.of(context).t('كلمة المرور الحالية'),
             obscure: _obscureCurrent,
             toggle: () => setState(() => _obscureCurrent = !_obscureCurrent),
           ),
           const SizedBox(height: 16),
           _passwordField(
             controller: _passwordController,
-            label: 'كلمة المرور الجديدة',
+            label: AppStrings.of(context).t('كلمة المرور الجديدة'),
             obscure: _obscureNew,
             toggle: () => setState(() => _obscureNew = !_obscureNew),
             onChanged: () => setState(() {}),
@@ -140,11 +141,11 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
             backgroundColor: AppColors.of(context).background,
           ),
           const SizedBox(height: 8),
-          const Text('يجب أن تكون 8 أحرف على الأقل.'),
+          Text(AppStrings.of(context).t('يجب أن تكون 8 أحرف على الأقل.')),
           const SizedBox(height: 16),
           _passwordField(
             controller: _confirmController,
-            label: 'تأكيد كلمة المرور',
+            label: AppStrings.of(context).t('تأكيد كلمة المرور'),
             obscure: _obscureConfirm,
             toggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
             onChanged: () => setState(() {}),

@@ -16,6 +16,7 @@ import '../../subjects/widgets/subjects_header.dart';
 import '../data/models/announcement_model.dart';
 import '../widgets/announcement_type_badge.dart';
 import 'announcements_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class AnnouncementDetailsScreen extends ConsumerStatefulWidget {
   const AnnouncementDetailsScreen({
@@ -87,15 +88,15 @@ class _AnnouncementDetailsScreenState
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
         return Column(
-          children: const [
-            SubjectsHeader(title: 'تفاصيل الإعلان'),
-            Expanded(child: LoadingWidget(message: 'جاري تحميل الإعلان...')),
+          children: [
+            SubjectsHeader(title: AppStrings.of(context).t('تفاصيل الإعلان')),
+            Expanded(child: LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الإعلان...'))),
           ],
         );
       case FeatureLoadStatus.error:
         return Column(
           children: [
-            const SubjectsHeader(title: 'تفاصيل الإعلان'),
+            SubjectsHeader(title: AppStrings.of(context).t('تفاصيل الإعلان')),
             Expanded(
               child: ErrorView(
                 message: state.errorMessage ?? 'تعذر تحميل الإعلان',
@@ -110,10 +111,10 @@ class _AnnouncementDetailsScreenState
         if (announcement == null) {
           return Column(
             children: [
-              const SubjectsHeader(title: 'تفاصيل الإعلان'),
+              SubjectsHeader(title: AppStrings.of(context).t('تفاصيل الإعلان')),
               Expanded(
                 child: ErrorView(
-                  message: 'الإعلان غير موجود',
+                  message: AppStrings.of(context).t('الإعلان غير موجود'),
                   onRetry: _loadDetails,
                 ),
               ),
@@ -123,8 +124,8 @@ class _AnnouncementDetailsScreenState
 
         return CustomScrollView(
           slivers: [
-            const SliverToBoxAdapter(
-              child: SubjectsHeader(title: 'تفاصيل الإعلان'),
+            SliverToBoxAdapter(
+              child: SubjectsHeader(title: AppStrings.of(context).t('تفاصيل الإعلان')),
             ),
             ResponsiveSliverContent(
               padding: AppLayoutMetrics.of(
@@ -181,8 +182,7 @@ class _AnnouncementDetailsScreenState
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              announcement.title,
+                            child: Text(AppStrings.of(context).t(announcement.title),
                               style: AppTextStyles.titleOf(context).copyWith(
                                 fontSize: 22,
                                 color: AppColors.of(context).primary,
@@ -193,30 +193,28 @@ class _AnnouncementDetailsScreenState
                         ],
                       ),
                       const SizedBox(height: 16),
-                      _InfoRow(label: 'النوع', value: announcement.typeLabel),
+                      _InfoRow(label: AppStrings.of(context).t('النوع'), value: AppStrings.of(context).t(announcement.typeLabel)),
                       if (announcement.subjectTitle != null &&
                           announcement.subjectTitle!.isNotEmpty)
                         _InfoRow(
-                          label: 'المادة',
+                          label: AppStrings.of(context).t('المادة'),
                           value: announcement.subjectTitle!,
                         ),
                       if (announcement.createdAt != null &&
                           announcement.createdAt!.isNotEmpty)
                         _InfoRow(
-                          label: 'التاريخ',
-                          value: _formatDate(announcement.createdAt!),
+                          label: AppStrings.of(context).t('التاريخ'),
+                          value: _formatDate(context, announcement.createdAt!),
                         ),
                       const SizedBox(height: 8),
-                      Text(
-                        'نص الإعلان',
+                      Text(AppStrings.of(context).t('نص الإعلان'),
                         style: AppTextStyles.subtitleOf(context).copyWith(
                           fontWeight: FontWeight.w700,
                           color: AppColors.of(context).primary,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        announcement.body ?? '—',
+                      Text(AppStrings.of(context).t(announcement.body ?? '—'),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           height: 1.6,
                           color: AppColors.of(context).text,
@@ -232,12 +230,12 @@ class _AnnouncementDetailsScreenState
     }
   }
 
-  String _formatDate(String raw) {
+  String _formatDate(BuildContext context, String raw) {
     final parsed = DateTime.tryParse(raw);
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd – HH:mm', 'ar').format(parsed.toLocal());
+    return DateFormat('yyyy/MM/dd – HH:mm', AppStrings.of(context).dateLocale).format(parsed.toLocal());
   }
 }
 
@@ -254,14 +252,13 @@ class _InfoRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
+          Text(AppStrings.of(context).t(label),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(color: AppColors.of(context).textMuted, fontSize: 13),
           ),
           const SizedBox(height: 4),
-          Text(value, style: AppTextStyles.bodyOf(context)),
+          Text(AppStrings.of(context).t(value), style: AppTextStyles.bodyOf(context)),
         ],
       ),
     );

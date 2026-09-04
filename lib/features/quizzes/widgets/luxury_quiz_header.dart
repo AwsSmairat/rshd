@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/presentation/widgets/login_header.dart';
 import 'quiz_icon_helper.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class LuxuryQuizHeader extends StatelessWidget {
   const LuxuryQuizHeader({
@@ -88,8 +89,7 @@ class LuxuryQuizHeader extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Text(
-                      title,
+                    Text(AppStrings.of(context).t(title),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,

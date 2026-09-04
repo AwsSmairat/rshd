@@ -14,6 +14,7 @@ import 'widgets/login_header.dart';
 import 'widgets/luxury_login_card.dart';
 import 'widgets/login_remember_row.dart';
 import 'widgets/luxury_text_field.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key, this.initialEmail});
@@ -155,8 +156,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ).error.withValues(alpha: 0.2),
                       ),
                     ),
-                    child: Text(
-                      authState.errorMessage!,
+                    child: Text(AppStrings.of(context).t(authState.errorMessage!),
                       style: AppTextStyles.errorOf(
                         context,
                       ).copyWith(fontSize: metrics.isTablet ? 14 : null),
@@ -167,7 +167,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ],
                 LuxuryTextField(
                   controller: _emailController,
-                  label: 'البريد الإلكتروني',
+                  label: AppStrings.of(context).t('البريد الإلكتروني'),
                   hintText: 'example@domain.com',
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
@@ -175,10 +175,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   errorText: fieldErrors['email'],
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'البريد الإلكتروني مطلوب';
+                      return AppStrings.of(context).t('البريد الإلكتروني مطلوب');
                     }
                     if (!value.contains('@')) {
-                      return 'أدخل بريداً إلكترونياً صالحاً';
+                      return AppStrings.of(context).t('أدخل بريداً إلكترونياً صالحاً');
                     }
                     return null;
                   },
@@ -186,7 +186,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 SizedBox(height: metrics.fieldSpacing),
                 LuxuryTextField(
                   controller: _passwordController,
-                  label: 'كلمة المرور',
+                  label: AppStrings.of(context).t('كلمة المرور'),
                   hintText: '••••••••',
                   obscureText: _obscurePassword,
                   textInputAction: TextInputAction.done,
@@ -208,7 +208,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   errorText: fieldErrors['password'],
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'كلمة المرور مطلوبة';
+                      return AppStrings.of(context).t('كلمة المرور مطلوبة');
                     }
                     return null;
                   },
@@ -226,7 +226,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 SizedBox(height: metrics.isTablet ? 22 : 18),
                 GoldGradientButton(
-                  label: 'دخول',
+                  label: AppStrings.of(context).t('دخول'),
                   icon: Icons.arrow_back,
                   isLoading: authState.status == AuthStatus.loading,
                   onPressed: _submit,
@@ -236,8 +236,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   alignment: WrapAlignment.center,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Text(
-                      'ليس لديك حساب؟ ',
+                    Text(AppStrings.of(context).t('ليس لديك حساب؟ '),
                       style: TextStyle(
                         fontSize: metrics.isTablet ? 14 : 13,
                         color: AppColors.of(
@@ -247,8 +246,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     GestureDetector(
                       onTap: () => context.push(AppRoutes.register),
-                      child: Text(
-                        'إنشاء حساب جديد',
+                      child: Text(AppStrings.of(context).t('إنشاء حساب جديد'),
                         style: TextStyle(
                           fontSize: metrics.isTablet ? 14 : 13,
                           fontWeight: FontWeight.w700,

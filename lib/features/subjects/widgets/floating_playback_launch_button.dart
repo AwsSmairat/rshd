@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/l10n/app_strings.dart';
 
 /// Full-width action under the player.
 class FloatingPlaybackLaunchBar extends StatelessWidget {
@@ -18,7 +19,7 @@ class FloatingPlaybackLaunchBar extends StatelessWidget {
       child: FilledButton.icon(
         onPressed: onPressed,
         icon: const Icon(Icons.picture_in_picture_alt_rounded, size: 20),
-        label: const Text('تشغيل عائم داخل التطبيق'),
+        label: Text(AppStrings.of(context).t('تشغيل عائم داخل التطبيق')),
         style: FilledButton.styleFrom(
           backgroundColor: colors.accent,
           foregroundColor: colors.primary,

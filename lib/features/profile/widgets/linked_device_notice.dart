@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
@@ -28,8 +29,7 @@ class LinkedDeviceNotice extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              'حسابك مرتبط بهذا الجهاز لحماية المحتوى التعليمي.',
+            child: Text(AppStrings.of(context).t(AppStrings.of(context).linkedDeviceNotice),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 13,
                 height: 1.45,

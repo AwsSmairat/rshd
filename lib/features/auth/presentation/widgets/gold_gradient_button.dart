@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class GoldGradientButton extends StatelessWidget {
   const GoldGradientButton({
@@ -59,8 +60,7 @@ class GoldGradientButton extends StatelessWidget {
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        label,
+                      Text(AppStrings.of(context).t(label),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,

@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/security/safe_external_url.dart';
 import 'data/contact_channels.dart';
+import '../../core/l10n/app_strings.dart';
 
 /// Opens RSHD contact channels via platform handlers.
 class ContactLauncher {
@@ -163,6 +164,6 @@ class ContactLauncher {
   void _showError(BuildContext context, [String? message]) {
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text(message ?? launchFailedMessage)));
+    ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(message ?? launchFailedMessage))));
   }
 }

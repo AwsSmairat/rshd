@@ -11,6 +11,7 @@ import '../widgets/quiz_score_helper.dart';
 import '../widgets/quiz_submission_success_card.dart';
 import '../widgets/quiz_stats_grid.dart';
 import '../widgets/result_action_buttons.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class QuizResultScreen extends StatelessWidget {
   const QuizResultScreen({
@@ -38,8 +39,8 @@ class QuizResultScreen extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SubjectsHeader(
-            title: 'نتيجة الاختبار',
+          SubjectsHeader(
+            title: AppStrings.of(context).t('نتيجة الاختبار'),
             backgroundIcon: Icons.emoji_events_outlined,
           ),
           Expanded(
@@ -57,7 +58,7 @@ class QuizResultScreen extends StatelessWidget {
                         const SizedBox(height: 16),
                         QuizResultSummaryCard(
                           score: parsedScore,
-                          title: 'نتيجتك',
+                          title: AppStrings.of(context).t('نتيجتك'),
                         ),
                         const SizedBox(height: 16),
                         QuizStatsGrid(
@@ -69,9 +70,9 @@ class QuizResultScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
                         ResultActionButtons(
-                          primaryLabel: 'العودة للاختبارات',
+                          primaryLabel: AppStrings.of(context).t('العودة للاختبارات'),
                           onPrimary: () => context.go(AppRoutes.quizzes),
-                          secondaryLabel: 'بدء الاختبار مرة أخرى',
+                          secondaryLabel: AppStrings.of(context).t('بدء الاختبار مرة أخرى'),
                           onSecondary: () =>
                               context.push(AppRoutes.quizAttempt(quizId)),
                           tertiaryLabel: 'الصفحة الرئيسية',

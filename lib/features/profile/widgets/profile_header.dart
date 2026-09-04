@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -61,7 +62,7 @@ class ProfileHeader extends StatelessWidget {
               top: topInset + 4,
               left: 4,
               child: IconButton(
-                tooltip: 'رجوع',
+                tooltip: AppStrings.of(context).back,
                 onPressed: onBack,
                 style: IconButton.styleFrom(
                   backgroundColor: Colors.white.withValues(alpha: 0.08),
@@ -82,8 +83,7 @@ class ProfileHeader extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Text(
-                    'الملف الشخصي',
+                  Text(AppStrings.of(context).t(AppStrings.of(context).profileTooltip),
                     style: AppTextStyles.subtitleOf(context).copyWith(
                       fontSize: metrics.pageHeaderTitleFontSize,
                       fontWeight: FontWeight.w700,
@@ -117,8 +117,7 @@ class ProfileHeader extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              name,
+                            Text(AppStrings.of(context).t(name),
                               style: AppTextStyles.titleOf(context).copyWith(
                                 fontSize: metrics.isTablet ? 24 : 22,
                                 color: AppColors.of(context).white,
@@ -149,8 +148,7 @@ class ProfileHeader extends StatelessWidget {
                                     ).white.withValues(alpha: 0.95),
                                   ),
                                   const SizedBox(width: 4),
-                                  Text(
-                                    'طالب',
+                                  Text(AppStrings.of(context).t(AppStrings.of(context).studentRole),
                                     style: AppTextStyles.bodyOf(context)
                                         .copyWith(
                                           fontSize: 12,

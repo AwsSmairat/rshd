@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../data/terms_and_conditions_model.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class TermsSection extends StatelessWidget {
   const TermsSection({super.key, required this.section});
@@ -17,8 +18,7 @@ class TermsSection extends StatelessWidget {
         ...section.paragraphs.map(
           (p) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: Text(
-              p,
+            child: Text(AppStrings.of(context).t(p),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(fontSize: 14, height: 1.65),
@@ -50,8 +50,7 @@ class TermsSection extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              item,
+            child: Text(AppStrings.of(context).t(item),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(fontSize: 14, height: 1.6),
@@ -68,8 +67,7 @@ class TermsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            subsection.title,
+          Text(AppStrings.of(context).t(subsection.title),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 14,
               fontWeight: FontWeight.w700,
@@ -141,8 +139,7 @@ class TermsSectionTile extends StatelessWidget {
               size: 18,
             ),
           ),
-          title: Text(
-            section.title,
+          title: Text(AppStrings.of(context).t(section.title),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 14, fontWeight: FontWeight.w700),

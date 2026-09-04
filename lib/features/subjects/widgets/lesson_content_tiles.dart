@@ -7,6 +7,7 @@ import '../../assignments/data/models/assignment_model.dart';
 import '../../assignments/widgets/submission_status_badge.dart';
 import '../../quizzes/data/models/quiz_model.dart';
 import '../../quizzes/widgets/quiz_status_badge.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class LessonAssignmentTile extends StatelessWidget {
   const LessonAssignmentTile({
@@ -41,8 +42,7 @@ class LessonAssignmentTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  assignment.title,
+                Text(AppStrings.of(context).t(assignment.title),
                   style: AppTextStyles.bodyOf(
                     context,
                   ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
@@ -50,8 +50,7 @@ class LessonAssignmentTile extends StatelessWidget {
                 if (assignment.dueDate != null &&
                     assignment.dueDate!.isNotEmpty) ...[
                   const SizedBox(height: 6),
-                  Text(
-                    'موعد التسليم: ${_formatDate(assignment.dueDate!)}',
+                  Text(AppStrings.of(context).t('موعد التسليم: ${_formatDate(assignment.dueDate!)}'),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       color: AppColors.of(context).textMuted,
                       fontSize: 12,
@@ -113,19 +112,17 @@ class LessonQuizTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  quiz.title,
+                Text(AppStrings.of(context).t(quiz.title),
                   style: AppTextStyles.bodyOf(
                     context,
                   ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
                 ),
                 if (duration != null || questions != null) ...[
                   const SizedBox(height: 6),
-                  Text(
-                    [
+                  Text(AppStrings.of(context).t([
                       if (duration != null) '$duration دقيقة',
                       if (questions != null) '$questions سؤال',
-                    ].join(' · '),
+                    ].join(' · ')),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       color: AppColors.of(context).textMuted,
                       fontSize: 12,

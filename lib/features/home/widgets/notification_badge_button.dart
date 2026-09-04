@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -17,12 +18,11 @@ class NotificationBadgeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      tooltip: 'الإشعارات',
+      tooltip: AppStrings.of(context).notifications,
       onPressed: () => context.push(AppRoutes.notifications),
       icon: Badge(
         isLabelVisible: unreadCount > 0,
-        label: Text(
-          unreadCount > 9 ? '9+' : '$unreadCount',
+        label: Text(AppStrings.of(context).t(unreadCount > 9 ? '9+' : '$unreadCount'),
           style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
         ),
         backgroundColor: AppColors.of(context).accent,

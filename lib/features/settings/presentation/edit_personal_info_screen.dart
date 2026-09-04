@@ -6,6 +6,7 @@ import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../data/models/student_settings_model.dart';
 import 'student_settings_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class EditPersonalInfoScreen extends ConsumerStatefulWidget {
   const EditPersonalInfoScreen({super.key, required this.profile});
@@ -66,7 +67,7 @@ class _EditPersonalInfoScreenState
     if (name.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('الاسم مطلوب')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('الاسم مطلوب'))));
       return;
     }
 
@@ -98,7 +99,7 @@ class _EditPersonalInfoScreenState
           next.errorMessage != previous?.errorMessage) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.errorMessage!),
+            content: Text(AppStrings.of(context).t(next.errorMessage!)),
             backgroundColor: const Color(0xFF991B1B),
           ),
         );
@@ -106,43 +107,43 @@ class _EditPersonalInfoScreenState
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('تعديل المعلومات الشخصية')),
+      appBar: AppBar(title: Text(AppStrings.of(context).t('تعديل المعلومات الشخصية'))),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          AppTextField(controller: _nameController, label: 'الاسم الكامل'),
+          AppTextField(controller: _nameController, label: AppStrings.of(context).t('الاسم الكامل')),
           const SizedBox(height: 16),
           TextFormField(
             controller: _emailController,
             readOnly: true,
-            decoration: const InputDecoration(labelText: 'البريد الإلكتروني'),
+            decoration: InputDecoration(labelText: AppStrings.of(context).t('البريد الإلكتروني')),
           ),
           const SizedBox(height: 16),
           AppTextField(
             controller: _phoneController,
-            label: 'رقم الهاتف',
+            label: AppStrings.of(context).t('رقم الهاتف'),
             keyboardType: TextInputType.phone,
           ),
           const SizedBox(height: 16),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('تاريخ الميلاد'),
-            subtitle: Text(_birthDate ?? '—'),
+            title: Text(AppStrings.of(context).t('تاريخ الميلاد')),
+            subtitle: Text(AppStrings.of(context).t(_birthDate ?? '—')),
             trailing: const Icon(Icons.calendar_today_outlined),
             onTap: _pickBirthDate,
           ),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
             initialValue: _gender,
-            decoration: const InputDecoration(labelText: 'الجنس'),
-            items: const [
-              DropdownMenuItem(value: 'male', child: Text('ذكر')),
-              DropdownMenuItem(value: 'female', child: Text('أنثى')),
+            decoration: InputDecoration(labelText: AppStrings.of(context).t('الجنس')),
+            items: [
+              DropdownMenuItem(value: 'male', child: Text(AppStrings.of(context).t('ذكر'))),
+              DropdownMenuItem(value: 'female', child: Text(AppStrings.of(context).t('أنثى'))),
             ],
             onChanged: (value) => setState(() => _gender = value),
           ),
           const SizedBox(height: 16),
-          AppTextField(controller: _countryController, label: 'الدولة'),
+          AppTextField(controller: _countryController, label: AppStrings.of(context).t('الدولة')),
           const SizedBox(height: 24),
           AppButton(
             label: isSaving ? 'جارٍ الحفظ...' : 'حفظ التغييرات',

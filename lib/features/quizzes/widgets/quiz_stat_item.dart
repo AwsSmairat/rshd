@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class QuizStatItem extends StatelessWidget {
   const QuizStatItem({
@@ -32,8 +33,7 @@ class QuizStatItem extends StatelessWidget {
             child: Icon(icon, size: 18, color: AppColors.of(context).darkGold),
           ),
           const SizedBox(height: 10),
-          Text(
-            label,
+          Text(AppStrings.of(context).t(label),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
@@ -42,8 +42,7 @@ class QuizStatItem extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
-          Text(
-            value,
+          Text(AppStrings.of(context).t(value),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 14,
               fontWeight: FontWeight.w700,

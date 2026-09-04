@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class RegisterLoginLink extends StatelessWidget {
   const RegisterLoginLink({super.key, required this.onLoginTap});
@@ -13,8 +14,7 @@ class RegisterLoginLink extends StatelessWidget {
       alignment: WrapAlignment.center,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        Text(
-          'لديك حساب بالفعل؟ ',
+        Text(AppStrings.of(context).t('لديك حساب بالفعل؟ '),
           style: TextStyle(
             fontSize: 13,
             color: AppColors.of(context).textMuted.withValues(alpha: 0.95),
@@ -22,8 +22,7 @@ class RegisterLoginLink extends StatelessWidget {
         ),
         GestureDetector(
           onTap: onLoginTap,
-          child: Text(
-            'سجل الدخول',
+          child: Text(AppStrings.of(context).t('سجل الدخول'),
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,

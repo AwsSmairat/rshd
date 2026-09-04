@@ -6,6 +6,7 @@ import '../../core/platform/platform_settings_controller.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/widgets/app_button.dart';
+import '../../core/l10n/app_strings.dart';
 
 class MaintenanceScreen extends ConsumerWidget {
   const MaintenanceScreen({super.key});
@@ -32,22 +33,20 @@ class MaintenanceScreen extends ConsumerWidget {
                 color: AppColors.of(context).accent,
               ),
               const SizedBox(height: 24),
-              Text(
-                'المنصة تحت الصيانة',
+              Text(AppStrings.of(context).t('المنصة تحت الصيانة'),
                 style: AppTextStyles.titleOf(
                   context,
                 ).copyWith(color: AppColors.of(context).primary),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              Text(
-                message,
+              Text(AppStrings.of(context).t(message),
                 style: AppTextStyles.subtitleOf(context),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
               AppButton(
-                label: 'إعادة المحاولة',
+                label: AppStrings.of(context).t('إعادة المحاولة'),
                 onPressed: () =>
                     ref.read(platformSettingsProvider.notifier).refresh(),
               ),

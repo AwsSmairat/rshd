@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
@@ -14,7 +15,7 @@ class ProfileInfoCard extends StatelessWidget {
 
   static const _successGreen = Color(0xFF16A34A);
 
-  String _formatDate(String? raw) {
+  String _formatDate(BuildContext context, String? raw) {
     if (raw == null || raw.isEmpty) {
       return '—';
     }
@@ -22,22 +23,14 @@ class ProfileInfoCard extends StatelessWidget {
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd', 'ar').format(parsed.toLocal());
+    return DateFormat(
+      'yyyy/MM/dd',
+      AppStrings.of(context).dateLocale,
+    ).format(parsed.toLocal());
   }
 
-  String _statusLabel() {
-    switch (profile.status) {
-      case 'active':
-        return 'نشط';
-      case 'inactive':
-        return 'غير نشط';
-      case 'pending':
-        return 'قيد الانتظار';
-      case 'blocked':
-        return 'موقوف';
-      default:
-        return profile.statusLabel;
-    }
+  String _statusLabel(AppStrings strings) {
+    return strings.profileStatusLabel(profile.status);
   }
 
   Color? _statusColor() {
@@ -49,6 +42,7 @@ class ProfileInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return LiquidGlassSurface(
       borderRadius: BorderRadius.circular(22),
       padding: const EdgeInsets.all(20),
@@ -71,8 +65,7 @@ class ProfileInfoCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              Text(
-                'بيانات الحساب',
+              Text(AppStrings.of(context).t(strings.accountDetails),
                 style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
@@ -84,34 +77,34 @@ class ProfileInfoCard extends StatelessWidget {
           const SizedBox(height: 8),
           ProfileDetailRow(
             icon: Icons.person_outline,
-            label: 'الاسم',
+            label: strings.name,
             value: profile.name,
           ),
           ProfileDetailRow(
             icon: Icons.mail_outline,
-            label: 'البريد الإلكتروني',
+            label: strings.email,
             value: profile.email,
           ),
           ProfileDetailRow(
             icon: Icons.phone_outlined,
-            label: 'رقم الهاتف',
+            label: strings.phone,
             value: profile.phone?.isNotEmpty == true ? profile.phone! : '—',
           ),
           ProfileDetailRow(
             icon: Icons.shield_outlined,
-            label: 'الدور',
-            value: profile.roleLabel,
+            label: strings.role,
+            value: strings.roleLabel(profile.role),
           ),
           ProfileDetailRow(
             icon: Icons.verified_user_outlined,
-            label: 'حالة الحساب',
-            value: _statusLabel(),
+            label: strings.accountStatus,
+            value: _statusLabel(strings),
             valueColor: _statusColor(),
           ),
           ProfileDetailRow(
             icon: Icons.calendar_today_outlined,
-            label: 'تاريخ إنشاء الحساب',
-            value: _formatDate(profile.createdAt),
+            label: strings.accountCreatedAt,
+            value: _formatDate(context, profile.createdAt),
             showDivider: false,
           ),
         ],

@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../data/models/subject_model.dart';
 import 'subject_grouping_helper.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class SubjectCategoryBadge extends StatelessWidget {
   const SubjectCategoryBadge({super.key, required this.subject});
@@ -28,10 +29,10 @@ class SubjectCategoryBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label =
-        subject.categoryLabel.isNotEmpty &&
-            subject.categoryLabel != subject.category
-        ? subject.categoryLabel
-        : _fallbackLabel();
+        AppStrings.of(context).t(subject.categoryLabel).isNotEmpty &&
+            AppStrings.of(context).t(subject.categoryLabel) != subject.category
+        ? AppStrings.of(context).t(subject.categoryLabel)
+        : _fallbackLabel(context);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
@@ -51,8 +52,7 @@ class SubjectCategoryBadge extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: Colors.white.withValues(alpha: 0.52)),
           ),
-          child: Text(
-            label,
+          child: Text(AppStrings.of(context).t(label),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 11,
               fontWeight: FontWeight.w700,
@@ -64,16 +64,16 @@ class SubjectCategoryBadge extends StatelessWidget {
     );
   }
 
-  String _fallbackLabel() {
+  String _fallbackLabel(BuildContext context) {
     switch (SubjectGroupingHelper.resolveCategoryKey(subject)) {
       case 'medicine':
-        return 'طب';
+        return AppStrings.of(context).t('طب');
       case 'it':
-        return 'تقنية';
+        return AppStrings.of(context).t('تقنية');
       case 'engineering':
-        return 'هندسة';
+        return AppStrings.of(context).t('هندسة');
       default:
-        return 'عام';
+        return AppStrings.of(context).t('عام');
     }
   }
 }

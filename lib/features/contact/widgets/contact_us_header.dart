@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../../auth/presentation/widgets/login_header.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class ContactUsHeader extends StatelessWidget {
   const ContactUsHeader({super.key});
@@ -72,13 +73,12 @@ class ContactUsHeader extends StatelessWidget {
                               color: Colors.white,
                               size: 20,
                             ),
-                            tooltip: 'رجوع',
+                            tooltip: AppStrings.of(context).t('رجوع'),
                           )
                         else
                           const SizedBox(width: 48),
                         Expanded(
-                          child: Text(
-                            'تواصل معنا',
+                          child: Text(AppStrings.of(context).t('تواصل معنا'),
                             style: AppTextStyles.titleOf(
                               context,
                             ).copyWith(color: Colors.white, fontSize: 22),
@@ -89,8 +89,7 @@ class ContactUsHeader extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      'نحن هنا لمساعدتك — اختر وسيلة التواصل المناسبة',
+                    Text(AppStrings.of(context).t('نحن هنا لمساعدتك — اختر وسيلة التواصل المناسبة'),
                       style: AppTextStyles.bodyOf(context).copyWith(
                         color: Colors.white.withValues(alpha: 0.88),
                         height: 1.5,

@@ -5,6 +5,7 @@ import '../../../core/widgets/liquid_glass_surface.dart';
 import '../data/models/quiz_model.dart';
 import 'quiz_score_helper.dart';
 import 'quiz_stat_item.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class QuizStatsGrid extends StatelessWidget {
   const QuizStatsGrid({
@@ -35,29 +36,37 @@ class QuizStatsGrid extends StatelessWidget {
     final stats = [
       _StatData(
         icon: Icons.format_list_numbered_rounded,
-        label: 'عدد الأسئلة',
-        value: count != null ? _formatQuestionsCount(count) : '—',
+        label: AppStrings.of(context).t('عدد الأسئلة'),
+        value: count != null ? _formatQuestionsCount(context, count) : '—',
       ),
       _StatData(
         icon: scoreDisplay != null
             ? Icons.grade_outlined
             : Icons.schedule_outlined,
-        label: scoreDisplay != null ? 'الدرجة' : 'مدة الاختبار',
+        label: scoreDisplay != null
+            ? AppStrings.of(context).t('الدرجة')
+            : AppStrings.of(context).t('مدة الاختبار'),
         value:
             scoreDisplay ??
             (quiz?.durationMinutes != null
-                ? '${quiz!.durationMinutes} دقيقة'
+                ? AppStrings.of(context).t('${quiz!.durationMinutes} دقيقة')
                 : '—'),
       ),
       _StatData(
         icon: Icons.timer_outlined,
-        label: finishTimeLabel,
-        value: QuizDateHelper.formatTime(attemptSubmittedAt),
+        label: AppStrings.of(context).t(finishTimeLabel),
+        value: QuizDateHelper.formatTime(
+          attemptSubmittedAt,
+          locale: AppStrings.of(context).dateLocale,
+        ),
       ),
       _StatData(
         icon: Icons.calendar_today_outlined,
-        label: finishDateLabel,
-        value: QuizDateHelper.formatDate(attemptSubmittedAt),
+        label: AppStrings.of(context).t(finishDateLabel),
+        value: QuizDateHelper.formatDate(
+          attemptSubmittedAt,
+          locale: AppStrings.of(context).dateLocale,
+        ),
       ),
     ];
 
@@ -137,12 +146,12 @@ class _StatData {
   final String value;
 }
 
-String _formatQuestionsCount(int count) {
+String _formatQuestionsCount(BuildContext context, int count) {
   if (count == 1) {
-    return '1 سؤال';
+    return AppStrings.of(context).t('1 سؤال');
   }
   if (count == 2) {
-    return '2 سؤالان';
+    return AppStrings.of(context).t('2 سؤالان');
   }
-  return '$count أسئلة';
+  return AppStrings.of(context).t('$count أسئلة');
 }

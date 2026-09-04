@@ -8,6 +8,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../widgets/terms_contact_card.dart';
 import 'terms_acceptance_gate_controller.dart';
 import 'terms_and_conditions_controller.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class TermsAcceptanceScreen extends ConsumerStatefulWidget {
   const TermsAcceptanceScreen({super.key});
@@ -46,7 +47,7 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
     return Scaffold(
       backgroundColor: AppColors.of(context).background,
       appBar: AppBar(
-        title: const Text('تحديث الشروط والأحكام'),
+        title: Text(AppStrings.of(context).t('تحديث الشروط والأحكام')),
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
@@ -65,30 +66,26 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'تم تحديث الشروط والأحكام',
+                    Text(AppStrings.of(context).t('تم تحديث الشروط والأحكام'),
                       style: AppTextStyles.titleOf(context).copyWith(
                         fontSize: 20,
                         color: AppColors.of(context).primary,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      'يرجى قراءة النسخة الحالية والموافقة عليها لمتابعة استخدام التطبيق.',
+                    Text(AppStrings.of(context).t('يرجى قراءة النسخة الحالية والموافقة عليها لمتابعة استخدام التطبيق.'),
                       style: AppTextStyles.bodyOf(context),
                     ),
                     const SizedBox(height: 12),
                     if (gate.status != null) ...[
-                      Text(
-                        'الإصدار الحالي: ${gate.status!.currentVersion}',
+                      Text(AppStrings.of(context).t('الإصدار الحالي: ${gate.status!.currentVersion}'),
                         style: AppTextStyles.bodyOf(
                           context,
                         ).copyWith(fontWeight: FontWeight.w600),
                       ),
                       if (gate.status!.lastUpdated != null &&
                           gate.status!.lastUpdated!.isNotEmpty)
-                        Text(
-                          'آخر تحديث: ${gate.status!.lastUpdated}',
+                        Text(AppStrings.of(context).t('آخر تحديث: ${gate.status!.lastUpdated}'),
                           style: AppTextStyles.bodyOf(
                             context,
                           ).copyWith(color: AppColors.of(context).textMuted),
@@ -101,7 +98,7 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
               OutlinedButton.icon(
                 onPressed: () => context.push(AppRoutes.termsAndConditions),
                 icon: const Icon(Icons.description_outlined),
-                label: const Text('عرض الشروط والأحكام'),
+                label: Text(AppStrings.of(context).t('عرض الشروط والأحكام')),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 48),
                   foregroundColor: AppColors.of(context).darkGold,
@@ -117,8 +114,8 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
                   final success = await gateNotifier.accept();
                   if (success && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('تم تسجيل موافقتك على الشروط'),
+                      SnackBar(
+                        content: Text(AppStrings.of(context).t('تم تسجيل موافقتك على الشروط')),
                       ),
                     );
                   }
@@ -126,8 +123,7 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
               ),
               if (gate.errorMessage != null) ...[
                 const SizedBox(height: 12),
-                Text(
-                  gate.errorMessage!,
+                Text(AppStrings.of(context).t(gate.errorMessage!),
                   style: AppTextStyles.bodyOf(
                     context,
                   ).copyWith(color: Colors.red),
@@ -136,8 +132,7 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
               ],
               const Spacer(),
               if (document != null)
-                Text(
-                  'النسخة المعروضة: ${document.version}',
+                Text(AppStrings.of(context).t('النسخة المعروضة: ${document.version}'),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
                     color: AppColors.of(context).textMuted,

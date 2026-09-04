@@ -61,28 +61,28 @@ class QuizScoreHelper {
 class QuizDateHelper {
   QuizDateHelper._();
 
-  static String formatDate(String? raw) {
+  static String formatDate(String? raw, {String locale = 'ar'}) {
     final parsed = _parse(raw);
     if (parsed == null) {
       return '—';
     }
-    return DateFormat('yyyy/MM/dd', 'ar').format(parsed);
+    return DateFormat('yyyy/MM/dd', locale).format(parsed);
   }
 
-  static String formatTime(String? raw) {
+  static String formatTime(String? raw, {String locale = 'ar'}) {
     final parsed = _parse(raw);
     if (parsed == null) {
       return '—';
     }
-    return DateFormat('h:mm a', 'ar').format(parsed);
+    return DateFormat('h:mm a', locale).format(parsed);
   }
 
-  static String formatDateLong(String? raw) {
+  static String formatDateLong(String? raw, {String locale = 'ar'}) {
     final parsed = _parse(raw);
     if (parsed == null) {
       return '—';
     }
-    return DateFormat('d MMMM yyyy', 'ar').format(parsed);
+    return DateFormat('d MMMM yyyy', locale).format(parsed);
   }
 
   static DateTime? _parse(String? raw) {

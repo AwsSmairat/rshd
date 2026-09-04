@@ -9,6 +9,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../data/models/assignment_submission_model.dart';
 import 'assignment_file_helper.dart';
 import 'assignment_section_card.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class SubmittedFileCard extends StatelessWidget {
   const SubmittedFileCard({super.key, required this.submission});
@@ -25,7 +26,7 @@ class SubmittedFileCard extends StatelessWidget {
     if (uri == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('تعذر فتح الملف')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تعذر فتح الملف'))));
       return;
     }
 
@@ -39,7 +40,7 @@ class SubmittedFileCard extends StatelessWidget {
     if (!launched) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('تعذر فتح الملف')));
+      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تعذر فتح الملف'))));
     }
   }
 
@@ -59,7 +60,7 @@ class SubmittedFileCard extends StatelessWidget {
         submission.fileMimeType?.split('/').last.toUpperCase() ?? 'FILE';
 
     return AssignmentSectionCard(
-      title: 'ملف الحل',
+      title: AppStrings.of(context).t('ملف الحل'),
       icon: Icons.cloud_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -91,8 +92,7 @@ class SubmittedFileCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        fileName,
+                      Text(AppStrings.of(context).t(fileName),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontWeight: FontWeight.w700,
                           color: AppColors.of(context).primary,
@@ -101,8 +101,7 @@ class SubmittedFileCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        '$size • $mime',
+                      Text(AppStrings.of(context).t('$size • $mime'),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
                           color: AppColors.of(context).textMuted,
@@ -118,7 +117,7 @@ class SubmittedFileCard extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: () => _openFile(context),
             icon: const Icon(Icons.open_in_new_rounded, size: 18),
-            label: const Text('فتح الملف'),
+            label: Text(AppStrings.of(context).t('فتح الملف')),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.of(context).primary,
               side: BorderSide(
@@ -146,7 +145,7 @@ class AssignmentSubmissionDetailsCard extends StatelessWidget {
     final evaluation = AssignmentGradeHelper.evaluationLabel(submission.grade);
 
     return AssignmentSectionCard(
-      title: 'تفاصيل التسليم',
+      title: AppStrings.of(context).t('تفاصيل التسليم'),
       icon: Icons.edit_note_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -155,26 +154,26 @@ class AssignmentSubmissionDetailsCard extends StatelessWidget {
               submission.answerText!.trim().isNotEmpty)
             _DetailRow(
               icon: Icons.notes_outlined,
-              label: 'نص الإجابة',
+              label: AppStrings.of(context).t('نص الإجابة'),
               value: submission.answerText!,
             ),
           if (submission.submittedAt != null)
             _DetailRow(
               icon: Icons.calendar_today_outlined,
-              label: 'تاريخ الإرسال',
-              value: _formatDate(submission.submittedAt!),
+              label: AppStrings.of(context).t('تاريخ الإرسال'),
+              value: _formatDate(context, submission.submittedAt!),
             ),
           if (submission.grade != null && submission.grade!.isNotEmpty)
             _DetailRow(
               icon: Icons.star_outline,
-              label: 'الدرجة',
+              label: AppStrings.of(context).t('الدرجة'),
               value: '${submission.grade} / 100',
               valueColor: const Color(0xFF15803D),
             ),
           if (evaluation != null)
             _DetailRow(
               icon: Icons.grade_outlined,
-              label: 'التقييم',
+              label: AppStrings.of(context).t('التقييم'),
               value: evaluation,
               valueColor: const Color(0xFF15803D),
             ),
@@ -182,7 +181,7 @@ class AssignmentSubmissionDetailsCard extends StatelessWidget {
               submission.feedback!.trim().isNotEmpty)
             _DetailRow(
               icon: Icons.rate_review_outlined,
-              label: 'ملاحظات المدرس',
+              label: AppStrings.of(context).t('ملاحظات المدرس'),
               value: submission.feedback!,
             ),
         ],
@@ -190,12 +189,12 @@ class AssignmentSubmissionDetailsCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(String raw) {
+  String _formatDate(BuildContext context, String raw) {
     final parsed = DateTime.tryParse(raw);
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd – HH:mm', 'ar').format(parsed.toLocal());
+    return DateFormat('yyyy/MM/dd – HH:mm', AppStrings.of(context).dateLocale).format(parsed.toLocal());
   }
 }
 
@@ -225,16 +224,14 @@ class _DetailRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  label,
+                Text(AppStrings.of(context).t(label),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
                     color: AppColors.of(context).textMuted,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  value,
+                Text(AppStrings.of(context).t(value),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontWeight: FontWeight.w600,
                     color: valueColor ?? AppColors.of(context).primary,

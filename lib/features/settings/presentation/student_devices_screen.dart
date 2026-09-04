@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../profile/data/models/device_model.dart';
 import 'student_settings_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class StudentDevicesScreen extends ConsumerWidget {
   const StudentDevicesScreen({super.key, required this.devices});
@@ -15,11 +16,10 @@ class StudentDevicesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text('الجلسات والأجهزة')),
+      appBar: AppBar(title: Text(AppStrings.of(context).t('الجلسات والأجهزة'))),
       body: devices.isEmpty
           ? Center(
-              child: Text(
-                'لا توجد أجهزة مسجّلة',
+              child: Text(AppStrings.of(context).t('لا توجد أجهزة مسجّلة'),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(color: AppColors.of(context).textMuted),
@@ -37,18 +37,17 @@ class StudentDevicesScreen extends ConsumerWidget {
                     final ok = await showDialog<bool>(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('إلغاء الجهاز'),
-                        content: Text(
-                          'هل تريد تسجيل الخروج من "${device.deviceName ?? device.platform ?? 'جهاز'}"؟',
+                        title: Text(AppStrings.of(context).t('إلغاء الجهاز')),
+                        content: Text(AppStrings.of(context).t('هل تريد تسجيل الخروج من "${device.deviceName ?? device.platform ?? 'جهاز'}"؟'),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context, false),
-                            child: const Text('إلغاء'),
+                            child: Text(AppStrings.of(context).t('إلغاء')),
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(context, true),
-                            child: const Text('تأكيد'),
+                            child: Text(AppStrings.of(context).t('تأكيد')),
                           ),
                         ],
                       ),
@@ -99,8 +98,7 @@ class _DeviceTile extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  device.deviceName ?? device.platform ?? 'جهاز',
+                child: Text(AppStrings.of(context).t(device.deviceName ?? device.platform ?? 'جهاز'),
                   style: AppTextStyles.subtitleOf(
                     context,
                   ).copyWith(fontWeight: FontWeight.w700),
@@ -116,22 +114,19 @@ class _DeviceTile extends StatelessWidget {
                     color: AppColors.of(context).accent.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
-                    'نشط',
+                  child: Text(AppStrings.of(context).t('نشط'),
                     style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
                   ),
                 ),
             ],
           ),
           const SizedBox(height: 6),
-          Text(
-            'النظام: ${device.platform ?? '—'}',
+          Text(AppStrings.of(context).t('النظام: ${device.platform ?? '—'}'),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
           ),
-          Text(
-            'آخر نشاط: $formatted',
+          Text(AppStrings.of(context).t('آخر نشاط: $formatted'),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
@@ -141,7 +136,7 @@ class _DeviceTile extends StatelessWidget {
             alignment: AlignmentDirectional.centerEnd,
             child: TextButton(
               onPressed: onRevoke,
-              child: const Text('إلغاء الجهاز'),
+              child: Text(AppStrings.of(context).t('إلغاء الجهاز')),
             ),
           ),
         ],

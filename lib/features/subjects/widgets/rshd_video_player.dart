@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../data/models/video_model.dart';
 import '../utils/playback_refresh_scheduler.dart';
+import '../../../core/l10n/app_strings.dart';
 
 /// Network video player with Chewie controls and signed URL refresh support.
 class RshdVideoPlayer extends StatefulWidget {
@@ -170,7 +171,7 @@ class RshdVideoPlayerState extends State<RshdVideoPlayer> {
       errorBuilder: (context, errorMessage) {
         return _buildStatePanel(
           icon: Icons.play_disabled_rounded,
-          title: 'تعذّر التشغيل',
+          title: AppStrings.of(context).t('تعذّر التشغيل'),
           message: _playbackErrorMessage,
           showRetry: true,
         );
@@ -412,8 +413,7 @@ class RshdVideoPlayerState extends State<RshdVideoPlayer> {
                 ),
               ),
               SizedBox(height: compact ? 6 : 8),
-              Text(
-                title,
+              Text(AppStrings.of(context).t(title),
                 style: AppTextStyles.subtitleOf(context).copyWith(
                   color: AppColors.of(context).primary,
                   fontWeight: FontWeight.w700,
@@ -421,8 +421,7 @@ class RshdVideoPlayerState extends State<RshdVideoPlayer> {
                 ),
               ),
               SizedBox(height: compact ? 4 : 6),
-              Text(
-                message,
+              Text(AppStrings.of(context).t(message),
                 textAlign: TextAlign.center,
                 maxLines: compact ? 2 : 3,
                 overflow: TextOverflow.ellipsis,
@@ -443,8 +442,7 @@ class RshdVideoPlayerState extends State<RshdVideoPlayer> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : Icon(Icons.refresh_rounded, size: compact ? 15 : 17),
-                  label: Text(
-                    _isRefreshing ? 'جاري التحديث...' : 'إعادة المحاولة',
+                  label: Text(AppStrings.of(context).t(_isRefreshing ? 'جاري التحديث...' : 'إعادة المحاولة'),
                   ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.of(context).secondary,
@@ -494,8 +492,7 @@ class RshdVideoPlayerState extends State<RshdVideoPlayer> {
           children: [
             CircularProgressIndicator(color: AppColors.of(context).accent),
             const SizedBox(height: 12),
-            Text(
-              'جاري تجهيز الفيديو...',
+            Text(AppStrings.of(context).t('جاري تجهيز الفيديو...'),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(color: AppColors.of(context).white),
@@ -508,7 +505,7 @@ class RshdVideoPlayerState extends State<RshdVideoPlayer> {
     if (_errorMessage != null || _chewieController == null) {
       return _buildStatePanel(
         icon: Icons.play_disabled_rounded,
-        title: 'تعذّر التشغيل',
+        title: AppStrings.of(context).t('تعذّر التشغيل'),
         message: _errorMessage ?? _playbackErrorMessage,
         showRetry: true,
       );

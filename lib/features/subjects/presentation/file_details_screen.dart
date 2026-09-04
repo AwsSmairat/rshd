@@ -12,6 +12,7 @@ import '../../../core/widgets/responsive_content.dart';
 import '../../auth/presentation/auth_controller.dart';
 import '../data/models/lesson_file_model.dart';
 import 'subjects_controller.dart';
+import '../../../core/l10n/app_strings.dart';
 
 class FileDetailsScreen extends ConsumerStatefulWidget {
   const FileDetailsScreen({super.key, required this.fileId});
@@ -69,7 +70,7 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
-        return const LoadingWidget(message: 'جاري تحميل الملف...');
+        return LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الملف...'));
       case FeatureLoadStatus.error:
         return ErrorView(
           message: state.errorMessage ?? 'تعذر تحميل الملف',
@@ -79,7 +80,7 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
       case FeatureLoadStatus.loaded:
         final file = state.file;
         if (file == null) {
-          return const ErrorView(message: 'الملف غير موجود');
+          return ErrorView(message: AppStrings.of(context).t('الملف غير موجود'));
         }
 
         return RefreshIndicator(
@@ -118,8 +119,8 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
     if (file.isLocked) {
       return _FileStatusCard(
         icon: Icons.lock_outline_rounded,
-        title: 'ملف مقفل',
-        message: 'فعّل المادة لفتح هذا الملف والاطلاع عليه.',
+        title: AppStrings.of(context).t('ملف مقفل'),
+        message: AppStrings.of(context).t('فعّل المادة لفتح هذا الملف والاطلاع عليه.'),
         tone: _FileStatusTone.locked,
       );
     }
@@ -131,13 +132,13 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
           _PrimaryActionButton(
             onPressed: () => _openPdfViewer(file),
             icon: Icons.auto_stories_outlined,
-            label: 'عرض داخل التطبيق',
+            label: AppStrings.of(context).t('عرض داخل التطبيق'),
           ),
           const SizedBox(height: 12),
           _InfoNote(
             icon: Icons.visibility_outlined,
             text:
-                'الملفات متاحة للعرض داخل التطبيق فقط ولا يمكن تنزيلها أو حفظها.',
+                AppStrings.of(context).t('الملفات متاحة للعرض داخل التطبيق فقط ولا يمكن تنزيلها أو حفظها.'),
           ),
         ],
       );
@@ -146,9 +147,9 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
     if (file.fileType == 'pdf' && !file.isLocked) {
       return _FileStatusCard(
         icon: Icons.hourglass_top_rounded,
-        title: 'جاري تجهيز الملف',
+        title: AppStrings.of(context).t('جاري تجهيز الملف'),
         message:
-            'الملف قيد المعالجة حالياً. اسحب للأسفل للتحديث أو حاول بعد لحظات.',
+            AppStrings.of(context).t('الملف قيد المعالجة حالياً. اسحب للأسفل للتحديث أو حاول بعد لحظات.'),
         tone: _FileStatusTone.pending,
         onRetry: _reloadFile,
       );
@@ -188,8 +189,7 @@ class _FileDetailsHero extends StatelessWidget {
       scrolledUnderElevation: 0,
       backgroundColor: AppColors.of(context).primary,
       foregroundColor: AppColors.of(context).white,
-      title: Text(
-        title,
+      title: Text(AppStrings.of(context).t(title),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
@@ -278,8 +278,7 @@ class _FilePreviewCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
-                file.title,
+              Text(AppStrings.of(context).t(file.title),
                 textAlign: TextAlign.center,
                 style: AppTextStyles.titleOf(
                   context,
@@ -295,8 +294,7 @@ class _FilePreviewCard extends StatelessWidget {
                   color: _accentColor(context).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: Text(
-                  file.fileTypeLabel,
+                child: Text(AppStrings.of(context).t(file.fileTypeLabel),
                   style: AppTextStyles.captionOf(context).copyWith(
                     color: _accentColor(context),
                     fontWeight: FontWeight.w700,
@@ -324,7 +322,7 @@ class _FileMetaSection extends StatelessWidget {
         Expanded(
           child: _MetaChip(
             icon: Icons.insert_drive_file_outlined,
-            label: 'النوع',
+            label: AppStrings.of(context).t('النوع'),
             value: file.fileTypeLabel,
           ),
         ),
@@ -332,7 +330,7 @@ class _FileMetaSection extends StatelessWidget {
         Expanded(
           child: _MetaChip(
             icon: Icons.sd_storage_outlined,
-            label: 'الحجم',
+            label: AppStrings.of(context).t('الحجم'),
             value: file.formattedSize,
           ),
         ),
@@ -342,7 +340,7 @@ class _FileMetaSection extends StatelessWidget {
             icon: file.isLocked
                 ? Icons.lock_outline_rounded
                 : Icons.check_circle_outline_rounded,
-            label: 'الحالة',
+            label: AppStrings.of(context).t('الحالة'),
             value: file.isLocked ? 'مقفل' : 'متاح',
             valueColor: file.isLocked
                 ? AppColors.of(context).textMuted
@@ -378,15 +376,13 @@ class _MetaChip extends StatelessWidget {
         children: [
           Icon(icon, size: 18, color: AppColors.of(context).secondary),
           const SizedBox(height: 8),
-          Text(
-            label,
+          Text(AppStrings.of(context).t(label),
             style: AppTextStyles.captionOf(
               context,
             ).copyWith(color: AppColors.of(context).textMuted, fontSize: 11),
           ),
           const SizedBox(height: 2),
-          Text(
-            value,
+          Text(AppStrings.of(context).t(value),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTextStyles.bodyOf(context).copyWith(
@@ -442,16 +438,14 @@ class _FileStatusCard extends StatelessWidget {
             child: Icon(icon, size: 26, color: accent),
           ),
           const SizedBox(height: 12),
-          Text(
-            title,
+          Text(AppStrings.of(context).t(title),
             style: AppTextStyles.subtitleOf(context).copyWith(
               color: AppColors.of(context).primary,
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 6),
-          Text(
-            message,
+          Text(AppStrings.of(context).t(message),
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyOf(context).copyWith(
               color: AppColors.of(context).textMuted,
@@ -464,7 +458,7 @@ class _FileStatusCard extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('تحديث'),
+              label: Text(AppStrings.of(context).t('تحديث')),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.of(context).primary,
                 side: BorderSide(
@@ -527,8 +521,7 @@ class _PrimaryActionButton extends StatelessWidget {
               children: [
                 Icon(icon, color: AppColors.of(context).white, size: 22),
                 const SizedBox(width: 10),
-                Text(
-                  label,
+                Text(AppStrings.of(context).t(label),
                   style: AppTextStyles.buttonOf(context).copyWith(fontSize: 15),
                 ),
               ],
@@ -558,8 +551,7 @@ class _InfoNote extends StatelessWidget {
           Icon(icon, size: 18, color: AppColors.of(context).textMuted),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              text,
+            child: Text(AppStrings.of(context).t(text),
               style: AppTextStyles.captionOf(context).copyWith(
                 color: AppColors.of(context).textMuted,
                 height: 1.5,
