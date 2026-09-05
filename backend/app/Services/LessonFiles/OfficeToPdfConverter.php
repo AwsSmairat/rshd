@@ -35,14 +35,21 @@ class OfficeToPdfConverter
         // LibreOffice names its output after the source file, so two conversions
         // of same-named sources would overwrite each other in a shared folder.
         $outputDir = dirname($destinationPath).'/lo-'.bin2hex(random_bytes(8));
+        $profileDir = $outputDir.'/profile';
+        $configDir = $outputDir.'/.config';
+        $cacheDir = $outputDir.'/.cache';
 
         if (! @mkdir($outputDir, 0775, true) && ! is_dir($outputDir)) {
             return false;
         }
 
+        @mkdir($configDir, 0775, true);
+        @mkdir($cacheDir, 0775, true);
+
         try {
             $process = new Process([
                 $binary,
+                '-env:UserInstallation=file://'.$profileDir,
                 '--headless',
                 '--norestore',
                 '--convert-to',
@@ -50,6 +57,10 @@ class OfficeToPdfConverter
                 '--outdir',
                 $outputDir,
                 $sourcePath,
+            ], sys_get_temp_dir(), [
+                'HOME' => $outputDir,
+                'XDG_CONFIG_HOME' => $configDir,
+                'XDG_CACHE_HOME' => $cacheDir,
             ]);
             $process->setTimeout(90);
             $process->run();
@@ -76,8 +87,12 @@ class OfficeToPdfConverter
             return;
         }
 
-        foreach (glob($directory.'/*') ?: [] as $entry) {
-            if (is_file($entry)) {
+        foreach (array_diff(scandir($directory) ?: [], ['.', '..']) as $name) {
+            $entry = $directory.'/'.$name;
+
+            if (is_dir($entry) && ! is_link($entry)) {
+                $this->removeDirectory($entry);
+            } else {
                 @unlink($entry);
             }
         }
@@ -116,20 +131,27 @@ class OfficeToPdfConverter
     protected function libreOfficeBinary(): ?string
     {
         $candidates = [
-            'soffice',
-            'libreoffice',
             '/usr/bin/soffice',
             '/usr/bin/libreoffice',
             '/Applications/LibreOffice.app/Contents/MacOS/soffice',
+            'soffice',
+            'libreoffice',
         ];
 
         foreach ($candidates as $candidate) {
             if ($candidate === 'soffice' || $candidate === 'libreoffice') {
-                $process = Process::fromShellCommandline('command -v '.escapeshellarg($candidate));
-                $process->run();
+                try {
+                    $process = Process::fromShellCommandline(
+                        'command -v '.escapeshellarg($candidate),
+                        sys_get_temp_dir(),
+                    );
+                    $process->run();
 
-                if ($process->isSuccessful() && is_executable(trim($process->getOutput()))) {
-                    return trim($process->getOutput());
+                    if ($process->isSuccessful() && is_executable(trim($process->getOutput()))) {
+                        return trim($process->getOutput());
+                    }
+                } catch (\Throwable) {
+                    continue;
                 }
 
                 continue;
