@@ -85,7 +85,7 @@ class VideoResource extends Resource
                             ->openable()
                             ->uploadingMessage('جاري رفع الفيديو...')
                             ->uploadProgressIndicatorPosition('left')
-                            ->helperText('ارفع ملف الفيديو مباشرة (MP4, WebM, MOV, MKV). الحد الأقصى 10 جيجابايت. تأكد من تشغيل السيرفر عبر ./serve.sh')
+                            ->helperText('ارفع ملف الفيديو مباشرة (MP4, WebM, MOV, MKV). الحد الأقصى 10 جيجابايت.')
                             ->required(fn (string $operation): bool => $operation === 'create')
                             ->columnSpanFull(),
                     ]),
