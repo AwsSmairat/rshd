@@ -34,20 +34,17 @@ class AuthPortalPageTest extends TestCase
             ->assertSee('التعليم يبدأ من هنا', false);
     }
 
-    public function test_login_portal_switches_to_english(): void
+    public function test_login_portal_is_arabic_only(): void
     {
-        $this->from('/admin/login')
-            ->get('/locale/en')
-            ->assertRedirect('/admin/login')
-            ->assertSessionHas('filament_locale', 'en');
+        $this->get('/locale/en')->assertNotFound();
 
         $this->withSession(['filament_locale' => 'en'])
             ->get('/admin/login')
             ->assertOk()
-            ->assertSee('Instructors & admin portal')
-            ->assertSee('Log in to your account', false)
-            ->assertSee('Education starts here', false)
-            ->assertSee('Forgot password?', false);
+            ->assertSee('بوابة خاصة بالمدرسين', false)
+            ->assertSee('التعليم يبدأ من هنا', false)
+            ->assertDontSee('Instructors & admin portal', false)
+            ->assertDontSee('rshd-auth-portal__lang', false);
     }
 
     public function test_password_reset_request_uses_portal_layout(): void

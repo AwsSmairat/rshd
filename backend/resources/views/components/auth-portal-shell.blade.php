@@ -5,13 +5,6 @@
 <div class="rshd-auth-portal" dir="{{ $portal['dir'] }}">
     <div class="rshd-auth-portal__top">
         <p class="rshd-auth-portal__slogan">{{ $portal['slogan'] }}</p>
-        <a class="rshd-auth-portal__lang" href="{{ route('auth.locale', ['locale' => $portal['nextLocale']]) }}">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                <circle cx="12" cy="12" r="9"></circle>
-                <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path>
-            </svg>
-            <span>{{ $portal['languageLabel'] }}</span>
-        </a>
     </div>
 
     <div class="rshd-auth-portal__grid">

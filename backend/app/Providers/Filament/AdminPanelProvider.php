@@ -80,8 +80,8 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::STYLES_AFTER,
                 fn (): HtmlString => new HtmlString(
-                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=32">'.
-                    '<link rel="stylesheet" href="'.e(asset('css/rshd-auth-portal.css')).'?v=5">'.
+                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=33">'.
+                    '<link rel="stylesheet" href="'.e(asset('css/rshd-auth-portal.css')).'?v=6">'.
                     '<link rel="preconnect" href="https://fonts.googleapis.com">'.
                     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'.
                     '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">'

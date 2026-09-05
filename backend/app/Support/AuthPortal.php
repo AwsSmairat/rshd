@@ -9,14 +9,12 @@ class AuthPortal
     /**
      * @return array{
      *     locale: string,
-     *     nextLocale: string,
      *     dir: string,
      *     isArabic: bool,
      *     platformName: string,
      *     logoUrl: string,
      *     faviconUrl: string,
      *     slogan: string,
-     *     languageLabel: string,
      *     portalTitle: string,
      *     portalSubtitle: string,
      *     newTeacherTitle: string,
@@ -40,15 +38,8 @@ class AuthPortal
     public static function data(): array
     {
         $settings = app(PlatformSettingsService::class);
-        $locale = session('filament_locale', 'ar');
-
-        if (! in_array($locale, ['ar', 'en'], true)) {
-            $locale = 'ar';
-        }
-
-        app()->setLocale($locale);
-        $isArabic = $locale === 'ar';
-        $copy = self::copy($locale);
+        app()->setLocale('ar');
+        $copy = self::copy('ar');
         $phone = (string) config('auth_portal.contact.whatsapp', '');
         $phoneDisplay = (string) config('auth_portal.contact.whatsapp_display', '');
         $email = (string) config('auth_portal.contact.email', '');
@@ -57,10 +48,9 @@ class AuthPortal
         $vendorLogo = public_path((string) config('auth_portal.vendor.logo'));
 
         return [
-            'locale' => $locale,
-            'nextLocale' => $isArabic ? 'en' : 'ar',
-            'dir' => $isArabic ? 'rtl' : 'ltr',
-            'isArabic' => $isArabic,
+            'locale' => 'ar',
+            'dir' => 'rtl',
+            'isArabic' => true,
             'platformName' => $settings->platformName(),
             'logoUrl' => $logoUrl.(str_contains($logoUrl, '?') ? '&' : '?').'v='.$version,
             'faviconUrl' => $settings->faviconUrl().'?v=1',
@@ -86,7 +76,6 @@ class AuthPortal
         if ($locale === 'en') {
             return [
                 'slogan' => 'Education starts here',
-                'languageLabel' => 'English',
                 'portalTitle' => 'Instructors & admin portal',
                 'portalSubtitle' => 'A private workspace for instructors and administrators to manage courses, students, and academic content.',
                 'newTeacherTitle' => 'Are you a new instructor?',
@@ -103,7 +92,6 @@ class AuthPortal
 
         return [
             'slogan' => 'التعليم يبدأ من هنا',
-            'languageLabel' => 'العربية',
             'portalTitle' => 'بوابة خاصة بالمدرسين',
             'portalSubtitle' => 'هذه البوابة مخصصة للمدرسين والإدارة لإدارة المحتوى التعليمي والطلاب من مكان واحد.',
             'newTeacherTitle' => 'هل أنت مدرس جديد؟',

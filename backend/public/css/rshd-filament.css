@@ -38,15 +38,6 @@
     padding-block: 1.25rem !important;
 }
 
-/* زر طي الشريط أعلى القائمة */
-.fi-sidebar-header > .fi-icon-btn {
-    display: inline-flex !important;
-}
-
-.fi-topbar-sidebar-toggle {
-    display: inline-flex !important;
-}
-
 @media (min-width: 1024px) {
     .fi-topbar-open-sidebar-btn,
     .fi-topbar-close-sidebar-btn,

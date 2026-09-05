@@ -35,24 +35,6 @@
     font-weight: 600;
 }
 
-.rshd-auth-portal__lang {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.38rem 0.8rem;
-    border: 1px solid #D9D1C4;
-    border-radius: 999px;
-    color: var(--portal-ink);
-    text-decoration: none;
-    background: rgba(255, 255, 255, 0.72);
-    font-size: 0.82rem;
-    font-weight: 700;
-}
-
-.rshd-auth-portal__lang:hover {
-    border-color: var(--portal-gold);
-}
-
 .rshd-auth-portal__grid {
     direction: ltr;
     flex: 1;

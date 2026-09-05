@@ -4,11 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Enums\QuestionType;
 use App\Filament\Concerns\HasInstructorScope;
+use App\Filament\Concerns\HasQuizQuestionsFormFields;
 use App\Filament\Resources\QuizQuestionResource\Pages;
-use App\Filament\Resources\QuizQuestionResource\RelationManagers\AnswersRelationManager;
 use App\Models\QuizQuestion;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 class QuizQuestionResource extends Resource
 {
     use HasInstructorScope;
+    use HasQuizQuestionsFormFields;
 
     protected static ?string $model = QuizQuestion::class;
 
@@ -44,7 +46,7 @@ class QuizQuestionResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('السؤال')
+                Forms\Components\Section::make('الاختبار')
                     ->schema([
                         Forms\Components\Select::make('quiz_id')
                             ->label('الاختبار')
@@ -55,17 +57,26 @@ class QuizQuestionResource extends Resource
                             )
                             ->searchable()
                             ->preload()
-                            ->required(),
+                            ->required()
+                            ->columnSpanFull(),
+                    ]),
+                Forms\Components\Section::make('تفاصيل السؤال')
+                    ->schema([
                         Forms\Components\Textarea::make('question_text')
                             ->label('نص السؤال')
+                            ->placeholder('اكتب السؤال هنا...')
                             ->required()
-                            ->rows(4)
+                            ->rows(3)
                             ->columnSpanFull(),
                         Forms\Components\Select::make('question_type')
                             ->label('نوع السؤال')
                             ->options(QuestionType::options())
                             ->default(QuestionType::Mcq->value)
-                            ->required(),
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(function (mixed $state, Set $set): void {
+                                static::fillAnswersForQuestionType(is_string($state) ? $state : null, $set);
+                            }),
                         Forms\Components\TextInput::make('points')
                             ->label('الدرجة')
                             ->numeric()
@@ -75,6 +86,13 @@ class QuizQuestionResource extends Resource
                             ->suffix('نقطة'),
                     ])
                     ->columns(2),
+                Forms\Components\Section::make('الخيارات')
+                    ->description('اكتب الخيارات، ثم حدّد الإجابة الصحيحة بالدائرة.')
+                    ->icon('heroicon-o-clipboard-document-list')
+                    ->extraAttributes(['class' => 'rshd-quiz-builder'])
+                    ->schema([
+                        static::quizAnswersRepeater(),
+                    ]),
             ]);
     }
 
@@ -144,15 +162,13 @@ class QuizQuestionResource extends Resource
                 ]),
             ])
             ->emptyStateHeading('لا توجد أسئلة')
-            ->emptyStateDescription('أنشئ اختباراً أولاً من «الاختبارات»، ثم أضف أسئله من زر «إضافة سؤال».')
+            ->emptyStateDescription('أنشئ اختباراً من «الاختبارات»، أو أضف سؤالاً مع خياراته من زر «إضافة سؤال».')
             ->emptyStateIcon('heroicon-o-list-bullet');
     }
 
     public static function getRelations(): array
     {
-        return [
-            AnswersRelationManager::class,
-        ];
+        return [];
     }
 
     public static function getPages(): array
