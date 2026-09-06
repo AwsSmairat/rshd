@@ -57,6 +57,20 @@ From Laravel 11 + Filament + app usage:
 | Scheduler | Cron: `* * * * * php /path/to/artisan schedule:run` |
 | TLS | Valid certificate (Let's Encrypt). Avoid self-signed for Flutter release builds |
 
+### PHP-FPM staging tuning
+
+Validated staging pool settings for the current 2-vCPU server:
+
+```ini
+pm = dynamic
+pm.max_children = 8
+pm.start_servers = 4
+pm.min_spare_servers = 4
+pm.max_spare_servers = 8
+```
+
+Load validation on 2026-09-06 at 250 VUs for 5 minutes: p95 1.144s, average 1.001s, 124.14 req/s, and 0% HTTP failures.
+
 ### Redis (optional)
 
 Not required by default. `.env.staging.example` uses `database` queue + `database` cache.
