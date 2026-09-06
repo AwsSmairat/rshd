@@ -14,6 +14,8 @@ class PlatformSettingsService
 
     public const CACHE_GROUP_PREFIX = 'platform_settings.group.';
 
+    private const NULL_CACHE_VALUE = '__rshd_platform_setting_null__';
+
     /**
      * @return array<string, array<string, array{type: string, value: mixed, is_public: bool}>>
      */
@@ -208,6 +210,10 @@ class PlatformSettingsService
         $type = $definition['type'] ?? 'string';
         $cacheKey = self::CACHE_PREFIX.$group.'.'.$key;
         $cached = $this->cacheGet($cacheKey);
+
+        if ($cached === self::NULL_CACHE_VALUE) {
+            return $this->castStoredValue(null, $type, $defaultValue);
+        }
 
         if (! is_null($cached)) {
             return $this->castStoredValue($cached, $type, $defaultValue);
@@ -588,7 +594,7 @@ class PlatformSettingsService
     protected function cacheForever(string $key, mixed $value): void
     {
         try {
-            Cache::forever($key, $value);
+            Cache::forever($key, $value ?? self::NULL_CACHE_VALUE);
         } catch (QueryException $exception) {
             if ($this->isMissingSettingsInfrastructure($exception)) {
                 return;

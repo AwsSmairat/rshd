@@ -79,6 +79,28 @@ class PlatformSettingsPreferencesTest extends TestCase
         $this->assertSame([], $queries);
     }
 
+    public function test_missing_null_setting_is_cached_without_repeated_database_queries(): void
+    {
+        /** @var PlatformSettingsService $settings */
+        $settings = app(PlatformSettingsService::class);
+
+        Cache::forget(PlatformSettingsService::CACHE_PREFIX.'branding.main_logo');
+
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+
+        $this->assertNull($settings->logoUrl());
+        $this->assertNull($settings->logoUrl());
+
+        $queries = collect(DB::getQueryLog())
+            ->pluck('query')
+            ->filter(fn (string $sql): bool => str_contains(strtolower($sql), 'platform_settings'))
+            ->values();
+
+        $this->assertCount(1, $queries);
+        $this->assertTrue(Cache::has(PlatformSettingsService::CACHE_PREFIX.'branding.main_logo'));
+    }
+
     public function test_apply_preferences_survive_missing_cache_table(): void
     {
         config(['cache.default' => 'database']);
