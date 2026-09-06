@@ -72,7 +72,7 @@ class LessonFileDownloadService
                 'api.v1.files.stream',
                 $expiresAt,
                 [
-                    'file' => $lessonFile->id,
+                    'lessonFile' => $lessonFile->id,
                     'uid' => $user->id,
                 ],
             ),

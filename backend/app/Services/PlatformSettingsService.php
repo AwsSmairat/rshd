@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\PlatformSetting;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class PlatformSettingsService
@@ -206,23 +206,29 @@ class PlatformSettingsService
         $definition = $this->definitions()[$group][$key] ?? null;
         $defaultValue = $definition['value'] ?? $default;
         $type = $definition['type'] ?? 'string';
+        $cacheKey = self::CACHE_PREFIX.$group.'.'.$key;
+        $cached = Cache::get($cacheKey);
 
-        if (! Schema::hasTable('platform_settings')) {
-            if (app()->environment('local', 'testing')) {
-                return $this->castStoredValue($defaultValue, $type, $defaultValue);
-            }
+        if (! is_null($cached)) {
+            return $this->castStoredValue($cached, $type, $defaultValue);
         }
 
-        $cacheKey = self::CACHE_PREFIX.$group.'.'.$key;
+        try {
+            $stored = Cache::rememberForever($cacheKey, function () use ($group, $key, $defaultValue) {
+                $record = PlatformSetting::query()
+                    ->where('group', $group)
+                    ->where('key', $key)
+                    ->first();
 
-        $stored = Cache::rememberForever($cacheKey, function () use ($group, $key, $defaultValue) {
-            $record = PlatformSetting::query()
-                ->where('group', $group)
-                ->where('key', $key)
-                ->first();
+                return $record?->value ?? $defaultValue;
+            });
+        } catch (QueryException $exception) {
+            if ($this->isMissingPlatformSettingsTable($exception)) {
+                return $this->castStoredValue($defaultValue, $type, $defaultValue);
+            }
 
-            return $record?->value ?? $defaultValue;
-        });
+            throw $exception;
+        }
 
         return $this->castStoredValue($stored, $type, $defaultValue);
     }
@@ -566,6 +572,15 @@ class PlatformSettingsService
         }
 
         return $this->faviconUrl();
+    }
+
+    protected function isMissingPlatformSettingsTable(QueryException $exception): bool
+    {
+        $message = strtolower($exception->getMessage());
+
+        return str_contains($message, 'no such table')
+            || str_contains($message, 'base table or view not found')
+            || (str_contains($message, 'platform_settings') && str_contains($message, "doesn't exist"));
     }
 
     protected function isBrandingKey(string $key): bool

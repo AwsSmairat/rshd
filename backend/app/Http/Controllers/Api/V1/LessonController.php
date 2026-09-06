@@ -8,6 +8,7 @@ use App\Http\Resources\LessonResource;
 use App\Models\Lesson;
 use App\Models\Subject;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -27,6 +28,8 @@ class LessonController extends Controller
             ->with($this->lessonRelationsFor($user))
             ->get();
 
+        $lessons->each(fn (Lesson $lesson) => $this->linkParents($lesson, $subject));
+
         return $this->successResourceList(LessonResource::collection($lessons));
     }
 
@@ -40,6 +43,32 @@ class LessonController extends Controller
         ));
 
         return $this->successResource(new LessonResource($lesson));
+    }
+
+    /**
+     * Policies and resources call loadMissing('lesson.subject') on every nested
+     * video, file, assignment and quiz. The subject is already known here, so
+     * handing it down turns each of those lazy loads into a no-op.
+     */
+    private function linkParents(Lesson $lesson, Subject $subject): void
+    {
+        $subjectSummary = $subject->withoutRelations();
+        $lesson->setRelation('subject', $subjectSummary);
+
+        $lessonSummary = $lesson->withoutRelations();
+        $lessonSummary->setRelation('subject', $subjectSummary);
+
+        foreach (['videos', 'files'] as $relation) {
+            $lesson->getRelation($relation)->each(
+                fn (Model $child) => $child->setRelation('lesson', $lessonSummary)
+            );
+        }
+
+        foreach (['assignments', 'quizzes'] as $relation) {
+            $lesson->getRelation($relation)->each(
+                fn (Model $child) => $child->setRelation('subject', $subjectSummary)
+            );
+        }
     }
 
     /**

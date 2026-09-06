@@ -19,6 +19,7 @@ use App\Policies\SubjectPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\VideoPolicy;
 use App\Services\Bunny\BunnyStreamConfigValidator;
+use App\Services\EnrollmentService;
 use App\Services\PlatformSettingsService;
 use App\Support\RateLimitKeys;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -27,7 +28,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -37,7 +37,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Scoped rather than singleton so the memoised enrollment lookups are
+        // dropped between queued jobs instead of going stale in a long-lived worker.
+        $this->app->scoped(EnrollmentService::class);
     }
 
     /**
@@ -163,13 +165,11 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(120)->by($request->ip());
         });
 
+        // Cache-first: do not probe the schema on every request. Missing-table
+        // and first-install cases are handled inside PlatformSettingsService.
         $settings = app(PlatformSettingsService::class);
-        if (Schema::hasTable('platform_settings')) {
-            $settings->applyMailPreferences();
-            $settings->applySecurityPreferences();
-        } elseif (app()->environment('local', 'testing')) {
-            // During first install or empty local DB, env defaults apply.
-        }
+        $settings->applyMailPreferences();
+        $settings->applySecurityPreferences();
 
         foreach ([
             storage_path('app/public/livewire-tmp'),

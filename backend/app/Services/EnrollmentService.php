@@ -14,6 +14,14 @@ use Illuminate\Validation\ValidationException;
 
 class EnrollmentService
 {
+    /**
+     * Access checks repeat for every lesson, video and file in a listing, so the
+     * lookup is memoised for the lifetime of the request.
+     *
+     * @var array<string, SubjectStudent|null>
+     */
+    protected array $activeEnrollments = [];
+
     public function __construct(
         protected PlatformSettingsService $settings,
         protected PlatformNotificationService $notifications,
@@ -26,6 +34,17 @@ class EnrollmentService
     }
 
     public function findActiveEnrollment(User $student, Subject $subject): ?SubjectStudent
+    {
+        $key = $student->id.':'.$subject->id;
+
+        if (array_key_exists($key, $this->activeEnrollments)) {
+            return $this->activeEnrollments[$key];
+        }
+
+        return $this->activeEnrollments[$key] = $this->resolveActiveEnrollment($student, $subject);
+    }
+
+    protected function resolveActiveEnrollment(User $student, Subject $subject): ?SubjectStudent
     {
         $enrollment = SubjectStudent::query()
             ->where('student_id', $student->id)
@@ -47,6 +66,11 @@ class EnrollmentService
         }
 
         return $enrollment;
+    }
+
+    protected function forgetActiveEnrollment(User $student, Subject $subject): void
+    {
+        unset($this->activeEnrollments[$student->id.':'.$subject->id]);
     }
 
     public function enrollmentExpiresAt(User $student, Subject $subject): ?Carbon
@@ -109,6 +133,8 @@ class EnrollmentService
         $enrollment->activated_at = null;
         $enrollment->save();
 
+        $this->forgetActiveEnrollment($student, $subject);
+
         $this->audit->logActivation(
             'enrollment.requested',
             $student,
@@ -168,6 +194,8 @@ class EnrollmentService
 
         $enrollment->delete();
 
+        $this->forgetActiveEnrollment($student, $subject);
+
         $this->audit->logActivation(
             'enrollment.cancelled',
             $student,
@@ -207,6 +235,8 @@ class EnrollmentService
         }
 
         $enrollment->save();
+
+        $this->forgetActiveEnrollment($student, $subject);
 
         $this->audit->logActivation(
             'enrollment.activated',
@@ -259,6 +289,8 @@ class EnrollmentService
 
         $enrollment->delete();
 
+        $this->forgetActiveEnrollment($student, $subject);
+
         $this->audit->logActivation(
             'enrollment.rejected',
             $actor ?? $student,
@@ -272,6 +304,8 @@ class EnrollmentService
             ->where('student_id', $student->id)
             ->where('subject_id', $subject->id)
             ->update(['access_status' => AccessStatus::Revoked]);
+
+        $this->forgetActiveEnrollment($student, $subject);
 
         $this->audit->logActivation(
             'enrollment.revoked',

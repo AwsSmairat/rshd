@@ -22,10 +22,7 @@ use App\Http\Controllers\Api\V1\VideoController;
 use App\Http\Controllers\Api\V1\VideoStreamController;
 use App\Http\Middleware\RejectBlockedApiUser;
 use App\Http\Middleware\RejectUnverifiedApiUser;
-use App\Models\LessonFile;
 use Illuminate\Support\Facades\Route;
-
-Route::bind('file', fn (string $value) => LessonFile::findOrFail($value));
 
 Route::prefix('v1')->middleware('throttle:api-guest')->group(function () {
     Route::get('settings/public', PublicSettingsController::class);
@@ -46,7 +43,7 @@ Route::prefix('v1')->middleware('throttle:api-guest')->group(function () {
     Route::get('videos/{video}/stream', [VideoStreamController::class, 'stream'])
         ->name('api.v1.videos.stream');
 
-    Route::get('files/{file}/stream', [LessonFileController::class, 'stream'])
+    Route::get('files/{lessonFile}/stream', [LessonFileController::class, 'stream'])
         ->middleware('signed')
         ->name('api.v1.files.stream');
 });
@@ -78,11 +75,11 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:api-authenticated'])-
         Route::post('videos/{video}/progress', [VideoController::class, 'updateProgress'])
             ->middleware('throttle:video-progress');
 
-        Route::get('files/{file}', [LessonFileController::class, 'show']);
-        Route::get('files/{file}/download', [LessonFileController::class, 'download'])
+        Route::get('files/{lessonFile}', [LessonFileController::class, 'show']);
+        Route::get('files/{lessonFile}/download', [LessonFileController::class, 'download'])
             ->middleware('throttle:signed-file');
-        Route::get('files/{file}/annotations', [LessonFileController::class, 'getAnnotations']);
-        Route::post('files/{file}/annotations', [LessonFileController::class, 'storeAnnotations'])
+        Route::get('files/{lessonFile}/annotations', [LessonFileController::class, 'getAnnotations']);
+        Route::post('files/{lessonFile}/annotations', [LessonFileController::class, 'storeAnnotations'])
             ->middleware('throttle:annotations');
 
         Route::get('assignments', [AssignmentController::class, 'index']);
