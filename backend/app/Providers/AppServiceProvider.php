@@ -40,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
         // Scoped rather than singleton so the memoised enrollment lookups are
         // dropped between queued jobs instead of going stale in a long-lived worker.
         $this->app->scoped(EnrollmentService::class);
+        $this->app->scoped(PlatformSettingsService::class);
     }
 
     /**

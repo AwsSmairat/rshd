@@ -16,12 +16,16 @@ class PlatformSettingsService
 
     private const NULL_CACHE_VALUE = '__rshd_platform_setting_null__';
 
+    private ?array $definitionsCache = null;
+
+    private array $memoizedValues = [];
+
     /**
      * @return array<string, array<string, array{type: string, value: mixed, is_public: bool}>>
      */
     public function definitions(): array
     {
-        return [
+        return $this->definitionsCache ??= [
             'platform' => [
                 'platform_name' => ['type' => 'string', 'value' => 'RSHD', 'is_public' => true],
                 'platform_subtitle' => ['type' => 'string', 'value' => 'منصة تعليمية ذكية', 'is_public' => true],
@@ -209,14 +213,27 @@ class PlatformSettingsService
         $defaultValue = $definition['value'] ?? $default;
         $type = $definition['type'] ?? 'string';
         $cacheKey = self::CACHE_PREFIX.$group.'.'.$key;
+
+        if ($definition !== null && array_key_exists($cacheKey, $this->memoizedValues)) {
+            return $this->memoizedValues[$cacheKey];
+        }
+
         $cached = $this->cacheGet($cacheKey);
 
         if ($cached === self::NULL_CACHE_VALUE) {
-            return $this->castStoredValue(null, $type, $defaultValue);
+            $value = $this->castStoredValue(null, $type, $defaultValue);
+
+            return $definition !== null
+                ? $this->memoizedValues[$cacheKey] = $value
+                : $value;
         }
 
         if (! is_null($cached)) {
-            return $this->castStoredValue($cached, $type, $defaultValue);
+            $value = $this->castStoredValue($cached, $type, $defaultValue);
+
+            return $definition !== null
+                ? $this->memoizedValues[$cacheKey] = $value
+                : $value;
         }
 
         try {
@@ -234,7 +251,11 @@ class PlatformSettingsService
             throw $exception;
         }
 
-        return $this->castStoredValue($stored, $type, $defaultValue);
+        $value = $this->castStoredValue($stored, $type, $defaultValue);
+
+        return $definition !== null
+            ? $this->memoizedValues[$cacheKey] = $value
+            : $value;
     }
 
     public function set(string $key, mixed $value, ?string $group = null): void
@@ -263,6 +284,8 @@ class PlatformSettingsService
                 'is_public' => $definition['is_public'] ?? false,
             ],
         );
+
+        unset($this->memoizedValues[self::CACHE_PREFIX.$group.'.'.$key]);
 
         Cache::forget(self::CACHE_PREFIX.$group.'.'.$key);
         Cache::forget(self::CACHE_GROUP_PREFIX.$group);
@@ -337,6 +360,8 @@ class PlatformSettingsService
 
     public function clearCache(): void
     {
+        $this->memoizedValues = [];
+
         foreach ($this->definitions() as $group => $keys) {
             Cache::forget(self::CACHE_GROUP_PREFIX.$group);
             foreach (array_keys($keys) as $key) {
