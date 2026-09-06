@@ -6,6 +6,7 @@ use App\Services\PlatformSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class PlatformSettingsPreferencesTest extends TestCase
@@ -76,5 +77,20 @@ class PlatformSettingsPreferencesTest extends TestCase
             ->all();
 
         $this->assertSame([], $queries);
+    }
+
+    public function test_apply_preferences_survive_missing_cache_table(): void
+    {
+        config(['cache.default' => 'database']);
+        Schema::dropIfExists('cache');
+
+        /** @var PlatformSettingsService $settings */
+        $settings = app(PlatformSettingsService::class);
+
+        $settings->applyMailPreferences();
+        $settings->applySecurityPreferences();
+
+        $this->assertSame('RSHD', config('mail.from.name'));
+        $this->assertGreaterThanOrEqual(5, (int) config('session.lifetime'));
     }
 }

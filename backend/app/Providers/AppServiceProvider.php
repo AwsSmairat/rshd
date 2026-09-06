@@ -165,11 +165,13 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(120)->by($request->ip());
         });
 
-        // Cache-first: do not probe the schema on every request. Missing-table
-        // and first-install cases are handled inside PlatformSettingsService.
-        $settings = app(PlatformSettingsService::class);
-        $settings->applyMailPreferences();
-        $settings->applySecurityPreferences();
+        // HTTP + tests only. package:discover / migrate boot before the cache
+        // table exists, and CACHE_STORE=database would abort composer install.
+        if (! $this->app->runningInConsole() || $this->app->runningUnitTests()) {
+            $settings = app(PlatformSettingsService::class);
+            $settings->applyMailPreferences();
+            $settings->applySecurityPreferences();
+        }
 
         foreach ([
             storage_path('app/public/livewire-tmp'),

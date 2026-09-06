@@ -207,23 +207,21 @@ class PlatformSettingsService
         $defaultValue = $definition['value'] ?? $default;
         $type = $definition['type'] ?? 'string';
         $cacheKey = self::CACHE_PREFIX.$group.'.'.$key;
-        $cached = Cache::get($cacheKey);
+        $cached = $this->cacheGet($cacheKey);
 
         if (! is_null($cached)) {
             return $this->castStoredValue($cached, $type, $defaultValue);
         }
 
         try {
-            $stored = Cache::rememberForever($cacheKey, function () use ($group, $key, $defaultValue) {
-                $record = PlatformSetting::query()
-                    ->where('group', $group)
-                    ->where('key', $key)
-                    ->first();
-
-                return $record?->value ?? $defaultValue;
-            });
+            $record = PlatformSetting::query()
+                ->where('group', $group)
+                ->where('key', $key)
+                ->first();
+            $stored = $record?->value ?? $defaultValue;
+            $this->cacheForever($cacheKey, $stored);
         } catch (QueryException $exception) {
-            if ($this->isMissingPlatformSettingsTable($exception)) {
+            if ($this->isMissingSettingsInfrastructure($exception)) {
                 return $this->castStoredValue($defaultValue, $type, $defaultValue);
             }
 
@@ -574,13 +572,42 @@ class PlatformSettingsService
         return $this->faviconUrl();
     }
 
-    protected function isMissingPlatformSettingsTable(QueryException $exception): bool
+    protected function cacheGet(string $key): mixed
+    {
+        try {
+            return Cache::get($key);
+        } catch (QueryException $exception) {
+            if ($this->isMissingSettingsInfrastructure($exception)) {
+                return null;
+            }
+
+            throw $exception;
+        }
+    }
+
+    protected function cacheForever(string $key, mixed $value): void
+    {
+        try {
+            Cache::forever($key, $value);
+        } catch (QueryException $exception) {
+            if ($this->isMissingSettingsInfrastructure($exception)) {
+                return;
+            }
+
+            throw $exception;
+        }
+    }
+
+    protected function isMissingSettingsInfrastructure(QueryException $exception): bool
     {
         $message = strtolower($exception->getMessage());
 
         return str_contains($message, 'no such table')
             || str_contains($message, 'base table or view not found')
-            || (str_contains($message, 'platform_settings') && str_contains($message, "doesn't exist"));
+            || (str_contains($message, "doesn't exist") && (
+                str_contains($message, 'platform_settings')
+                || str_contains($message, 'cache')
+            ));
     }
 
     protected function isBrandingKey(string $key): bool

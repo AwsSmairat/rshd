@@ -19,6 +19,9 @@ jobs:
       APP_ENV: testing
       DB_CONNECTION: sqlite
       DB_DATABASE: ${{ github.workspace }}/backend/database/database.sqlite
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+      SESSION_DRIVER: array
     steps:
       - uses: actions/checkout@v4
 
@@ -42,6 +45,9 @@ jobs:
         run: |
           mkdir -p backend/database
           touch backend/database/database.sqlite
+
+      - name: Install audit tools
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
 
       - name: Install Laravel dependencies
         working-directory: backend
@@ -96,6 +102,9 @@ jobs:
       APP_ENV: testing
       DB_CONNECTION: sqlite
       DB_DATABASE: ${{ github.workspace }}/backend/database/database.sqlite
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+      SESSION_DRIVER: array
     steps:
       - uses: actions/checkout@v4
 
@@ -119,6 +128,9 @@ jobs:
           mkdir -p backend/database
           touch backend/database/database.sqlite
 
+      - name: Install audit tools
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -126,8 +138,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd backend && composer install --no-interaction
-          cd backend && php artisan migrate --force
+          composer install --no-interaction --working-dir=backend
+          php backend/artisan migrate --force
           flutter pub get
           pip install semgrep
 
