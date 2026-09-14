@@ -47,6 +47,11 @@ class HelpCenterController extends StateNotifier<HelpCenterState> {
 
     try {
       final contacts = await _repository.getContacts();
+
+      if (!mounted) {
+        return;
+      }
+
       state = HelpCenterState(
         status: contacts.teachers.isEmpty && contacts.supportEmail.isEmpty
             ? FeatureLoadStatus.empty
@@ -54,6 +59,10 @@ class HelpCenterController extends StateNotifier<HelpCenterState> {
         contacts: contacts,
       );
     } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       state = HelpCenterState(
         status: FeatureLoadStatus.error,
         errorMessage: error.message.isNotEmpty
@@ -61,6 +70,10 @@ class HelpCenterController extends StateNotifier<HelpCenterState> {
             : 'تعذر تحميل مركز المساعدة',
       );
     } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
       state = const HelpCenterState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر تحميل مركز المساعدة',

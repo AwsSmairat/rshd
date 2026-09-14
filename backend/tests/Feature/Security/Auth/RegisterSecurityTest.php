@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Auth;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Services\PlatformSettingsService;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -10,9 +12,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class RegisterSecurityTest extends TestCase
 {
     use RefreshDatabase;

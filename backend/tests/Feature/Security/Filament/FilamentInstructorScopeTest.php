@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Filament;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Enums\ContentStatus;
 use App\Enums\SubjectCategory;
 use App\Enums\UserRole;
@@ -13,9 +15,7 @@ use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class FilamentInstructorScopeTest extends TestCase
 {
     use RefreshDatabase;

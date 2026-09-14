@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Auth;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Enums\GradeSourceType;
 use App\Models\Grade;
 use App\Services\PlatformSettingsService;
@@ -10,9 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class UnverifiedStudentSessionTest extends TestCase
 {
     use CreatesEnrollmentScenario;

@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../core/network/api_exception.dart';
-import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/loading_widget.dart';
 import '../../../core/widgets/responsive_content.dart';
-import '../../auth/presentation/auth_controller.dart';
 import '../data/models/subject_model.dart';
 import '../data/subjects_repository.dart';
 import '../widgets/lesson_card.dart';
@@ -56,13 +53,6 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
           .read(subjectLessonsControllerProvider(widget.subjectId).notifier)
           .load(widget.subjectId);
     });
-  }
-
-  void _handleUnauthorized(String? message) {
-    if (message != null && message.contains('انتهت الجلسة') && mounted) {
-      ref.read(authControllerProvider.notifier).logout();
-      context.go(AppRoutes.login);
-    }
   }
 
   Future<void> _requestPurchase() async {
@@ -221,20 +211,6 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
     final lessonsState = ref.watch(
       subjectLessonsControllerProvider(widget.subjectId),
     );
-
-    ref.listen(subjectLessonsControllerProvider(widget.subjectId), (
-      prev,
-      next,
-    ) {
-      _handleUnauthorized(next.errorMessage);
-    });
-
-    ref.listen(subjectDetailsControllerProvider(widget.subjectId), (
-      prev,
-      next,
-    ) {
-      _handleUnauthorized(next.errorMessage);
-    });
 
     return Scaffold(
       backgroundColor: AppColors.of(context).background,

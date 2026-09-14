@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Auth;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Enums\GradeSourceType;
 use App\Enums\UserStatus;
 use App\Models\Grade;
@@ -10,9 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class BlockedStudentSessionTest extends TestCase
 {
     use CreatesEnrollmentScenario;

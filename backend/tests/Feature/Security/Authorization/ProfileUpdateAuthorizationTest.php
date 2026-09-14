@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Authorization;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Models\User;
@@ -11,9 +13,7 @@ use Laravel\Sanctum\Sanctum;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class ProfileUpdateAuthorizationTest extends TestCase
 {
     use CreatesEnrollmentScenario;

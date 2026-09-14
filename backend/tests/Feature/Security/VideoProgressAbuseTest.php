@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Enums\AccessStatus;
 use App\Enums\ContentStatus;
 use App\Enums\PaymentStatus;
@@ -19,9 +21,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class VideoProgressAbuseTest extends TestCase
 {
     use RefreshDatabase;

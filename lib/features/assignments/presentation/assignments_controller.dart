@@ -130,6 +130,11 @@ class AssignmentsListController extends StateNotifier<AssignmentsListState> {
 
     try {
       final assignments = await _repository.getAssignments();
+
+      if (!mounted) {
+        return;
+      }
+
       state = AssignmentsListState(
         status: assignments.isEmpty
             ? FeatureLoadStatus.empty
@@ -137,11 +142,19 @@ class AssignmentsListController extends StateNotifier<AssignmentsListState> {
         assignments: assignments,
       );
     } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       state = AssignmentsListState(
         status: FeatureLoadStatus.error,
         errorMessage: mapAssignmentError(error),
       );
     } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
       state = const AssignmentsListState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -198,16 +211,28 @@ class AssignmentDetailsController
 
     try {
       final assignment = await _repository.getAssignmentDetails(assignmentId);
+      if (mounted == false) {
+        return;
+      }
+
       state = AssignmentDetailsState(
         status: FeatureLoadStatus.loaded,
         assignment: assignment,
       );
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return;
+      }
+
       state = AssignmentDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: mapAssignmentError(error),
       );
     } catch (_) {
+      if (mounted == false) {
+        return;
+      }
+
       state = const AssignmentDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -252,17 +277,29 @@ class AssignmentSubmitController extends StateNotifier<AssignmentSubmitState> {
         fileName: fileName,
       );
 
+      if (mounted == false) {
+        return null;
+      }
+
       state = AssignmentSubmitState(
         status: AssignmentSubmitStatus.success,
         submission: submission,
       );
       return submission;
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return null;
+      }
+
       state = AssignmentSubmitState(
         status: AssignmentSubmitStatus.error,
         errorMessage: mapAssignmentSubmitError(error),
       );
     } catch (_) {
+      if (mounted == false) {
+        return null;
+      }
+
       state = const AssignmentSubmitState(
         status: AssignmentSubmitStatus.error,
         errorMessage: 'تعذر تسليم الواجب',

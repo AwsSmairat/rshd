@@ -10,7 +10,6 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/loading_widget.dart';
-import '../../auth/presentation/auth_controller.dart';
 import '../data/models/quiz_model.dart';
 import '../widgets/quiz_question_card.dart';
 import 'quizzes_controller.dart';
@@ -150,13 +149,6 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
     );
   }
 
-  void _handleUnauthorized(String? message) {
-    if (message != null && message.contains('انتهت الجلسة') && mounted) {
-      ref.read(authControllerProvider.notifier).logout();
-      context.go(AppRoutes.login);
-    }
-  }
-
   String _formatTime(int seconds) {
     final minutes = seconds ~/ 60;
     final secs = seconds % 60;
@@ -171,7 +163,6 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
     );
 
     ref.listen(quizAttemptControllerProvider(widget.quizId), (previous, next) {
-      _handleUnauthorized(next.errorMessage);
       final message = next.errorMessage;
       if (message != null &&
           message != previous?.errorMessage &&

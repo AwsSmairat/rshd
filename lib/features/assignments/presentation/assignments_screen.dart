@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../auth/presentation/auth_controller.dart';
 import '../../subjects/presentation/subjects_controller.dart';
 import '../widgets/assignment_card.dart';
 import '../widgets/assignments_header.dart';
@@ -34,20 +33,9 @@ class _AssignmentsScreenState extends ConsumerState<AssignmentsScreen> {
         .load(refresh: true);
   }
 
-  void _handleUnauthorized(String? message) {
-    if (message != null && message.contains('انتهت الجلسة') && mounted) {
-      ref.read(authControllerProvider.notifier).logout();
-      context.go(AppRoutes.login);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(assignmentsListControllerProvider);
-
-    ref.listen(assignmentsListControllerProvider, (previous, next) {
-      _handleUnauthorized(next.errorMessage);
-    });
 
     return Scaffold(
       backgroundColor: Colors.transparent,

@@ -2,14 +2,14 @@
 
 namespace Tests\Feature\Security\RateLimit;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\RateLimiter;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class ApiRateLimitTest extends TestCase
 {
     use RefreshDatabase;

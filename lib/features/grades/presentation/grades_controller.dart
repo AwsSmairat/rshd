@@ -107,6 +107,11 @@ class GradesListController extends StateNotifier<GradesListState> {
 
     try {
       final grades = await _repository.getGrades();
+
+      if (!mounted) {
+        return;
+      }
+
       state = GradesListState(
         status: grades.isEmpty
             ? FeatureLoadStatus.empty
@@ -114,11 +119,19 @@ class GradesListController extends StateNotifier<GradesListState> {
         grades: grades,
       );
     } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       state = GradesListState(
         status: FeatureLoadStatus.error,
         errorMessage: mapGradesError(error),
       );
     } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
       state = const GradesListState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -141,6 +154,12 @@ class GradeDetailsController extends StateNotifier<GradeDetailsState>
   GradeDetailsController(this._repository) : super(const GradeDetailsState());
 
   final GradesRepository _repository;
+
+  @override
+  void dispose() {
+    disposeLoadGuard();
+    super.dispose();
+  }
 
   Future<void> load(int gradeId, {GradeModel? cached}) async {
     if (cached != null) {

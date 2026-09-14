@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Authorization;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Enums\GradeSourceType;
 use App\Enums\UserStatus;
 use App\Models\Grade;
@@ -12,9 +14,7 @@ use Laravel\Sanctum\Sanctum;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class GradesAuthorizationTest extends TestCase
 {
     use CreatesEnrollmentScenario;

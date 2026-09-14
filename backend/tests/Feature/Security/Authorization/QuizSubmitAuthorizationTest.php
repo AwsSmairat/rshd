@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Authorization;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Enums\ContentStatus;
 use App\Models\Quiz;
 use Database\Seeders\RolePermissionSeeder;
@@ -10,9 +12,7 @@ use Laravel\Sanctum\Sanctum;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class QuizSubmitAuthorizationTest extends TestCase
 {
     use CreatesEnrollmentScenario;

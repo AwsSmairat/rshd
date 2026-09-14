@@ -64,11 +64,9 @@ String mapSettingsError(ApiException error) {
 }
 
 class StudentSettingsController extends StateNotifier<StudentSettingsState> {
-  StudentSettingsController(
-    this._repository, {
-    StudentAvatarStore? avatarStore,
-  }) : _avatarStore = avatarStore ?? StudentAvatarStore(),
-       super(const StudentSettingsState());
+  StudentSettingsController(this._repository, {StudentAvatarStore? avatarStore})
+    : _avatarStore = avatarStore ?? StudentAvatarStore(),
+      super(const StudentSettingsState());
 
   final SettingsRepository _repository;
   final StudentAvatarStore _avatarStore;
@@ -81,15 +79,35 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
     }
 
     final cached = await _avatarStore.existingPath();
+
+    if (!mounted) {
+      return null;
+    }
+
     if (cached != null) {
       return cached;
     }
 
     final bytes = await _repository.downloadAvatar();
+
+    if (!mounted) {
+      return null;
+    }
+
     if (bytes != null) {
       try {
-        return await _avatarStore.saveFromBytes(bytes);
+        final saved = await _avatarStore.saveFromBytes(bytes);
+
+        if (!mounted) {
+          return null;
+        }
+
+        return saved;
       } catch (_) {
+        if (!mounted) {
+          return null;
+        }
+
         return state.localAvatarPath;
       }
     }
@@ -111,7 +129,17 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
 
     try {
       final settings = await _repository.getSettings();
+
+      if (!mounted) {
+        return;
+      }
+
       final localPath = await _resolveLocalAvatar(settings);
+
+      if (!mounted) {
+        return;
+      }
+
       state = state.copyWith(
         status: FeatureLoadStatus.loaded,
         settings: settings,
@@ -120,6 +148,10 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
         clearError: true,
       );
     } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       state = state.copyWith(
         status: FeatureLoadStatus.error,
         errorMessage: mapSettingsError(error),
@@ -147,6 +179,11 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
         gender: gender,
         country: country,
       );
+
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(
         isSaving: false,
         settings: settings,
@@ -154,6 +191,10 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
       );
       return true;
     } on ApiException catch (error) {
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(
         isSaving: false,
         errorMessage: mapSettingsError(error),
@@ -169,6 +210,11 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
     } catch (_) {
       previewPath = path;
     }
+
+    if (!mounted) {
+      return false;
+    }
+
     state = state.copyWith(
       isUploadingAvatar: true,
       localAvatarPath: previewPath,
@@ -177,6 +223,11 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
     );
     try {
       final settings = await _repository.uploadAvatar(path);
+
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(
         isUploadingAvatar: false,
         settings: settings,
@@ -185,6 +236,10 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
       );
       return true;
     } on ApiException catch (error) {
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(
         isUploadingAvatar: false,
         errorMessage: mapSettingsError(error),
@@ -197,7 +252,17 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
     state = state.copyWith(isUploadingAvatar: true, clearMessage: true);
     try {
       final settings = await _repository.deleteAvatar();
+
+      if (!mounted) {
+        return false;
+      }
+
       await _avatarStore.clear();
+
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(
         isUploadingAvatar: false,
         settings: settings,
@@ -206,6 +271,10 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
       );
       return true;
     } on ApiException catch (error) {
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(
         isUploadingAvatar: false,
         errorMessage: mapSettingsError(error),
@@ -226,12 +295,21 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
         password: password,
         passwordConfirmation: confirmation,
       );
+
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(
         isSaving: false,
         actionMessage: 'تم تغيير كلمة المرور',
       );
       return true;
     } on ApiException catch (error) {
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(
         isSaving: false,
         errorMessage: mapSettingsError(error),
@@ -260,8 +338,17 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
 
     try {
       final settings = await _repository.updatePreferences(patch);
+
+      if (!mounted) {
+        return;
+      }
+
       state = state.copyWith(settings: settings, isSaving: false);
     } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       state = state.copyWith(
         settings: current.copyWith(preferences: previous),
         isSaving: false,
@@ -286,8 +373,17 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
 
     try {
       final settings = await _repository.updatePreferences({key: value});
+
+      if (!mounted) {
+        return;
+      }
+
       state = state.copyWith(settings: settings, isSaving: false);
     } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       state = state.copyWith(
         settings: current.copyWith(preferences: previous),
         isSaving: false,
@@ -300,6 +396,11 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
     state = state.copyWith(isSaving: true, clearMessage: true);
     try {
       final settings = await _repository.revokeDevice(deviceId);
+
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(
         isSaving: false,
         settings: settings,
@@ -307,6 +408,10 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
       );
       return true;
     } on ApiException catch (error) {
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(
         isSaving: false,
         errorMessage: mapSettingsError(error),
@@ -319,13 +424,27 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
     state = state.copyWith(isSaving: true, clearMessage: true);
     try {
       await _repository.logoutAllDevices();
+
+      if (!mounted) {
+        return false;
+      }
+
       await load(refresh: true);
+
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(
         isSaving: false,
         actionMessage: 'تم تسجيل الخروج من الأجهزة الأخرى',
       );
       return true;
     } on ApiException catch (error) {
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(
         isSaving: false,
         errorMessage: mapSettingsError(error),
@@ -338,9 +457,18 @@ class StudentSettingsController extends StateNotifier<StudentSettingsState> {
     state = state.copyWith(isSaving: true, clearMessage: true);
     try {
       await _repository.deleteAccount(password: password);
+
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(isSaving: false);
       return true;
     } on ApiException catch (error) {
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(
         isSaving: false,
         errorMessage: mapSettingsError(error),

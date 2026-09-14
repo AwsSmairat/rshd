@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Auth;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Mail\StudentEmailVerificationCodeMail;
@@ -17,9 +19,7 @@ use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class EmailVerificationSecurityTest extends TestCase
 {
     use RefreshDatabase;

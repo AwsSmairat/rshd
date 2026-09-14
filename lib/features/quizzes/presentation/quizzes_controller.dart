@@ -202,6 +202,11 @@ class QuizzesListController extends StateNotifier<QuizzesListState> {
 
     try {
       final quizzes = await _repository.getQuizzes();
+
+      if (!mounted) {
+        return;
+      }
+
       state = QuizzesListState(
         status: quizzes.isEmpty
             ? FeatureLoadStatus.empty
@@ -209,11 +214,19 @@ class QuizzesListController extends StateNotifier<QuizzesListState> {
         quizzes: quizzes,
       );
     } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       state = QuizzesListState(
         status: FeatureLoadStatus.error,
         errorMessage: mapQuizError(error),
       );
     } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
       state = const QuizzesListState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -263,6 +276,10 @@ class QuizDetailsController extends StateNotifier<QuizDetailsState> {
 
     try {
       final quiz = await _repository.findQuizById(quizId);
+      if (mounted == false) {
+        return;
+      }
+
       if (quiz == null) {
         state = const QuizDetailsState(
           status: FeatureLoadStatus.error,
@@ -273,11 +290,19 @@ class QuizDetailsController extends StateNotifier<QuizDetailsState> {
 
       state = QuizDetailsState(status: FeatureLoadStatus.loaded, quiz: quiz);
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return;
+      }
+
       state = QuizDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: mapQuizError(error),
       );
     } catch (_) {
+      if (mounted == false) {
+        return;
+      }
+
       state = const QuizDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -298,6 +323,10 @@ class QuizAttemptController extends StateNotifier<QuizAttemptState> {
 
     try {
       final result = await _repository.startQuiz(quizId);
+      if (mounted == false) {
+        return false;
+      }
+
       final duration = result.quiz.durationMinutes;
 
       state = QuizAttemptState(
@@ -310,11 +339,19 @@ class QuizAttemptController extends StateNotifier<QuizAttemptState> {
       );
       return true;
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return false;
+      }
+
       state = QuizAttemptState(
         status: QuizAttemptStatus.error,
         errorMessage: mapQuizStartError(error),
       );
     } catch (_) {
+      if (mounted == false) {
+        return false;
+      }
+
       state = const QuizAttemptState(
         status: QuizAttemptStatus.error,
         errorMessage: 'تعذر بدء الاختبار',
@@ -373,6 +410,10 @@ class QuizAttemptController extends StateNotifier<QuizAttemptState> {
         selectedAnswers: state.selectedAnswers,
       );
 
+      if (mounted == false) {
+        return null;
+      }
+
       state = QuizAttemptState(
         status: QuizAttemptStatus.submitted,
         attemptId: state.attemptId,
@@ -394,6 +435,10 @@ class QuizAttemptController extends StateNotifier<QuizAttemptState> {
   /// [QuizAttemptStatus.error] would swap the questions for the "start quiz"
   /// error screen, whose retry opens a brand new attempt and discards answers.
   void _failSubmit(String message) {
+    if (mounted == false) {
+      return;
+    }
+
     state = QuizAttemptState(
       status: QuizAttemptStatus.loaded,
       attemptId: state.attemptId,

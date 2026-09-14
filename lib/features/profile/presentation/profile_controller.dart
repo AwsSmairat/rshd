@@ -54,13 +54,26 @@ class ProfileController extends StateNotifier<ProfileState> {
 
     try {
       final profile = await _repository.getProfile();
+
+      if (!mounted) {
+        return;
+      }
+
       state = ProfileState(status: FeatureLoadStatus.loaded, profile: profile);
     } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       state = ProfileState(
         status: FeatureLoadStatus.error,
         errorMessage: mapProfileError(error),
       );
     } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
       state = const ProfileState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',

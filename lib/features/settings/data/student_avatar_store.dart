@@ -7,8 +7,14 @@ import 'package:path_provider/path_provider.dart';
 /// Keeps a local copy of the student's avatar so the UI never has to fetch
 /// the public `/storage` URL (staging currently answers 403 for those).
 class StudentAvatarStore {
+  StudentAvatarStore({Future<Directory> Function()? documentsDirectoryProvider})
+    : _documentsDirectoryProvider =
+          documentsDirectoryProvider ?? getApplicationDocumentsDirectory;
+
+  final Future<Directory> Function() _documentsDirectoryProvider;
+
   Future<File> _file() async {
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = await _documentsDirectoryProvider();
     return File('${directory.path}/student_avatar.jpg');
   }
 

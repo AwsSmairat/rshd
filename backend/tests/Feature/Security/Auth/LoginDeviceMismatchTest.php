@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Auth;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Models\StudentDevice;
 use App\Models\User;
 use App\Services\DeviceService;
@@ -13,9 +15,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class LoginDeviceMismatchTest extends TestCase
 {
     use CreatesEnrollmentScenario;

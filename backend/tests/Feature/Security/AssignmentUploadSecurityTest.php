@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Enums\AccessStatus;
 use App\Enums\ContentStatus;
 use App\Enums\PaymentStatus;
@@ -16,9 +18,7 @@ use Laravel\Sanctum\Sanctum;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class AssignmentUploadSecurityTest extends TestCase
 {
     use CreatesEnrollmentScenario;

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Authorization;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Enums\ContentStatus;
 use App\Enums\VideoStatus;
 use App\Models\Assignment;
@@ -12,9 +14,7 @@ use Laravel\Sanctum\Sanctum;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class SubjectLessonsAuthorizationTest extends TestCase
 {
     use CreatesEnrollmentScenario;

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Authorization;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Models\StudentDevice;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
@@ -10,9 +12,7 @@ use Laravel\Sanctum\Sanctum;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class DeviceRevokeAuthorizationTest extends TestCase
 {
     use CreatesEnrollmentScenario;

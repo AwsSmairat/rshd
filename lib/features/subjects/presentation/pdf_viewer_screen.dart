@@ -373,8 +373,13 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     );
 
     try {
+      final pdfBytes = _pdfBytes;
+      if (pdfBytes == null || pdfBytes.isEmpty) {
+        throw Exception('مصدر ملف PDF غير متوفر');
+      }
+
       final result = await _exportService.exportAnnotatedPdf(
-        fileId: widget.fileId,
+        sourceBytes: pdfBytes,
         courseTitle: widget.courseTitle,
         documentTitle: widget.title,
         annotationJson: _state.annotationJson,

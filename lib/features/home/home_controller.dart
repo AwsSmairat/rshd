@@ -46,15 +46,10 @@ class HomeState {
 }
 
 class _SectionResult<T> {
-  const _SectionResult({
-    this.data,
-    this.failed = false,
-    this.unauthorized = false,
-  });
+  const _SectionResult({this.data, this.failed = false});
 
   final T? data;
   final bool failed;
-  final bool unauthorized;
 }
 
 class HomeController extends StateNotifier<HomeState> {
@@ -132,14 +127,8 @@ class HomeController extends StateNotifier<HomeState> {
         announcementsFuture,
       ]);
 
-      for (final result in results) {
-        if (result.unauthorized) {
-          state = const HomeState(
-            status: HomeLoadStatus.error,
-            errorMessage: 'انتهت الجلسة. يرجى تسجيل الدخول مجدداً.',
-          );
-          return;
-        }
+      if (!mounted) {
+        return;
       }
 
       final profileResult = results[0] as _SectionResult<ProfileModel>;
@@ -197,6 +186,10 @@ class HomeController extends StateNotifier<HomeState> {
         ),
       );
     } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       state = HomeState(
         status: HomeLoadStatus.error,
         errorMessage: error.isUnauthorized
@@ -206,6 +199,10 @@ class HomeController extends StateNotifier<HomeState> {
                   : 'تعذر تحميل الصفحة الرئيسية'),
       );
     } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
       state = const HomeState(
         status: HomeLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -217,11 +214,8 @@ class HomeController extends StateNotifier<HomeState> {
     try {
       final data = await loader();
       return _SectionResult(data: data);
-    } on ApiException catch (error) {
-      if (error.isUnauthorized) {
-        return const _SectionResult(unauthorized: true);
-      }
-      return _SectionResult(failed: true, data: null);
+    } on ApiException {
+      return const _SectionResult(failed: true);
     } catch (_) {
       return const _SectionResult(failed: true);
     }

@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../core/router/app_router.dart';
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/loading_widget.dart';
-import '../../auth/presentation/auth_controller.dart';
 import '../../subjects/presentation/subjects_controller.dart';
 import '../../subjects/widgets/subjects_header.dart';
 import '../notification_navigation.dart';
@@ -70,20 +67,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     NotificationNavigation.open(context, latestNotification);
   }
 
-  void _handleUnauthorized(String? message) {
-    if (message != null && message.contains('انتهت الجلسة') && mounted) {
-      ref.read(authControllerProvider.notifier).logout();
-      context.go(AppRoutes.login);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(notificationsListControllerProvider);
-
-    ref.listen(notificationsListControllerProvider, (previous, next) {
-      _handleUnauthorized(next.errorMessage);
-    });
 
     return Scaffold(
       backgroundColor: Colors.transparent,

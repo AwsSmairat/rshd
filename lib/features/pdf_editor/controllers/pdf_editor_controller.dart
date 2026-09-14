@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../auth/presentation/auth_controller.dart';
 import '../../subjects/data/subjects_repository.dart';
 import '../models/annotation_enums.dart';
 import '../models/pdf_editor_models.dart';
@@ -199,9 +200,12 @@ String mapPdfEditorError(ApiException error) {
 }
 
 class PdfEditorController extends StateNotifier<PdfEditorState> {
-  PdfEditorController(this._repository, this._fileId)
-    : super(const PdfEditorState()) {
-    _localCache = AnnotationLocalCache();
+  PdfEditorController(
+    this._repository,
+    this._fileId, {
+    AnnotationLocalCache? localCache,
+  }) : super(const PdfEditorState()) {
+    _localCache = localCache ?? AnnotationLocalCache();
   }
 
   final SubjectsRepository _repository;
@@ -223,6 +227,8 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
   }
 
   Future<void> load() async {
+    if (_isDisposed) return;
+
     state = state.copyWith(
       status: PdfAnnotationStatus.loading,
       clearError: true,
@@ -233,13 +239,20 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
       local = await _localCache.loadAnnotations(_fileId);
     } catch (_) {}
 
+    if (_isDisposed) return;
+
     try {
       final model = await _repository.getFileAnnotations(_fileId);
+      if (_isDisposed) return;
+
       final remote = model.annotationJson.isEmpty
           ? PdfAnnotationDocumentV2.empty(documentId: _fileId)
           : PdfAnnotationDocumentV2(model.annotationJson).toJson();
 
       final merged = _mergeLocalAndRemote(local, remote);
+
+      if (_isDisposed) return;
+
       state = PdfEditorState(
         status: PdfAnnotationStatus.loaded,
         annotationJson: merged,
@@ -250,6 +263,8 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
       );
       _history.clear();
     } on ApiException catch (error) {
+      if (_isDisposed) return;
+
       if (local != null) {
         state = PdfEditorState(
           status: PdfAnnotationStatus.loaded,
@@ -261,6 +276,7 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
         );
         return;
       }
+
       state = PdfEditorState(
         status: PdfAnnotationStatus.loaded,
         annotationJson: PdfAnnotationDocumentV2.empty(documentId: _fileId),
@@ -268,7 +284,12 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
         errorMessage: mapPdfEditorError(error),
       );
     } catch (error) {
-      if (kDebugMode) debugPrint('PdfEditorController.load: $error');
+      if (_isDisposed) return;
+
+      if (kDebugMode) {
+        debugPrint('PdfEditorController.load: $error');
+      }
+
       if (local != null) {
         state = PdfEditorState(
           status: PdfAnnotationStatus.loaded,
@@ -278,6 +299,7 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
         );
         return;
       }
+
       state = const PdfEditorState(
         status: PdfAnnotationStatus.loaded,
         loadFailed: true,
@@ -472,7 +494,7 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
   }
 
   Future<void> saveToServer({bool showErrors = true}) async {
-    if (state.status == PdfAnnotationStatus.saving) return;
+    if (_isDisposed || state.status == PdfAnnotationStatus.saving) return;
 
     state = state.copyWith(
       status: PdfAnnotationStatus.saving,
@@ -487,11 +509,14 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
       payload['updated_at'] = DateTime.now().toIso8601String();
 
       final model = await _repository.saveFileAnnotations(_fileId, payload);
+      if (_isDisposed) return;
+
       await _localCache.saveAnnotations(_fileId, {
         ...model.annotationJson,
         'pending_sync': false,
         'last_synced_at': DateTime.now().toIso8601String(),
       });
+      if (_isDisposed) return;
 
       state = state.copyWith(
         status: PdfAnnotationStatus.loaded,
@@ -501,6 +526,8 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
         pendingSync: false,
       );
     } on ApiException catch (error) {
+      if (_isDisposed) return;
+
       final message = mapPdfEditorError(error);
       state = state.copyWith(
         status: PdfAnnotationStatus.loaded,
@@ -509,6 +536,8 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
         errorMessage: showErrors ? message : state.errorMessage,
       );
     } catch (_) {
+      if (_isDisposed) return;
+
       state = state.copyWith(
         status: PdfAnnotationStatus.loaded,
         saveStatus: PdfSaveStatus.offlinePending,
@@ -519,20 +548,33 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
   }
 
   Future<void> flushOnBackground() async {
+    if (_isDisposed) return;
+
     final json = Map<String, dynamic>.from(state.annotationJson);
     json['pending_sync'] = true;
+
     await _localCache.saveAnnotations(_fileId, json);
+    if (_isDisposed) return;
+
     if (state.hasUnsavedChanges || state.pendingSync) {
       await saveToServer(showErrors: false);
     }
+
+    if (_isDisposed) return;
     await _persistSession();
   }
 
   Future<void> restoreSession(PdfViewerSessionController session) async {
+    if (_isDisposed) return;
+
     final saved = await _localCache.loadSession(_fileId);
-    if (saved == null) return;
+    if (_isDisposed || saved == null) return;
+
     session.jumpToPage(saved.pageNumber);
     session.setZoom(saved.zoomLevel);
+
+    if (_isDisposed) return;
+
     state = state.copyWith(
       currentPage: saved.pageNumber,
       zoomLevel: saved.zoomLevel,
@@ -540,12 +582,14 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
   }
 
   Future<void> _persistSession() async {
+    if (_isDisposed) return;
+
+    final pageNumber = state.currentPage;
+    final zoomLevel = state.zoomLevel;
+
     await _localCache.saveSession(
       _fileId,
-      PdfReadingSession(
-        pageNumber: state.currentPage,
-        zoomLevel: state.zoomLevel,
-      ),
+      PdfReadingSession(pageNumber: pageNumber, zoomLevel: zoomLevel),
     );
   }
 
@@ -1031,7 +1075,13 @@ class PdfViewerSessionController {
 
 final pdfEditorControllerProvider = StateNotifierProvider.autoDispose
     .family<PdfEditorController, PdfEditorState, int>((ref, fileId) {
-      return PdfEditorController(ref.watch(subjectsRepositoryProvider), fileId);
+      final userId = ref.watch(authControllerProvider).user?.id;
+
+      return PdfEditorController(
+        ref.watch(subjectsRepositoryProvider),
+        fileId,
+        localCache: AnnotationLocalCache(userId: userId),
+      );
     });
 
 // Backward compatibility aliases for existing imports.

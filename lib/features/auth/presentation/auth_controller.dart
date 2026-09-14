@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../../core/network/session_invalidation.dart';
 import '../../../core/security/protected_content_cache.dart';
 import '../../../core/startup/startup_timing.dart';
 import '../data/auth_repository.dart';
@@ -124,7 +127,13 @@ class AuthController extends StateNotifier<AuthState> {
         }
         state = AuthState(status: AuthStatus.authenticated, user: user);
       } on ApiException catch (error) {
-        await _repository.logout();
+        // Only authentication/authorization rejection proves that the stored
+        // session must be discarded. Transient network/server failures must
+        // not erase an otherwise valid local session.
+        if (error.isUnauthorized || error.isForbidden) {
+          await invalidateSession();
+        }
+
         if (error.message.contains('تأكيد بريدك')) {
           state = AuthState(
             status: AuthStatus.unauthenticated,
@@ -133,13 +142,18 @@ class AuthController extends StateNotifier<AuthState> {
           );
           return;
         }
+
         state = AuthState(
           status: AuthStatus.unauthenticated,
           errorMessage: error.isUnauthorized ? null : error.message,
         );
       } catch (_) {
-        await _repository.logout();
-        state = const AuthState(status: AuthStatus.unauthenticated);
+        // Fail closed, but do not destroy the stored session for an
+        // unexpected/transient bootstrap failure.
+        state = const AuthState(
+          status: AuthStatus.unauthenticated,
+          errorMessage: 'تعذر الاتصال بالسيرفر',
+        );
       }
     } finally {
       _bootstrapInFlight = false;
@@ -326,6 +340,29 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
+  bool _isInvalidatingSession = false;
+
+  Future<void> invalidateSession() async {
+    if (_isInvalidatingSession || state.status == AuthStatus.unauthenticated) {
+      return;
+    }
+
+    _isInvalidatingSession = true;
+
+    // Fail closed immediately so protected UI is removed before any
+    // feature-level error handler can keep using an invalid session.
+    state = const AuthState(status: AuthStatus.unauthenticated);
+
+    try {
+      await _repository.clearLocalSession();
+    } catch (_) {
+      // The auth state must remain unauthenticated even if local cleanup
+      // encounters an unexpected platform/storage error.
+    } finally {
+      _isInvalidatingSession = false;
+    }
+  }
+
   Future<void> logout() async {
     state = state.copyWith(status: AuthStatus.loading, clearError: true);
     await _repository.logout();
@@ -432,12 +469,18 @@ class AuthController extends StateNotifier<AuthState> {
   }
 }
 
-enum LoginFlowResult { success, requiresEmailVerification, cancelled, failed }
+enum LoginFlowResult { success, requiresEmailVerification, failed }
 
 enum RegisterResult { requiresEmailVerification, authenticated, failed }
 
 final authControllerProvider = StateNotifierProvider<AuthController, AuthState>(
   (ref) {
-    return AuthController(ref.watch(authRepositoryProvider));
+    final controller = AuthController(ref.watch(authRepositoryProvider));
+
+    ref.listen<int>(sessionInvalidationProvider, (previous, next) {
+      unawaited(controller.invalidateSession());
+    });
+
+    return controller;
   },
 );

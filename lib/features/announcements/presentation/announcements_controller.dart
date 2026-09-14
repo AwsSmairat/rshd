@@ -84,6 +84,11 @@ class AnnouncementsListController
 
     try {
       final announcements = await _repository.getAnnouncements();
+
+      if (!mounted) {
+        return;
+      }
+
       state = AnnouncementsListState(
         status: announcements.isEmpty
             ? FeatureLoadStatus.empty
@@ -91,11 +96,19 @@ class AnnouncementsListController
         announcements: announcements,
       );
     } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       state = AnnouncementsListState(
         status: FeatureLoadStatus.error,
         errorMessage: mapAnnouncementsError(error),
       );
     } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
       state = const AnnouncementsListState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -140,6 +153,10 @@ class AnnouncementDetailsController
 
     try {
       final announcement = await _repository.findById(announcementId);
+      if (mounted == false) {
+        return;
+      }
+
       if (announcement == null) {
         state = const AnnouncementDetailsState(
           status: FeatureLoadStatus.error,
@@ -153,11 +170,19 @@ class AnnouncementDetailsController
         announcement: announcement,
       );
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return;
+      }
+
       state = AnnouncementDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: mapAnnouncementsError(error),
       );
     } catch (_) {
+      if (mounted == false) {
+        return;
+      }
+
       state = const AnnouncementDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',

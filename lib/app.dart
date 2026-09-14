@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/platform/platform_settings_controller.dart';
 import 'core/router/app_router.dart';
+import 'core/security/protected_session_state_reset.dart';
 import 'core/startup/startup_coordinator.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_theme_controller.dart';
@@ -25,6 +26,8 @@ class _RshdAppState extends ConsumerState<RshdApp> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Keep session-bound feature state isolated between authenticated users.
+      ref.read(protectedSessionStateResetProvider);
       ref.read(platformSettingsProvider);
       ref
           .read(startupCoordinatorProvider.notifier)

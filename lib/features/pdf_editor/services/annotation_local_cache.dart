@@ -4,23 +4,46 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
-/// Persists annotation drafts and reading session locally for offline use.
+/// Persists annotation drafts and reading sessions locally for offline use.
+///
+/// Protected PDF editor data is scoped by authenticated user so two accounts
+/// using the same device can never read each other's local drafts/session.
 class AnnotationLocalCache {
-  Future<File> _annotationFile(int fileId) async {
-    final dir = await getApplicationDocumentsDirectory();
-    final folder = Directory('${dir.path}/pdf_annotations');
+  AnnotationLocalCache({
+    int? userId,
+    Future<Directory> Function()? documentsDirectoryProvider,
+  }) : _userId = userId,
+       _documentsDirectoryProvider =
+           documentsDirectoryProvider ?? getApplicationDocumentsDirectory;
+
+  final int? _userId;
+  final Future<Directory> Function() _documentsDirectoryProvider;
+
+  Future<Directory> _userFolder(String rootName) async {
+    final userId = _userId;
+    if (userId == null) {
+      throw StateError(
+        'Authenticated user is required for protected PDF local cache.',
+      );
+    }
+
+    final dir = await _documentsDirectoryProvider();
+    final folder = Directory('${dir.path}/$rootName/$userId');
+
     if (!await folder.exists()) {
       await folder.create(recursive: true);
     }
+
+    return folder;
+  }
+
+  Future<File> _annotationFile(int fileId) async {
+    final folder = await _userFolder('pdf_annotations');
     return File('${folder.path}/$fileId.json');
   }
 
   Future<File> _sessionFile(int fileId) async {
-    final dir = await getApplicationDocumentsDirectory();
-    final folder = Directory('${dir.path}/pdf_sessions');
-    if (!await folder.exists()) {
-      await folder.create(recursive: true);
-    }
+    final folder = await _userFolder('pdf_sessions');
     return File('${folder.path}/$fileId.json');
   }
 
@@ -28,8 +51,10 @@ class AnnotationLocalCache {
     try {
       final file = await _annotationFile(fileId);
       if (!await file.exists()) return null;
+
       final content = await file.readAsString();
       final decoded = jsonDecode(content);
+
       if (decoded is Map<String, dynamic>) {
         return decoded;
       }
@@ -38,6 +63,7 @@ class AnnotationLocalCache {
         debugPrint('AnnotationLocalCache.load failed: $error');
       }
     }
+
     return null;
   }
 
@@ -49,7 +75,8 @@ class AnnotationLocalCache {
         'cached_at': DateTime.now().toIso8601String(),
         'pending_sync': json['pending_sync'] ?? false,
       };
-      await file.writeAsString(jsonEncode(payload));
+
+      await file.writeAsString(jsonEncode(payload), flush: true);
     } catch (error) {
       if (kDebugMode) {
         debugPrint('AnnotationLocalCache.save failed: $error');
@@ -61,6 +88,7 @@ class AnnotationLocalCache {
   Future<void> markSynced(int fileId) async {
     final cached = await loadAnnotations(fileId);
     if (cached == null) return;
+
     cached['pending_sync'] = false;
     cached['last_synced_at'] = DateTime.now().toIso8601String();
     await saveAnnotations(fileId, cached);
@@ -70,17 +98,19 @@ class AnnotationLocalCache {
     try {
       final file = await _sessionFile(fileId);
       if (!await file.exists()) return null;
+
       final decoded = jsonDecode(await file.readAsString());
       if (decoded is Map<String, dynamic>) {
         return PdfReadingSession.fromJson(decoded);
       }
     } catch (_) {}
+
     return null;
   }
 
   Future<void> saveSession(int fileId, PdfReadingSession session) async {
     final file = await _sessionFile(fileId);
-    await file.writeAsString(jsonEncode(session.toJson()));
+    await file.writeAsString(jsonEncode(session.toJson()), flush: true);
   }
 }
 

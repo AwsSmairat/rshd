@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Account;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -9,9 +11,7 @@ use Laravel\Sanctum\Sanctum;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class StudentPasswordUpdateSecurityTest extends TestCase
 {
     use CreatesEnrollmentScenario;

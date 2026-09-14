@@ -37,13 +37,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return ref.read(profileControllerProvider.notifier).load(refresh: true);
   }
 
-  void _handleUnauthorized(String? message) {
-    if (message != null && message.contains('انتهت الجلسة') && mounted) {
-      ref.read(authControllerProvider.notifier).logout();
-      context.go(AppRoutes.login);
-    }
-  }
-
   Future<void> _confirmLogout() async {
     final strings = AppStrings.of(context);
     final confirmed = await showDialog<bool>(
@@ -82,10 +75,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(profileControllerProvider);
     final authState = ref.watch(authControllerProvider);
-
-    ref.listen(profileControllerProvider, (previous, next) {
-      _handleUnauthorized(next.errorMessage);
-    });
 
     return Scaffold(
       body: _buildBody(state, authState.status == AuthStatus.loading),

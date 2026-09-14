@@ -9,7 +9,6 @@ import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 import '../../../core/widgets/loading_widget.dart';
 import '../../../core/widgets/responsive_content.dart';
-import '../../auth/presentation/auth_controller.dart';
 import '../data/models/lesson_file_model.dart';
 import 'subjects_controller.dart';
 import '../../../core/l10n/app_strings.dart';
@@ -38,13 +37,6 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
         .load(widget.fileId);
   }
 
-  void _handleUnauthorized(String? message) {
-    if (message != null && message.contains('انتهت الجلسة') && mounted) {
-      ref.read(authControllerProvider.notifier).logout();
-      context.go(AppRoutes.login);
-    }
-  }
-
   void _openPdfViewer(LessonFileModel file) {
     context.push(
       AppRoutes.filePdfViewer(file.id),
@@ -55,10 +47,6 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(fileDetailsControllerProvider(widget.fileId));
-
-    ref.listen(fileDetailsControllerProvider(widget.fileId), (prev, next) {
-      _handleUnauthorized(next.errorMessage);
-    });
 
     return Scaffold(
       backgroundColor: AppColors.of(context).background,

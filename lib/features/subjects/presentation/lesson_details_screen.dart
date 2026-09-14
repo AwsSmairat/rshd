@@ -8,7 +8,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/responsive_content.dart';
-import '../../auth/presentation/auth_controller.dart';
 import '../../assignments/data/models/assignment_model.dart';
 import '../../quizzes/data/models/quiz_model.dart';
 import '../widgets/lesson_content_tiles.dart';
@@ -40,20 +39,9 @@ class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
     });
   }
 
-  void _handleUnauthorized(String? message) {
-    if (message != null && message.contains('انتهت الجلسة') && mounted) {
-      ref.read(authControllerProvider.notifier).logout();
-      context.go(AppRoutes.login);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(lessonDetailsControllerProvider(widget.lessonId));
-
-    ref.listen(lessonDetailsControllerProvider(widget.lessonId), (prev, next) {
-      _handleUnauthorized(next.errorMessage);
-    });
 
     final title = state.lesson?.title ?? 'تفاصيل الدرس';
 

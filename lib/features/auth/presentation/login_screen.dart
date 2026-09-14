@@ -108,8 +108,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         );
       case LoginFlowResult.failed:
         break;
-      case LoginFlowResult.cancelled:
-        break;
     }
   }
 

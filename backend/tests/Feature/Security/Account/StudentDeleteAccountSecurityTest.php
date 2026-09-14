@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Account;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Enums\UserStatus;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -10,9 +12,7 @@ use Laravel\Sanctum\Sanctum;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class StudentDeleteAccountSecurityTest extends TestCase
 {
     use CreatesEnrollmentScenario;

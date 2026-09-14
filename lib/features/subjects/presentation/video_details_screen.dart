@@ -12,7 +12,6 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/loading_widget.dart';
 import '../../../core/widgets/responsive_content.dart';
-import '../../auth/presentation/auth_controller.dart';
 import '../data/models/video_model.dart';
 import '../playback/floating_playback_controller.dart';
 import '../services/video_progress_tracker.dart';
@@ -104,13 +103,6 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     return ref
         .read(videoDetailsControllerProvider(widget.videoId).notifier)
         .load(widget.videoId);
-  }
-
-  void _handleUnauthorized(String? message) {
-    if (message != null && message.contains('انتهت الجلسة') && mounted) {
-      ref.read(authControllerProvider.notifier).logout();
-      context.go(AppRoutes.login);
-    }
   }
 
   void _showSnackBar(String message) {
@@ -227,7 +219,6 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     final state = ref.watch(videoDetailsControllerProvider(widget.videoId));
 
     ref.listen(videoDetailsControllerProvider(widget.videoId), (prev, next) {
-      _handleUnauthorized(next.errorMessage);
 
       if (next.progressMessage != null &&
           next.progressMessage != prev?.progressMessage) {

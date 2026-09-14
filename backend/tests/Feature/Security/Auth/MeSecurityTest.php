@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Security\Auth;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use App\Enums\UserStatus;
 use App\Services\PlatformSettingsService;
 use Database\Seeders\RolePermissionSeeder;
@@ -11,9 +13,7 @@ use Laravel\Sanctum\Sanctum;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class MeSecurityTest extends TestCase
 {
     use CreatesEnrollmentScenario;

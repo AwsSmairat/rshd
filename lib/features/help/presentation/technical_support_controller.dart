@@ -52,11 +52,20 @@ class TechnicalSupportController extends StateNotifier<TechnicalSupportState> {
 
     try {
       final conversation = await _repository.getConversation();
+
+      if (!mounted) {
+        return;
+      }
+
       state = TechnicalSupportState(
         status: FeatureLoadStatus.loaded,
         conversation: conversation,
       );
     } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       state = TechnicalSupportState(
         status: FeatureLoadStatus.error,
         errorMessage: error.message.isNotEmpty
@@ -64,6 +73,10 @@ class TechnicalSupportController extends StateNotifier<TechnicalSupportState> {
             : 'تعذر تحميل محادثة الدعم',
       );
     } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
       state = const TechnicalSupportState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر تحميل محادثة الدعم',
@@ -76,23 +89,32 @@ class TechnicalSupportController extends StateNotifier<TechnicalSupportState> {
 
     try {
       final conversation = await _repository.sendMessage(message);
+
+      if (!mounted) {
+        return;
+      }
+
       state = TechnicalSupportState(
         status: FeatureLoadStatus.loaded,
         conversation: conversation,
       );
     } on ApiException catch (error) {
-      state = state.copyWith(
-        sending: false,
-        errorMessage: error.message.isNotEmpty
-            ? error.message
-            : 'تعذر إرسال الرسالة',
-      );
+      if (mounted) {
+        state = state.copyWith(
+          sending: false,
+          errorMessage: error.message.isNotEmpty
+              ? error.message
+              : 'تعذر إرسال الرسالة',
+        );
+      }
       rethrow;
     } catch (_) {
-      state = state.copyWith(
-        sending: false,
-        errorMessage: 'تعذر إرسال الرسالة',
-      );
+      if (mounted) {
+        state = state.copyWith(
+          sending: false,
+          errorMessage: 'تعذر إرسال الرسالة',
+        );
+      }
       rethrow;
     }
   }

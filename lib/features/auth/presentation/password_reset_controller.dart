@@ -63,6 +63,10 @@ class PasswordResetController extends StateNotifier<PasswordResetState> {
 
     try {
       await _repository.requestPasswordReset(email: email);
+      if (mounted == false) {
+        return false;
+      }
+
       state = state.copyWith(
         status: PasswordResetStatus.success,
         successMessage:
@@ -70,6 +74,10 @@ class PasswordResetController extends StateNotifier<PasswordResetState> {
       );
       return true;
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return false;
+      }
+
       state = state.copyWith(
         status: PasswordResetStatus.error,
         errorMessage: _mapError(error),
@@ -77,6 +85,10 @@ class PasswordResetController extends StateNotifier<PasswordResetState> {
       );
       return false;
     } catch (_) {
+      if (mounted == false) {
+        return false;
+      }
+
       state = state.copyWith(
         status: PasswordResetStatus.error,
         errorMessage: 'تعذر الاتصال بالخادم، تحقق من اتصالك بالإنترنت.',
@@ -98,12 +110,20 @@ class PasswordResetController extends StateNotifier<PasswordResetState> {
         email: email,
         code: code,
       );
+      if (mounted == false) {
+        return false;
+      }
+
       state = state.copyWith(
         status: PasswordResetStatus.success,
         resetToken: resetToken,
       );
       return true;
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return false;
+      }
+
       state = state.copyWith(
         status: PasswordResetStatus.error,
         errorMessage: _mapError(error),
@@ -111,6 +131,10 @@ class PasswordResetController extends StateNotifier<PasswordResetState> {
       );
       return false;
     } catch (_) {
+      if (mounted == false) {
+        return false;
+      }
+
       state = state.copyWith(
         status: PasswordResetStatus.error,
         errorMessage: 'تعذر الاتصال بالخادم، تحقق من اتصالك بالإنترنت.',
@@ -122,15 +146,27 @@ class PasswordResetController extends StateNotifier<PasswordResetState> {
   Future<bool> resendCode(String email) async {
     try {
       await _repository.resendPasswordResetCode(email: email);
+      if (mounted == false) {
+        return false;
+      }
+
       state = state.copyWith(
         successMessage: 'تم إرسال رمز استعادة جديد.',
         clearError: true,
       );
       return true;
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return false;
+      }
+
       state = state.copyWith(errorMessage: _mapError(error));
       return false;
     } catch (_) {
+      if (mounted == false) {
+        return false;
+      }
+
       state = state.copyWith(
         errorMessage: 'تعذر الاتصال بالخادم، تحقق من اتصالك بالإنترنت.',
       );
@@ -157,6 +193,10 @@ class PasswordResetController extends StateNotifier<PasswordResetState> {
         password: password,
         passwordConfirmation: passwordConfirmation,
       );
+      if (mounted == false) {
+        return false;
+      }
+
       state = state.copyWith(
         status: PasswordResetStatus.success,
         successMessage: 'تم تغيير كلمة المرور بنجاح.',
@@ -164,6 +204,10 @@ class PasswordResetController extends StateNotifier<PasswordResetState> {
       );
       return true;
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return false;
+      }
+
       state = state.copyWith(
         status: PasswordResetStatus.error,
         errorMessage: _mapError(error),
@@ -171,6 +215,10 @@ class PasswordResetController extends StateNotifier<PasswordResetState> {
       );
       return false;
     } catch (_) {
+      if (mounted == false) {
+        return false;
+      }
+
       state = state.copyWith(
         status: PasswordResetStatus.error,
         errorMessage: 'تعذر الاتصال بالخادم، تحقق من اتصالك بالإنترنت.',

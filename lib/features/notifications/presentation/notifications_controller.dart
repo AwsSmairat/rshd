@@ -72,6 +72,11 @@ class NotificationsListController
 
     try {
       final notifications = await _repository.getNotifications();
+
+      if (!mounted) {
+        return;
+      }
+
       state = NotificationsListState(
         status: notifications.isEmpty
             ? FeatureLoadStatus.empty
@@ -79,11 +84,19 @@ class NotificationsListController
         notifications: notifications,
       );
     } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       state = NotificationsListState(
         status: FeatureLoadStatus.error,
         errorMessage: mapNotificationsError(error),
       );
     } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
       state = const NotificationsListState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -103,6 +116,11 @@ class NotificationsListController
   Future<bool> markAsRead(int notificationId) async {
     try {
       final updated = await _repository.markAsRead(notificationId);
+
+      if (!mounted) {
+        return false;
+      }
+
       final updatedList = state.notifications
           .map(
             (notification) =>
@@ -118,9 +136,17 @@ class NotificationsListController
       );
       return true;
     } on ApiException catch (error) {
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(errorMessage: mapMarkAsReadError(error));
       return false;
     } catch (_) {
+      if (!mounted) {
+        return false;
+      }
+
       state = state.copyWith(errorMessage: 'تعذر تحديث حالة الإشعار');
       return false;
     }

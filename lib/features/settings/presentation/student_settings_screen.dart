@@ -192,10 +192,6 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
       if (!mounted) {
         return;
       }
-      if (next.errorMessage?.contains('انتهت الجلسة') == true) {
-        ref.read(authControllerProvider.notifier).logout();
-        context.go(AppRoutes.login);
-      }
       if (next.actionMessage != null &&
           next.actionMessage != previous?.actionMessage) {
         ScaffoldMessenger.of(

@@ -301,6 +301,14 @@ class AuthRepository {
     await _secureStorage.clearPasswordResetSession();
   }
 
+  Future<void> clearLocalSession() async {
+    try {
+      await ProtectedContentCache.clearAll();
+    } finally {
+      await _secureStorage.clearAll();
+    }
+  }
+
   Future<void> logout() async {
     try {
       if (await _secureStorage.hasToken()) {
@@ -309,8 +317,7 @@ class AuthRepository {
     } catch (_) {
       // Always clear local session even if remote logout fails.
     } finally {
-      await ProtectedContentCache.clearAll();
-      await _secureStorage.clearAll();
+      await clearLocalSession();
     }
   }
 

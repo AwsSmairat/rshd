@@ -4,7 +4,7 @@ Mark each cell **PASS / FAIL / NOT RUN** during staging validation.
 
 | Feature | BT | FT | SM | RD | SEC |
 |---------|----|----|----|----|-----|
-| Auth — login | | | | | |
+| Auth — login | PASS | PASS | PASS | | |
 | Auth — register + verify | | | | | |
 | Auth — forgot/reset password | | | | | |
 | Auth — logout | | | | | |

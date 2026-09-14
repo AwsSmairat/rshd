@@ -1,4 +1,4 @@
-package com.example.rshd
+package com.rshdacademy.rshd
 
 import android.os.Bundle
 import android.view.WindowManager

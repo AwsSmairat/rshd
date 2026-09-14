@@ -8,7 +8,6 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/loading_widget.dart';
 import '../../../core/widgets/responsive_content.dart';
-import '../../auth/presentation/auth_controller.dart';
 import '../../subjects/presentation/subjects_controller.dart';
 import '../widgets/grade_card.dart';
 import '../widgets/grades_empty_state.dart';
@@ -37,20 +36,9 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
     return ref.read(gradesListControllerProvider.notifier).load(refresh: true);
   }
 
-  void _handleUnauthorized(String? message) {
-    if (message != null && message.contains('انتهت الجلسة') && mounted) {
-      ref.read(authControllerProvider.notifier).logout();
-      context.go(AppRoutes.login);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(gradesListControllerProvider);
-
-    ref.listen(gradesListControllerProvider, (previous, next) {
-      _handleUnauthorized(next.errorMessage);
-    });
 
     return Scaffold(
       backgroundColor: Colors.transparent,

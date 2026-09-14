@@ -2,15 +2,15 @@
 
 namespace Tests\Feature\Security;
 
+
+use PHPUnit\Framework\Attributes\Group;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
-/**
- * @group security
- */
+#[Group('security')]
 class LessonFileSerializationTest extends TestCase
 {
     use CreatesEnrollmentScenario;

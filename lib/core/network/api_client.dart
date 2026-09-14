@@ -5,14 +5,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/app_config.dart';
 import '../storage/secure_storage_service.dart';
+import 'api_endpoints.dart';
 import 'api_exception.dart';
 import 'redacted_log_interceptor.dart';
-
-typedef TokenReader = Future<String?> Function();
+import 'session_invalidation.dart';
 
 class ApiClient {
-  ApiClient({required SecureStorageService secureStorage, Dio? dio})
-    : _secureStorage = secureStorage {
+  ApiClient({
+    required SecureStorageService secureStorage,
+    Dio? dio,
+    void Function()? onUnauthorized,
+  }) : _secureStorage = secureStorage,
+       _onUnauthorized = onUnauthorized {
     _dio =
         dio ??
         Dio(
@@ -38,6 +42,7 @@ class ApiClient {
   }
 
   final SecureStorageService _secureStorage;
+  final void Function()? _onUnauthorized;
   late final Dio _dio;
 
   Dio get dio => _dio;
@@ -53,11 +58,24 @@ class ApiClient {
     handler.next(options);
   }
 
-  Future<void> _onError(
+  void _onError(
     DioException err,
     ErrorInterceptorHandler handler,
-  ) async {
+  ) {
+    if (err.response?.statusCode == 401 &&
+        err.requestOptions.path != ApiEndpoints.logout &&
+        _hasBearerAuthorization(err.requestOptions)) {
+      _onUnauthorized?.call();
+    }
+
     handler.next(err);
+  }
+
+  bool _hasBearerAuthorization(RequestOptions options) {
+    final authorization = options.headers['Authorization']?.toString();
+    return authorization != null &&
+        authorization.startsWith('Bearer ') &&
+        authorization.length > 'Bearer '.length;
   }
 
   Future<Response<T>> get<T>(
@@ -176,5 +194,10 @@ final secureStorageProvider = Provider<SecureStorageService>(
 
 final apiClientProvider = Provider<ApiClient>((ref) {
   final storage = ref.watch(secureStorageProvider);
-  return ApiClient(secureStorage: storage);
+  final sessionInvalidation = ref.read(sessionInvalidationProvider.notifier);
+
+  return ApiClient(
+    secureStorage: storage,
+    onUnauthorized: sessionInvalidation.notifyUnauthorized,
+  );
 });

@@ -137,6 +137,11 @@ class SubjectsListController extends StateNotifier<SubjectsListState> {
       final subjects = (category != null && category.isNotEmpty)
           ? await _repository.getSubjectsCatalog(category: category)
           : await _repository.getMySubjects();
+
+      if (!mounted) {
+        return;
+      }
+
       state = SubjectsListState(
         status: subjects.isEmpty
             ? FeatureLoadStatus.empty
@@ -144,11 +149,19 @@ class SubjectsListController extends StateNotifier<SubjectsListState> {
         subjects: subjects,
       );
     } on ApiException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
       state = SubjectsListState(
         status: FeatureLoadStatus.error,
         errorMessage: mapSubjectsError(error),
       );
     } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
       state = const SubjectsListState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -159,6 +172,11 @@ class SubjectsListController extends StateNotifier<SubjectsListState> {
   Future<String?> requestPurchase(int subjectId) async {
     try {
       final updated = await _repository.requestPurchase(subjectId);
+
+      if (!mounted) {
+        return null;
+      }
+
       syncEnrollmentStatus(subjectId, updated.enrollmentStatus);
       return null;
     } on ApiException catch (error) {
@@ -275,6 +293,10 @@ class SubjectDetailsController extends StateNotifier<SubjectDetailsState> {
 
     try {
       final subject = await _repository.findSubjectById(subjectId);
+      if (mounted == false) {
+        return;
+      }
+
       if (subject == null) {
         state = const SubjectDetailsState(
           status: FeatureLoadStatus.error,
@@ -288,11 +310,19 @@ class SubjectDetailsController extends StateNotifier<SubjectDetailsState> {
         subject: subject,
       );
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return;
+      }
+
       state = SubjectDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: mapSubjectsError(error),
       );
     } catch (_) {
+      if (mounted == false) {
+        return;
+      }
+
       state = const SubjectDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -319,6 +349,10 @@ class SubjectLessonsController extends StateNotifier<LessonsListState> {
 
     try {
       final lessons = await _repository.getSubjectLessons(subjectId);
+      if (mounted == false) {
+        return;
+      }
+
       state = LessonsListState(
         status: lessons.isEmpty
             ? FeatureLoadStatus.empty
@@ -326,11 +360,19 @@ class SubjectLessonsController extends StateNotifier<LessonsListState> {
         lessons: lessons,
       );
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return;
+      }
+
       state = LessonsListState(
         status: FeatureLoadStatus.error,
         errorMessage: mapSubjectsError(error),
       );
     } catch (_) {
+      if (mounted == false) {
+        return;
+      }
+
       state = const LessonsListState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -344,6 +386,12 @@ class LessonDetailsController extends StateNotifier<LessonDetailsState>
   LessonDetailsController(this._repository) : super(const LessonDetailsState());
 
   final SubjectsRepository _repository;
+
+  @override
+  void dispose() {
+    disposeLoadGuard();
+    super.dispose();
+  }
 
   Future<void> load(int lessonId) async {
     final generation = beginLoad();
@@ -477,13 +525,25 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
 
     try {
       final video = await _repository.getVideoDetails(videoId);
+      if (mounted == false) {
+        return;
+      }
+
       state = VideoDetailsState(status: FeatureLoadStatus.loaded, video: video);
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return;
+      }
+
       state = VideoDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: mapContentError(error, videoContext: true),
       );
     } catch (_) {
+      if (mounted == false) {
+        return;
+      }
+
       state = const VideoDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
@@ -516,6 +576,10 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
         replayCount: 0,
       );
 
+      if (mounted == false) {
+        return;
+      }
+
       final currentVideo = state.video;
       if (currentVideo == null) {
         return;
@@ -545,6 +609,10 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
   Future<VideoPlaybackModel?> refreshPlayback(int videoId) async {
     try {
       final playback = await _repository.refreshVideoPlayback(videoId);
+      if (mounted == false) {
+        return null;
+      }
+
       final currentVideo = state.video;
 
       if (currentVideo != null) {
@@ -555,6 +623,10 @@ class VideoDetailsController extends StateNotifier<VideoDetailsState> {
 
       return playback;
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return null;
+      }
+
       if (error.isForbidden || error.isUnauthorized) {
         state = state.copyWith(
           errorMessage: mapContentError(error, videoContext: true),
@@ -586,13 +658,25 @@ class FileDetailsController extends StateNotifier<FileDetailsState> {
 
     try {
       final file = await _repository.getFileDetails(fileId);
+      if (mounted == false) {
+        return;
+      }
+
       state = FileDetailsState(status: FeatureLoadStatus.loaded, file: file);
     } on ApiException catch (error) {
+      if (mounted == false) {
+        return;
+      }
+
       state = FileDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: mapContentError(error, fileContext: true),
       );
     } catch (_) {
+      if (mounted == false) {
+        return;
+      }
+
       state = const FileDetailsState(
         status: FeatureLoadStatus.error,
         errorMessage: 'تعذر الاتصال بالسيرفر',
