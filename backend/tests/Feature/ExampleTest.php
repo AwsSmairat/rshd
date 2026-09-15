@@ -2,14 +2,24 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    public function test_root_redirects_to_admin_panel(): void
-    {
-        $response = $this->get('/');
+    use RefreshDatabase;
 
-        $response->assertRedirect('/admin');
+    public function test_root_shows_public_rshd_home_page(): void
+    {
+        $response = $this->get("/");
+
+        $response
+            ->assertOk()
+            ->assertSee("التعليم يبدأ من هنا", false)
+            ->assertSee("منصة RSHD الأكاديمية", false)
+            ->assertSee("/admin/login", false)
+            ->assertSee("index, follow, max-image-preview:large", false)
+            ->assertSee("rel=\"canonical\"", false)
+            ->assertDontSee("<title>Laravel</title>", false);
     }
 }

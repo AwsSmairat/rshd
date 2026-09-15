@@ -95,6 +95,7 @@ class AdminPanelProvider extends PanelProvider
                     $apple = e(asset('images/apple-touch-icon.png'));
 
                     return new HtmlString(
+                        '<meta name="robots" content="noindex, nofollow, noarchive">'.
                         '<link rel="icon" type="image/png" sizes="32x32" href="'.$favicon.'?v=1">'.
                         '<link rel="icon" type="image/png" sizes="16x16" href="'.$icon16.'?v=1">'.
                         '<link rel="shortcut icon" href="'.$favicon.'?v=1">'.
