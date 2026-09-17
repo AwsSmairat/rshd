@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Services\Bunny\BunnyStreamService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -111,12 +112,27 @@ class PlatformSystemStatusService
      */
     protected function videoRow(): array
     {
-        $hasFfprobe = app(VideoMetadataService::class)->isAvailable();
+        $provider = (string) config('video.provider', 'local');
+
+        if ($provider === 'bunny') {
+            $connected = app(BunnyStreamService::class)->isConfigured();
+        } else {
+            try {
+                $disk = Storage::disk((string) config('video.local.disk', 'lesson_videos'));
+                $healthcheck = '_video_healthcheck.txt';
+
+                $disk->put($healthcheck, 'ok');
+                $connected = $disk->exists($healthcheck);
+                $disk->delete($healthcheck);
+            } catch (\Throwable) {
+                $connected = false;
+            }
+        }
 
         return [
             'label' => 'خدمة الفيديو',
-            'status' => $hasFfprobe ? 'متصل' : 'غير مهيأ',
-            'tone' => $hasFfprobe ? 'success' : 'warning',
+            'status' => $connected ? 'متصل' : 'غير مهيأ',
+            'tone' => $connected ? 'success' : 'warning',
         ];
     }
 
@@ -126,7 +142,13 @@ class PlatformSystemStatusService
     protected function queueRow(): array
     {
         $driver = (string) config('queue.default');
-        $running = $driver === 'sync' || $driver === 'database';
+
+        if ($driver === 'sync') {
+            $running = true;
+        } else {
+            $lastRun = cache('queue_worker_last_run');
+            $running = $lastRun && now()->diffInMinutes($lastRun) <= 5;
+        }
 
         return [
             'label' => 'Queue worker',

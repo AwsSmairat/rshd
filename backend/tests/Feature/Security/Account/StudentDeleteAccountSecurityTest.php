@@ -4,10 +4,10 @@ namespace Tests\Feature\Security\Account;
 
 
 use PHPUnit\Framework\Attributes\Group;
-use App\Enums\UserStatus;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
@@ -42,9 +42,8 @@ class StudentDeleteAccountSecurityTest extends TestCase
             ->assertOk()
             ->assertJsonPath('success', true);
 
-        $fresh = $student->fresh();
-        $this->assertSame(UserStatus::Blocked, $fresh->status);
-        $this->assertStringContainsString('deleted_', $fresh->email);
+        $this->assertDatabaseMissing('users', ['id' => $student->id]);
+        $this->assertNull($student->fresh());
     }
 
     public function test_deleted_account_revokes_current_session_token(): void
@@ -54,14 +53,23 @@ class StudentDeleteAccountSecurityTest extends TestCase
             'password' => Hash::make('DeleteMe123!'),
             'password_set_at' => now(),
         ]);
-        $token = $student->createToken('api')->plainTextToken;
 
-        $this->withToken($token)->postJson('/api/v1/student/account/delete', [
+        $createdToken = $student->createToken('api');
+        $plainTextToken = $createdToken->plainTextToken;
+        $tokenId = $createdToken->accessToken->getKey();
+
+        $this->withToken($plainTextToken)->postJson('/api/v1/student/account/delete', [
             'password' => 'DeleteMe123!',
             'confirmation' => 'حذف',
         ])->assertOk();
 
-        $this->withToken($token)->getJson('/api/v1/me')->assertForbidden();
+        $this->assertDatabaseMissing('personal_access_tokens', [
+            'id' => $tokenId,
+        ]);
+
+        $this->assertDatabaseMissing('users', [
+            'id' => $student->id,
+        ]);
     }
 
     public function test_wrong_password_is_rejected(): void
@@ -82,7 +90,7 @@ class StudentDeleteAccountSecurityTest extends TestCase
         $this->assertSame('delete-wrong-pass@rshd.test', $student->fresh()->email);
     }
 
-    public function test_missing_confirmation_is_rejected(): void
+    public function test_wrong_confirmation_is_rejected(): void
     {
         $student = $this->createStudent([
             'email' => 'delete-no-confirm@rshd.test',
@@ -96,6 +104,96 @@ class StudentDeleteAccountSecurityTest extends TestCase
             'password' => 'DeleteMe123!',
             'confirmation' => 'delete',
         ])->assertStatus(422);
+    }
+
+    public function test_missing_confirmation_is_rejected(): void
+    {
+        $student = $this->createStudent([
+            'email' => 'delete-missing-confirm@rshd.test',
+            'password' => Hash::make('DeleteMe123!'),
+            'password_set_at' => now(),
+        ]);
+
+        Sanctum::actingAs($student);
+
+        $this->postJson('/api/v1/student/account/delete', [
+            'password' => 'DeleteMe123!',
+        ])->assertStatus(422);
+
+        $this->assertDatabaseHas('users', ['id' => $student->id]);
+    }
+
+    public function test_delete_account_removes_avatar_file(): void
+    {
+        Storage::fake('public');
+
+        $avatarPath = 'avatars/delete-account-test.png';
+        Storage::disk('public')->put($avatarPath, 'avatar');
+
+        $student = $this->createStudent([
+            'email' => 'delete-avatar@rshd.test',
+            'password' => Hash::make('DeleteMe123!'),
+            'password_set_at' => now(),
+            'avatar_path' => $avatarPath,
+        ]);
+
+        Sanctum::actingAs($student);
+
+        $this->postJson('/api/v1/student/account/delete', [
+            'password' => 'DeleteMe123!',
+            'confirmation' => 'حذف',
+        ])->assertOk();
+
+        Storage::disk('public')->assertMissing($avatarPath);
+        $this->assertDatabaseMissing('users', ['id' => $student->id]);
+    }
+
+    public function test_delete_account_removes_assignment_submission_file(): void
+    {
+        Storage::fake('local');
+
+        $student = $this->createStudent([
+            'email' => 'delete-submission@rshd.test',
+            'password' => Hash::make('DeleteMe123!'),
+            'password_set_at' => now(),
+        ]);
+
+        $subject = $this->createSubject();
+
+        $assignment = \App\Models\Assignment::query()->create([
+            'subject_id' => $subject->id,
+            'title' => 'واجب اختبار حذف الحساب',
+        ]);
+
+        $submissionPath = 'assignment-submissions/delete-account-test.pdf';
+        Storage::disk('local')->put($submissionPath, 'submission-file');
+
+        $submission = \App\Models\AssignmentSubmission::query()->create([
+            'assignment_id' => $assignment->id,
+            'student_id' => $student->id,
+            'file_path' => $submissionPath,
+            'original_file_name' => 'submission.pdf',
+            'file_size' => 15,
+            'file_mime_type' => 'application/pdf',
+            'submitted_at' => now(),
+        ]);
+
+        Sanctum::actingAs($student);
+
+        $this->postJson('/api/v1/student/account/delete', [
+            'password' => 'DeleteMe123!',
+            'confirmation' => 'حذف',
+        ])->assertOk();
+
+        Storage::disk('local')->assertMissing($submissionPath);
+
+        $this->assertDatabaseMissing('assignment_submissions', [
+            'id' => $submission->id,
+        ]);
+
+        $this->assertDatabaseMissing('users', [
+            'id' => $student->id,
+        ]);
     }
 
     public function test_anonymous_user_cannot_delete_account(): void
@@ -128,6 +226,7 @@ class StudentDeleteAccountSecurityTest extends TestCase
         ])->assertOk();
 
         $this->assertSame('delete-b@rshd.test', $studentB->fresh()->email);
-        $this->assertStringContainsString('deleted_', $studentA->fresh()->email);
+        $this->assertDatabaseMissing('users', ['id' => $studentA->id]);
+        $this->assertNull($studentA->fresh());
     }
 }

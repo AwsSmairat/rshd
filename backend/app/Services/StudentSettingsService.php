@@ -194,13 +194,30 @@ class StudentSettingsService
             ]);
         }
 
-        $user->tokens()->delete();
-        $this->deviceService->resetStudentDevices($user);
+        $avatarPath = $user->resolvedAvatarPath();
 
-        $user->update([
-            'status' => UserStatus::Blocked,
-            'email' => 'deleted_'.$user->id.'_'.time().'@deleted.local',
-        ]);
+        $submissionPaths = \App\Models\AssignmentSubmission::query()
+            ->where('student_id', $user->id)
+            ->whereNotNull('file_path')
+            ->pluck('file_path')
+            ->filter(fn ($path): bool => is_string($path) && $path !== '')
+            ->values()
+            ->all();
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($user): void {
+            $user->tokens()->delete();
+            $user->roles()->detach();
+            $user->permissions()->detach();
+            $user->delete();
+        });
+
+        if ($avatarPath !== null) {
+            Storage::disk('public')->delete($avatarPath);
+        }
+
+        if ($submissionPaths !== []) {
+            Storage::disk('local')->delete($submissionPaths);
+        }
     }
 
     protected function assertValidAvatar(UploadedFile $file): void
