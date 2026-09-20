@@ -147,6 +147,7 @@ jobs:
         run: chmod +x security/scripts/*.sh && ./security/scripts/full-audit.sh
 
       - name: Upload reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: security-reports

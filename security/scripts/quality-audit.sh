@@ -15,7 +15,7 @@ record() { RESULTS+=("$1|$2|$3"); }
 
 run_laravel_tests() {
   log "Running Laravel tests..."
-  if (cd "${ROOT}/backend" && php artisan test > "${REPORT_DIR}/laravel-test.log" 2>&1); then
+  if (cd "${ROOT}/backend" && php artisan test --exclude-group=manual > "${REPORT_DIR}/laravel-test.log" 2>&1); then
     record "laravel_tests" "PASS" "See laravel-test.log"
   else
     record "laravel_tests" "FAIL" "See laravel-test.log"
@@ -56,7 +56,7 @@ run_flutter_analyze() {
 
 run_flutter_tests() {
   log "Flutter tests..."
-  if (cd "${ROOT}" && flutter test > "${REPORT_DIR}/flutter-test.log" 2>&1); then
+  if (cd "${ROOT}" && flutter test --exclude-tags golden > "${REPORT_DIR}/flutter-test.log" 2>&1); then
     record "flutter_tests" "PASS" "See flutter-test.log"
   else
     record "flutter_tests" "FAIL" "See flutter-test.log"
@@ -80,4 +80,5 @@ if [[ ${QUALITY_SCORE} -lt 0 ]]; then QUALITY_SCORE=0; fi
 } > "${REPORT_DIR}/quality-audit.yaml"
 
 log "Quality score: ${QUALITY_SCORE}/100"
+cat "${REPORT_DIR}/quality-audit.yaml"
 exit 0

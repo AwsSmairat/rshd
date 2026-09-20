@@ -102,6 +102,56 @@ class LoginDeviceMismatchTest extends TestCase
             ->assertJsonPath('message', DeviceService::DEVICE_MISMATCH_MESSAGE);
     }
 
+    public function test_device_binding_exempt_student_can_login_from_foreign_device(): void
+    {
+        $student = $this->createStudent([
+            'email' => 'reviewer-device-exempt@rshd.test',
+            'password' => Hash::make('secret-password'),
+            'preferences' => [
+                DeviceService::DEVICE_BINDING_EXEMPT_PREFERENCE => true,
+            ],
+        ]);
+
+        $this->createActiveDevice($student, 'registered-device');
+
+        $this->postJson('/api/v1/login', [
+            'email' => $student->email,
+            'password' => 'secret-password',
+            'device_id' => 'foreign-device',
+            'device_name' => 'Google Play Reviewer Device',
+            'platform' => 'android',
+        ])
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonStructure(['data' => ['token', 'user']]);
+
+        $this->assertSame(1, $student->studentDevices()->where('is_active', true)->count());
+    }
+
+    public function test_non_boolean_device_binding_exemption_does_not_bypass_device_binding(): void
+    {
+        $student = $this->createStudent([
+            'email' => 'reviewer-non-boolean-exempt@rshd.test',
+            'password' => Hash::make('secret-password'),
+            'preferences' => [
+                DeviceService::DEVICE_BINDING_EXEMPT_PREFERENCE => 'true',
+            ],
+        ]);
+
+        $this->createActiveDevice($student, 'registered-device');
+
+        $this->postJson('/api/v1/login', [
+            'email' => $student->email,
+            'password' => 'secret-password',
+            'device_id' => 'foreign-device',
+            'device_name' => 'Other Reviewer Device',
+            'platform' => 'android',
+        ])
+            ->assertForbidden()
+            ->assertJsonPath('error_code', DeviceService::DEVICE_MISMATCH_CODE)
+            ->assertJsonPath('message', DeviceService::DEVICE_MISMATCH_MESSAGE);
+    }
+
     protected function createActiveDevice(User $student, string $deviceId): StudentDevice
     {
         return StudentDevice::query()->create([

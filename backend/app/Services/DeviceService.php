@@ -12,6 +12,8 @@ class DeviceService
 
     public const DEVICE_MISMATCH_MESSAGE = 'هذا الحساب متصل على جهاز آخر، يرجى التواصل مع الإدارة لإعادة تعيين الجهاز.';
 
+    public const DEVICE_BINDING_EXEMPT_PREFERENCE = 'device_binding_exempt';
+
     public function __construct(
         protected PlatformSettingsService $settings,
     ) {}
@@ -23,7 +25,9 @@ class DeviceService
      */
     public function assertStudentDeviceAllowed(User $user, array $deviceData): bool
     {
-        if (! $user->isStudent() || ! $this->settings->deviceBindingEnabled()) {
+        if (! $user->isStudent()
+            || $this->isDeviceBindingExempt($user)
+            || ! $this->settings->deviceBindingEnabled()) {
             return true;
         }
 
@@ -71,7 +75,9 @@ class DeviceService
      */
     public function studentHasForeignActiveDevice(User $user, array $deviceData): bool
     {
-        if (! $user->isStudent() || ! $this->settings->deviceBindingEnabled()) {
+        if (! $user->isStudent()
+            || $this->isDeviceBindingExempt($user)
+            || ! $this->settings->deviceBindingEnabled()) {
             return false;
         }
 
@@ -151,6 +157,11 @@ class DeviceService
                 'last_login_at' => now(),
             ],
         );
+    }
+
+    protected function isDeviceBindingExempt(User $user): bool
+    {
+        return $user->preference(self::DEVICE_BINDING_EXEMPT_PREFERENCE, false) === true;
     }
 
     public function resetStudentDevices(User $student, ?User $actor = null): void

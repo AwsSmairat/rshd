@@ -62,9 +62,14 @@ class StudentSettingsService
     {
         $user->loadMissing(['activeStudentDevice', 'studentDevices']);
 
-        $preferences = array_merge(
-            $this->defaultPreferences(),
-            is_array($user->preferences) ? $user->preferences : [],
+        $defaults = $this->defaultPreferences();
+
+        $preferences = array_intersect_key(
+            array_merge(
+                $defaults,
+                is_array($user->preferences) ? $user->preferences : [],
+            ),
+            array_flip(array_keys($defaults)),
         );
 
         return [
