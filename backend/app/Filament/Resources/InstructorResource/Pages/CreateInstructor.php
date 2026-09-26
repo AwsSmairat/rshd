@@ -9,6 +9,7 @@ use App\Services\PlatformAuditService;
 use App\Services\PlatformSettingsService;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class CreateInstructor extends CreateRecord
 {
@@ -26,7 +27,14 @@ class CreateInstructor extends CreateRecord
     {
         $this->record->assignRole(UserRole::Instructor->value);
 
-        app(InstructorInvitationService::class)->sendInvitation($this->record);
+        $mailFailed = false;
+
+        try {
+            app(InstructorInvitationService::class)->sendInvitation($this->record);
+        } catch (TransportExceptionInterface $exception) {
+            report($exception);
+            $mailFailed = true;
+        }
 
         app(PlatformAuditService::class)->logAdmin(
             action: 'instructor.created',
@@ -34,6 +42,16 @@ class CreateInstructor extends CreateRecord
             description: 'تم إنشاء المدرس «'.$this->record->name.'».',
             model: $this->record,
         );
+
+        if ($mailFailed) {
+            Notification::make()
+                ->title('تم إنشاء المدرس لكن تعذر إرسال الدعوة')
+                ->body('تعذر إرسال بريد الدعوة حالياً. تحقق من إعدادات البريد ثم استخدم «إعادة إرسال رابط تعيين كلمة المرور».')
+                ->warning()
+                ->send();
+
+            return;
+        }
 
         $settings = app(PlatformSettingsService::class);
 

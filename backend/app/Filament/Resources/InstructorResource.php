@@ -154,7 +154,19 @@ class InstructorResource extends Resource
                         : 'سيتم إنشاء رابط جديد. إرسال البريد معطّل حالياً في إعدادات المنصة.')
                     ->visible(fn (User $record): bool => (auth()->user()?->isAdmin() ?? false) && $record->password_set_at === null)
                     ->action(function (User $record) use ($settings): void {
-                        app(InstructorInvitationService::class)->resendInvitation($record);
+                        try {
+                            app(InstructorInvitationService::class)->resendInvitation($record);
+                        } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $exception) {
+                            report($exception);
+
+                            Notification::make()
+                                ->title('تعذر إرسال رابط تعيين كلمة المرور')
+                                ->body('تعذر إرسال البريد حالياً. تحقق من إعدادات البريد ثم حاول إعادة الإرسال.')
+                                ->warning()
+                                ->send();
+
+                            return;
+                        }
 
                         app(PlatformAuditService::class)->logAdmin(
                             action: 'instructor.invitation_resent',

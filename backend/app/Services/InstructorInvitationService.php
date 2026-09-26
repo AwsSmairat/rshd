@@ -37,10 +37,12 @@ class InstructorInvitationService
     {
         $token = $this->createInvitation($instructor);
 
-        if ($this->settings->enabled('instructor_invitation_email_enabled', 'email')) {
-            $this->settings->applyMailPreferences();
-            Mail::to($instructor->email)->send(new InstructorInvitationMail($instructor, $token));
+        if (! $this->settings->enabled('instructor_invitation_email_enabled', 'email')) {
+            return;
         }
+
+        $this->settings->applyMailPreferences();
+        Mail::to($instructor->email)->send(new InstructorInvitationMail($instructor, $token));
 
         $instructor->update(['invitation_sent_at' => now()]);
     }
