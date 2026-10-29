@@ -252,10 +252,8 @@ class VideoResource extends Resource
         $usesBunny = config('video.provider', 'local') === 'bunny';
 
         if ($newPath && is_string($newPath)) {
-            if ($record?->video_path && $record->video_path !== $newPath) {
-                Storage::disk('lesson_videos')->delete($record->video_path);
-                Storage::disk('public')->delete($record->video_path);
-            }
+            // Never delete the previous file while preparing form data.
+            // A replacement must be verified before old-file cleanup.
 
             $disk = Storage::disk('lesson_videos');
 
@@ -276,8 +274,15 @@ class VideoResource extends Resource
 
             if ($usesBunny) {
                 $data['storage_provider'] = 'bunny';
-                $data['status'] = VideoStatus::Uploading->value;
-                $data['external_video_id'] = null;
+
+                if ($record !== null && $record->video_path === $newPath) {
+                    // Metadata edits must not overwrite asynchronous Bunny updates.
+                    unset($data['status'], $data['external_video_id']);
+                } else {
+                    // Only an actual new file starts a new upload.
+                    $data['status'] = VideoStatus::Uploading->value;
+                    $data['external_video_id'] = null;
+                }
             } else {
                 $data['storage_provider'] = 'local';
                 $data['status'] = VideoStatus::Ready->value;
@@ -289,6 +294,11 @@ class VideoResource extends Resource
             $data['file_mime_type'] = $record->file_mime_type;
             $data['duration_seconds'] = $record->duration_seconds;
             $data['original_file_name'] = $data['original_file_name'] ?? $record->original_file_name;
+
+            if ($record->storage_provider === 'bunny') {
+                // Preserve the remote identity and processing status.
+                unset($data['status'], $data['external_video_id']);
+            }
         }
 
         if (! filled($data['storage_provider'] ?? null)) {

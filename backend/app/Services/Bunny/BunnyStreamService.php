@@ -23,6 +23,38 @@ class BunnyStreamService
             && app(BunnyStreamVideoProvider::class)->isConfigured();
     }
 
+    public function shouldUploadLocalVideo(Video $video): bool
+    {
+        $externalId = trim((string) ($video->external_video_id ?? ''));
+
+        if ($externalId === '') {
+            return true;
+        }
+
+        // Check Bunny before retrying an upload with an existing GUID.
+        $remote = $this->api->getVideo($externalId);
+
+        $remoteStatus = (int) ($remote['status'] ?? -1);
+        $remoteSize = (int) ($remote['storageSize'] ?? 0);
+
+        if ($this->statusMapper->isPlayableApiStatus($remoteStatus)) {
+            // A playable remote video must never be uploaded again.
+            $this->applyRemotePayload($video, $remote);
+
+            return false;
+        }
+
+        if ($remoteSize > 0) {
+            // Partial data and processing data cannot be distinguished
+            // safely by storageSize alone.
+            throw new RuntimeException(
+                'Ambiguous Bunny upload state: remote data exists, but completion is unconfirmed.'
+            );
+        }
+
+        return true;
+    }
+
     public function uploadLocalVideo(Video $video): void
     {
         if (! $this->api->isConfigured()) {
@@ -44,17 +76,24 @@ class BunnyStreamService
             'storage_provider' => 'bunny',
         ]);
 
-        $created = $this->api->createVideo($video->title);
-        $externalId = (string) ($created['guid'] ?? '');
+        $externalId = trim((string) ($video->external_video_id ?? ''));
 
         if ($externalId === '') {
-            throw new RuntimeException('Bunny Stream did not return a video id.');
-        }
+            $created = $this->api->createVideo($video->title);
+            $externalId = (string) ($created['guid'] ?? '');
 
-        $video->update([
-            'external_video_id' => $externalId,
-            'status' => VideoStatus::Processing,
-        ]);
+            if ($externalId === '') {
+                throw new RuntimeException('Bunny Stream did not return a video id.');
+            }
+
+            $video->update([
+                'external_video_id' => $externalId,
+                'status' => VideoStatus::Processing,
+            ]);
+        } else {
+            // Resume the existing Bunny asset instead of creating a duplicate.
+            $video->update(['status' => VideoStatus::Processing]);
+        }
 
         $stream = $disk->readStream($video->video_path);
 
@@ -106,7 +145,41 @@ class BunnyStreamService
             $attributes['duration_seconds'] = $length;
         }
 
-        $video->update($attributes);
+        // A verified ready video may still need its duration.
+        // Never downgrade its existing ready status.
+        if ($mappedStatus === VideoStatus::Ready && $length > 0) {
+            Video::query()
+                ->whereKey($video->id)
+                ->where('external_video_id', $video->external_video_id)
+                ->where('status', VideoStatus::Ready->value)
+                ->where(function ($query): void {
+                    $query->whereNull('duration_seconds')
+                        ->orWhere('duration_seconds', '<=', 0);
+                })
+                ->update([
+                    'duration_seconds' => $length,
+                ]);
+        }
+
+        $updated = Video::query()
+            ->whereKey($video->id)
+            ->where('external_video_id', $video->external_video_id)
+            ->whereIn(
+                'status',
+                $mappedStatus === VideoStatus::Uploading
+                    ? ['uploading']
+                    : ['uploading', 'processing']
+            )
+            ->update([
+                ...$attributes,
+                'status' => $mappedStatus->value,
+            ]);
+
+        if ($updated === 0) {
+            return;
+        }
+
+        $video->refresh();
 
         Log::info('bunny.stream.status.updated', [
             'video_id' => $video->id,
@@ -143,9 +216,20 @@ class BunnyStreamService
 
         $mappedStatus = $this->statusMapper->fromWebhookStatus($remoteStatus);
 
-        $video->update([
-            'status' => $mappedStatus,
-        ]);
+        Video::query()
+            ->whereKey($video->id)
+            ->where('external_video_id', $externalId)
+            ->whereIn(
+                'status',
+                $mappedStatus === VideoStatus::Uploading
+                    ? ['uploading']
+                    : ['uploading', 'processing']
+            )
+            ->update([
+                'status' => $mappedStatus->value,
+            ]);
+
+        $video->refresh();
 
         if ($this->statusMapper->isPlayableWebhookStatus($remoteStatus)) {
             SyncBunnyVideoStatusJob::dispatch($video->id)->delay(now()->addSeconds(5));

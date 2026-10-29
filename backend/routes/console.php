@@ -18,5 +18,9 @@ Schedule::job(new QueueWorkerHeartbeatJob)
     ->everyMinute()
     ->name('queue-worker-heartbeat');
 
+Schedule::command('bunny:reconcile-video-statuses')
+    ->everyFiveMinutes()
+    ->withoutOverlapping(10);
+
 Schedule::command('platform:backup')->dailyAt('02:00');
 Schedule::command('platform:prune-audit-logs')->dailyAt('03:00');

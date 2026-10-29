@@ -11,6 +11,7 @@ use App\Enums\UserStatus;
 use App\Enums\VideoStatus;
 use App\Filament\Resources\VideoResource;
 use App\Jobs\UploadVideoToBunnyJob;
+use App\Jobs\SyncBunnyVideoStatusJob;
 use App\Models\Lesson;
 use App\Models\Subject;
 use App\Models\SubjectStudent;
@@ -26,6 +27,8 @@ use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -56,6 +59,547 @@ class BunnyStreamTest extends TestCase
         Config::set('video.bunny.playback_mode', 'embed');
         Config::set('video.signing_key', 'test-signing-key');
         Config::set('video.playback_ttl', 600);
+    }
+
+    public function test_stale_api_result_cannot_downgrade_ready_video(): void
+    {
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'external_video_id' => 'race-ready-guid',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        $stale = $video->fresh();
+
+        $video->update(['status' => VideoStatus::Ready]);
+
+        app(BunnyStreamService::class)->applyRemotePayload(
+            $stale,
+            ['status' => 2, 'length' => 120]
+        );
+
+        $this->assertSame(
+            VideoStatus::Ready,
+            $video->fresh()->status
+        );
+    }
+
+    public function test_stale_api_result_cannot_update_replaced_video(): void
+    {
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'external_video_id' => 'old-race-guid',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        $stale = $video->fresh();
+
+        $video->update([
+            'external_video_id' => 'new-race-guid',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        app(BunnyStreamService::class)->applyRemotePayload(
+            $stale,
+            ['status' => 4, 'length' => 120]
+        );
+
+        $current = $video->fresh();
+
+        $this->assertSame(
+            'new-race-guid',
+            $current->external_video_id
+        );
+
+        $this->assertSame(
+            VideoStatus::Processing,
+            $current->status
+        );
+    }
+
+    public function test_stale_webhook_cannot_downgrade_ready_video(): void
+    {
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'external_video_id' => 'race-webhook-guid',
+            'status' => VideoStatus::Ready,
+        ]);
+
+        app(BunnyStreamService::class)->applyWebhookPayload([
+            'VideoGuid' => 'race-webhook-guid',
+            'Status' => 2,
+        ]);
+
+        $this->assertSame(
+            VideoStatus::Ready,
+            $video->fresh()->status
+        );
+    }
+
+    public function test_processing_sync_schedules_only_one_follow_up(): void
+    {
+        Config::set('cache.default', 'array');
+        Queue::fake();
+
+        Http::fake([
+            '*video.bunnycdn.com/*' => Http::response([
+                'guid' => 'poll-test-guid',
+                'status' => 2,
+                'length' => 0,
+            ], 200),
+        ]);
+
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'external_video_id' => 'poll-test-guid',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        $service = app(BunnyStreamService::class);
+
+        (new SyncBunnyVideoStatusJob($video->id))->handle($service);
+        (new SyncBunnyVideoStatusJob($video->id))->handle($service);
+
+        Queue::assertPushed(SyncBunnyVideoStatusJob::class, 1);
+
+        Queue::assertPushed(
+            SyncBunnyVideoStatusJob::class,
+            fn (SyncBunnyVideoStatusJob $job) =>
+                $job->videoId === $video->id &&
+                $job->pollAttempt === 1 &&
+                $job->expectedGuid === 'poll-test-guid'
+        );
+    }
+
+    public function test_ready_webhook_sync_fills_missing_duration(): void
+    {
+        Config::set('cache.default', 'array');
+        Queue::fake();
+
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'external_video_id' => 'duration-test-guid',
+            'status' => VideoStatus::Processing,
+            'duration_seconds' => 0,
+        ]);
+
+        app(BunnyStreamService::class)->applyWebhookPayload([
+            'VideoGuid' => 'duration-test-guid',
+            'Status' => 3,
+        ]);
+
+        $this->assertSame(
+            VideoStatus::Ready,
+            $video->fresh()->status
+        );
+
+        Queue::assertPushed(SyncBunnyVideoStatusJob::class);
+
+        Http::fake([
+            '*video.bunnycdn.com/*' => Http::response([
+                'guid' => 'duration-test-guid',
+                'status' => 4,
+                'length' => 1800,
+            ], 200),
+        ]);
+
+        (new SyncBunnyVideoStatusJob($video->id))
+            ->handle(app(BunnyStreamService::class));
+
+        $this->assertSame(
+            VideoStatus::Ready,
+            $video->fresh()->status
+        );
+
+        $this->assertSame(
+            1800,
+            $video->fresh()->duration_seconds
+        );
+    }
+
+    public function test_completed_video_does_not_poll_again(): void
+    {
+        Config::set('cache.default', 'array');
+        Queue::fake();
+        Http::fake();
+
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'external_video_id' => 'completed-test-guid',
+            'status' => VideoStatus::Ready,
+            'duration_seconds' => 120,
+        ]);
+
+        (new SyncBunnyVideoStatusJob($video->id))
+            ->handle(app(BunnyStreamService::class));
+
+        Queue::assertNotPushed(SyncBunnyVideoStatusJob::class);
+        Http::assertNothingSent();
+    }
+
+    public function test_poll_limit_prevents_further_scheduling(): void
+    {
+        Config::set('cache.default', 'array');
+        Queue::fake();
+
+        Http::fake([
+            '*video.bunnycdn.com/*' => Http::response([
+                'guid' => 'limit-test-guid',
+                'status' => 2,
+                'length' => 0,
+            ], 200),
+        ]);
+
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'external_video_id' => 'limit-test-guid',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        (new SyncBunnyVideoStatusJob(
+            $video->id,
+            SyncBunnyVideoStatusJob::MAX_POLLS
+        ))->handle(app(BunnyStreamService::class));
+
+        Queue::assertNotPushed(SyncBunnyVideoStatusJob::class);
+    }
+
+    public function test_old_guid_sync_does_not_touch_replacement(): void
+    {
+        Config::set('cache.default', 'array');
+        Queue::fake();
+        Http::fake();
+
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'external_video_id' => 'new-guid',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        (new SyncBunnyVideoStatusJob(
+            $video->id,
+            1,
+            'old-guid'
+        ))->handle(app(BunnyStreamService::class));
+
+        Queue::assertNotPushed(SyncBunnyVideoStatusJob::class);
+        Http::assertNothingSent();
+    }
+
+    public function test_old_api_upload_status_cannot_regress_processing(): void
+    {
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'external_video_id' => 'api-regression-guid',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        app(BunnyStreamService::class)->applyRemotePayload(
+            $video,
+            ['status' => 0]
+        );
+
+        $this->assertSame(
+            VideoStatus::Processing,
+            $video->fresh()->status
+        );
+    }
+
+    public function test_old_webhook_upload_status_cannot_regress_processing(): void
+    {
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'external_video_id' => 'webhook-regression-guid',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        app(BunnyStreamService::class)->applyWebhookPayload([
+            'VideoGuid' => 'webhook-regression-guid',
+            'Status' => 6,
+        ]);
+
+        $this->assertSame(
+            VideoStatus::Processing,
+            $video->fresh()->status
+        );
+    }
+
+    public function test_api_processing_advances_uploading(): void
+    {
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'external_video_id' => 'forward-progress-guid',
+            'status' => VideoStatus::Uploading,
+        ]);
+
+        app(BunnyStreamService::class)->applyRemotePayload(
+            $video,
+            ['status' => 2]
+        );
+
+        $this->assertSame(
+            VideoStatus::Processing,
+            $video->fresh()->status
+        );
+    }
+
+
+    public function test_reconciliation_processing_check_does_not_schedule_follow_up(): void
+    {
+        Config::set('cache.default', 'array');
+        Queue::fake();
+
+        Http::fake([
+            '*video.bunnycdn.com/*' => Http::response([
+                'guid' => 'one-shot-processing-guid',
+                'status' => 2,
+                'length' => 0,
+            ], 200),
+        ]);
+
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'storage_provider' => 'bunny',
+            'external_video_id' => 'one-shot-processing-guid',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        DB::table('videos')
+            ->where('id', $video->id)
+            ->update([
+                'updated_at' => now()->subMinutes(15),
+            ]);
+
+        $this->assertSame(
+            0,
+            Artisan::call('bunny:reconcile-video-statuses')
+        );
+
+        Queue::assertPushed(SyncBunnyVideoStatusJob::class, 1);
+
+        $entry = Queue::pushed(
+            SyncBunnyVideoStatusJob::class
+        )->first();
+
+        $this->assertNotNull($entry);
+
+        $job = $entry;
+
+        $this->assertFalse($job->scheduleFollowUp);
+
+        $job->handle(app(BunnyStreamService::class));
+
+        Http::assertSentCount(1);
+
+        Queue::assertPushed(
+            SyncBunnyVideoStatusJob::class,
+            1
+        );
+
+        $this->assertSame(
+            VideoStatus::Processing,
+            $video->fresh()->status
+        );
+    }
+
+    public function test_reconcile_dispatches_stale_video_only_once(): void
+    {
+        Config::set('cache.default', 'array');
+        Queue::fake();
+
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'storage_provider' => 'bunny',
+            'external_video_id' => 'stale-processing-guid',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        DB::table('videos')
+            ->where('id', $video->id)
+            ->update(['updated_at' => now()->subMinutes(15)]);
+
+        $this->assertSame(
+            0,
+            Artisan::call('bunny:reconcile-video-statuses')
+        );
+
+        $this->assertSame(
+            0,
+            Artisan::call('bunny:reconcile-video-statuses')
+        );
+
+        Queue::assertPushed(SyncBunnyVideoStatusJob::class, 1);
+
+        Queue::assertPushed(
+            SyncBunnyVideoStatusJob::class,
+            fn (SyncBunnyVideoStatusJob $job) =>
+                $job->videoId === $video->id &&
+                $job->pollAttempt === 0 &&
+                $job->expectedGuid === 'stale-processing-guid'
+        );
+    }
+
+    public function test_reconcile_recovers_ready_video_without_duration(): void
+    {
+        Config::set('cache.default', 'array');
+        Queue::fake();
+
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'storage_provider' => 'bunny',
+            'external_video_id' => 'missing-duration-guid',
+            'status' => VideoStatus::Ready,
+            'duration_seconds' => 0,
+        ]);
+
+        DB::table('videos')
+            ->where('id', $video->id)
+            ->update(['updated_at' => now()->subMinutes(15)]);
+
+        $this->assertSame(
+            0,
+            Artisan::call('bunny:reconcile-video-statuses')
+        );
+
+        Queue::assertPushed(SyncBunnyVideoStatusJob::class, 1);
+    }
+
+    public function test_reconcile_skips_recent_and_completed_videos(): void
+    {
+        Config::set('cache.default', 'array');
+        Queue::fake();
+
+        $recent = $this->createLocalVideoForBunny();
+
+        $recent->update([
+            'storage_provider' => 'bunny',
+            'external_video_id' => 'recent-guid',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        $completed = $this->createLocalVideoForBunny();
+
+        $completed->update([
+            'storage_provider' => 'bunny',
+            'external_video_id' => 'completed-guid',
+            'status' => VideoStatus::Ready,
+            'duration_seconds' => 1200,
+        ]);
+
+        DB::table('videos')
+            ->where('id', $completed->id)
+            ->update(['updated_at' => now()->subMinutes(20)]);
+
+        $this->assertSame(
+            0,
+            Artisan::call('bunny:reconcile-video-statuses')
+        );
+
+        Queue::assertNotPushed(SyncBunnyVideoStatusJob::class);
+    }
+
+    public function test_reconcile_dry_run_does_not_dispatch(): void
+    {
+        Config::set('cache.default', 'array');
+        Queue::fake();
+
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'storage_provider' => 'bunny',
+            'external_video_id' => 'dry-run-guid',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        DB::table('videos')
+            ->where('id', $video->id)
+            ->update(['updated_at' => now()->subMinutes(20)]);
+
+        $this->assertSame(
+            0,
+            Artisan::call(
+                'bunny:reconcile-video-statuses',
+                ['--dry-run' => true]
+            )
+        );
+
+        Queue::assertNotPushed(SyncBunnyVideoStatusJob::class);
+
+        $this->assertSame(
+            0,
+            Artisan::call('bunny:reconcile-video-statuses')
+        );
+
+        Queue::assertPushed(SyncBunnyVideoStatusJob::class, 1);
+    }
+
+    public function test_reconcile_dispatches_twenty_jobs_even_when_oldest_is_reserved(): void
+    {
+        Config::set('cache.default', 'array');
+        Queue::fake();
+
+        $ids = [];
+
+        for ($i = 1; $i <= 21; $i++) {
+            $video = $this->createLocalVideoForBunny();
+
+            $video->update([
+                'storage_provider' => 'bunny',
+                'external_video_id' => 'batch-guid-'.$i,
+                'status' => VideoStatus::Processing,
+            ]);
+
+            DB::table('videos')
+                ->where('id', $video->id)
+                ->update([
+                    'updated_at' => now()->subMinutes(20),
+                ]);
+
+            $ids[] = $video->id;
+        }
+
+        $reservedKey = 'bunny:stream:reconcile:'
+            .$ids[0].':'.sha1('batch-guid-1');
+
+        $this->assertTrue(
+            cache()->add($reservedKey, 1, 600)
+        );
+
+        $this->assertSame(
+            0,
+            Artisan::call('bunny:reconcile-video-statuses')
+        );
+
+        Queue::assertPushed(
+            SyncBunnyVideoStatusJob::class,
+            20
+        );
+
+        Queue::assertNotPushed(
+            SyncBunnyVideoStatusJob::class,
+            fn (SyncBunnyVideoStatusJob $job) =>
+                $job->videoId === $ids[0]
+        );
+
+        Queue::assertPushed(
+            SyncBunnyVideoStatusJob::class,
+            fn (SyncBunnyVideoStatusJob $job) =>
+                $job->videoId === $ids[20]
+        );
     }
 
     public function test_status_mapper_maps_api_and_webhook_statuses(): void
@@ -112,6 +656,282 @@ class BunnyStreamTest extends TestCase
         $this->assertSame('bunny', $video->storage_provider);
         $this->assertSame('bunny-guid-1', $video->external_video_id);
         $this->assertSame(VideoStatus::Processing, $video->status);
+    }
+
+    public function test_retried_upload_reuses_existing_bunny_video(): void
+    {
+        Http::fake(function (\Illuminate\Http\Client\Request $request) {
+            if ($request->method() === 'GET'
+                && str_contains($request->url(), '/videos/bunny-guid-resume')) {
+                return Http::response([
+                    'guid' => 'bunny-guid-resume',
+                    'status' => 0,
+                    'storageSize' => 0,
+                ], 200);
+            }
+
+            if ($request->method() === 'PUT'
+                && str_contains($request->url(), '/videos/bunny-guid-resume')) {
+                return Http::response(['success' => true], 200);
+            }
+
+            return Http::response(['error' => 'unexpected request'], 500);
+        });
+
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'storage_provider' => 'bunny',
+            'external_video_id' => 'bunny-guid-resume',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        (new UploadVideoToBunnyJob($video->id))
+            ->handle(app(BunnyStreamService::class));
+
+        Http::assertSent(
+            fn ($request): bool =>
+                $request->method() === 'PUT'
+                && str_contains($request->url(), '/videos/bunny-guid-resume')
+        );
+
+        Http::assertNotSent(
+            fn ($request): bool => $request->method() === 'POST'
+        );
+
+        $this->assertSame(
+            'bunny-guid-resume',
+            $video->fresh()->external_video_id
+        );
+    }
+
+    public function test_retry_skips_ready_remote_without_upload(): void
+    {
+        Http::fake([
+            'video.bunnycdn.com/library/12345/videos/bunny-guid-already-ready'
+                => Http::response([
+                    'guid' => 'bunny-guid-already-ready',
+                    'status' => 4,
+                    'storageSize' => 500000,
+                    'length' => 180,
+                ], 200),
+        ]);
+
+        $video = $this->createLocalVideoForBunny();
+        $video->update([
+            'storage_provider' => 'bunny',
+            'external_video_id' => 'bunny-guid-already-ready',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        (new UploadVideoToBunnyJob($video->id))
+            ->handle(app(BunnyStreamService::class));
+
+        Http::assertSent(
+            fn ($request): bool =>
+                $request->method() === 'GET'
+                && str_contains($request->url(), '/videos/bunny-guid-already-ready')
+        );
+
+        Http::assertNotSent(
+            fn ($request): bool =>
+                in_array($request->method(), ['POST', 'PUT'], true)
+        );
+
+        $this->assertSame(
+            VideoStatus::Ready,
+            $video->fresh()->status
+        );
+    }
+
+    public function test_retry_rejects_ambiguous_remote_storage(): void
+    {
+        Http::fake([
+            'video.bunnycdn.com/library/12345/videos/bunny-guid-ambiguous'
+                => Http::response([
+                    'guid' => 'bunny-guid-ambiguous',
+                    'status' => 0,
+                    'storageSize' => 128,
+                ], 200),
+        ]);
+
+        $video = $this->createLocalVideoForBunny();
+        $video->update([
+            'storage_provider' => 'bunny',
+            'external_video_id' => 'bunny-guid-ambiguous',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        // Nonzero storage with no confirmed upload completion is ambiguous.
+        // We must neither silently accept it nor overwrite it automatically.
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Ambiguous Bunny upload state');
+
+        app(BunnyStreamService::class)->shouldUploadLocalVideo($video);
+    }
+
+    public function test_upload_failure_does_not_overwrite_concurrently_ready_video(): void
+    {
+        $video = $this->createLocalVideoForBunny();
+
+        $video->update([
+            'storage_provider' => 'bunny',
+            'external_video_id' => 'bunny-guid-race',
+            'status' => VideoStatus::Processing,
+        ]);
+
+        Http::fake(function ($request) use ($video) {
+            if (
+                $request->method() === 'GET'
+                && str_contains($request->url(), '/videos/bunny-guid-race')
+            ) {
+                // Another process finishes the video while this job runs.
+                Video::query()->whereKey($video->id)->update([
+                    'status' => VideoStatus::Ready,
+                ]);
+
+                return Http::response(['error' => 'temporary outage'], 503);
+            }
+
+            return Http::response(['error' => 'unexpected request'], 500);
+        });
+
+        $caught = false;
+
+        try {
+            (new UploadVideoToBunnyJob($video->id))
+                ->handle(app(BunnyStreamService::class));
+        } catch (\Illuminate\Http\Client\RequestException $exception) {
+            $caught = true;
+        }
+
+        $this->assertTrue($caught, 'Expected the simulated API error.');
+
+        $this->assertSame(
+            VideoStatus::Ready,
+            $video->fresh()->status,
+            'A failed old job must not overwrite a newer Ready status.'
+        );
+    }
+
+    public function test_concurrent_upload_jobs_create_only_one_bunny_video(): void
+    {
+        \Illuminate\Support\Facades\Queue::fake();
+
+        $video = $this->createLocalVideoForBunny();
+
+        $createCount = 0;
+        $secondJobStarted = false;
+
+        Http::fake(function ($request) use (
+            $video,
+            &$createCount,
+            &$secondJobStarted
+        ) {
+            $url = $request->url();
+
+            if (
+                $request->method() === 'POST'
+                && str_contains($url, '/library/12345/videos')
+                && ! str_contains($url, '/videos/')
+            ) {
+                $createCount++;
+                $guid = 'race-guid-'.$createCount;
+
+                if (! $secondJobStarted) {
+                    $secondJobStarted = true;
+
+                    // Simulate a second worker starting before the
+                    // first Bunny create request has finished.
+                    (new UploadVideoToBunnyJob($video->id))
+                        ->handle(app(BunnyStreamService::class));
+                }
+
+                return Http::response([
+                    'guid' => $guid,
+                    'status' => 0,
+                ], 200);
+            }
+
+            if (
+                $request->method() === 'PUT'
+                && str_contains($url, '/videos/race-guid-')
+            ) {
+                return Http::response(['success' => true], 200);
+            }
+
+            return Http::response([
+                'error' => 'unexpected request',
+            ], 500);
+        });
+
+        (new UploadVideoToBunnyJob($video->id))
+            ->handle(app(BunnyStreamService::class));
+
+        $this->assertSame(
+            1,
+            $createCount,
+            'Concurrent jobs must not create duplicate Bunny videos.'
+        );
+
+        $this->assertSame(
+            'race-guid-1',
+            $video->fresh()->external_video_id
+        );
+    }
+
+    public function test_busy_upload_lock_releases_job_for_retry(): void
+    {
+        $video = $this->createLocalVideoForBunny();
+
+        $queueJob = $this->createMock(
+            \Illuminate\Contracts\Queue\Job::class
+        );
+
+        $queueJob->expects($this->once())
+            ->method('release')
+            ->with(7500);
+
+        $upload = new UploadVideoToBunnyJob($video->id);
+        $upload->setJob($queueJob);
+
+        $lock = \Illuminate\Support\Facades\Cache::lock(
+            'bunny:video:upload:'.$video->id,
+            7500
+        );
+
+        $this->assertTrue($lock->get());
+
+        try {
+            $upload->handle(app(BunnyStreamService::class));
+        } finally {
+            $lock->release();
+        }
+    }
+
+    public function test_upload_job_uses_dedicated_queue(): void
+    {
+        $job = new UploadVideoToBunnyJob(123);
+
+        $this->assertSame('bunny_uploads', $job->connection);
+        $this->assertSame('bunny-uploads', $job->queue);
+
+        $this->assertSame(
+            'database',
+            config('queue.connections.bunny_uploads.driver')
+        );
+
+        $this->assertSame(
+            'bunny-uploads',
+            config('queue.connections.bunny_uploads.queue')
+        );
+
+        $this->assertGreaterThan(
+            $job->timeout,
+            (int) config(
+                'queue.connections.bunny_uploads.retry_after'
+            )
+        );
     }
 
     public function test_sync_updates_video_to_ready_from_bunny_api(): void
@@ -286,6 +1106,51 @@ class BunnyStreamTest extends TestCase
 
         $this->assertStringNotContainsString('read-only-key', $combined);
         $this->assertStringNotContainsString($signature, $combined);
+    }
+
+    public function test_editing_bunny_video_preserves_remote_identity(): void
+    {
+        $path = 'lesson-videos/already-ready.mp4';
+        Storage::disk('lesson_videos')->put($path, 'video-bytes');
+
+        $video = $this->createBunnyVideo('existing-bunny-guid');
+        $video->update(['video_path' => $path]);
+
+        $prepared = VideoResource::prepareVideoData([
+            'title' => 'Updated title',
+            'video_path' => $path,
+            'status' => VideoStatus::Uploading->value,
+        ], $video);
+
+        $this->assertArrayNotHasKey('external_video_id', $prepared);
+        $this->assertArrayNotHasKey('status', $prepared);
+
+        $video->update($prepared);
+        $video->refresh();
+
+        $this->assertSame('existing-bunny-guid', $video->external_video_id);
+        $this->assertSame(VideoStatus::Ready, $video->status);
+        $this->assertSame('Updated title', $video->title);
+    }
+
+    public function test_preparing_replacement_keeps_old_file(): void
+    {
+        $oldPath = 'lesson-videos/original.mp4';
+        $newPath = 'lesson-videos/replacement.mp4';
+
+        Storage::disk('lesson_videos')->put($oldPath, 'old-video');
+        Storage::disk('lesson_videos')->put($newPath, 'new-video');
+
+        $video = $this->createBunnyVideo('existing-replacement-guid');
+        $video->update(['video_path' => $oldPath]);
+
+        VideoResource::prepareVideoData([
+            'title' => 'Replacement',
+            'video_path' => $newPath,
+        ], $video);
+
+        $this->assertTrue(Storage::disk('lesson_videos')->exists($oldPath));
+        $this->assertTrue(Storage::disk('lesson_videos')->exists($newPath));
     }
 
     public function test_prepare_video_data_sets_storage_provider_for_bunny_uploads(): void
