@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import 'rshd_loader.dart';
 import '../l10n/app_strings.dart';
 
 class AppButton extends StatelessWidget {
@@ -20,14 +21,7 @@ class AppButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
       child: isLoading
-          ? SizedBox(
-              width: 22,
-              height: 22,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: AppColors.of(context).white,
-              ),
-            )
+          ? RshdLoader(size: 13.6, color: AppColors.of(context).white)
           : Text(AppStrings.of(context).t(label)),
     );
   }

@@ -44,31 +44,25 @@ class SubjectSectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 4,
-          height: 22,
-          decoration: BoxDecoration(
-            color: AppColors.of(context).accent,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-        const SizedBox(width: 10),
+        // Same look as the home section titles: a soft tile, no accent bar.
         Container(
           width: 34,
           height: 34,
           decoration: BoxDecoration(
-            color: AppColors.of(context).accent.withValues(alpha: 0.18),
-            shape: BoxShape.circle,
+            color: _iconColor(context).withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(11),
           ),
-          child: Icon(_icon, size: 18, color: _iconColor(context)),
+          child: Icon(_icon, size: 19, color: _iconColor(context)),
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: Text(AppStrings.of(context).t(title),
+          child: Text(
+            AppStrings.of(context).t(title),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 19,
               fontWeight: FontWeight.w800,
-              color: AppColors.of(context).primary,
+              color: AppColors.of(context).text,
+              letterSpacing: -0.2,
             ),
           ),
         ),

@@ -12,9 +12,16 @@ import 'department_card.dart';
 import 'home_section_header.dart';
 
 class AcademicDepartmentsSection extends StatelessWidget {
-  const AcademicDepartmentsSection({super.key, required this.subjects});
+  const AcademicDepartmentsSection({
+    super.key,
+    required this.subjects,
+    this.showViewAll = true,
+  });
 
   final List<SubjectModel> subjects;
+
+  /// Off on the Subjects tab, where "view all" would point at itself.
+  final bool showViewAll;
 
   int _countForCategory(String category) {
     return subjects
@@ -79,7 +86,9 @@ class AcademicDepartmentsSection extends StatelessWidget {
         children: [
           HomeSectionHeader(
             title: AppStrings.of(context).academicDepartments,
-            onViewAll: () => context.push(AppRoutes.subjects),
+            onViewAll: showViewAll
+                ? () => context.go(AppRoutes.subjects)
+                : null,
           ),
           const SizedBox(height: 8),
           if (metrics.useDepartmentRow)

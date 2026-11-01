@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,6 +13,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/error_view.dart';
 import '../../../core/widgets/loading_widget.dart';
 import '../../../core/widgets/responsive_content.dart';
+import '../../home/home_controller.dart';
 import '../data/models/video_model.dart';
 import '../playback/floating_playback_controller.dart';
 import '../services/video_progress_tracker.dart';
@@ -35,6 +37,7 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
   final GlobalKey<RshdVideoPlayerState> _nativePlayerKey =
       GlobalKey<RshdVideoPlayerState>();
   FloatingPlaybackController? _floatingPlayback;
+  HomeController? _home;
   VideoProgressTracker? _progressTracker;
   int? _trackerVideoId;
   bool _isPlaying = false;
@@ -55,12 +58,26 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _floatingPlayback = ref.read(floatingPlaybackControllerProvider);
+    _home = ref.read(homeControllerProvider.notifier);
   }
 
   @override
   void dispose() {
     _statusPollTimer?.cancel();
-    _progressTracker?.dispose();
+    final tracker = _progressTracker;
+    _progressTracker = null;
+    if (tracker != null) {
+      // Once the last position is saved, refresh the home screen so the
+      // subject's progress bar reflects what was just watched.
+      final home = _home;
+      unawaited(
+        tracker.dispose().whenComplete(() {
+          if (home != null && home.mounted) {
+            home.load(refresh: true);
+          }
+        }),
+      );
+    }
     final video = _activeVideo;
     final playback = video?.playback;
     final floating = _floatingPlayback;
@@ -164,6 +181,35 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     }
   }
 
+  void _onEmbedProgress(EmbedPlaybackProgress progress) {
+    final tracker = _progressTracker;
+    if (tracker == null) {
+      return;
+    }
+    final reported = progress.duration.inSeconds;
+    if (reported > 0 && reported != tracker.durationSeconds) {
+      tracker.durationSeconds = reported;
+    }
+    _isPlaying = progress.isPlaying;
+    // At the very end the player may stop a fraction short of the duration;
+    // count a finished video as fully watched.
+    final position = progress.ended && reported > 0
+        ? Duration(seconds: reported)
+        : progress.position;
+    // `updatePosition` only arms the periodic save while playing, and a short
+    // video can end before the first tick, so mark it started explicitly.
+    tracker.updatePosition(
+      position,
+      isPlaying: progress.isPlaying || progress.ended,
+    );
+    if (progress.ended) {
+      unawaited(tracker.flush(showSuccessMessage: true));
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   void _onPlaybackStateChanged(bool isPlaying) {
     _isPlaying = isPlaying;
     final seconds = _progressTracker?.currentPositionSeconds ?? 0;
@@ -219,7 +265,6 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     final state = ref.watch(videoDetailsControllerProvider(widget.videoId));
 
     ref.listen(videoDetailsControllerProvider(widget.videoId), (prev, next) {
-
       if (next.progressMessage != null &&
           next.progressMessage != prev?.progressMessage) {
         _showSnackBar(next.progressMessage!);
@@ -236,7 +281,9 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
-        return LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الفيديو...'));
+        return LoadingWidget(
+          message: AppStrings.of(context).t('جاري تحميل الفيديو...'),
+        );
       case FeatureLoadStatus.error:
         return ErrorView(
           message: state.errorMessage ?? 'تعذر تحميل الفيديو',
@@ -246,7 +293,9 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
       case FeatureLoadStatus.loaded:
         final video = state.video;
         if (video == null) {
-          return ErrorView(message: AppStrings.of(context).t('المحتوى غير موجود'));
+          return ErrorView(
+            message: AppStrings.of(context).t('المحتوى غير موجود'),
+          );
         }
 
         _ensureProgressTracker(video);
@@ -265,7 +314,7 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
         final playbackUrl = video.playback?.url.trim() ?? '';
         final canFloat = playbackUrl.isNotEmpty && video.status == 'ready';
 
-        return RefreshIndicator(
+        return RshdRefreshIndicator(
           color: AppColors.of(context).accent,
           backgroundColor: AppColors.of(context).cardWhite,
           onRefresh: _reloadVideo,
@@ -400,6 +449,7 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
         rememberPosition: display.saveWatchPosition,
         quality: display.videoQuality,
         onRequestFloating: _floatAndLeave,
+        onProgress: _onEmbedProgress,
         onRefreshPlayback: () => ref
             .read(videoDetailsControllerProvider(widget.videoId).notifier)
             .refreshPlayback(widget.videoId),
@@ -477,7 +527,8 @@ class _VideoDetailsHero extends StatelessWidget {
       scrolledUnderElevation: 0,
       backgroundColor: AppColors.of(context).primary,
       foregroundColor: AppColors.of(context).white,
-      title: Text(AppStrings.of(context).t(title),
+      title: Text(
+        AppStrings.of(context).t(title),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
@@ -557,7 +608,8 @@ class _PlayerPlaceholder extends StatelessWidget {
             child: Icon(icon, size: 24, color: accent),
           ),
           const SizedBox(height: 10),
-          Text(AppStrings.of(context).t(title),
+          Text(
+            AppStrings.of(context).t(title),
             style: AppTextStyles.subtitleOf(context).copyWith(
               color: AppColors.of(context).primary,
               fontWeight: FontWeight.w700,
@@ -565,7 +617,8 @@ class _PlayerPlaceholder extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(AppStrings.of(context).t(message),
+          Text(
+            AppStrings.of(context).t(message),
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -616,7 +669,8 @@ class _VideoInfoSection extends StatelessWidget {
             title: AppStrings.of(context).t('معلومات الفيديو'),
           ),
           const SizedBox(height: 14),
-          Text(AppStrings.of(context).t(video.title),
+          Text(
+            AppStrings.of(context).t(video.title),
             style: AppTextStyles.titleOf(
               context,
             ).copyWith(fontSize: 22, height: 1.25),
@@ -626,7 +680,10 @@ class _VideoInfoSection extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              _StatusChip(label: AppStrings.of(context).t(video.statusLabel), status: video.status),
+              _StatusChip(
+                label: AppStrings.of(context).t(video.statusLabel),
+                status: video.status,
+              ),
               _InfoPill(
                 icon: Icons.schedule_rounded,
                 label: video.formattedDuration,
@@ -690,13 +747,17 @@ class _ProgressSection extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(AppStrings.of(context).t(positionSeconds > 0
-                      ? 'توقفت عند $positionSeconds ثانية'
-                      : 'لم تبدأ المشاهدة بعد'),
+                child: Text(
+                  AppStrings.of(context).t(
+                    positionSeconds > 0
+                        ? 'توقفت عند $positionSeconds ثانية'
+                        : 'لم تبدأ المشاهدة بعد',
+                  ),
                   style: AppTextStyles.captionOf(context),
                 ),
               ),
-              Text(AppStrings.of(context).t('من $durationLabel'),
+              Text(
+                AppStrings.of(context).t('من $durationLabel'),
                 style: AppTextStyles.captionOf(context).copyWith(
                   color: AppColors.of(context).secondary,
                   fontWeight: FontWeight.w600,
@@ -757,7 +818,8 @@ class _SectionHeading extends StatelessWidget {
           child: Icon(icon, size: 18, color: AppColors.of(context).darkGold),
         ),
         const SizedBox(width: 10),
-        Text(AppStrings.of(context).t(title),
+        Text(
+          AppStrings.of(context).t(title),
           style: AppTextStyles.bodyOf(context).copyWith(
             fontWeight: FontWeight.w700,
             color: AppColors.of(context).primary,
@@ -781,7 +843,8 @@ class _ProgressBadge extends StatelessWidget {
         color: AppColors.of(context).background,
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(AppStrings.of(context).t('$percentage%'),
+      child: Text(
+        AppStrings.of(context).t('$percentage%'),
         style: AppTextStyles.captionOf(context).copyWith(
           color: AppColors.of(context).secondary,
           fontWeight: FontWeight.w800,
@@ -823,7 +886,8 @@ class _StatusChip extends StatelessWidget {
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 7),
-          Text(AppStrings.of(context).t(label),
+          Text(
+            AppStrings.of(context).t(label),
             style: AppTextStyles.captionOf(
               context,
             ).copyWith(color: color, fontWeight: FontWeight.w700),
@@ -861,10 +925,12 @@ class _InfoPill extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(AppStrings.of(context).t(caption),
+              Text(
+                AppStrings.of(context).t(caption),
                 style: AppTextStyles.captionOf(context).copyWith(fontSize: 10),
               ),
-              Text(AppStrings.of(context).t(label),
+              Text(
+                AppStrings.of(context).t(label),
                 style: AppTextStyles.captionOf(context).copyWith(
                   color: AppColors.of(context).primary,
                   fontWeight: FontWeight.w700,

@@ -132,7 +132,8 @@ class _QuickActionTile extends StatelessWidget {
             ),
           ),
           SizedBox(height: metrics.isTablet ? 10 : 8),
-          Text(AppStrings.of(context).t(action.label),
+          Text(
+            AppStrings.of(context).t(action.label),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: metrics.quickActionLabelFontSize,
               height: 1.25,

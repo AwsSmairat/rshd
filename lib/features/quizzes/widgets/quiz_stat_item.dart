@@ -33,7 +33,8 @@ class QuizStatItem extends StatelessWidget {
             child: Icon(icon, size: 18, color: AppColors.of(context).darkGold),
           ),
           const SizedBox(height: 10),
-          Text(AppStrings.of(context).t(label),
+          Text(
+            AppStrings.of(context).t(label),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
@@ -42,7 +43,8 @@ class QuizStatItem extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
-          Text(AppStrings.of(context).t(value),
+          Text(
+            AppStrings.of(context).t(value),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 14,
               fontWeight: FontWeight.w700,

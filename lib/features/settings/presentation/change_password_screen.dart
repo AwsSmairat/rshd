@@ -111,7 +111,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(title: Text(AppStrings.of(context).t('تغيير كلمة المرور'))),
+      appBar: AppBar(
+        title: Text(AppStrings.of(context).t('تغيير كلمة المرور')),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [

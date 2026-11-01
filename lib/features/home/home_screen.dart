@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/widgets/rshd_refresh_indicator.dart';
 
 import '../../core/l10n/app_strings.dart';
 import '../../core/layout/app_layout_metrics.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/error_view.dart';
+import '../../core/widgets/responsive_content.dart';
+import '../announcements/widgets/announcement_image_carousel.dart';
 import '../auth/presentation/auth_controller.dart';
-import '../announcements/widgets/home_announcements_section.dart';
 import 'home_controller.dart';
-import 'widgets/academic_departments_section.dart';
+import 'home_dashboard_model.dart';
+import '../subjects/data/models/subject_model.dart';
 import 'widgets/continue_learning_card.dart';
-import 'widgets/dashboard_summary_card.dart';
-import 'widgets/quick_action_grid.dart';
+import 'widgets/home_reveal.dart';
+import 'widgets/home_search_field.dart';
+import 'widgets/home_top_bar.dart';
+import 'widgets/suggested_subjects_section.dart';
 import 'widgets/upcoming_assignments_section.dart';
-import 'widgets/welcome_header.dart';
 
+/// The Home tab: a short, ordered overview — greeting and search, featured
+/// announcements, what to continue, what to try next, and what is
+/// due. Full lists live in their own tabs.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -52,7 +59,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(homeControllerProvider);
 
-    return Scaffold(body: _buildBody(state));
+    return Scaffold(
+      backgroundColor: AppColors.of(context).background,
+      body: _buildBody(state),
+    );
   }
 
   Widget _buildBody(HomeState state) {
@@ -64,85 +74,115 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     final dashboard = state.dashboard;
-    final isLoading =
+    final isBusy =
         state.status == HomeLoadStatus.initial ||
-        state.status == HomeLoadStatus.loading;
-    final isRefreshing = state.status == HomeLoadStatus.refreshing;
+        state.status == HomeLoadStatus.loading ||
+        state.status == HomeLoadStatus.refreshing;
     final userName =
         dashboard?.studentName ??
         ref.watch(authControllerProvider).user?.name ??
         AppStrings.of(context).rshdStudentFallback;
+    final gap = AppLayoutMetrics.of(context).sectionSpacing;
 
-    final metrics = AppLayoutMetrics.of(context);
-    final sectionGap = metrics.sectionSpacing;
+    final banners = (dashboard?.featuredAnnouncements ?? const [])
+        .where((item) => item.hasCarouselImage)
+        .toList();
+    final suggested = _suggestedSubjects(dashboard);
 
-    return RefreshIndicator(
-      onRefresh: isLoading ? () async {} : _refresh,
-      color: AppColors.of(context).secondary,
+    var order = 0;
+    Widget section(Widget child, {double top = 0}) => SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.only(top: top),
+        child: HomeReveal(order: order++, child: child),
+      ),
+    );
+
+    return RshdRefreshIndicator(
+      onRefresh: isBusy ? () async {} : _refresh,
+      color: AppColors.of(context).darkGold,
       child: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
         slivers: [
-          SliverToBoxAdapter(
-            child: WelcomeHeader(
-              studentName: userName,
-              unreadCount: dashboard?.unreadNotificationsCount ?? 0,
-            ),
-          ),
-          if (isLoading || isRefreshing)
-            SliverToBoxAdapter(
-              child: LinearProgressIndicator(
-                minHeight: 2,
-                color: AppColors.of(context).accent,
-                backgroundColor: Colors.transparent,
-              ),
-            ),
-          SliverToBoxAdapter(
-            child: Transform.translate(
-              offset: const Offset(0, -16),
-              child: DashboardSummaryGrid(
-                subjectsCount: dashboard?.subjectsCount ?? 0,
-                unsubmittedAssignmentsCount:
-                    dashboard?.unsubmittedAssignmentsCount ?? 0,
-                availableQuizzesCount: dashboard?.availableQuizzesCount ?? 0,
+          SliverSafeArea(
+            bottom: false,
+            sliver: SliverToBoxAdapter(
+              child: ResponsiveContent(
+                child: HomeTopBar(
+                  studentName: userName,
+                  unreadCount: dashboard?.unreadNotificationsCount ?? 0,
+                ),
               ),
             ),
           ),
-          const SliverToBoxAdapter(child: QuickActionGrid()),
-          if (dashboard != null &&
-              dashboard.continueLearningSubjects.isNotEmpty) ...[
-            SliverToBoxAdapter(child: SizedBox(height: sectionGap)),
-            SliverToBoxAdapter(
-              child: ContinueLearningSection(
+          SliverToBoxAdapter(
+            child: AnimatedOpacity(
+              opacity: isBusy ? 1 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: LinearProgressIndicator(
+                  minHeight: 2,
+                  color: AppColors.of(context).accent,
+                  backgroundColor: Colors.transparent,
+                ),
+              ),
+            ),
+          ),
+          section(
+            ResponsiveContent(
+              child: HomeSearchField(
+                subjects: [
+                  ...?dashboard?.subjects,
+                  ...?dashboard?.catalogSubjects,
+                ],
+              ),
+            ),
+            top: 10,
+          ),
+          if (dashboard != null)
+            section(
+              ContinueLearningSection(
                 subjects: dashboard.continueLearningSubjects,
                 progressFor: dashboard.resolvedProgressPercent,
               ),
+              top: 24,
             ),
-          ],
-          SliverToBoxAdapter(child: SizedBox(height: sectionGap)),
-          SliverToBoxAdapter(
-            child: HomeAnnouncementsSection(
-              announcements: dashboard?.featuredAnnouncements ?? const [],
-              loadFailed: dashboard?.announcementsLoadFailed ?? false,
+          if (banners.isNotEmpty)
+            section(
+              ResponsiveContent(
+                child: AnnouncementImageCarousel(announcements: banners),
+              ),
+              top: gap,
             ),
-          ),
-          SliverToBoxAdapter(child: SizedBox(height: sectionGap)),
-          SliverToBoxAdapter(
-            child: AcademicDepartmentsSection(
-              subjects: dashboard?.catalogSubjects ?? const [],
+          if (suggested.isNotEmpty)
+            section(
+              ResponsiveContent(
+                child: SuggestedSubjectsSection(subjects: suggested),
+              ),
+              top: gap,
             ),
-          ),
-          SliverToBoxAdapter(child: SizedBox(height: sectionGap)),
-          SliverToBoxAdapter(
-            child: UpcomingAssignmentsSection(
+          section(
+            UpcomingAssignmentsSection(
               assignments: dashboard?.upcomingAssignments ?? const [],
               quizzes: dashboard?.featuredQuizzes ?? const [],
             ),
+            top: gap,
           ),
-          SliverToBoxAdapter(
-            child: SizedBox(height: MediaQuery.paddingOf(context).bottom + 24),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 28)),
         ],
       ),
     );
+  }
+
+  /// Catalogue courses the student has not joined, newest first as served.
+  List<SubjectModel> _suggestedSubjects(HomeDashboardModel? dashboard) {
+    if (dashboard == null) return const [];
+    final enrolled = dashboard.subjects.map((s) => s.id).toSet();
+    return dashboard.catalogSubjects
+        .where((s) => !enrolled.contains(s.id) && !s.isEnrollmentActive)
+        .take(8)
+        .toList();
   }
 }

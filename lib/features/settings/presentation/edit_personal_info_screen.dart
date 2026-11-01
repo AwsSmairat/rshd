@@ -65,9 +65,9 @@ class _EditPersonalInfoScreenState
   Future<void> _save() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('الاسم مطلوب'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.of(context).t('الاسم مطلوب'))),
+      );
       return;
     }
 
@@ -107,16 +107,23 @@ class _EditPersonalInfoScreenState
     });
 
     return Scaffold(
-      appBar: AppBar(title: Text(AppStrings.of(context).t('تعديل المعلومات الشخصية'))),
+      appBar: AppBar(
+        title: Text(AppStrings.of(context).t('تعديل المعلومات الشخصية')),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          AppTextField(controller: _nameController, label: AppStrings.of(context).t('الاسم الكامل')),
+          AppTextField(
+            controller: _nameController,
+            label: AppStrings.of(context).t('الاسم الكامل'),
+          ),
           const SizedBox(height: 16),
           TextFormField(
             controller: _emailController,
             readOnly: true,
-            decoration: InputDecoration(labelText: AppStrings.of(context).t('البريد الإلكتروني')),
+            decoration: InputDecoration(
+              labelText: AppStrings.of(context).t('البريد الإلكتروني'),
+            ),
           ),
           const SizedBox(height: 16),
           AppTextField(
@@ -135,15 +142,26 @@ class _EditPersonalInfoScreenState
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
             initialValue: _gender,
-            decoration: InputDecoration(labelText: AppStrings.of(context).t('الجنس')),
+            decoration: InputDecoration(
+              labelText: AppStrings.of(context).t('الجنس'),
+            ),
             items: [
-              DropdownMenuItem(value: 'male', child: Text(AppStrings.of(context).t('ذكر'))),
-              DropdownMenuItem(value: 'female', child: Text(AppStrings.of(context).t('أنثى'))),
+              DropdownMenuItem(
+                value: 'male',
+                child: Text(AppStrings.of(context).t('ذكر')),
+              ),
+              DropdownMenuItem(
+                value: 'female',
+                child: Text(AppStrings.of(context).t('أنثى')),
+              ),
             ],
             onChanged: (value) => setState(() => _gender = value),
           ),
           const SizedBox(height: 16),
-          AppTextField(controller: _countryController, label: AppStrings.of(context).t('الدولة')),
+          AppTextField(
+            controller: _countryController,
+            label: AppStrings.of(context).t('الدولة'),
+          ),
           const SizedBox(height: 24),
           AppButton(
             label: isSaving ? 'جارٍ الحفظ...' : 'حفظ التغييرات',

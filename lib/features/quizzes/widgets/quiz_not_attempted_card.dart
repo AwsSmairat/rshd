@@ -21,7 +21,8 @@ class QuizNotAttemptedCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppStrings.of(context).t('لم تقم بحل هذا الاختبار بعد'),
+          Text(
+            AppStrings.of(context).t('لم تقم بحل هذا الاختبار بعد'),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -29,7 +30,8 @@ class QuizNotAttemptedCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          Text(AppStrings.of(context).t('ابدأ الاختبار لعرض نتيجتك هنا'),
+          Text(
+            AppStrings.of(context).t('ابدأ الاختبار لعرض نتيجتك هنا'),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),

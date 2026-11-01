@@ -84,13 +84,15 @@ class UpcomingTaskCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Column(
                       children: [
-                        Text(AppStrings.of(context).t(_dayLabel()),
+                        Text(
+                          AppStrings.of(context).t(_dayLabel()),
                           style: AppTextStyles.titleOf(context).copyWith(
                             fontSize: 18,
                             color: AppColors.of(context).primary,
                           ),
                         ),
-                        Text(AppStrings.of(context).t(_monthLabel(context)),
+                        Text(
+                          AppStrings.of(context).t(_monthLabel(context)),
                           style: AppTextStyles.bodyOf(context).copyWith(
                             fontSize: 10,
                             color: AppColors.of(context).textMuted,
@@ -136,7 +138,8 @@ class UpcomingTaskCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(AppStrings.of(context).t(task.title),
+                          Text(
+                            AppStrings.of(context).t(task.title),
                             style: AppTextStyles.subtitleOf(context).copyWith(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -146,7 +149,8 @@ class UpcomingTaskCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
-                          Text(AppStrings.of(context).t(task.subtitle),
+                          Text(
+                            AppStrings.of(context).t(task.subtitle),
                             style: AppTextStyles.bodyOf(context).copyWith(
                               fontSize: 12,
                               color: AppColors.of(context).textMuted,

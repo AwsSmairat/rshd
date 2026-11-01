@@ -23,7 +23,7 @@ class AvailableQuizzesSection extends StatelessWidget {
         children: [
           HomeSectionHeader(
             title: AppStrings.of(context).quizzes,
-            onViewAll: () => context.push(AppRoutes.quizzes),
+            onViewAll: () => context.go(AppRoutes.quizzes),
           ),
           const SizedBox(height: 14),
           if (quizzes.isEmpty)
@@ -35,7 +35,8 @@ class AvailableQuizzesSection extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFE5E7EB)),
               ),
-              child: Text(AppStrings.of(context).t(AppStrings.of(context).noQuizzesYet),
+              child: Text(
+                AppStrings.of(context).t(AppStrings.of(context).noQuizzesYet),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(color: AppColors.of(context).textMuted),

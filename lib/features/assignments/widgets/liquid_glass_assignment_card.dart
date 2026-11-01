@@ -47,7 +47,8 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: Text(AppStrings.of(context).t(assignment.title),
+                      child: Text(
+                        AppStrings.of(context).t(assignment.title),
                         style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 17,
                           height: 1.3,
@@ -80,7 +81,8 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
                 if (assignment.subjectTitle != null &&
                     assignment.subjectTitle!.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text(AppStrings.of(context).t(assignment.subjectTitle!),
+                  Text(
+                    AppStrings.of(context).t(assignment.subjectTitle!),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 13,
                       color: AppColors.of(context).textMuted,
@@ -101,7 +103,10 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Flexible(
-                        child: Text(AppStrings.of(context).t('تاريخ التسليم: ${_formatDate(context, assignment.dueDate!)}'),
+                        child: Text(
+                          AppStrings.of(context).t(
+                            'تاريخ التسليم: ${_formatDate(context, assignment.dueDate!)}',
+                          ),
                           style: AppTextStyles.bodyOf(context).copyWith(
                             fontSize: 12,
                             color: AppColors.of(context).textMuted,
@@ -136,6 +141,9 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd', AppStrings.of(context).dateLocale).format(parsed.toLocal());
+    return DateFormat(
+      'yyyy/MM/dd',
+      AppStrings.of(context).dateLocale,
+    ).format(parsed.toLocal());
   }
 }

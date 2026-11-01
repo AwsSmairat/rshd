@@ -36,7 +36,8 @@ class QuizzesEmptyState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Text(AppStrings.of(context).t('لا توجد اختبارات حالياً'),
+          Text(
+            AppStrings.of(context).t('لا توجد اختبارات حالياً'),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -45,7 +46,10 @@ class QuizzesEmptyState extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-          Text(AppStrings.of(context).t('ستظهر الاختبارات هنا عند إضافتها من المدرّس'),
+          Text(
+            AppStrings.of(
+              context,
+            ).t('ستظهر الاختبارات هنا عند إضافتها من المدرّس'),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 13,
               height: 1.5,
@@ -138,7 +142,8 @@ class QuizzesErrorState extends StatelessWidget {
             size: 36,
           ),
           const SizedBox(height: 12),
-          Text(AppStrings.of(context).t(message),
+          Text(
+            AppStrings.of(context).t(message),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.of(context).text,

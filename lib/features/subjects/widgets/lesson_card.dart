@@ -64,7 +64,9 @@ class _LessonCardState extends State<LessonCard>
     if (locked) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppStrings.of(context).t('هذا الفيديو مقفل. فعّل المادة لمشاهدته.')),
+          content: Text(
+            AppStrings.of(context).t('هذا الفيديو مقفل. فعّل المادة لمشاهدته.'),
+          ),
         ),
       );
       return;
@@ -75,7 +77,11 @@ class _LessonCardState extends State<LessonCard>
   void _openFile(BuildContext context, int fileId, {required bool locked}) {
     if (locked) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.of(context).t('الملف مقفل. فعّل المادة لفتحه.'))),
+        SnackBar(
+          content: Text(
+            AppStrings.of(context).t('الملف مقفل. فعّل المادة لفتحه.'),
+          ),
+        ),
       );
       return;
     }
@@ -116,7 +122,8 @@ class _LessonCardState extends State<LessonCard>
                     backgroundColor: AppColors.of(
                       context,
                     ).secondary.withValues(alpha: 0.15),
-                    child: Text(AppStrings.of(context).t('${widget.displayOrder}'),
+                    child: Text(
+                      AppStrings.of(context).t('${widget.displayOrder}'),
                       style: AppTextStyles.bodyOf(context).copyWith(
                         color: AppColors.of(context).secondary,
                         fontWeight: FontWeight.w700,
@@ -128,7 +135,8 @@ class _LessonCardState extends State<LessonCard>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(AppStrings.of(context).t(lesson.title),
+                        Text(
+                          AppStrings.of(context).t(lesson.title),
                           style: AppTextStyles.bodyOf(
                             context,
                           ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
@@ -136,7 +144,8 @@ class _LessonCardState extends State<LessonCard>
                         if (lesson.description != null &&
                             lesson.description!.isNotEmpty) ...[
                           const SizedBox(height: 4),
-                          Text(AppStrings.of(context).t(lesson.description!),
+                          Text(
+                            AppStrings.of(context).t(lesson.description!),
                             style: AppTextStyles.bodyOf(
                               context,
                             ).copyWith(color: AppColors.of(context).textMuted),
@@ -145,7 +154,8 @@ class _LessonCardState extends State<LessonCard>
                           ),
                         ],
                         const SizedBox(height: 6),
-                        Text(AppStrings.of(context).t(_summaryLabel(lesson)),
+                        Text(
+                          AppStrings.of(context).t(_summaryLabel(lesson)),
                           style: AppTextStyles.bodyOf(context).copyWith(
                             color: AppColors.of(context).secondary,
                             fontSize: 12,
@@ -244,14 +254,16 @@ class _ExpandedBody extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           if (!hasContent)
-            Text(AppStrings.of(context).t('لا يوجد محتوى في هذا الجزء بعد'),
+            Text(
+              AppStrings.of(context).t('لا يوجد محتوى في هذا الجزء بعد'),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(color: AppColors.of(context).textMuted),
             )
           else ...[
             if (lesson.videos.isNotEmpty) ...[
-              Text(AppStrings.of(context).t('الفيديوهات'),
+              Text(
+                AppStrings.of(context).t('الفيديوهات'),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
@@ -272,7 +284,8 @@ class _ExpandedBody extends StatelessWidget {
             ],
             if (lesson.files.isNotEmpty) ...[
               if (lesson.videos.isNotEmpty) const SizedBox(height: 4),
-              Text(AppStrings.of(context).t('الملفات'),
+              Text(
+                AppStrings.of(context).t('الملفات'),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
@@ -294,7 +307,8 @@ class _ExpandedBody extends StatelessWidget {
             if (lesson.assignments.isNotEmpty) ...[
               if (lesson.videos.isNotEmpty || lesson.files.isNotEmpty)
                 const SizedBox(height: 4),
-              Text(AppStrings.of(context).t('الواجبات'),
+              Text(
+                AppStrings.of(context).t('الواجبات'),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
@@ -317,7 +331,8 @@ class _ExpandedBody extends StatelessWidget {
                   lesson.files.isNotEmpty ||
                   lesson.assignments.isNotEmpty)
                 const SizedBox(height: 4),
-              Text(AppStrings.of(context).t('الاختبارات'),
+              Text(
+                AppStrings.of(context).t('الاختبارات'),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,

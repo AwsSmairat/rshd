@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/widgets/rshd_loader.dart';
 
 class ProfileLogoutButton extends StatelessWidget {
   const ProfileLogoutButton({
@@ -41,18 +42,12 @@ class ProfileLogoutButton extends StatelessWidget {
           ),
           child: Center(
             child: isLoading
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
+                ? RshdLoader(size: 13.6, color: Colors.white)
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(AppStrings.of(context).t(AppStrings.of(context).logout),
+                      Text(
+                        AppStrings.of(context).t(AppStrings.of(context).logout),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,

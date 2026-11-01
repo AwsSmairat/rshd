@@ -39,7 +39,8 @@ class GradeCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: Text(AppStrings.of(context).t(grade.displayTitle),
+                      child: Text(
+                        AppStrings.of(context).t(grade.displayTitle),
                         style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 17,
                           height: 1.3,
@@ -70,7 +71,8 @@ class GradeCard extends StatelessWidget {
                 if (grade.subjectTitle != null &&
                     grade.subjectTitle!.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text(AppStrings.of(context).t(grade.subjectTitle!),
+                  Text(
+                    AppStrings.of(context).t(grade.subjectTitle!),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 13,
                       color: AppColors.of(context).textMuted,
@@ -94,7 +96,10 @@ class GradeCard extends StatelessWidget {
                         ).textMuted.withValues(alpha: 0.85),
                       ),
                       const SizedBox(width: 4),
-                      Text(AppStrings.of(context).t(_formatDate(context, grade.createdAt!)),
+                      Text(
+                        AppStrings.of(
+                          context,
+                        ).t(_formatDate(context, grade.createdAt!)),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
                           color: AppColors.of(context).textMuted,
@@ -131,7 +136,10 @@ class GradeCard extends StatelessWidget {
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd', AppStrings.of(context).dateLocale).format(parsed.toLocal());
+    return DateFormat(
+      'yyyy/MM/dd',
+      AppStrings.of(context).dateLocale,
+    ).format(parsed.toLocal());
   }
 }
 
@@ -167,7 +175,12 @@ class _GradeScoreRing extends StatelessWidget {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(AppStrings.of(context).t(value % 1 == 0 ? '${value.toInt()}' : value.toStringAsFixed(1)),
+              Text(
+                AppStrings.of(context).t(
+                  value % 1 == 0
+                      ? '${value.toInt()}'
+                      : value.toStringAsFixed(1),
+                ),
                 style: AppTextStyles.titleOf(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
@@ -175,7 +188,8 @@ class _GradeScoreRing extends StatelessWidget {
                   height: 1,
                 ),
               ),
-              Text(AppStrings.of(context).t('%'),
+              Text(
+                AppStrings.of(context).t('%'),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   fontSize: 10,
                   color: AppColors.of(context).textMuted,

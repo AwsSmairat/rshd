@@ -53,7 +53,8 @@ class QuizResultSummaryCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppStrings.of(context).t(title),
+                Text(
+                  AppStrings.of(context).t(title),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -61,7 +62,8 @@ class QuizResultSummaryCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(AppStrings.of(context).t(grade),
+                Text(
+                  AppStrings.of(context).t(grade),
                   style: AppTextStyles.titleOf(
                     context,
                   ).copyWith(fontSize: 24, color: gradeColor),
@@ -69,7 +71,9 @@ class QuizResultSummaryCard extends StatelessWidget {
                 if (showEncouragement) ...[
                   const SizedBox(height: 6),
                   Text(
-                    AppStrings.of(context).t(QuizScoreHelper.encouragement(score)),
+                    AppStrings.of(
+                      context,
+                    ).t(QuizScoreHelper.encouragement(score)),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 12,
                       height: 1.4,

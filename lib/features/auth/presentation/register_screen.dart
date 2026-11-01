@@ -65,7 +65,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       case RegisterResult.requiresEmailVerification:
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppStrings.of(context).t('تم إنشاء الحساب وإرسال رمز التحقق إلى بريدك الإلكتروني'),
+            content: Text(
+              AppStrings.of(
+                context,
+              ).t('تم إنشاء الحساب وإرسال رمز التحقق إلى بريدك الإلكتروني'),
             ),
           ),
         );
@@ -123,7 +126,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(AppStrings.of(context).t('إنشاء حساب طالب جديد'),
+                      Text(
+                        AppStrings.of(context).t('إنشاء حساب طالب جديد'),
                         style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 22,
                           color: AppColors.of(context).primary,
@@ -131,7 +135,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
-                      Text(AppStrings.of(context).t('أنشئ حسابك ثم أكد بريدك الإلكتروني للوصول إلى التطبيق'),
+                      Text(
+                        AppStrings.of(context).t(
+                          'أنشئ حسابك ثم أكد بريدك الإلكتروني للوصول إلى التطبيق',
+                        ),
                         style: AppTextStyles.subtitleOf(
                           context,
                         ).copyWith(height: 1.5, fontSize: 13),
@@ -148,7 +155,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               color: AppColors.of(context).accent,
                             ),
                           ),
-                          child: Text(AppStrings.of(context).t('التسجيل الذاتي للطلاب غير مفعّل حالياً.'),
+                          child: Text(
+                            AppStrings.of(
+                              context,
+                            ).t('التسجيل الذاتي للطلاب غير مفعّل حالياً.'),
                             style: AppTextStyles.subtitleOf(context),
                             textAlign: TextAlign.center,
                           ),
@@ -169,7 +179,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               ).error.withValues(alpha: 0.2),
                             ),
                           ),
-                          child: Text(AppStrings.of(context).t(authState.errorMessage!),
+                          child: Text(
+                            AppStrings.of(context).t(authState.errorMessage!),
                             style: AppTextStyles.errorOf(context),
                             textAlign: TextAlign.center,
                           ),
@@ -199,10 +210,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         errorText: fieldErrors['email'],
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return AppStrings.of(context).t('البريد الإلكتروني مطلوب');
+                            return AppStrings.of(
+                              context,
+                            ).t('البريد الإلكتروني مطلوب');
                           }
                           if (!value.contains('@')) {
-                            return AppStrings.of(context).t('أدخل بريداً إلكترونياً صالحاً');
+                            return AppStrings.of(
+                              context,
+                            ).t('أدخل بريداً إلكترونياً صالحاً');
                           }
                           return null;
                         },
@@ -210,7 +225,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       const SizedBox(height: 14),
                       RegisterFormField(
                         controller: _phoneController,
-                        hintText: AppStrings.of(context).t('رقم الهاتف (اختياري)'),
+                        hintText: AppStrings.of(
+                          context,
+                        ).t('رقم الهاتف (اختياري)'),
                         keyboardType: TextInputType.phone,
                         textInputAction: TextInputAction.next,
                         icon: Icons.phone_outlined,
@@ -234,7 +251,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         errorText: fieldErrors['password'],
                         validator: (value) {
                           if (value == null || value.length < 8) {
-                            return AppStrings.of(context).t('كلمة المرور 8 أحرف على الأقل');
+                            return AppStrings.of(
+                              context,
+                            ).t('كلمة المرور 8 أحرف على الأقل');
                           }
                           return null;
                         },
@@ -258,7 +277,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         errorText: fieldErrors['password_confirmation'],
                         validator: (value) {
                           if (value != _passwordController.text) {
-                            return AppStrings.of(context).t('كلمة المرور غير متطابقة');
+                            return AppStrings.of(
+                              context,
+                            ).t('كلمة المرور غير متطابقة');
                           }
                           return null;
                         },

@@ -75,9 +75,9 @@ class _SubmitAssignmentScreenState
 
     if (validationError != null) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(validationError))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppStrings.of(context).t(validationError))),
+        );
       }
       return;
     }
@@ -92,7 +92,11 @@ class _SubmitAssignmentScreenState
 
     if (answerText.isEmpty && !hasFile) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.of(context).t('يرجى كتابة إجابة أو رفع ملف الحل.'))),
+        SnackBar(
+          content: Text(
+            AppStrings.of(context).t('يرجى كتابة إجابة أو رفع ملف الحل.'),
+          ),
+        ),
       );
       return;
     }
@@ -104,9 +108,9 @@ class _SubmitAssignmentScreenState
         size: _selectedFile!.size,
       );
       if (validationError != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(validationError))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppStrings.of(context).t(validationError))),
+        );
         return;
       }
     }
@@ -146,9 +150,11 @@ class _SubmitAssignmentScreenState
               .copyWith(submission: submission),
         );
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تم تسليم الواجب بنجاح'))));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppStrings.of(context).t('تم تسليم الواجب بنجاح')),
+      ),
+    );
 
     context.pop();
   }
@@ -171,9 +177,9 @@ class _SubmitAssignmentScreenState
     ) {
       if (next.status == AssignmentSubmitStatus.error &&
           next.errorMessage != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(next.errorMessage!))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppStrings.of(context).t(next.errorMessage!))),
+        );
       }
     });
 
@@ -271,7 +277,9 @@ class _SubmitAssignmentScreenState
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
-            child: LuxuryAssignmentHeader(title: AppStrings.of(context).t('تسليم الواجب')),
+            child: LuxuryAssignmentHeader(
+              title: AppStrings.of(context).t('تسليم الواجب'),
+            ),
           ),
           ResponsiveSliverContent(
             padding: AppLayoutMetrics.of(

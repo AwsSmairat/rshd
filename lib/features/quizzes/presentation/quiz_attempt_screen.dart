@@ -78,7 +78,11 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
     _timeExpiredSubmitting = true;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppStrings.of(context).t('انتهى وقت الاختبار، جاري التسليم...'))),
+      SnackBar(
+        content: Text(
+          AppStrings.of(context).t('انتهى وقت الاختبار، جاري التسليم...'),
+        ),
+      ),
     );
 
     await _submit(force: true);
@@ -92,7 +96,10 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
         context: context,
         builder: (context) => AlertDialog(
           title: Text(AppStrings.of(context).t('أسئلة غير مجابة')),
-          content: Text(AppStrings.of(context).t('لم تجب على جميع الأسئلة. هل تريد تسليم الاختبار؟'),
+          content: Text(
+            AppStrings.of(
+              context,
+            ).t('لم تجب على جميع الأسئلة. هل تريد تسليم الاختبار؟'),
           ),
           actions: [
             TextButton(
@@ -167,9 +174,9 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
       if (message != null &&
           message != previous?.errorMessage &&
           next.status != QuizAttemptStatus.submitting) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(message))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppStrings.of(context).t(message))),
+        );
       }
     });
 
@@ -181,7 +188,10 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
             Padding(
               padding: const EdgeInsetsDirectional.only(end: 16),
               child: Center(
-                child: Text(AppStrings.of(context).t(_formatTime(state.remainingSeconds!)),
+                child: Text(
+                  AppStrings.of(
+                    context,
+                  ).t(_formatTime(state.remainingSeconds!)),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     color: state.remainingSeconds! <= 60
                         ? AppColors.of(context).error
@@ -200,7 +210,9 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
   Widget _buildBody(QuizAttemptState state, QuizAttemptController controller) {
     switch (state.status) {
       case QuizAttemptStatus.loading:
-        return LoadingWidget(message: AppStrings.of(context).t('جاري بدء الاختبار...'));
+        return LoadingWidget(
+          message: AppStrings.of(context).t('جاري بدء الاختبار...'),
+        );
       case QuizAttemptStatus.error:
         final isRetakeBlocked =
             state.errorMessage?.contains('إعادة الاختبار غير مسموحة') ?? false;
@@ -286,7 +298,9 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
           ),
         );
       case QuizAttemptStatus.submitted:
-        return LoadingWidget(message: AppStrings.of(context).t('جاري عرض النتيجة...'));
+        return LoadingWidget(
+          message: AppStrings.of(context).t('جاري عرض النتيجة...'),
+        );
     }
   }
 }

@@ -35,7 +35,8 @@ class AssignmentsEmptyState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Text(AppStrings.of(context).t('لا توجد واجبات حالياً'),
+          Text(
+            AppStrings.of(context).t('لا توجد واجبات حالياً'),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -44,7 +45,10 @@ class AssignmentsEmptyState extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-          Text(AppStrings.of(context).t('ستظهر الواجبات هنا عند إضافتها من المدرّس'),
+          Text(
+            AppStrings.of(
+              context,
+            ).t('ستظهر الواجبات هنا عند إضافتها من المدرّس'),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 13,
               height: 1.5,
@@ -131,7 +135,8 @@ class AssignmentsErrorState extends StatelessWidget {
             size: 36,
           ),
           const SizedBox(height: 12),
-          Text(AppStrings.of(context).t(message),
+          Text(
+            AppStrings.of(context).t(message),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.of(context).text,

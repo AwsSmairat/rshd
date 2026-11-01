@@ -4,6 +4,9 @@ import 'package:flutter/services.dart';
 import 'app_colors.dart';
 import 'app_text_styles.dart';
 
+/// The app's typeface, bundled under assets/fonts/tajawal.
+const appFontFamily = 'Tajawal';
+
 class AppTheme {
   AppTheme._();
 
@@ -27,6 +30,8 @@ class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
+      // Tajawal for Arabic and Latin text across the app.
+      fontFamily: appFontFamily,
       brightness: brightness,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: Colors.transparent,

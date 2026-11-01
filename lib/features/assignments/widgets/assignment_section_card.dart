@@ -34,7 +34,8 @@ class AssignmentSectionCard extends StatelessWidget {
             children: [
               Icon(icon, size: 18, color: AppColors.of(context).darkGold),
               const SizedBox(width: 8),
-              Text(AppStrings.of(context).t(title),
+              Text(
+                AppStrings.of(context).t(title),
                 style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,

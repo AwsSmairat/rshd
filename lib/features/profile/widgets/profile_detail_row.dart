@@ -51,7 +51,8 @@ class ProfileDetailRow extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(AppStrings.of(context).t(label),
+                child: Text(
+                  AppStrings.of(context).t(label),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: dense ? 13 : 14,
                     fontWeight: FontWeight.w600,
@@ -62,7 +63,8 @@ class ProfileDetailRow extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Flexible(
-                child: Text(AppStrings.of(context).t(value),
+                child: Text(
+                  AppStrings.of(context).t(value),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: dense ? 12 : 13,
                     color: valueColor ?? AppColors.of(context).textMuted,

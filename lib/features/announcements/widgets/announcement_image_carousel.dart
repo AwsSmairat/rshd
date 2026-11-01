@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../../core/widgets/rshd_loader.dart';
+import '../../../core/widgets/cached_image.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -223,8 +225,8 @@ class _CarouselSlide extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           if (imageUrl != null)
-            Image.network(
-              imageUrl,
+            Image(
+              image: cachedImage(imageUrl),
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return _PlaceholderSlide(title: announcement.title);
@@ -234,9 +236,9 @@ class _CarouselSlide extends StatelessWidget {
                   return child;
                 }
                 return Center(
-                  child: CircularProgressIndicator(
+                  child: RshdLoader(
+                    size: 22,
                     color: AppColors.of(context).darkGold,
-                    strokeWidth: 2,
                   ),
                 );
               },
@@ -269,7 +271,8 @@ class _PlaceholderSlide extends StatelessWidget {
             color: AppColors.of(context).darkGold.withValues(alpha: 0.8),
           ),
           const SizedBox(height: 12),
-          Text(AppStrings.of(context).t(title),
+          Text(
+            AppStrings.of(context).t(title),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontWeight: FontWeight.w700,
               color: AppColors.of(context).primary,
@@ -303,7 +306,8 @@ class _CarouselOverlay extends StatelessWidget {
           ],
         ),
       ),
-      child: Text(AppStrings.of(context).t(announcement.title),
+      child: Text(
+        AppStrings.of(context).t(announcement.title),
         style: AppTextStyles.subtitleOf(context).copyWith(
           color: AppColors.of(context).white,
           fontWeight: FontWeight.w700,

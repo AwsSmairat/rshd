@@ -37,7 +37,8 @@ class LiquidGlassQuizInfoCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppStrings.of(context).t(quiz.title),
+                Text(
+                  AppStrings.of(context).t(quiz.title),
                   style: AppTextStyles.titleOf(context).copyWith(
                     fontSize: 20,
                     height: 1.3,
@@ -102,7 +103,8 @@ class _InfoLine extends StatelessWidget {
           children: [
             Icon(icon, size: 14, color: AppColors.of(context).darkGold),
             const SizedBox(width: 6),
-            Text(AppStrings.of(context).t(label),
+            Text(
+              AppStrings.of(context).t(label),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -112,7 +114,8 @@ class _InfoLine extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 4),
-        Text(AppStrings.of(context).t(value),
+        Text(
+          AppStrings.of(context).t(value),
           style: AppTextStyles.bodyOf(context).copyWith(
             fontSize: 14,
             height: 1.45,

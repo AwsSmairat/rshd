@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/widgets/rshd_loader.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -51,9 +52,11 @@ Future<void> launchTermsEmail({
 }) async {
   if (email.isEmpty) {
     if (context != null && context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('بريد التواصل غير متوفر'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.of(context).t('بريد التواصل غير متوفر')),
+        ),
+      );
     }
     return;
   }
@@ -65,7 +68,9 @@ Future<void> launchTermsEmail({
   );
   final launched = await launchUrl(uri);
   if (!launched && context != null && context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(email))));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(email))));
   }
 }
 
@@ -100,7 +105,8 @@ class TermsContactCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(AppStrings.of(context).t('التواصل'),
+          Text(
+            AppStrings.of(context).t('التواصل'),
             style: AppTextStyles.subtitleOf(
               context,
             ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
@@ -172,14 +178,16 @@ class TermsContactCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppStrings.of(context).t(label),
+                Text(
+                  AppStrings.of(context).t(label),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
                     color: AppColors.of(context).textMuted,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                Text(AppStrings.of(context).t(value),
+                Text(
+                  AppStrings.of(context).t(value),
                   style: AppTextStyles.bodyOf(context).copyWith(fontSize: 14),
                 ),
               ],
@@ -219,7 +227,8 @@ class TermsAcceptanceCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(AppStrings.of(context).t('مطلوب: موافقة على النسخة الجديدة'),
+          Text(
+            AppStrings.of(context).t('مطلوب: موافقة على النسخة الجديدة'),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontWeight: FontWeight.w700,
               color: AppColors.of(context).primary,
@@ -231,7 +240,9 @@ class TermsAcceptanceCard extends StatelessWidget {
             onChanged: isLoading ? null : (v) => onCheckedChanged(v ?? false),
             controlAffinity: ListTileControlAffinity.leading,
             contentPadding: EdgeInsets.zero,
-            title: Text(AppStrings.of(context).t('قرأت الشروط والأحكام وأوافق عليها')),
+            title: Text(
+              AppStrings.of(context).t('قرأت الشروط والأحكام وأوافق عليها'),
+            ),
           ),
           const SizedBox(height: 8),
           FilledButton(
@@ -244,14 +255,7 @@ class TermsAcceptanceCard extends StatelessWidget {
               ),
             ),
             child: isLoading
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
+                ? RshdLoader(size: 13.6, color: Colors.white)
                 : Text(AppStrings.of(context).t('موافقة ومتابعة')),
           ),
         ],
@@ -305,7 +309,8 @@ class TermsFooter extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onDeleteAccount,
             icon: const Icon(Icons.delete_outline, color: Color(0xFF991B1B)),
-            label: Text(AppStrings.of(context).t('طلب حذف الحساب'),
+            label: Text(
+              AppStrings.of(context).t('طلب حذف الحساب'),
               style: TextStyle(color: Color(0xFF991B1B)),
             ),
             style: OutlinedButton.styleFrom(
@@ -317,20 +322,23 @@ class TermsFooter extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          Text(AppStrings.of(context).t(platformName),
+          Text(
+            AppStrings.of(context).t(platformName),
             textAlign: TextAlign.center,
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontWeight: FontWeight.w700,
               color: AppColors.of(context).primary,
             ),
           ),
-          Text(AppStrings.of(context).t('إصدار الشروط: $version'),
+          Text(
+            AppStrings.of(context).t('إصدار الشروط: $version'),
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
           ),
-          Text(AppStrings.of(context).t('آخر تحديث: $lastUpdated'),
+          Text(
+            AppStrings.of(context).t('آخر تحديث: $lastUpdated'),
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyOf(
               context,

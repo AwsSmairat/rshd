@@ -1,131 +1,240 @@
 // Generated UI English lookups. Keys are the original Arabic UI strings.
 const kUiEnglish = <String, String>{
-  'ابدأ محادثة جديدة مع فريق الدعم الفني — سيظهر طلبك لجميع المسؤولين حتى يقبله أحدهم.': 'Start a new conversation with technical support — your request will be visible to all admins until one accepts it.',
-  'طلب الشراء قيد المراجعة. يمكنك مشاهدة الفيديوهات المجانية حتى يتم تفعيل المادة.': 'Your purchase request is under review. You can watch free videos until the course is activated.',
-  'الفيديو قيد الرفع إلى Bunny Stream. انتظر قليلاً ثم اسحب للأسفل لتحديث الصفحة.': 'The video is uploading to Bunny Stream. Please wait, then pull down to refresh.',
-  'هذا الحساب متصل على جهاز آخر، يرجى التواصل مع الإدارة لإعادة تعيين الجهاز.': 'This account is active on another device. Contact admin to reset the device.',
-  'لا توجد مواد مفعّلة حالياً. فعّل مادة أولاً لتتمكن من التواصل مع مدرّسها.': 'No active courses yet. Activate a course first to contact its instructor.',
-  'انتهت صلاحية الوصول إلى هذه المادة أو لا تملك صلاحية مشاهدة هذا الفيديو.': 'Access to this course has expired, or you don\'t have permission to watch this video.',
-  'سيتم إنشاء نسخة PDF جديدة تحتوي على التعليقات مع الاحتفاظ بالملف الأصلي.': 'A new PDF copy will be created with annotations, keeping the original file.',
-  'فشل تجهيز الفيديو. يرجى التواصل مع الدعم أو إعادة رفعه من لوحة الإدارة.': 'Video preparation failed. Contact support or re-upload it from the admin panel.',
-  'الفيديو قيد المعالجة. سيظهر رابط التشغيل تلقائياً عند اكتمال الترميز.': 'The video is processing. The playback link will appear automatically when encoding finishes.',
-  'تعذّر تهيئة مشغّل الفيديو. أعد تشغيل التطبيق بالكامل (flutter run).': 'Could not initialize the video player. Fully restart the app (flutter run).',
-  'شاهد، اقرأ، ظلّل ودوّن ملاحظاتك، وكمّل تعلّمك بالطريقة اللي تناسبك.': 'Watch, read, highlight, take notes, and continue learning your way.',
-  'إذا كان البريد مسجلاً لدينا، فستصلك رسالة تحتوي على رمز الاستعادة.': 'If this email is registered, you\'ll receive a message with a recovery code.',
-  'يرجى قراءة النسخة الحالية والموافقة عليها لمتابعة استخدام التطبيق.': 'Please read and agree to the current version to continue using the app.',
-  'الملف قيد المعالجة حالياً. اسحب للأسفل للتحديث أو حاول بعد لحظات.': 'The file is currently processing. Pull down to refresh or try again in a moment.',
-  'هذا التطبيق مخصص للطلاب فقط. يرجى استخدام لوحة التحكم من المتصفح.': 'This app is for students only. Please use the dashboard in a browser.',
-  'القوانين المعمول بها في الدولة التي تعتمدها الجهة المالكة للمنصة': 'The applicable laws of the country designated by the platform owner',
-  'الملف غير متوفر بدون اتصال. افتح الملف مرة واحدة أونلاين أولاً.': 'File is unavailable offline. Open it once while online first.',
-  'الملفات متاحة للعرض داخل التطبيق فقط ولا يمكن تنزيلها أو حفظها.': 'Files can only be viewed inside the app and cannot be downloaded or saved.',
-  'هل أنت متأكد؟ قد يكون هذا الإجراء نهائياً ولا يمكن التراجع عنه.': 'Are you sure? This action may be permanent and cannot be undone.',
-  'هل تريد إلغاء طلب شراء هذه المادة؟ يمكنك إرسال طلب جديد لاحقاً.': 'Cancel the purchase request for this course? You can send a new request later.',
-  'اختر كلمة مرور قوية لحسابك (8 أحرف على الأقل، حرف كبير، ورقم).': 'Choose a strong password (at least 8 characters, one uppercase letter, and one number).',
-  'طالب يستخدم أدوات RSHD للدراسة ومشاهدة الدروس وتدوين الملاحظات': 'A student using RSHD tools to study, watch lessons, and take notes',
-  'يجب إنشاء OAuth Client IDs من Google Cloud Console ووضع القيم ': 'You must create OAuth Client IDs in Google Cloud Console and put the values ',
-  'البحث متاح للملفات التي تحتوي على نص قابل للاستخراج — قريباً': 'Search is available for files with extractable text — coming soon',
-  'تم التقاط لقطة شاشة. المحتوى التعليمي محمي ولا يجوز مشاركته.': 'A screenshot was taken. Educational content is protected and must not be shared.',
-  'أدخل بريدك الإلكتروني وسنساعدك في استعادة الوصول إلى حسابك.': 'Enter your email and we\'ll help you recover access to your account.',
-  'تابع إنجازك، اختباراتك ودرجاتك، وخليك دائمًا عارف وين وصلت.': 'Track your progress, quizzes, and grades, and always know where you stand.',
-  'تحذير: عند حذف حسابك، قد تُزال بياناتك الشخصية والتفضيلات ': 'Warning: deleting your account may remove your personal data and preferences ',
-  'جهة الاختصاص القضائي المعتمدة في النسخة المعتمدة من الشروط': 'The jurisdiction specified in the approved version of the terms',
-  'الحقيقية في oauth_defines.json (ليس YOUR_WEB_CLIENT_ID). ': 'the real values in oauth_defines.json (not YOUR_WEB_CLIENT_ID). ',
-  'تعذر الوصول للملف حالياً. تأكد من اتصالك ثم حاول التحديث.': 'Could not access the file right now. Check your connection, then refresh.',
-  'العرض داخل التطبيق متاح لملفات PDF فقط. ملفات Word والعروض التقديمية غير مدعومة للفتح هنا.': 'In-app viewing is available for PDF files only. Word and presentation files cannot be opened here.',
-  'هذا النوع من الملفات غير متاح للعرض حالياً داخل التطبيق.': 'This file type cannot be viewed in the app yet.',
-  'لا يوجد اتصال بالسيرفر. تحقق من الاتصال وحاول مرة أخرى.': 'No server connection. Check your connection and try again.',
-  'باستخدامك للمنصة، فإنك تقر بأنك اطلعت على هذه السياسة ': 'By using the platform, you acknowledge that you have read this policy ',
-  'تم إنشاء الحساب وإرسال رمز التحقق إلى بريدك الإلكتروني': 'Account created and a verification code was sent to your email',
-  'طالب يتعلّم باستخدام جهاز لوحي أمام منصة رشد التعليمية': 'A student learning on a tablet in front of the RSHD platform',
-  'أنشئ حسابك ثم أكد بريدك الإلكتروني للوصول إلى التطبيق': 'Create your account, then confirm your email to access the app',
-  'تم تحميل نسخة محلية — سيتم المزامنة عند عودة الإنترنت': 'A local copy was loaded — it will sync when you\'re back online',
-  'حدث خطأ أثناء إنشاء ملف PDF. يمكنك المحاولة مرة أخرى.': 'An error occurred while creating the PDF. You can try again.',
-  'نحن نلتزم بحماية بياناتك ولن نشاركها مع أي جهة خارجية': 'We are committed to protecting your data and will not share it with third parties',
-  'ثم شغّل: ./tool/sync_oauth_config.sh && flutter run ': 'then run: ./tool/sync_oauth_config.sh && flutter run ',
-  'والجلسات. قد نحتفظ ببعض السجلات إذا فرض القانون ذلك.': 'and sessions. We may keep some records if required by law.',
-  'معاينة المحتوى — الفيديوهات المجانية متاحة للمشاهدة': 'Content preview — free videos are available to watch',
-  'تعذر الاتصال — يتم عرض النسخة المحلية الاحتياطية.': 'Could not connect — showing the local backup copy.',
-  'تعذّر تشغيل الفيديو. أعد المحاولة أو حدّث الصفحة.': 'Could not play the video. Try again or refresh the page.',
-  'الموقع حالياً تحت الصيانة، يرجى المحاولة لاحقاً.': 'The site is currently under maintenance. Please try again later.',
-  'سيتم تصدير نسخة PDF تحتوي على التعليقات المدمجة.': 'A PDF copy with flattened annotations will be exported.',
-  'لم تجب على جميع الأسئلة. هل تريد تسليم الاختبار؟': 'You haven\'t answered all questions. Submit the quiz anyway?',
-  'يرجى تأكيد بريدك الإلكتروني قبل استخدام التطبيق.': 'Please confirm your email before using the app.',
-  'تعذر الاتصال بالخادم، تحقق من اتصالك بالإنترنت.': 'Could not connect to the server. Check your internet connection.',
-  'ستظهر درجاتك هنا بعد تقييم الواجبات والاختبارات': 'Your grades will appear here after assignments and quizzes are graded',
-  'عندما يضيف المدرّس مواداً ستظهر هنا لطلب الشراء': 'When your instructor adds courses, they will appear here to request',
-  'تم إنهاء هذه المحادثة — يمكنك بدء محادثة جديدة': 'This conversation has ended — you can start a new one',
-  'نحن هنا لمساعدتك — اختر وسيلة التواصل المناسبة': 'We\'re here to help — choose the contact method that works for you',
-  'تم تجاوز عدد المحاولات. يرجى المحاولة لاحقاً.': 'Attempt limit exceeded. Please try again later.',
-  'ووافقت عليها وفق الآليات المعتمدة في التطبيق.': 'and you agreed to them through the approved in-app process.',
-  'يرجى تأكيد بريدك الإلكتروني قبل تسجيل الدخول.': 'Please confirm your email before signing in.',
-  'اطلب شراء مادة من الأقسام، ثم فعّلها الإدارة': 'Request a course from the departments, then wait for admin activation',
-  'لا توجد رسائل بعد. اكتب رسالتك الأولى أدناه.': 'No messages yet. Write your first message below.',
-  'تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.': 'Purchase request sent. Waiting for admin activation.',
-  'تواصل مع مدرّس مادتك أو مع فريق الدعم الفني': 'Contact your course instructor or technical support',
-  'ستظهر الاختبارات هنا عند إضافتها من المدرّس': 'Quizzes will appear here when your instructor adds them',
-  'الأحد – الخميس، 9:00 – 17:00 (توقيت عمّان)': 'Sunday – Thursday, 9:00 – 17:00 (Amman time)',
-  'دروسك، ملفاتك ومتابعة تقدّمك في مكان واحد.': 'Your lessons, files, and progress in one place.',
-  'سيتم عرض المواد هنا بعد تفعيلها من الإدارة': 'Courses will appear here after they are activated by admin',
-  'طالب يتابع تقدمه الدراسي وإنجازاته في RSHD': 'A student tracking academic progress and achievements in RSHD',
-  'أوقف تسجيل أو مشاركة الشاشة لعرض المحتوى.': 'Stop screen recording or sharing to view this content.',
-  'انتهت جلسة الاستعادة. يرجى البدء من جديد.': 'The recovery session expired. Please start again.',
-  'ستظهر الواجبات هنا عند إضافتها من المدرّس': 'Assignments will appear here when your instructor adds them',
-  'فعّل المادة لفتح هذا الملف والاطلاع عليه.': 'Activate the course to open and view this file.',
-  'يتم عرض النسخة المحلية من سياسة الخصوصية.': 'Showing the local copy of the privacy policy.',
-  'يجب كتابة إجابة أو رفع ملف واحد على الأقل': 'You must write an answer or upload at least one file',
-  'يجب أن تحتوي على حرف كبير واحد على الأقل': 'Must contain at least one uppercase letter',
-  'يجب أن تكون كلمة المرور 8 أحرف على الأقل': 'Password must be at least 8 characters',
-  'يمكنك رفع ملف PDF أو Word أو صورة أو ZIP': 'You can upload a PDF, Word, image, or ZIP file',
-  'التسجيل الذاتي للطلاب غير مفعّل حالياً.': 'Student self-registration is currently disabled.',
-  'انتهت الجلسة. يرجى تسجيل الدخول مجدداً.': 'Your session has expired. Please sign in again.',
-  'هذا الفيديو مقفل. فعّل المادة لمشاهدته.': 'This video is locked. Activate the course to watch it.',
-  'اضغط على أي بطاقة للتواصل مع فريق RSHD': 'Tap any card to contact the RSHD team',
-  'انتظر تجهيز الفيديو ثم اضغط تشغيل عائم': 'Wait for the video to be ready, then tap in-app floating play',
-  'تعذر فتح الرابط. يرجى المحاولة لاحقاً.': 'Could not open the link. Please try again later.',
-  'تعذر فتح ملف PDF، يرجى المحاولة لاحقاً': 'Could not open the PDF. Please try again later',
-  'تعذر فتح الملف، يرجى المحاولة لاحقاً': 'Could not open the file. Please try again later',
-  'تعذر عرض ملف Word القديم. ارفع الملف بصيغة DOCX أو PDF.': 'This older Word file cannot be displayed. Upload it as DOCX or PDF.',
-  'تواصل مع إدارة المنصة للمساعدة التقنية': 'Contact platform admin for technical help',
-  'لا تملك صلاحية الوصول إلى هذا الاختبار': 'You don\'t have access to this quiz',
-  'خطأ في السيرفر. يرجى المحاولة لاحقاً.': 'Server error. Please try again later.',
-  'لا تملك صلاحية الوصول إلى هذا الإشعار': 'You don\'t have access to this notification',
-  'لا تملك صلاحية الوصول إلى هذا الإعلان': 'You don\'t have access to this announcement',
-  'لا تملك صلاحية الوصول إلى هذا المحتوى': 'You don\'t have access to this content',
-  'لا تملك صلاحية الوصول إلى هذه الدرجات': 'You don\'t have access to these grades',
-  'خطأ غير متوقع. يرجى المحاولة لاحقاً.': 'Unexpected error. Please try again later.',
-  'لا تملك صلاحية الوصول إلى هذا الواجب': 'You don\'t have access to this assignment',
-  'لا تملك صلاحية الوصول إلى هذه المادة': 'You don\'t have access to this course',
-  'مرحبًا، لدي استفسار بخصوص منصة RSHD.': 'Hello, I have a question about the RSHD platform.',
-  'يجب أن تكون الرسالة 3 أحرف على الأقل': 'The message must be at least 3 characters',
-  'المحادثة منتهية — ابدأ برسالة جديدة': 'This conversation has ended — start with a new message',
+  'ابدأ محادثة جديدة مع فريق الدعم الفني — سيظهر طلبك لجميع المسؤولين حتى يقبله أحدهم.':
+      'Start a new conversation with technical support — your request will be visible to all admins until one accepts it.',
+  'طلب الشراء قيد المراجعة. يمكنك مشاهدة الفيديوهات المجانية حتى يتم تفعيل المادة.':
+      'Your purchase request is under review. You can watch free videos until the course is activated.',
+  'الفيديو قيد الرفع إلى Bunny Stream. انتظر قليلاً ثم اسحب للأسفل لتحديث الصفحة.':
+      'The video is uploading to Bunny Stream. Please wait, then pull down to refresh.',
+  'هذا الحساب متصل على جهاز آخر، يرجى التواصل مع الإدارة لإعادة تعيين الجهاز.':
+      'This account is active on another device. Contact admin to reset the device.',
+  'لا توجد مواد مفعّلة حالياً. فعّل مادة أولاً لتتمكن من التواصل مع مدرّسها.':
+      'No active courses yet. Activate a course first to contact its instructor.',
+  'انتهت صلاحية الوصول إلى هذه المادة أو لا تملك صلاحية مشاهدة هذا الفيديو.':
+      'Access to this course has expired, or you don\'t have permission to watch this video.',
+  'سيتم إنشاء نسخة PDF جديدة تحتوي على التعليقات مع الاحتفاظ بالملف الأصلي.':
+      'A new PDF copy will be created with annotations, keeping the original file.',
+  'فشل تجهيز الفيديو. يرجى التواصل مع الدعم أو إعادة رفعه من لوحة الإدارة.':
+      'Video preparation failed. Contact support or re-upload it from the admin panel.',
+  'الفيديو قيد المعالجة. سيظهر رابط التشغيل تلقائياً عند اكتمال الترميز.':
+      'The video is processing. The playback link will appear automatically when encoding finishes.',
+  'تعذّر تهيئة مشغّل الفيديو. أعد تشغيل التطبيق بالكامل (flutter run).':
+      'Could not initialize the video player. Fully restart the app (flutter run).',
+  'شاهد، اقرأ، ظلّل ودوّن ملاحظاتك، وكمّل تعلّمك بالطريقة اللي تناسبك.':
+      'Watch, read, highlight, take notes, and continue learning your way.',
+  'إذا كان البريد مسجلاً لدينا، فستصلك رسالة تحتوي على رمز الاستعادة.':
+      'If this email is registered, you\'ll receive a message with a recovery code.',
+  'يرجى قراءة النسخة الحالية والموافقة عليها لمتابعة استخدام التطبيق.':
+      'Please read and agree to the current version to continue using the app.',
+  'الملف قيد المعالجة حالياً. اسحب للأسفل للتحديث أو حاول بعد لحظات.':
+      'The file is currently processing. Pull down to refresh or try again in a moment.',
+  'هذا التطبيق مخصص للطلاب فقط. يرجى استخدام لوحة التحكم من المتصفح.':
+      'This app is for students only. Please use the dashboard in a browser.',
+  'القوانين المعمول بها في الدولة التي تعتمدها الجهة المالكة للمنصة':
+      'The applicable laws of the country designated by the platform owner',
+  'الملف غير متوفر بدون اتصال. افتح الملف مرة واحدة أونلاين أولاً.':
+      'File is unavailable offline. Open it once while online first.',
+  'الملفات متاحة للعرض داخل التطبيق فقط ولا يمكن تنزيلها أو حفظها.':
+      'Files can only be viewed inside the app and cannot be downloaded or saved.',
+  'هل أنت متأكد؟ قد يكون هذا الإجراء نهائياً ولا يمكن التراجع عنه.':
+      'Are you sure? This action may be permanent and cannot be undone.',
+  'هل تريد إلغاء طلب شراء هذه المادة؟ يمكنك إرسال طلب جديد لاحقاً.':
+      'Cancel the purchase request for this course? You can send a new request later.',
+  'اختر كلمة مرور قوية لحسابك (8 أحرف على الأقل، حرف كبير، ورقم).':
+      'Choose a strong password (at least 8 characters, one uppercase letter, and one number).',
+  'طالب يستخدم أدوات RSHD للدراسة ومشاهدة الدروس وتدوين الملاحظات':
+      'A student using RSHD tools to study, watch lessons, and take notes',
+  'يجب إنشاء OAuth Client IDs من Google Cloud Console ووضع القيم ':
+      'You must create OAuth Client IDs in Google Cloud Console and put the values ',
+  'البحث متاح للملفات التي تحتوي على نص قابل للاستخراج — قريباً':
+      'Search is available for files with extractable text — coming soon',
+  'تم التقاط لقطة شاشة. المحتوى التعليمي محمي ولا يجوز مشاركته.':
+      'A screenshot was taken. Educational content is protected and must not be shared.',
+  'أدخل بريدك الإلكتروني وسنساعدك في استعادة الوصول إلى حسابك.':
+      'Enter your email and we\'ll help you recover access to your account.',
+  'تابع إنجازك، اختباراتك ودرجاتك، وخليك دائمًا عارف وين وصلت.':
+      'Track your progress, quizzes, and grades, and always know where you stand.',
+  'تحذير: عند حذف حسابك، قد تُزال بياناتك الشخصية والتفضيلات ':
+      'Warning: deleting your account may remove your personal data and preferences ',
+  'جهة الاختصاص القضائي المعتمدة في النسخة المعتمدة من الشروط':
+      'The jurisdiction specified in the approved version of the terms',
+  'الحقيقية في oauth_defines.json (ليس YOUR_WEB_CLIENT_ID). ':
+      'the real values in oauth_defines.json (not YOUR_WEB_CLIENT_ID). ',
+  'تعذر الوصول للملف حالياً. تأكد من اتصالك ثم حاول التحديث.':
+      'Could not access the file right now. Check your connection, then refresh.',
+  'العرض داخل التطبيق متاح لملفات PDF فقط. ملفات Word والعروض التقديمية غير مدعومة للفتح هنا.':
+      'In-app viewing is available for PDF files only. Word and presentation files cannot be opened here.',
+  'هذا النوع من الملفات غير متاح للعرض حالياً داخل التطبيق.':
+      'This file type cannot be viewed in the app yet.',
+  'لا يوجد اتصال بالسيرفر. تحقق من الاتصال وحاول مرة أخرى.':
+      'No server connection. Check your connection and try again.',
+  'باستخدامك للمنصة، فإنك تقر بأنك اطلعت على هذه السياسة ':
+      'By using the platform, you acknowledge that you have read this policy ',
+  'تم إنشاء الحساب وإرسال رمز التحقق إلى بريدك الإلكتروني':
+      'Account created and a verification code was sent to your email',
+  'طالب يتعلّم باستخدام جهاز لوحي أمام منصة رشد التعليمية':
+      'A student learning on a tablet in front of the RSHD platform',
+  'أنشئ حسابك ثم أكد بريدك الإلكتروني للوصول إلى التطبيق':
+      'Create your account, then confirm your email to access the app',
+  'تم تحميل نسخة محلية — سيتم المزامنة عند عودة الإنترنت':
+      'A local copy was loaded — it will sync when you\'re back online',
+  'حدث خطأ أثناء إنشاء ملف PDF. يمكنك المحاولة مرة أخرى.':
+      'An error occurred while creating the PDF. You can try again.',
+  'نحن نلتزم بحماية بياناتك ولن نشاركها مع أي جهة خارجية':
+      'We are committed to protecting your data and will not share it with third parties',
+  'ثم شغّل: ./tool/sync_oauth_config.sh && flutter run ':
+      'then run: ./tool/sync_oauth_config.sh && flutter run ',
+  'والجلسات. قد نحتفظ ببعض السجلات إذا فرض القانون ذلك.':
+      'and sessions. We may keep some records if required by law.',
+  'معاينة المحتوى — الفيديوهات المجانية متاحة للمشاهدة':
+      'Content preview — free videos are available to watch',
+  'تعذر الاتصال — يتم عرض النسخة المحلية الاحتياطية.':
+      'Could not connect — showing the local backup copy.',
+  'تعذّر تشغيل الفيديو. أعد المحاولة أو حدّث الصفحة.':
+      'Could not play the video. Try again or refresh the page.',
+  'الموقع حالياً تحت الصيانة، يرجى المحاولة لاحقاً.':
+      'The site is currently under maintenance. Please try again later.',
+  'سيتم تصدير نسخة PDF تحتوي على التعليقات المدمجة.':
+      'A PDF copy with flattened annotations will be exported.',
+  'لم تجب على جميع الأسئلة. هل تريد تسليم الاختبار؟':
+      'You haven\'t answered all questions. Submit the quiz anyway?',
+  'يرجى تأكيد بريدك الإلكتروني قبل استخدام التطبيق.':
+      'Please confirm your email before using the app.',
+  'تعذر الاتصال بالخادم، تحقق من اتصالك بالإنترنت.':
+      'Could not connect to the server. Check your internet connection.',
+  'ستظهر درجاتك هنا بعد تقييم الواجبات والاختبارات':
+      'Your grades will appear here after assignments and quizzes are graded',
+  'عندما يضيف المدرّس مواداً ستظهر هنا لطلب الشراء':
+      'When your instructor adds courses, they will appear here to request',
+  'تم إنهاء هذه المحادثة — يمكنك بدء محادثة جديدة':
+      'This conversation has ended — you can start a new one',
+  'نحن هنا لمساعدتك — اختر وسيلة التواصل المناسبة':
+      'We\'re here to help — choose the contact method that works for you',
+  'تم تجاوز عدد المحاولات. يرجى المحاولة لاحقاً.':
+      'Attempt limit exceeded. Please try again later.',
+  'ووافقت عليها وفق الآليات المعتمدة في التطبيق.':
+      'and you agreed to them through the approved in-app process.',
+  'يرجى تأكيد بريدك الإلكتروني قبل تسجيل الدخول.':
+      'Please confirm your email before signing in.',
+  'اطلب شراء مادة من الأقسام، ثم فعّلها الإدارة':
+      'Request a course from the departments, then wait for admin activation',
+  'لا توجد رسائل بعد. اكتب رسالتك الأولى أدناه.':
+      'No messages yet. Write your first message below.',
+  'تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.':
+      'Purchase request sent. Waiting for admin activation.',
+  'تواصل مع مدرّس مادتك أو مع فريق الدعم الفني':
+      'Contact your course instructor or technical support',
+  'ستظهر الاختبارات هنا عند إضافتها من المدرّس':
+      'Quizzes will appear here when your instructor adds them',
+  'الأحد – الخميس، 9:00 – 17:00 (توقيت عمّان)':
+      'Sunday – Thursday, 9:00 – 17:00 (Amman time)',
+  'دروسك، ملفاتك ومتابعة تقدّمك في مكان واحد.':
+      'Your lessons, files, and progress in one place.',
+  'سيتم عرض المواد هنا بعد تفعيلها من الإدارة':
+      'Courses will appear here after they are activated by admin',
+  'طالب يتابع تقدمه الدراسي وإنجازاته في RSHD':
+      'A student tracking academic progress and achievements in RSHD',
+  'أوقف تسجيل أو مشاركة الشاشة لعرض المحتوى.':
+      'Stop screen recording or sharing to view this content.',
+  'انتهت جلسة الاستعادة. يرجى البدء من جديد.':
+      'The recovery session expired. Please start again.',
+  'ستظهر الواجبات هنا عند إضافتها من المدرّس':
+      'Assignments will appear here when your instructor adds them',
+  'فعّل المادة لفتح هذا الملف والاطلاع عليه.':
+      'Activate the course to open and view this file.',
+  'يتم عرض النسخة المحلية من سياسة الخصوصية.':
+      'Showing the local copy of the privacy policy.',
+  'يجب كتابة إجابة أو رفع ملف واحد على الأقل':
+      'You must write an answer or upload at least one file',
+  'يجب أن تحتوي على حرف كبير واحد على الأقل':
+      'Must contain at least one uppercase letter',
+  'يجب أن تكون كلمة المرور 8 أحرف على الأقل':
+      'Password must be at least 8 characters',
+  'يمكنك رفع ملف PDF أو Word أو صورة أو ZIP':
+      'You can upload a PDF, Word, image, or ZIP file',
+  'التسجيل الذاتي للطلاب غير مفعّل حالياً.':
+      'Student self-registration is currently disabled.',
+  'انتهت الجلسة. يرجى تسجيل الدخول مجدداً.':
+      'Your session has expired. Please sign in again.',
+  'هذا الفيديو مقفل. فعّل المادة لمشاهدته.':
+      'This video is locked. Activate the course to watch it.',
+  'اضغط على أي بطاقة للتواصل مع فريق RSHD':
+      'Tap any card to contact the RSHD team',
+  'انتظر تجهيز الفيديو ثم اضغط تشغيل عائم':
+      'Wait for the video to be ready, then tap in-app floating play',
+  'تعذر فتح الرابط. يرجى المحاولة لاحقاً.':
+      'Could not open the link. Please try again later.',
+  'تعذر فتح ملف PDF، يرجى المحاولة لاحقاً':
+      'Could not open the PDF. Please try again later',
+  'تعذر فتح الملف، يرجى المحاولة لاحقاً':
+      'Could not open the file. Please try again later',
+  'تعذر عرض ملف Word القديم. ارفع الملف بصيغة DOCX أو PDF.':
+      'This older Word file cannot be displayed. Upload it as DOCX or PDF.',
+  'تواصل مع إدارة المنصة للمساعدة التقنية':
+      'Contact platform admin for technical help',
+  'لا تملك صلاحية الوصول إلى هذا الاختبار':
+      'You don\'t have access to this quiz',
+  'خطأ في السيرفر. يرجى المحاولة لاحقاً.':
+      'Server error. Please try again later.',
+  'لا تملك صلاحية الوصول إلى هذا الإشعار':
+      'You don\'t have access to this notification',
+  'لا تملك صلاحية الوصول إلى هذا الإعلان':
+      'You don\'t have access to this announcement',
+  'لا تملك صلاحية الوصول إلى هذا المحتوى':
+      'You don\'t have access to this content',
+  'لا تملك صلاحية الوصول إلى هذه الدرجات':
+      'You don\'t have access to these grades',
+  'خطأ غير متوقع. يرجى المحاولة لاحقاً.':
+      'Unexpected error. Please try again later.',
+  'لا تملك صلاحية الوصول إلى هذا الواجب':
+      'You don\'t have access to this assignment',
+  'لا تملك صلاحية الوصول إلى هذه المادة':
+      'You don\'t have access to this course',
+  'مرحبًا، لدي استفسار بخصوص منصة RSHD.':
+      'Hello, I have a question about the RSHD platform.',
+  'يجب أن تكون الرسالة 3 أحرف على الأقل':
+      'The message must be at least 3 characters',
+  'المحادثة منتهية — ابدأ برسالة جديدة':
+      'This conversation has ended — start with a new message',
   'انتهى وقت الاختبار، جاري التسليم...': 'Quiz time is up, submitting...',
   'لا تملك صلاحية الوصول إلى هذا الملف': 'You don\'t have access to this file',
   'يجب أن تحتوي على رقم واحد على الأقل': 'Must contain at least one number',
-  'أفهم أن حذف الحساب قد يكون نهائياً': 'I understand that account deletion may be permanent',
+  'أفهم أن حذف الحساب قد يكون نهائياً':
+      'I understand that account deletion may be permanent',
   'لا توجد اختبارات لهذا الجزء حالياً': 'No quizzes for this part right now',
   'لا توجد فيديوهات لهذا الدرس حالياً': 'No videos for this lesson right now',
   'الانتقال إلى صفحة التعريف التالية': 'Go to the next intro page',
   'الفيديو غير جاهز للمشاهدة حالياً.': 'This video is not ready to watch yet.',
   'تم تسجيل الخروج من الأجهزة الأخرى': 'Signed out of other devices',
-  'حسب طريقة الدفع والسياسة المعتمدة': 'According to the payment method and approved policy',
-  'قرأت الشروط والأحكام وأوافق عليها': 'I have read and agree to the terms and conditions',
-  'لا توجد مواد في هذا القسم حالياً.': 'No courses in this department right now.',
+  'حسب طريقة الدفع والسياسة المعتمدة':
+      'According to the payment method and approved policy',
+  'قرأت الشروط والأحكام وأوافق عليها':
+      'I have read and agree to the terms and conditions',
+  'لا توجد مواد في هذا القسم حالياً.':
+      'No courses in this department right now.',
   'مؤشر القراءة: الأقسام التي فتحتها': 'Reading progress: sections you opened',
-  'يرجى تأكيد فهمك لعواقب حذف الحساب': 'Please confirm you understand the consequences of deleting your account',
-  'يرجى كتابة إجابة أو رفع ملف الحل.': 'Please write an answer or upload a solution file.',
-  'فعّل المادة لمشاهدة هذا الفيديو.': 'Activate the course to watch this video.',
+  'يرجى تأكيد فهمك لعواقب حذف الحساب':
+      'Please confirm you understand the consequences of deleting your account',
+  'يرجى كتابة إجابة أو رفع ملف الحل.':
+      'Please write an answer or upload a solution file.',
+  'فعّل المادة لمشاهدة هذا الفيديو.':
+      'Activate the course to watch this video.',
   'لا توجد مواد في هذا القسم حالياً': 'No courses in this department right now',
   'لا توجد واجبات لهذا الجزء حالياً': 'No assignments for this part right now',
   'مطلوب: موافقة على النسخة الجديدة': 'Required: agree to the new version',
   'أهلاً بك في منصة RSHD التعليمية': 'Welcome to the RSHD learning platform',
-  'حسب السياسة المعتمدة من الإدارة': 'According to the policy approved by administration',
-  'طلبك بانتظار قبول أحد المسؤولين': 'Your request is waiting for an admin to accept it',
+  'حسب السياسة المعتمدة من الإدارة':
+      'According to the policy approved by administration',
+  'طلبك بانتظار قبول أحد المسؤولين':
+      'Your request is waiting for an admin to accept it',
   'لا توجد ملفات لهذا الدرس حالياً': 'No files for this lesson right now',
   'يرجى إدخال رمز مكوّن من 6 أرقام': 'Please enter a 6-digit code',
   'استجابة غير متوقعة من السيرفر.': 'Unexpected server response.',
-  'الملف مقفل. فعّل المادة لفتحه.': 'This file is locked. Activate the course to open it.',
+  'الملف مقفل. فعّل المادة لفتحه.':
+      'This file is locked. Activate the course to open it.',
   'حجم الملف يجب ألا يتجاوز 10MB.': 'File size must not exceed 10MB.',
-  'لا تملك صلاحية تعديل هذا الملف': 'You don\'t have permission to edit this file',
+  'لا تملك صلاحية تعديل هذا الملف':
+      'You don\'t have permission to edit this file',
   'لا يوجد محتوى في هذا الجزء بعد': 'No content in this part yet',
   'مرحباً،\n\nأحتاج مساعدة بخصوص:\n\n': 'Hello,\n\nI need help with:\n\n',
   'أدخل بريداً إلكترونياً صالحاً': 'Enter a valid email address',
@@ -135,7 +244,8 @@ const kUiEnglish = <String, String>{
   'تعذر تأكيد البريد الإلكتروني.': 'Could not confirm email.',
   'جاري تحميل الشروط والأحكام...': 'Loading terms and conditions...',
   'رابط التشغيل غير متوفر حالياً': 'Playback link is not currently available',
-  'غير مصرح لك بتنزيل هذا الملف.': 'You are not authorized to download this file.',
+  'غير مصرح لك بتنزيل هذا الملف.':
+      'You are not authorized to download this file.',
   'كل أدواتك للدراسة… بمكان واحد': 'All your study tools… in one place',
   'لا توجد أسئلة في هذا الاختبار': 'There are no questions in this quiz',
   'يجب أن تكون 8 أحرف على الأقل.': 'Must be at least 8 characters.',
@@ -708,4 +818,3 @@ final List<String> kUiEnglishKeysByLength = () {
   keys.sort((a, b) => b.length.compareTo(a.length));
   return keys;
 }();
-

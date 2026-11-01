@@ -47,7 +47,10 @@ class HomeAnnouncementsSection extends StatelessWidget {
           if (loadFailed)
             Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: Text(AppStrings.of(context).t(AppStrings.of(context).announcementsLoadFailed),
+              child: Text(
+                AppStrings.of(
+                  context,
+                ).t(AppStrings.of(context).announcementsLoadFailed),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   color: AppColors.of(context).textMuted,
                   fontSize: 12,

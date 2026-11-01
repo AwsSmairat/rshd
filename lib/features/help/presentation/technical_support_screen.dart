@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/rshd_refresh_indicator.dart';
+import '../../../core/widgets/rshd_loader.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
 import '../../../core/layout/app_layout_metrics.dart';
@@ -47,7 +49,11 @@ class _TechnicalSupportScreenState
     final message = _messageController.text.trim();
     if (message.length < 3) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.of(context).t('يجب أن تكون الرسالة 3 أحرف على الأقل'))),
+        SnackBar(
+          content: Text(
+            AppStrings.of(context).t('يجب أن تكون الرسالة 3 أحرف على الأقل'),
+          ),
+        ),
       );
       return;
     }
@@ -63,7 +69,12 @@ class _TechnicalSupportScreenState
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppStrings.of(context).t(error.message.isNotEmpty ? error.message : AppStrings.of(context).t('تعذر إرسال الرسالة')),
+          content: Text(
+            AppStrings.of(context).t(
+              error.message.isNotEmpty
+                  ? error.message
+                  : AppStrings.of(context).t('تعذر إرسال الرسالة'),
+            ),
           ),
         ),
       );
@@ -89,8 +100,9 @@ class _TechnicalSupportScreenState
     return Scaffold(
       backgroundColor: AppColors.of(context).background,
       body: switch (state.status) {
-        FeatureLoadStatus.initial || FeatureLoadStatus.loading =>
-          LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الدعم الفني...')),
+        FeatureLoadStatus.initial || FeatureLoadStatus.loading => LoadingWidget(
+          message: AppStrings.of(context).t('جاري تحميل الدعم الفني...'),
+        ),
         FeatureLoadStatus.error => ErrorView(
           message: state.errorMessage ?? 'تعذر تحميل الدعم الفني',
           onRetry: () => ref
@@ -100,7 +112,7 @@ class _TechnicalSupportScreenState
         FeatureLoadStatus.empty || FeatureLoadStatus.loaded => Column(
           children: [
             Expanded(
-              child: RefreshIndicator(
+              child: RshdRefreshIndicator(
                 onRefresh: () => ref
                     .read(technicalSupportControllerProvider.notifier)
                     .load(refresh: true),
@@ -161,7 +173,10 @@ class _TechnicalSupportScreenState
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: const Color(0xFFE5E7EB)),
         ),
-        child: Text(AppStrings.of(context).t('ابدأ محادثة جديدة مع فريق الدعم الفني — سيظهر طلبك لجميع المسؤولين حتى يقبله أحدهم.'),
+        child: Text(
+          AppStrings.of(context).t(
+            'ابدأ محادثة جديدة مع فريق الدعم الفني — سيظهر طلبك لجميع المسؤولين حتى يقبله أحدهم.',
+          ),
           style: AppTextStyles.bodyOf(context).copyWith(
             fontSize: 13,
             color: AppColors.of(context).textMuted,
@@ -188,7 +203,8 @@ class _TechnicalSupportScreenState
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
-      child: Text(AppStrings.of(context).t(statusText),
+      child: Text(
+        AppStrings.of(context).t(statusText),
         style: AppTextStyles.bodyOf(context).copyWith(
           fontSize: 13,
           color: AppColors.of(context).primary,
@@ -210,7 +226,10 @@ class _TechnicalSupportScreenState
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: const Color(0xFFE5E7EB)),
         ),
-        child: Text(AppStrings.of(context).t('لا توجد رسائل بعد. اكتب رسالتك الأولى أدناه.'),
+        child: Text(
+          AppStrings.of(
+            context,
+          ).t('لا توجد رسائل بعد. اكتب رسالتك الأولى أدناه.'),
           style: AppTextStyles.bodyOf(
             context,
           ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
@@ -226,7 +245,10 @@ class _TechnicalSupportScreenState
 
   Widget _buildMessageBubble(SupportMessageModel message) {
     final time = message.createdAt != null
-        ? DateFormat('d/M HH:mm', AppStrings.of(context).dateLocale).format(message.createdAt!.toLocal())
+        ? DateFormat(
+            'd/M HH:mm',
+            AppStrings.of(context).dateLocale,
+          ).format(message.createdAt!.toLocal())
         : '';
 
     return Align(
@@ -250,21 +272,24 @@ class _TechnicalSupportScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (!message.isMine && (message.senderName?.isNotEmpty ?? false))
-              Text(AppStrings.of(context).t(message.senderName!),
+              Text(
+                AppStrings.of(context).t(message.senderName!),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   color: AppColors.of(context).darkGold,
                 ),
               ),
-            Text(AppStrings.of(context).t(message.body),
+            Text(
+              AppStrings.of(context).t(message.body),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(fontSize: 14, height: 1.5),
             ),
             if (time.isNotEmpty) ...[
               const SizedBox(height: 6),
-              Text(AppStrings.of(context).t(time),
+              Text(
+                AppStrings.of(context).t(time),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   fontSize: 10,
                   color: AppColors.of(context).textMuted,
@@ -329,14 +354,7 @@ class _TechnicalSupportScreenState
               ),
             ),
             child: state.sending
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
+                ? RshdLoader(size: 12.4, color: Colors.white)
                 : const Icon(Icons.send_rounded),
           ),
         ],

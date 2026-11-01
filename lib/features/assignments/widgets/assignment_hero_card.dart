@@ -37,7 +37,8 @@ class AssignmentHeroCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppStrings.of(context).t(assignment.title),
+                Text(
+                  AppStrings.of(context).t(assignment.title),
                   style: AppTextStyles.titleOf(context).copyWith(
                     fontSize: 20,
                     height: 1.3,
@@ -47,7 +48,8 @@ class AssignmentHeroCard extends StatelessWidget {
                 if (assignment.subjectTitle != null &&
                     assignment.subjectTitle!.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text(AppStrings.of(context).t(assignment.subjectTitle!),
+                  Text(
+                    AppStrings.of(context).t(assignment.subjectTitle!),
                     style: AppTextStyles.bodyOf(
                       context,
                     ).copyWith(color: AppColors.of(context).textMuted),
@@ -125,7 +127,8 @@ class AssignmentInfoGrid extends StatelessWidget {
                   color: AppColors.of(context).darkGold,
                 ),
                 const SizedBox(width: 8),
-                Text(AppStrings.of(context).t('معلومات الواجب'),
+                Text(
+                  AppStrings.of(context).t('معلومات الواجب'),
                   style: AppTextStyles.subtitleOf(context).copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -194,14 +197,16 @@ class AssignmentInfoGrid extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text(AppStrings.of(context).t(item.label),
+            Text(
+              AppStrings.of(context).t(item.label),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
-            Text(AppStrings.of(context).t(item.value),
+            Text(
+              AppStrings.of(context).t(item.value),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
@@ -225,7 +230,10 @@ class AssignmentInfoGrid extends StatelessWidget {
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd', AppStrings.of(context).dateLocale).format(parsed.toLocal());
+    return DateFormat(
+      'yyyy/MM/dd',
+      AppStrings.of(context).dateLocale,
+    ).format(parsed.toLocal());
   }
 }
 

@@ -166,7 +166,8 @@ class _DraggableMiniPlayer extends StatelessWidget {
                     Expanded(
                       child: GestureDetector(
                         onTap: onOpen,
-                        child: Text(AppStrings.of(context).t(title),
+                        child: Text(
+                          AppStrings.of(context).t(title),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.captionOf(context).copyWith(

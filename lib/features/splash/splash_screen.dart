@@ -177,7 +177,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         offset: Offset(0, 14 * (1 - progress)),
         child: Transform.scale(
           scale: 0.85 + 0.15 * progress,
-          child: Text(AppStrings.of(context).t(_letters[index]),
+          child: Text(
+            AppStrings.of(context).t(_letters[index]),
             style: TextStyle(
               fontSize: 56,
               fontWeight: FontWeight.w800,
@@ -265,7 +266,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                             alignment: const Alignment(0, 0.28),
                             child: Opacity(
                               opacity: holdProgress,
-                              child: Text(AppStrings.of(context).t('منصة تعليمية ذكية'),
+                              child: Text(
+                                AppStrings.of(context).t('منصة تعليمية ذكية'),
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
@@ -280,13 +282,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                             child: AnimatedOpacity(
                               duration: const Duration(milliseconds: 250),
                               opacity: waitingForAuth ? 1.0 : 0.0,
+                              // The RSHD letters are already the centrepiece
+                              // here, so waiting shows as a thin gold line.
                               child: SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    AppColors.of(context).accent,
+                                width: 72,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(999),
+                                  child: LinearProgressIndicator(
+                                    minHeight: 2,
+                                    color: AppColors.of(context).accent,
+                                    backgroundColor: AppColors.of(
+                                      context,
+                                    ).accent.withValues(alpha: 0.18),
                                   ),
                                 ),
                               ),

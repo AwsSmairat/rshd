@@ -41,7 +41,8 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
                 color: AppColors.of(context).darkGold,
               ),
               const SizedBox(width: 8),
-              Text(AppStrings.of(context).t('معلومات الواجب'),
+              Text(
+                AppStrings.of(context).t('معلومات الواجب'),
                 style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -58,7 +59,8 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(AppStrings.of(context).t(assignment.title),
+                    Text(
+                      AppStrings.of(context).t(assignment.title),
                       style: AppTextStyles.titleOf(context).copyWith(
                         fontSize: 18,
                         color: AppColors.of(context).primary,
@@ -67,7 +69,8 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
                     if (assignment.subjectTitle != null &&
                         assignment.subjectTitle!.isNotEmpty) ...[
                       const SizedBox(height: 8),
-                      Text(AppStrings.of(context).t(assignment.subjectTitle!),
+                      Text(
+                        AppStrings.of(context).t(assignment.subjectTitle!),
                         style: AppTextStyles.bodyOf(
                           context,
                         ).copyWith(color: AppColors.of(context).textMuted),
@@ -76,7 +79,10 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
                     if (assignment.dueDate != null &&
                         assignment.dueDate!.isNotEmpty) ...[
                       const SizedBox(height: 10),
-                      Text(AppStrings.of(context).t('تاريخ التسليم: ${_formatDate(context, assignment.dueDate!)}'),
+                      Text(
+                        AppStrings.of(context).t(
+                          'تاريخ التسليم: ${_formatDate(context, assignment.dueDate!)}',
+                        ),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 13,
                           color: AppColors.of(context).textMuted,
@@ -102,6 +108,9 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd', AppStrings.of(context).dateLocale).format(parsed.toLocal());
+    return DateFormat(
+      'yyyy/MM/dd',
+      AppStrings.of(context).dateLocale,
+    ).format(parsed.toLocal());
   }
 }

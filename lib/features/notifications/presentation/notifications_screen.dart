@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/rshd_refresh_indicator.dart';
 
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/theme/app_colors.dart';
@@ -50,9 +51,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             .read(notificationsListControllerProvider)
             .errorMessage;
         if (error != null) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(error))));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppStrings.of(context).t(error))),
+          );
         }
       }
     }
@@ -73,7 +74,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: RefreshIndicator(
+      body: RshdRefreshIndicator(
         onRefresh: _refresh,
         color: AppColors.of(context).secondary,
         child: CustomScrollView(
@@ -97,12 +98,16 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
         return SliverFillRemaining(
-          child: LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الإشعارات...')),
+          child: LoadingWidget(
+            message: AppStrings.of(context).t('جاري تحميل الإشعارات...'),
+          ),
         );
       case FeatureLoadStatus.empty:
         return SliverFillRemaining(
           hasScrollBody: false,
-          child: Center(child: Text(AppStrings.of(context).t('لا توجد إشعارات حالياً'))),
+          child: Center(
+            child: Text(AppStrings.of(context).t('لا توجد إشعارات حالياً')),
+          ),
         );
       case FeatureLoadStatus.error:
         return SliverFillRemaining(

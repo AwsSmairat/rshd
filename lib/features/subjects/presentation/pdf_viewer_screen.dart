@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:pdfrx/pdfrx.dart' show PdfViewerController;
 
+import '../../../core/network/api_client.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/error_view.dart';
@@ -17,7 +18,8 @@ import '../../pdf_editor/services/pdf_viewer_source_loader.dart';
 import '../../auth/presentation/auth_controller.dart';
 import '../data/subjects_repository.dart';
 import '../../pdf_editor/widgets/annotation_text_dialog.dart';
-import '../../pdf_editor/widgets/pdf_annotation_overlay_host.dart';
+import '../../pdf_editor/widgets/pdf_document_view.dart';
+import '../../pdf_editor/widgets/pdf_page_annotation_layer.dart';
 import '../../pdf_editor/widgets/pdf_editor_toolbar.dart';
 import '../../pdf_editor/widgets/pen_settings_sheet.dart';
 import '../../pdf_editor/widgets/text_settings_sheet.dart';
@@ -60,11 +62,15 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
   bool _hasError = false;
   String? _loadErrorMessage;
   Uint8List? _pdfBytes;
-  Size _viewportSize = Size.zero;
-  Size _pdfPageSize = const Size(595, 842);
-  final Map<int, Size> _pageSizes = {};
-  final Map<int, int> _pageRotations = {};
   bool _sessionRestored = false;
+
+  /// Student's chosen way of moving through pages; remembered per device.
+  PdfReadingDirection _direction = PdfReadingDirection.vertical;
+
+  /// Header and toolbar are shown. Picking a writing tool hides them so the
+  /// page fills the screen; the side rail brings them back.
+  bool _chromeVisible = true;
+  static const _directionKey = 'pdf_reading_direction';
 
   @override
   void initState() {
@@ -72,8 +78,26 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(pdfEditorControllerProvider(widget.fileId).notifier).load();
+      _loadReadingDirection();
       _preparePdfSource();
     });
+  }
+
+  Future<void> _loadReadingDirection() async {
+    final stored = await ref.read(secureStorageProvider).read(_directionKey);
+    if (!mounted || stored == null) return;
+    final direction = PdfReadingDirection.values
+        .where((d) => d.name == stored)
+        .firstOrNull;
+    if (direction != null && direction != _direction) {
+      setState(() => _direction = direction);
+    }
+  }
+
+  Future<void> _setReadingDirection(PdfReadingDirection direction) async {
+    if (direction == _direction) return;
+    setState(() => _direction = direction);
+    await ref.read(secureStorageProvider).write(_directionKey, direction.name);
   }
 
   Future<void> _preparePdfSource() async {
@@ -125,7 +149,6 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _pdfController.dispose();
     super.dispose();
   }
 
@@ -152,7 +175,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(message))));
   }
 
-  Future<void> _showNoteDialog(double x, double y) async {
+  Future<void> _showNoteDialog(int pageNumber, double x, double y) async {
     final text = await showDialog<String>(
       context: context,
       builder: (context) => const AnnotationTextDialog(
@@ -165,10 +188,10 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     );
 
     if (text == null || text.trim().isEmpty || !mounted) return;
-    _editor.addNote(pageNumber: _state.currentPage, x: x, y: y, text: text);
+    _editor.addNote(pageNumber: pageNumber, x: x, y: y, text: text);
   }
 
-  Future<void> _showTextDialog(double x, double y) async {
+  Future<void> _showTextDialog(int pageNumber, double x, double y) async {
     final text = await showDialog<String>(
       context: context,
       builder: (context) => const AnnotationTextDialog(
@@ -181,7 +204,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
 
     if (text == null || text.trim().isEmpty || !mounted) return;
     _editor.addTextBox(
-      pageNumber: _state.currentPage,
+      pageNumber: pageNumber,
       x: x,
       y: y,
       text: text,
@@ -476,6 +499,14 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              _ReadingDirectionPicker(
+                value: _direction,
+                onChanged: (direction) {
+                  Navigator.pop(context);
+                  _setReadingDirection(direction);
+                },
+              ),
+              const Divider(height: 1),
               ListTile(
                 leading: const Icon(Icons.save_as_outlined),
                 title: Text(AppStrings.of(context).t('حفظ التعديلات')),
@@ -546,7 +577,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
                       ? Icon(Icons.check, color: AppColors.of(context).accent)
                       : null,
                   onTap: () {
-                    _pdfController.jumpToPage(page);
+                    _pdfController.goToPage(pageNumber: page);
                     Navigator.pop(context);
                   },
                 );
@@ -567,6 +598,7 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
   void _handleToolSelected(PdfEditorTool tool) {
     final previousTool = _state.currentTool;
     _editor.setTool(tool);
+    setState(() => _chromeVisible = tool == PdfEditorTool.view);
 
     if (tool == PdfEditorTool.shapes) {
       if (previousTool != PdfEditorTool.shapes) {
@@ -676,8 +708,6 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     );
   }
 
-  int get _currentPageRotation => _pageRotations[_state.currentPage] ?? 0;
-
   @override
   Widget build(BuildContext context) {
     ref.listen(pdfEditorControllerProvider(widget.fileId), (prev, next) {
@@ -727,19 +757,21 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
         autofocus: true,
         child: Scaffold(
           backgroundColor: AppColors.of(context).background,
-          appBar: PdfEditorHeader(
-            fileName: widget.title,
-            currentPage: _state.currentPage,
-            totalPages: _state.totalPages,
-            saveStatus: _state.saveStatus,
-            onBack: () => Navigator.maybePop(context),
-            onSearch: _openSearch,
-            onMore: _openMoreMenu,
-            onSave: _handleSave,
-            onRetrySave: _handleSave,
-          ),
+          appBar: !_chromeVisible
+              ? null
+              : PdfEditorHeader(
+                  fileName: widget.title,
+                  currentPage: _state.currentPage,
+                  totalPages: _state.totalPages,
+                  saveStatus: _state.saveStatus,
+                  onBack: () => Navigator.maybePop(context),
+                  onSearch: _openSearch,
+                  onMore: _openMoreMenu,
+                  onSave: _handleSave,
+                  onRetrySave: _handleSave,
+                ),
           body: _buildBody(),
-          bottomNavigationBar: isTabletLandscape
+          bottomNavigationBar: isTabletLandscape || !_chromeVisible
               ? null
               : PdfEditorToolbar(
                   currentTool: _state.currentTool,
@@ -774,220 +806,177 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
       );
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Sizing the viewer to the page's own aspect ratio makes the rendered
-        // page fill its box exactly, so the annotation overlay lines up with
-        // the page instead of guessing where the viewer placed it.
-        _viewportSize = PdfCoordinateMapper.fitPageInViewport(
-          pageSize: PdfCoordinateMapper.effectivePageSize(
-            width: _pdfPageSize.width,
-            height: _pdfPageSize.height,
-            rotationDegrees: _currentPageRotation,
-          ),
-          viewportSize: Size(constraints.maxWidth, constraints.maxHeight),
-        );
-        final isViewTool = _state.currentTool == PdfEditorTool.view;
+    final isViewTool = _state.currentTool == PdfEditorTool.view;
 
-        return Stack(
-          children: [
-            Center(
-              child: SizedBox.fromSize(
-                size: _viewportSize,
-                child: Stack(
-                  children: [
-                    IgnorePointer(
-                      ignoring: !isViewTool,
-                      child: SfPdfViewer.memory(
-                        _pdfBytes!,
-                        controller: _pdfController,
-                        pageLayoutMode: PdfPageLayoutMode.single,
-                        scrollDirection: PdfScrollDirection.vertical,
-                        canShowScrollHead: false,
-                        canShowScrollStatus: false,
-                        canShowPaginationDialog: false,
-                        enableDoubleTapZooming: true,
-                        enableTextSelection: isViewTool,
-                        canShowTextSelectionMenu: false,
-                        canShowHyperlinkDialog: false,
-                        onDocumentLoaded: (details) =>
-                            _handleDocumentLoaded(details),
-                        onDocumentLoadFailed: (_) {
-                          if (!mounted) return;
-                          setState(() {
-                            _isLoading = false;
-                            _hasError = true;
-                            _loadErrorMessage =
-                                'تعذر فتح ملف PDF، يرجى المحاولة لاحقاً';
-                          });
-                        },
-                        onPageChanged: (details) {
-                          _editor.setCurrentPage(details.newPageNumber);
-                          final pageSize = _pageSizes[details.newPageNumber];
-                          if (pageSize != null) {
-                            _pdfPageSize = pageSize;
-                            _editor.registerPageSize(
-                              details.newPageNumber,
-                              pageSize.width,
-                              pageSize.height,
-                            );
-                            setState(() {});
-                          }
-                        },
-                        onZoomLevelChanged: (details) {
-                          _editor.setZoomLevel(details.newZoomLevel);
-                        },
-                      ),
-                    ),
-                    if (!_isLoading && _viewportSize != Size.zero)
-                      PdfAnnotationOverlayHost(
-                        pdfController: _pdfController,
-                        viewportSize: _viewportSize,
-                        pdfPageSize: _pdfPageSize,
-                        pageRotationDegrees: _currentPageRotation,
-                        passThroughTouches: isViewTool,
-                        tool: _state.currentTool,
-                        annotations: _state.currentPageAnnotations,
-                        penSettings: _state.penSettings,
-                        highlighterSettings: _state.highlighterSettings,
-                        eraserMode: _state.eraserMode,
-                        eraserSize: _state.eraserSize,
-                        allowFingerDrawing: _state.allowFingerDrawing,
-                        shapeTool: _state.shapeTool,
-                        selectedAnnotationId: _state.selectedAnnotationId,
-                        pageNumber: _state.currentPage,
-                        onInkComplete: (points, type) {
-                          if (type == AnnotationType.highlighter) {
-                            _editor.addInkStroke(
-                              pageNumber: _state.currentPage,
-                              points: points,
-                              type: type,
-                              color: _state.highlighterSettings.color,
-                              strokeWidth:
-                                  _state.highlighterSettings.strokeWidth,
-                              opacity: _state.highlighterSettings.opacity,
-                            );
-                          } else {
-                            _editor.addInkStroke(
-                              pageNumber: _state.currentPage,
-                              points: points,
-                              type: type,
-                              color: _state.penSettings.color,
-                              strokeWidth: _state.penSettings.strokeWidth,
-                              opacity: _state.penSettings.opacity,
-                              penKind: _state.penSettings.penKind,
-                            );
-                          }
-                        },
-                        onHighlightComplete: (x, y, width, height) {
-                          _editor.addHighlightRect(
-                            pageNumber: _state.currentPage,
-                            x: x,
-                            y: y,
-                            width: width,
-                            height: height,
-                            color: _state.highlighterSettings.color,
-                            opacity: _state.highlighterSettings.opacity,
-                          );
-                        },
-                        onShapeComplete: (x, y, width, height) {
-                          _editor.addShape(
-                            pageNumber: _state.currentPage,
-                            shape: _state.shapeTool,
-                            x: x,
-                            y: y,
-                            width: width,
-                            height: height,
-                            strokeColor: _state.penSettings.color,
-                            strokeWidth: _state.penSettings.strokeWidth,
-                            opacity: _state.penSettings.opacity,
-                          );
-                        },
-                        onNoteTap: _showNoteDialog,
-                        onTextTap: _showTextDialog,
-                        onErase: (point) {
-                          _editor.eraseAtPoint(
-                            pageNumber: _state.currentPage,
-                            point: point,
-                            radius: _state.eraserSize,
-                          );
-                        },
-                        onNoteMarkerTap: _showExistingNote,
-                        onSelectAnnotation: _editor.selectAnnotation,
-                        onMoveAnnotation: (id, x, y) {
-                          _editor.moveAnnotation(
-                            id: id,
-                            pageNumber: _state.currentPage,
-                            x: x,
-                            y: y,
-                          );
-                        },
-                        onBatchBegin: _editor.beginBatch,
-                        onBatchEnd: _editor.endBatch,
-                        onAnnotationTap: _handleAnnotationTap,
-                      ),
-                  ],
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: PdfDocumentView(
+            bytes: _pdfBytes!,
+            sourceName: 'lesson-file-${widget.fileId}',
+            controller: _pdfController,
+            direction: _direction,
+            interactive: isViewTool,
+            onReady: _handleDocumentReady,
+            onPageChanged: _editor.setCurrentPage,
+            pageOverlayBuilder: _buildPageOverlay,
+          ),
+        ),
+        if (_chromeVisible &&
+            MediaQuery.sizeOf(context).shortestSide >= 600 &&
+            MediaQuery.orientationOf(context) == Orientation.landscape)
+          PdfEditorToolbar(
+            currentTool: _state.currentTool,
+            canUndo: _editor.canUndo,
+            canRedo: _editor.canRedo,
+            visible: _state.toolbarVisible,
+            expanded: _state.toolbarExpanded,
+            isTabletLandscape: true,
+            onToolSelected: _handleToolSelected,
+            onUndo: _editor.undo,
+            onRedo: _editor.redo,
+            onToggleExpanded: _editor.toggleToolbarExpanded,
+            onToggleVisibility: _editor.toggleToolbar,
+          ),
+        if (!_chromeVisible)
+          PositionedDirectional(
+            end: 10,
+            top: 0,
+            bottom: 0,
+            child: SafeArea(
+              child: Center(
+                child: _WritingRail(
+                  tool: _state.currentTool,
+                  canUndo: _editor.canUndo,
+                  canRedo: _editor.canRedo,
+                  onShowTools: () => setState(() => _chromeVisible = true),
+                  onUndo: _editor.undo,
+                  onRedo: _editor.redo,
+                  onDone: () => _handleToolSelected(PdfEditorTool.view),
                 ),
               ),
             ),
-            if (_isLoading)
-              LoadingWidget(
-                message: AppStrings.of(context).t('جاري تحميل ملف PDF...'),
-              ),
-            if (MediaQuery.sizeOf(context).shortestSide >= 600 &&
-                MediaQuery.orientationOf(context) == Orientation.landscape)
-              PdfEditorToolbar(
-                currentTool: _state.currentTool,
-                canUndo: _editor.canUndo,
-                canRedo: _editor.canRedo,
-                visible: _state.toolbarVisible,
-                expanded: _state.toolbarExpanded,
-                isTabletLandscape: true,
-                onToolSelected: _handleToolSelected,
-                onUndo: _editor.undo,
-                onRedo: _editor.redo,
-                onToggleExpanded: _editor.toggleToolbarExpanded,
-                onToggleVisibility: _editor.toggleToolbar,
-              ),
-          ],
-        );
-      },
+          ),
+      ],
     );
   }
 
-  void _handleDocumentLoaded(PdfDocumentLoadedDetails details) {
+  /// Annotation layer for one page, laid out in that page's own space.
+  ///
+  /// [pageSize] is the page as currently displayed (already zoomed), so the
+  /// layer needs no scroll or zoom of its own: normalised coordinates map
+  /// straight onto it, and stroke widths — stored relative to page width —
+  /// scale with the page.
+  Widget _buildPageOverlay(Size pageSize, int pageNumber) {
+    final metrics = PdfPageLayoutMetrics(
+      displayPageSize: pageSize,
+      viewportSize: pageSize,
+      zoomLevel: 1,
+    );
+
+    return IgnorePointer(
+      ignoring: _state.currentTool == PdfEditorTool.view,
+      child: PdfPageAnnotationLayer(
+        tool: _state.currentTool,
+        annotations: _state.document.annotationsForPage(pageNumber),
+        metrics: metrics,
+        penSettings: _state.penSettings,
+        highlighterSettings: _state.highlighterSettings,
+        eraserMode: _state.eraserMode,
+        eraserSize: _state.eraserSize,
+        allowFingerDrawing: _state.allowFingerDrawing,
+        shapeTool: _state.shapeTool,
+        selectedAnnotationId: _state.selectedAnnotationId,
+        pageNumber: pageNumber,
+        onInkComplete: (points, type) {
+          _editor.setCurrentPage(pageNumber);
+          if (type == AnnotationType.highlighter) {
+            _editor.addInkStroke(
+              pageNumber: pageNumber,
+              points: points,
+              type: type,
+              color: _state.highlighterSettings.color,
+              strokeWidth: _state.highlighterSettings.strokeWidth,
+              opacity: _state.highlighterSettings.opacity,
+            );
+          } else {
+            _editor.addInkStroke(
+              pageNumber: pageNumber,
+              points: points,
+              type: type,
+              color: _state.penSettings.color,
+              strokeWidth: _state.penSettings.strokeWidth,
+              opacity: _state.penSettings.opacity,
+              penKind: _state.penSettings.penKind,
+            );
+          }
+        },
+        onHighlightComplete: (x, y, width, height) {
+          _editor.addHighlightRect(
+            pageNumber: pageNumber,
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            color: _state.highlighterSettings.color,
+            opacity: _state.highlighterSettings.opacity,
+          );
+        },
+        onShapeComplete: (x, y, width, height) {
+          _editor.addShape(
+            pageNumber: pageNumber,
+            shape: _state.shapeTool,
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            strokeColor: _state.penSettings.color,
+            strokeWidth: _state.penSettings.strokeWidth,
+            opacity: _state.penSettings.opacity,
+          );
+        },
+        onNoteTap: (x, y) => _showNoteDialog(pageNumber, x, y),
+        onTextTap: (x, y) => _showTextDialog(pageNumber, x, y),
+        onErase: (point) {
+          _editor.eraseAtPoint(
+            pageNumber: pageNumber,
+            point: point,
+            radius: _state.eraserSize,
+          );
+        },
+        onNoteMarkerTap: _showExistingNote,
+        onSelectAnnotation: _editor.selectAnnotation,
+        onMoveAnnotation: (id, x, y) {
+          _editor.moveAnnotation(id: id, pageNumber: pageNumber, x: x, y: y);
+        },
+        onBatchBegin: _editor.beginBatch,
+        onBatchEnd: _editor.endBatch,
+        onAnnotationTap: _handleAnnotationTap,
+      ),
+    );
+  }
+
+  void _handleDocumentReady(int pageCount, Map<int, PdfPageInfo> pages) {
     if (!mounted) return;
-    final pageCount = _pdfController.pageCount;
-    if (details.document.pages.count > 0) {
-      for (var i = 0; i < details.document.pages.count; i++) {
-        final page = details.document.pages[i];
-        _pageSizes[i + 1] = Size(page.size.width, page.size.height);
-        _pageRotations[i + 1] = _rotationDegrees(page.rotation);
-      }
-      final firstPage = details.document.pages[0];
-      _pdfPageSize = Size(firstPage.size.width, firstPage.size.height);
-      _editor.registerPageSize(1, firstPage.size.width, firstPage.size.height);
+    for (final entry in pages.entries) {
+      _editor.registerPageSize(
+        entry.key,
+        entry.value.width,
+        entry.value.height,
+      );
     }
-    setState(() => _isLoading = false);
     _editor.setTotalPages(pageCount);
-    _editor.setCurrentPage(_pdfController.pageNumber);
     if (!_sessionRestored) {
       _sessionRestored = true;
+      // Only the page is restored: zoom levels saved by the old viewer used a
+      // different scale and would land at the wrong magnification.
       _editor.restoreSession(
         PdfViewerSessionController(
-          (page) => _pdfController.jumpToPage(page),
-          (zoom) => _pdfController.zoomLevel = zoom,
+          (page) => _pdfController.goToPage(pageNumber: page),
+          (_) {},
         ),
       );
     }
-  }
-
-  int _rotationDegrees(dynamic rotation) {
-    final name = rotation.toString();
-    if (name.contains('rotateAngle90')) return 90;
-    if (name.contains('rotateAngle180')) return 180;
-    if (name.contains('rotateAngle270')) return 270;
-    return 0;
   }
 }
 
@@ -1026,6 +1015,200 @@ class _ShapeOption extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Two large choices for how pages move: down, or sideways.
+class _ReadingDirectionPicker extends StatelessWidget {
+  const _ReadingDirectionPicker({required this.value, required this.onChanged});
+
+  final PdfReadingDirection value;
+  final ValueChanged<PdfReadingDirection> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
+    final colors = AppColors.of(context);
+
+    Widget option(PdfReadingDirection direction, IconData icon, String label) {
+      final selected = direction == value;
+      return Expanded(
+        child: Material(
+          color: selected
+              ? colors.accent.withValues(alpha: 0.16)
+              : colors.background,
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => onChanged(direction),
+            child: Container(
+              height: 86,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: selected
+                      ? colors.accent
+                      : colors.textMuted.withValues(alpha: 0.2),
+                  width: selected ? 1.5 : 1,
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    size: 28,
+                    color: selected ? colors.darkGold : colors.textMuted,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    strings.t(label),
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                      color: colors.text,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            strings.t('طريقة التصفح'),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: colors.textMuted,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              option(
+                PdfReadingDirection.vertical,
+                Icons.swap_vert_rounded,
+                'للأسفل',
+              ),
+              const SizedBox(width: 12),
+              option(
+                PdfReadingDirection.horizontal,
+                Icons.swap_horiz_rounded,
+                'للجانب',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Floating side rail shown while writing full screen: the active tool (tap
+/// to bring back every tool), undo, redo, and done.
+class _WritingRail extends StatelessWidget {
+  const _WritingRail({
+    required this.tool,
+    required this.canUndo,
+    required this.canRedo,
+    required this.onShowTools,
+    required this.onUndo,
+    required this.onRedo,
+    required this.onDone,
+  });
+
+  final PdfEditorTool tool;
+  final bool canUndo;
+  final bool canRedo;
+  final VoidCallback onShowTools;
+  final VoidCallback onUndo;
+  final VoidCallback onRedo;
+  final VoidCallback onDone;
+
+  static IconData _toolIcon(PdfEditorTool tool) => switch (tool) {
+    PdfEditorTool.pen => Icons.draw_outlined,
+    PdfEditorTool.highlighter => Icons.highlight_outlined,
+    PdfEditorTool.eraser => Icons.auto_fix_off_outlined,
+    PdfEditorTool.lasso => Icons.crop_free_outlined,
+    PdfEditorTool.text => Icons.text_fields_outlined,
+    PdfEditorTool.note => Icons.sticky_note_2_outlined,
+    PdfEditorTool.shapes => Icons.category_outlined,
+    _ => Icons.pan_tool_alt_outlined,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    final strings = AppStrings.of(context);
+    const navy = Color(0xFF0B1F3A);
+
+    Widget action(
+      IconData icon,
+      String tooltip,
+      VoidCallback? onPressed, {
+      Color? color,
+    }) {
+      return IconButton(
+        tooltip: strings.t(tooltip),
+        onPressed: onPressed,
+        icon: Icon(icon, size: 22),
+        color: color ?? navy,
+        disabledColor: navy.withValues(alpha: 0.25),
+      );
+    }
+
+    return Material(
+      color: colors.cardWhite.withValues(alpha: 0.96),
+      elevation: 6,
+      shadowColor: navy.withValues(alpha: 0.3),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(28),
+        side: BorderSide(color: navy.withValues(alpha: 0.08)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Tooltip(
+              message: strings.t('الأدوات'),
+              child: InkWell(
+                onTap: onShowTools,
+                customBorder: const CircleBorder(),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  margin: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: navy,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: colors.accent, width: 1.5),
+                  ),
+                  child: Icon(_toolIcon(tool), color: colors.accent, size: 22),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            action(Icons.undo_rounded, 'تراجع', canUndo ? onUndo : null),
+            action(Icons.redo_rounded, 'إعادة', canRedo ? onRedo : null),
+            action(
+              Icons.check_rounded,
+              'إنهاء الكتابة',
+              onDone,
+              color: colors.accent,
+            ),
+          ],
         ),
       ),
     );

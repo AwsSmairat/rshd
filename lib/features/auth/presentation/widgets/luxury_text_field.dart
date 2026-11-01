@@ -46,7 +46,8 @@ class LuxuryTextField extends StatelessWidget {
       children: [
         Align(
           alignment: AlignmentDirectional.centerStart,
-          child: Text(AppStrings.of(context).t(label),
+          child: Text(
+            AppStrings.of(context).t(label),
             style: TextStyle(
               fontSize: labelSize,
               fontWeight: FontWeight.w600,

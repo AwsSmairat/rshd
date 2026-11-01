@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/layout/auth_layout_metrics.dart';
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
 import 'password_reset_controller.dart';
-import 'widgets/auth_screen_shell.dart';
-import 'widgets/gold_gradient_button.dart';
-import 'widgets/login_header.dart';
-import 'widgets/luxury_login_card.dart';
-import 'widgets/luxury_text_field.dart';
-import '../../../core/l10n/app_strings.dart';
+import 'widgets/auth_form_parts.dart';
+import 'widgets/auth_input_field.dart';
+import 'widgets/auth_page_scaffold.dart';
+import 'widgets/auth_primary_button.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key, this.initialEmail});
@@ -27,6 +24,7 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _emailController;
+  AuthButtonState _buttonState = AuthButtonState.idle;
 
   @override
   void initState() {
@@ -42,90 +40,120 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     super.dispose();
   }
 
+  /// Drops the button back to its resting state after a rejection.
+  Future<void> _flashFailure() async {
+    setState(() => _buttonState = AuthButtonState.failure);
+    await Future<void>.delayed(const Duration(milliseconds: 900));
+    if (mounted) {
+      setState(() => _buttonState = AuthButtonState.idle);
+    }
+  }
+
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_buttonState == AuthButtonState.loading ||
+        _buttonState == AuthButtonState.success) {
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+
+    if (!_formKey.currentState!.validate()) {
+      await _flashFailure();
+      return;
+    }
+
+    setState(() => _buttonState = AuthButtonState.loading);
 
     final success = await ref
         .read(passwordResetControllerProvider.notifier)
         .requestReset(_emailController.text);
 
-    if (!mounted || !success) return;
+    if (!mounted) {
+      return;
+    }
+
+    if (!success) {
+      await _flashFailure();
+      return;
+    }
+
+    setState(() => _buttonState = AuthButtonState.success);
+    // Let the arrow finish its run before the route changes.
+    await Future<void>.delayed(const Duration(milliseconds: 620));
+    if (!mounted) {
+      return;
+    }
 
     context.push(
-      '${AppRoutes.passwordResetVerify}?email=${Uri.encodeComponent(_emailController.text.trim())}',
+      '${AppRoutes.passwordResetVerify}'
+      '?email=${Uri.encodeComponent(_emailController.text.trim())}',
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(passwordResetControllerProvider);
-    final metrics = AuthLayoutMetrics.of(context);
+    final strings = AppStrings.of(context);
+    final colors = AppColors.of(context);
 
-    return Scaffold(
-      body: AuthScreenShell(
-        header: const LoginHeader(),
-        body: LuxuryLoginCard(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: IconButton(
-                    tooltip: AppStrings.of(context).t('رجوع'),
-                    onPressed: () => context.pop(),
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                    color: AppColors.of(context).primary,
-                  ),
-                ),
-                Text(AppStrings.of(context).t('نسيت كلمة المرور؟'),
-                  style: AppTextStyles.titleOf(
-                    context,
-                  ).copyWith(color: AppColors.of(context).primary),
-                  textAlign: TextAlign.right,
-                ),
-                SizedBox(height: metrics.fieldSpacing * 0.5),
-                Text(AppStrings.of(context).t('أدخل بريدك الإلكتروني وسنساعدك في استعادة الوصول إلى حسابك.'),
-                  style: AppTextStyles.bodyOf(
-                    context,
-                  ).copyWith(color: AppColors.of(context).textMuted),
-                  textAlign: TextAlign.right,
-                ),
-                SizedBox(height: metrics.sectionSpacing),
-                LuxuryTextField(
-                  controller: _emailController,
-                  label: AppStrings.of(context).t('البريد الإلكتروني'),
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.done,
-                  errorText: state.fieldErrors['email'],
-                  validator: (value) {
-                    final trimmed = value?.trim() ?? '';
-                    if (trimmed.isEmpty) return AppStrings.of(context).t('البريد الإلكتروني مطلوب');
-                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(trimmed)) {
-                      return AppStrings.of(context).t('صيغة البريد غير صحيحة');
-                    }
-                    return null;
-                  },
-                ),
-                if (state.errorMessage != null) ...[
-                  SizedBox(height: metrics.fieldSpacing),
-                  Text(AppStrings.of(context).t(state.errorMessage!),
-                    style: AppTextStyles.errorOf(context),
-                    textAlign: TextAlign.right,
-                  ),
-                ],
-                SizedBox(height: metrics.sectionSpacing),
-                GoldGradientButton(
-                  label: AppStrings.of(context).t('إرسال رمز الاستعادة'),
-                  isLoading: state.isLoading,
-                  onPressed: state.isLoading ? null : _submit,
-                ),
-              ],
-            ),
-          ),
+    return AuthPageScaffold(
+      title: strings.t('نسيت كلمة المرور؟'),
+      subtitle: strings.forgotPasswordSubtitle,
+      footer: TextButton(
+        onPressed: () => context.go(AppRoutes.login),
+        style: TextButton.styleFrom(
+          foregroundColor: colors.darkGold,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        ),
+        child: Text(
+          strings.backToSignIn,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
         ),
       ),
+      children: [
+        Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (state.errorMessage != null) ...[
+                AuthErrorBanner(message: strings.t(state.errorMessage!)),
+                const SizedBox(height: 16),
+              ],
+
+              AuthInputField(
+                controller: _emailController,
+                label: strings.emailFieldLabel,
+                hintText: strings.emailFieldHint,
+                icon: Icons.mail_outline_rounded,
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.done,
+                autofillHints: const [AutofillHints.email],
+                errorText: state.fieldErrors['email'],
+                onFieldSubmitted: (_) => _submit(),
+                validator: (value) {
+                  final trimmed = value?.trim() ?? '';
+                  if (trimmed.isEmpty) {
+                    return strings.t('البريد الإلكتروني مطلوب');
+                  }
+                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(trimmed)) {
+                    return strings.t('صيغة البريد غير صحيحة');
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 26),
+
+              AuthPrimaryButton(
+                label: strings.sendRecoveryCode,
+                variant: AuthButtonVariant.gold,
+                state: _buttonState,
+                onPressed: _submit,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

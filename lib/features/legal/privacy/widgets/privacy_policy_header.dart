@@ -98,7 +98,8 @@ class PrivacyPolicyHeader extends StatelessWidget {
                               size: 22,
                             ),
                             const SizedBox(width: 8),
-                            Text(AppStrings.of(context).t(title),
+                            Text(
+                              AppStrings.of(context).t(title),
                               style: TextStyle(
                                 fontSize: metrics.pageHeaderTitleFontSize,
                                 fontWeight: FontWeight.w700,
@@ -127,7 +128,8 @@ class PrivacyPolicyHeader extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Text(AppStrings.of(context).t(subtitle),
+                  Text(
+                    AppStrings.of(context).t(subtitle),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       color: Colors.white.withValues(alpha: 0.88),
                       fontSize: 14,
@@ -136,7 +138,8 @@ class PrivacyPolicyHeader extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 10),
-                  Text(AppStrings.of(context).t('آخر تحديث: $lastUpdated'),
+                  Text(
+                    AppStrings.of(context).t('آخر تحديث: $lastUpdated'),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       color: AppColors.of(
                         context,

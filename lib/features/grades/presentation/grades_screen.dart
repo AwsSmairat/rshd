@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
@@ -42,7 +43,7 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: RefreshIndicator(
+      body: RshdRefreshIndicator(
         onRefresh: _refresh,
         color: AppColors.of(context).darkGold,
         backgroundColor: AppColors.of(context).cardWhite,
@@ -64,7 +65,9 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
         return SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.only(top: 24),
-            child: LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الدرجات...')),
+            child: LoadingWidget(
+              message: AppStrings.of(context).t('جاري تحميل الدرجات...'),
+            ),
           ),
         );
       case FeatureLoadStatus.empty:
@@ -92,7 +95,8 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
             if (index == 1) {
               return Padding(
                 padding: const EdgeInsets.only(top: 20, bottom: 12),
-                child: Text(AppStrings.of(context).t('سجل الدرجات'),
+                child: Text(
+                  AppStrings.of(context).t('سجل الدرجات'),
                   style: AppTextStyles.subtitleOf(context).copyWith(
                     color: AppColors.of(context).primary,
                     fontWeight: FontWeight.w700,

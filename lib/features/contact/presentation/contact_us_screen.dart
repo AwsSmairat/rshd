@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/rshd_refresh_indicator.dart';
 
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/platform/platform_settings_controller.dart';
@@ -128,7 +129,7 @@ class _ContactUsScreenState extends ConsumerState<ContactUsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.of(context).background,
-      body: RefreshIndicator(
+      body: RshdRefreshIndicator(
         onRefresh: _refreshContactSettings,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -145,14 +146,18 @@ class _ContactUsScreenState extends ConsumerState<ContactUsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(AppStrings.of(context).t('وسائل التواصل'),
+                    Text(
+                      AppStrings.of(context).t('وسائل التواصل'),
                       style: AppTextStyles.subtitleOf(context).copyWith(
                         fontWeight: FontWeight.w700,
                         color: AppColors.of(context).primary,
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text(AppStrings.of(context).t('اضغط على أي بطاقة للتواصل مع فريق RSHD'),
+                    Text(
+                      AppStrings.of(
+                        context,
+                      ).t('اضغط على أي بطاقة للتواصل مع فريق RSHD'),
                       style: AppTextStyles.bodyOf(context).copyWith(
                         fontSize: 13,
                         color: AppColors.of(context).textMuted,

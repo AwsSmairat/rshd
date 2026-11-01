@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import '../../../core/widgets/rshd_loader.dart';
 
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -23,6 +25,7 @@ class RshdEmbedVideoPlayer extends StatefulWidget {
     this.quality = 'auto',
     this.onRefreshPlayback,
     this.onRequestFloating,
+    this.onProgress,
   });
 
   final String playbackUrl;
@@ -33,6 +36,9 @@ class RshdEmbedVideoPlayer extends StatefulWidget {
   final String quality;
   final Future<VideoPlaybackModel?> Function()? onRefreshPlayback;
   final VoidCallback? onRequestFloating;
+
+  /// Reports the embedded player's position so watch progress can be saved.
+  final void Function(EmbedPlaybackProgress progress)? onProgress;
 
   @override
   State<RshdEmbedVideoPlayer> createState() => RshdEmbedVideoPlayerState();
@@ -52,6 +58,30 @@ class RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
       'تعذّر تشغيل الفيديو. أعد المحاولة أو حدّث الصفحة.';
 
   static const _loadingTimeout = Duration(seconds: 20);
+
+  static const _progressChannel = 'RshdProgress';
+
+  /// Reads the Bunny page's `<video>` element and reports it to the app. The
+  /// player builds the element after load, so it is looked up on every tick.
+  static const _progressScript = '''
+(function () {
+  if (window.__rshdProgress) return;
+  window.__rshdProgress = true;
+  function report(ended) {
+    var v = document.querySelector('video');
+    if (!v || !isFinite(v.duration) || v.duration <= 0) return;
+    RshdProgress.postMessage(JSON.stringify({
+      position: v.currentTime,
+      duration: v.duration,
+      playing: !v.paused && !v.ended,
+      ended: !!(ended || v.ended)
+    }));
+  }
+  setInterval(function () { report(false); }, 1000);
+  document.addEventListener('ended', function () { report(true); }, true);
+  document.addEventListener('pause', function () { report(false); }, true);
+})();
+''';
 
   @override
   void initState() {
@@ -108,7 +138,10 @@ class RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
     try {
       final controller = createEmbedWebViewController(
         onPageStarted: (_) => _beginLoading(),
-        onPageFinished: (_) => _finishLoading(),
+        onPageFinished: (_) {
+          _finishLoading();
+          unawaited(_installProgressScript());
+        },
         onWebResourceError: (error) {
           if (!mounted) {
             return;
@@ -120,12 +153,52 @@ class RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
         },
       );
 
+      if (widget.onProgress != null) {
+        await controller.addJavaScriptChannel(
+          _progressChannel,
+          onMessageReceived: _onProgressMessage,
+        );
+      }
+
       _controller = controller;
       await _loadUrl(_activePlaybackUrl);
     } catch (_) {
       _setError(
         'تعذّر تهيئة مشغّل الفيديو. أعد تشغيل التطبيق بالكامل (flutter run).',
       );
+    }
+  }
+
+  Future<void> _installProgressScript() async {
+    if (widget.onProgress == null) {
+      return;
+    }
+    try {
+      await _controller?.runJavaScript(_progressScript);
+    } catch (_) {
+      // about:blank or a page without the player — nothing to track.
+    }
+  }
+
+  void _onProgressMessage(JavaScriptMessage message) {
+    final onProgress = widget.onProgress;
+    if (onProgress == null || !mounted) {
+      return;
+    }
+    try {
+      final data = jsonDecode(message.message) as Map<String, dynamic>;
+      final position = (data['position'] as num?)?.toDouble() ?? 0;
+      final duration = (data['duration'] as num?)?.toDouble() ?? 0;
+      onProgress(
+        EmbedPlaybackProgress(
+          position: Duration(milliseconds: (position * 1000).round()),
+          duration: Duration(milliseconds: (duration * 1000).round()),
+          isPlaying: data['playing'] == true,
+          ended: data['ended'] == true,
+        ),
+      );
+    } catch (_) {
+      // Ignore malformed messages from the page.
     }
   }
 
@@ -265,7 +338,8 @@ class RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
           ColoredBox(
             color: Colors.black87,
             child: Center(
-              child: CircularProgressIndicator(
+              child: RshdLoader(
+                size: 30,
                 color: AppColors.of(context).darkGold,
               ),
             ),
@@ -273,6 +347,21 @@ class RshdEmbedVideoPlayerState extends State<RshdEmbedVideoPlayer> {
       ],
     );
   }
+}
+
+/// One position report from the embedded player.
+class EmbedPlaybackProgress {
+  const EmbedPlaybackProgress({
+    required this.position,
+    required this.duration,
+    required this.isPlaying,
+    required this.ended,
+  });
+
+  final Duration position;
+  final Duration duration;
+  final bool isPlaying;
+  final bool ended;
 }
 
 class _PlaybackErrorState extends StatelessWidget {
@@ -301,14 +390,16 @@ class _PlaybackErrorState extends StatelessWidget {
             size: 48,
           ),
           const SizedBox(height: 16),
-          Text(AppStrings.of(context).t('تعذّر التشغيل'),
+          Text(
+            AppStrings.of(context).t('تعذّر التشغيل'),
             style: AppTextStyles.subtitleOf(
               context,
             ).copyWith(color: AppColors.of(context).text),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-          Text(AppStrings.of(context).t(message),
+          Text(
+            AppStrings.of(context).t(message),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(color: AppColors.of(context).textMuted),

@@ -19,7 +19,9 @@ class RegisterLegalLinks extends StatelessWidget {
           color: AppColors.of(context).textMuted.withValues(alpha: 0.95),
         ),
         children: [
-          TextSpan(text: AppStrings.of(context).t('بإنشاء الحساب أنت توافق على ')),
+          TextSpan(
+            text: AppStrings.of(context).t('بإنشاء الحساب أنت توافق على '),
+          ),
           TextSpan(
             text: AppStrings.of(context).t('شروط الاستخدام'),
             style: TextStyle(

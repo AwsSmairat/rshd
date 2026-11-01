@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/layout/app_layout_metrics.dart';
@@ -78,17 +79,20 @@ class _TermsAndConditionsPageState
       }
       if (next.acceptanceMessage != null &&
           next.acceptanceMessage != prev?.acceptanceMessage) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(next.acceptanceMessage!))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppStrings.of(context).t(next.acceptanceMessage!)),
+          ),
+        );
       }
     });
 
     return Scaffold(
       backgroundColor: AppColors.of(context).background,
       body: switch (state.status) {
-        TermsLoadStatus.initial || TermsLoadStatus.loading =>
-          LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الشروط والأحكام...')),
+        TermsLoadStatus.initial || TermsLoadStatus.loading => LoadingWidget(
+          message: AppStrings.of(context).t('جاري تحميل الشروط والأحكام...'),
+        ),
         TermsLoadStatus.error => ErrorView(
           message: state.errorMessage ?? 'تعذر تحميل الشروط',
           onRetry: () => ref
@@ -122,7 +126,7 @@ class _TermsAndConditionsPageState
         .toList();
     final progress = _readProgress(accordionSections);
 
-    return RefreshIndicator(
+    return RshdRefreshIndicator(
       onRefresh: () => ref
           .read(termsAndConditionsControllerProvider.notifier)
           .load(refresh: true),
@@ -188,7 +192,9 @@ class _TermsAndConditionsPageState
                             onPressed: () =>
                                 context.push(AppRoutes.privacyPolicy),
                             icon: const Icon(Icons.privacy_tip_outlined),
-                            label: Text(AppStrings.of(context).t('فتح سياسة الخصوصية')),
+                            label: Text(
+                              AppStrings.of(context).t('فتح سياسة الخصوصية'),
+                            ),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.of(context).darkGold,
                               side: BorderSide(
@@ -209,7 +215,8 @@ class _TermsAndConditionsPageState
                               Icons.delete_outline,
                               color: Color(0xFF991B1B),
                             ),
-                            label: Text(AppStrings.of(context).t('طلب حذف الحساب'),
+                            label: Text(
+                              AppStrings.of(context).t('طلب حذف الحساب'),
                               style: TextStyle(color: Color(0xFF991B1B)),
                             ),
                             style: OutlinedButton.styleFrom(
@@ -223,9 +230,11 @@ class _TermsAndConditionsPageState
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
                           child: OutlinedButton.icon(
-                            onPressed: () => context.push(AppRoutes.profile),
+                            onPressed: () => context.go(AppRoutes.profile),
                             icon: const Icon(Icons.security_outlined),
-                            label: Text(AppStrings.of(context).t('إعدادات الأمان')),
+                            label: Text(
+                              AppStrings.of(context).t('إعدادات الأمان'),
+                            ),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.of(context).darkGold,
                               side: BorderSide(
@@ -277,7 +286,8 @@ class _TermsAndConditionsPageState
       children: [
         Row(
           children: [
-            Text(AppStrings.of(context).t('الأقسام'),
+            Text(
+              AppStrings.of(context).t('الأقسام'),
               style: AppTextStyles.subtitleOf(context).copyWith(
                 fontWeight: FontWeight.w700,
                 color: AppColors.of(context).primary,
@@ -311,7 +321,8 @@ class _TermsAndConditionsPageState
               ),
             ),
             const SizedBox(width: 10),
-            Text(AppStrings.of(context).t('${(progress * 100).round()}%'),
+            Text(
+              AppStrings.of(context).t('${(progress * 100).round()}%'),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 12,
                 color: AppColors.of(context).textMuted,
@@ -321,7 +332,8 @@ class _TermsAndConditionsPageState
           ],
         ),
         const SizedBox(height: 4),
-        Text(AppStrings.of(context).t('مؤشر القراءة: الأقسام التي فتحتها'),
+        Text(
+          AppStrings.of(context).t('مؤشر القراءة: الأقسام التي فتحتها'),
           style: AppTextStyles.bodyOf(
             context,
           ).copyWith(fontSize: 11, color: AppColors.of(context).textMuted),
@@ -354,7 +366,10 @@ class _OfflineBanner extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(AppStrings.of(context).t('تعذر الاتصال — يتم عرض النسخة المحلية الاحتياطية.'),
+            child: Text(
+              AppStrings.of(
+                context,
+              ).t('تعذر الاتصال — يتم عرض النسخة المحلية الاحتياطية.'),
               style: AppTextStyles.bodyOf(context).copyWith(fontSize: 13),
             ),
           ),

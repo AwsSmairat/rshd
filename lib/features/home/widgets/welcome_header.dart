@@ -113,7 +113,7 @@ class WelcomeHeader extends StatelessWidget {
                       _HeaderIconButton(
                         icon: Icons.person_outline,
                         tooltip: strings.profileTooltip,
-                        onTap: () => context.push(AppRoutes.profile),
+                        onTap: () => context.go(AppRoutes.profile),
                       ),
                       const SizedBox(width: 4),
                       Container(
@@ -133,7 +133,8 @@ class WelcomeHeader extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text(AppStrings.of(context).t(strings.continueLearningToday),
+                  Text(
+                    AppStrings.of(context).t(strings.continueLearningToday),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: metrics.isTablet ? 15 : 14,
                       color: AppColors.of(

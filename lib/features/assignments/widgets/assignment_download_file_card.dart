@@ -30,9 +30,9 @@ class AssignmentDownloadFileCard extends StatelessWidget {
   Future<void> _openFile(BuildContext context) async {
     final uri = Uri.tryParse(fileUrl);
     if (uri == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تعذر فتح الملف'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.of(context).t('تعذر فتح الملف'))),
+      );
       return;
     }
 
@@ -44,9 +44,9 @@ class AssignmentDownloadFileCard extends StatelessWidget {
       return;
     }
     if (!launched) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تعذر فتح الملف'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.of(context).t('تعذر فتح الملف'))),
+      );
     }
   }
 
@@ -93,7 +93,8 @@ class AssignmentDownloadFileCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(AppStrings.of(context).t(displayName),
+                      Text(
+                        AppStrings.of(context).t(displayName),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontWeight: FontWeight.w700,
                           color: AppColors.of(context).primary,
@@ -102,7 +103,8 @@ class AssignmentDownloadFileCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
-                      Text(AppStrings.of(context).t('$size • $mime'),
+                      Text(
+                        AppStrings.of(context).t('$size • $mime'),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
                           color: AppColors.of(context).textMuted,

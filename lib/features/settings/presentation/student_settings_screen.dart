@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -19,7 +20,6 @@ import '../../auth/presentation/auth_controller.dart';
 import '../../subjects/presentation/subjects_controller.dart';
 import '../data/models/student_settings_model.dart';
 import '../widgets/settings_section_cards.dart';
-import '../widgets/student_settings_header.dart';
 import 'change_password_screen.dart';
 import 'edit_personal_info_screen.dart';
 import 'student_devices_screen.dart';
@@ -40,7 +40,13 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(studentSettingsControllerProvider.notifier).load();
+      // The shell usually fetched these already; refresh quietly then, so
+      // the tab opens on the page instead of a loading screen.
+      final loaded =
+          ref.read(studentSettingsControllerProvider).settings != null;
+      ref
+          .read(studentSettingsControllerProvider.notifier)
+          .load(refresh: loaded);
       _loadVersion();
     });
   }
@@ -82,7 +88,8 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(AppStrings.of(context).t(strings.logout),
+            child: Text(
+              AppStrings.of(context).t(strings.logout),
               style: const TextStyle(color: Color(0xFF991B1B)),
             ),
           ),
@@ -157,46 +164,16 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
     final authState = ref.watch(authControllerProvider);
 
     ref.listen(studentSettingsControllerProvider, (previous, next) {
-      final prefs = next.settings?.preferences;
-      final previousPrefs = previous?.settings?.preferences;
-      if (prefs != null &&
-          (previousPrefs == null ||
-              prefs.theme != previousPrefs.theme ||
-              prefs.language != previousPrefs.language ||
-              prefs.fontSize != previousPrefs.fontSize ||
-              prefs.autoPlayVideo != previousPrefs.autoPlayVideo ||
-              prefs.saveWatchPosition != previousPrefs.saveWatchPosition ||
-              prefs.defaultVideoQuality != previousPrefs.defaultVideoQuality)) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) {
-            return;
-          }
-          if (prefs.theme != previousPrefs?.theme) {
-            ref.read(appThemeControllerProvider.notifier).setTheme(prefs.theme);
-          }
-          if (prefs.language != previousPrefs?.language) {
-            ref
-                .read(appLocaleControllerProvider.notifier)
-                .setLocale(prefs.language);
-          }
-          ref
-              .read(appDisplayPreferencesProvider.notifier)
-              .applyFromSettings(
-                fontSize: prefs.fontSize,
-                autoPlayVideo: prefs.autoPlayVideo,
-                saveWatchPosition: prefs.saveWatchPosition,
-                videoQuality: prefs.defaultVideoQuality,
-              );
-        });
-      }
       if (!mounted) {
         return;
       }
       if (next.actionMessage != null &&
           next.actionMessage != previous?.actionMessage) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(next.actionMessage!))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppStrings.of(context).t(next.actionMessage!)),
+          ),
+        );
       }
       if (next.errorMessage != null &&
           next.errorMessage != previous?.errorMessage &&
@@ -210,8 +187,20 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
       }
     });
 
+    final colors = AppColors.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      body: _buildBody(state, authState.status == AuthStatus.loading),
+      // Same warm ivory ground as the redesigned auth pages.
+      backgroundColor: isDark ? colors.background : const Color(0xFFF7F2E9),
+      // Fade from the loading state to the page rather than swapping at once.
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 220),
+        child: KeyedSubtree(
+          key: ValueKey(state.status),
+          child: _buildBody(state, authState.status == AuthStatus.loading),
+        ),
+      ),
     );
   }
 
@@ -246,20 +235,25 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
     bool isLoggingOut,
   ) {
     final metrics = AppLayoutMetrics.of(context);
-    const cardGap = 8.0;
+    // Generous air between groups is what makes the page read as calm.
+    const cardGap = 22.0;
 
     Widget spaced(Widget child) => Padding(
       padding: const EdgeInsets.only(bottom: cardGap),
       child: child,
     );
 
-    final profilePhoto = ProfilePhotoCard(
+    final hero = SettingsProfileHero(
       profile: settings.profile,
       localAvatarPath: state.localAvatarPath,
       isUploading: state.isUploadingAvatar,
       onPick: _pickAvatar,
       onDelete: () =>
           ref.read(studentSettingsControllerProvider.notifier).deleteAvatar(),
+      // As the Account tab there is nothing to go back to.
+      onBack: Navigator.of(context).canPop()
+          ? () => Navigator.of(context).maybePop()
+          : null,
     );
 
     final personalInfo = PersonalInformationCard(
@@ -396,7 +390,6 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            spaced(profilePhoto),
             spaced(personalInfo),
             spaced(security),
             spaced(appPreferences),
@@ -418,11 +411,7 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    spaced(profilePhoto),
-                    spaced(security),
-                    notifications,
-                  ],
+                  children: [spaced(security), notifications],
                 ),
               ),
               const SizedBox(width: cardGap),
@@ -445,36 +434,42 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
       );
     }
 
-    return RefreshIndicator(
+    final colors = AppColors.of(context);
+
+    return RshdRefreshIndicator(
       onRefresh: () => ref
           .read(studentSettingsControllerProvider.notifier)
           .load(refresh: true),
-      color: AppColors.of(context).secondary,
+      color: colors.darkGold,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          SliverToBoxAdapter(
-            child: StudentSettingsHeader(
-              name: settings.profile.name,
-              localAvatarPath: state.localAvatarPath,
-              onBack: () {
-                if (context.canPop()) {
-                  context.pop();
-                } else {
-                  context.go(AppRoutes.home);
-                }
-              },
-            ),
-          ),
+          SliverToBoxAdapter(child: hero),
           SliverToBoxAdapter(
             child: ResponsiveContent(
               padding: EdgeInsets.fromLTRB(
                 metrics.outerHorizontalInset,
-                12,
+                20,
                 metrics.outerHorizontalInset,
-                MediaQuery.paddingOf(context).bottom + 20,
+                MediaQuery.paddingOf(context).bottom + 24,
               ),
-              child: buildColumns(twoColumns: metrics.isTablet),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  buildColumns(twoColumns: metrics.isTablet),
+                  const SizedBox(height: 18),
+                  Text(
+                    '${platformSettings?.platformName ?? 'RSHD'}'
+                    ' · ${_appVersion.isEmpty ? '—' : _appVersion}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      letterSpacing: 0.4,
+                      color: colors.textMuted.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../core/widgets/rshd_loader.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
-import '../../profile/widgets/profile_detail_row.dart';
 import '../data/models/student_settings_model.dart';
 import 'settings_shared_widgets.dart';
 import 'student_avatar_image.dart';
 
-class ProfilePhotoCard extends StatelessWidget {
-  const ProfilePhotoCard({
+const _activeGreen = Color(0xFF17865A);
+
+/// Top of the settings page: who you are, at a glance.
+///
+/// Replaces both the old navy header and the separate "profile photo" card —
+/// the avatar *is* the photo control, tapped directly, so the page opens on
+/// the person rather than on a form.
+class SettingsProfileHero extends StatelessWidget {
+  const SettingsProfileHero({
     super.key,
     required this.profile,
-    this.localAvatarPath,
     required this.isUploading,
     required this.onPick,
     required this.onDelete,
+    this.onBack,
+    this.localAvatarPath,
   });
 
   final StudentProfileModel profile;
@@ -25,139 +32,240 @@ class ProfilePhotoCard extends StatelessWidget {
   final ValueChanged<ImageSource> onPick;
   final VoidCallback onDelete;
 
-  Future<void> _showPicker(BuildContext context) async {
-    final strings = AppStrings.of(context);
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      builder: (context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.photo_library_outlined),
-                title: Text(AppStrings.of(context).t(strings.pickFromGallery)),
-                onTap: () => Navigator.pop(context, ImageSource.gallery),
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_camera_outlined),
-                title: Text(AppStrings.of(context).t(strings.takePhoto)),
-                onTap: () => Navigator.pop(context, ImageSource.camera),
-              ),
-              if (profile.avatarUrl != null || localAvatarPath != null)
-                ListTile(
-                  leading: const Icon(
-                    Icons.delete_outline,
-                    color: Color(0xFF991B1B),
-                  ),
-                  title: Text(AppStrings.of(context).t(strings.deletePhoto)),
-                  onTap: () {
-                    Navigator.pop(context);
-                    onDelete();
-                  },
-                ),
-            ],
-          ),
-        );
-      },
-    );
+  /// Null when the page is a tab root, which hides the back button.
+  final VoidCallback? onBack;
 
-    if (source != null) {
-      onPick(source);
+  Future<void> _showPhotoOptions(BuildContext context) async {
+    final strings = AppStrings.of(context);
+    final hasPhoto = profile.avatarUrl != null || localAvatarPath != null;
+
+    // Reuses the option-picker sheet so photo actions look like every other
+    // choice on this page.
+    final choice = await showSettingsOptionPicker<String>(
+      context: context,
+      title: strings.profilePhoto,
+      current: '',
+      options: [
+        SettingsPickerOption(value: 'gallery', label: strings.pickFromGallery),
+        SettingsPickerOption(value: 'camera', label: strings.takePhoto),
+        if (hasPhoto)
+          SettingsPickerOption(value: 'delete', label: strings.deletePhoto),
+      ],
+    );
+    switch (choice) {
+      case 'gallery':
+        onPick(ImageSource.gallery);
+      case 'camera':
+        onPick(ImageSource.camera);
+      case 'delete':
+        onDelete();
     }
   }
 
-  Widget _avatarPlaceholder(BuildContext context) => Icon(
-    Icons.person_outline,
-    size: 48,
-    color: AppColors.of(context).textMuted.withValues(alpha: 0.7),
-  );
-
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
     final strings = AppStrings.of(context);
-    return SettingsSectionCard(
-      title: strings.profilePhoto,
-      icon: Icons.account_circle_outlined,
-      child: Column(
-        children: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: 110,
-                height: 110,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.of(context).background,
-                  border: Border.all(
-                    color: AppColors.of(context).accent,
-                    width: 2,
-                  ),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: StudentAvatarImage(
-                  size: 110,
-                  localPath: localAvatarPath,
-                  placeholder: _avatarPlaceholder(context),
-                ),
-              ),
-              Positioned(
-                bottom: 4,
-                right: 4,
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: AppColors.of(context).darkGold,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.photo_camera_outlined,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
-              ),
-              if (isUploading)
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.35),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.of(context).accent,
-                        strokeWidth: 2,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    final isActive = profile.status == 'active';
+    final statusColor = isActive ? _activeGreen : colors.error;
+
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+        child: Column(
+          children: [
+            if (onBack != null)
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Material(
+                  color: isDark
+                      ? colors.white.withValues(alpha: 0.07)
+                      : colors.darkGold.withValues(alpha: 0.10),
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: onBack,
+                    child: SizedBox(
+                      width: 42,
+                      height: 42,
+                      child: Icon(
+                        isRtl
+                            ? Icons.arrow_forward_ios_rounded
+                            : Icons.arrow_back_ios_new_rounded,
+                        size: 17,
+                        color: colors.primary,
+                        semanticLabel: strings.back,
                       ),
                     ),
                   ),
                 ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            AppStrings.of(context).t(strings.changePhotoHint),
-            style: AppTextStyles.bodyOf(
-              context,
-            ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 12),
-          OutlinedButton(
-            onPressed: isUploading ? null : () => _showPicker(context),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.of(context).darkGold,
-              side: BorderSide(color: AppColors.of(context).darkGold),
-              minimumSize: const Size(double.infinity, 44),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+              ),
+
+            GestureDetector(
+              onTap: isUploading ? null : () => _showPhotoOptions(context),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 108,
+                    height: 108,
+                    padding: const EdgeInsets.all(3.5),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [colors.accent, colors.darkGold],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: colors.darkGold.withValues(alpha: 0.25),
+                          blurRadius: 22,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isDark
+                            ? colors.secondaryNavy
+                            : const Color(0xFFFBF8F2),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          StudentAvatarImage(
+                            size: 101,
+                            localPath: localAvatarPath,
+                            placeholder: Icon(
+                              Icons.person_rounded,
+                              size: 52,
+                              color: colors.darkGold.withValues(alpha: 0.55),
+                            ),
+                          ),
+                          if (isUploading)
+                            ColoredBox(
+                              color: Colors.black.withValues(alpha: 0.35),
+                              child: Center(
+                                child: RshdLoader(
+                                  size: 16.1,
+                                  color: colors.accent,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  PositionedDirectional(
+                    bottom: 2,
+                    end: 2,
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colors.primary,
+                        border: Border.all(
+                          color: isDark
+                              ? colors.background
+                              : const Color(0xFFF7F2E9),
+                          width: 2.5,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.photo_camera_rounded,
+                        size: 15,
+                        color: isDark ? const Color(0xFF0B1F3A) : colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: Text(AppStrings.of(context).t(strings.changePhoto)),
-          ),
-        ],
+            const SizedBox(height: 16),
+
+            Text(
+              profile.name,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                height: 1.3,
+                color: colors.primary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              profile.email,
+              textDirection: TextDirection.ltr,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: colors.textMuted),
+            ),
+            const SizedBox(height: 12),
+
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: statusColor.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: statusColor,
+                    ),
+                  ),
+                  const SizedBox(width: 7),
+                  Text(
+                    '${strings.studentRole} · ${strings.statusLabel(profile.status)}',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: statusColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Small text action aligned with a section label.
+class _SectionAction extends StatelessWidget {
+  const _SectionAction({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: onTap,
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.of(context).darkGold,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        minimumSize: const Size(0, 30),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      child: Text(
+        AppStrings.of(context).t(label),
+        style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700),
       ),
     );
   }
@@ -177,71 +285,44 @@ class PersonalInformationCard extends StatelessWidget {
     if (value == null || value.isEmpty) {
       return '—';
     }
-    return value.replaceAll('-', '/');
+    return value.split('T').first.replaceAll('-', '/');
   }
 
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+
+    // Name and email already headline the page, so they are not repeated here.
     return SettingsSectionCard(
       title: strings.personalInfo,
-      icon: Icons.person_outline,
-      trailing: TextButton(
-        onPressed: onEdit,
-        child: Text(AppStrings.of(context).t(strings.edit)),
-      ),
+      icon: Icons.person_outline_rounded,
+      trailing: _SectionAction(label: strings.edit, onTap: onEdit),
       child: Column(
         children: [
-          ProfileDetailRow(
-            dense: true,
-            icon: Icons.badge_outlined,
-            label: strings.fullName,
-            value: profile.name,
-          ),
-          ProfileDetailRow(
-            dense: true,
-            icon: Icons.email_outlined,
-            label: strings.email,
-            value: profile.email,
-          ),
-          ProfileDetailRow(
-            dense: true,
+          SettingsItemTile(
             icon: Icons.phone_outlined,
             label: strings.phone,
             value: profile.phone ?? '—',
           ),
-          ProfileDetailRow(
-            dense: true,
+          SettingsItemTile(
             icon: Icons.cake_outlined,
             label: strings.birthDate,
             value: _formatDate(profile.birthDate),
           ),
-          ProfileDetailRow(
-            dense: true,
+          SettingsItemTile(
             icon: Icons.wc_outlined,
             label: strings.gender,
             value: strings.genderLabel(profile.gender),
           ),
-          ProfileDetailRow(
-            dense: true,
+          SettingsItemTile(
             icon: Icons.flag_outlined,
             label: strings.country,
             value: profile.country ?? '—',
           ),
-          ProfileDetailRow(
-            dense: true,
-            icon: Icons.numbers_outlined,
+          SettingsItemTile(
+            icon: Icons.badge_outlined,
             label: strings.studentId,
             value: profile.studentNumber ?? '—',
-          ),
-          ProfileDetailRow(
-            dense: true,
-            icon: Icons.verified_user_outlined,
-            label: strings.accountStatus,
-            value: strings.statusLabel(profile.status),
-            valueColor: profile.status == 'active'
-                ? const Color(0xFF166534)
-                : const Color(0xFF991B1B),
             showDivider: false,
           ),
         ],
@@ -267,45 +348,34 @@ class SecuritySettingsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+    final passwordSetAt = profile.passwordSetAt;
+
     return SettingsSectionCard(
       title: strings.securityPassword,
-      icon: Icons.lock_outline,
+      icon: Icons.lock_outline_rounded,
+      footer: passwordSetAt == null
+          ? null
+          : strings.passwordLastUpdated(
+              passwordSetAt.split('T').first.replaceAll('-', '/'),
+            ),
       child: Column(
         children: [
           SettingsItemTile(
-            icon: Icons.vpn_key_outlined,
+            icon: Icons.key_rounded,
             label: strings.changePassword,
             onTap: onChangePassword,
           ),
           SettingsItemTile(
-            icon: Icons.devices_outlined,
+            icon: Icons.devices_rounded,
             label: strings.sessionsDevices,
             onTap: onDevices,
           ),
           SettingsItemTile(
-            icon: Icons.logout_outlined,
+            icon: Icons.phonelink_erase_rounded,
             label: strings.logoutAllDevices,
             onTap: onLogoutAllDevices,
             showDivider: false,
           ),
-          if (profile.passwordSetAt != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 4, bottom: 4),
-              child: Text(
-                AppStrings.of(context).t(
-                  strings.passwordLastUpdated(
-                    profile.passwordSetAt!
-                        .split('T')
-                        .first
-                        .replaceAll('-', '/'),
-                  ),
-                ),
-                style: AppTextStyles.bodyOf(context).copyWith(
-                  fontSize: 12,
-                  color: AppColors.of(context).textMuted,
-                ),
-              ),
-            ),
         ],
       ),
     );
@@ -417,11 +487,11 @@ class AppPreferencesCard extends StatelessWidget {
     final strings = AppStrings.of(context);
     return SettingsSectionCard(
       title: strings.appPreferences,
-      icon: Icons.tune_outlined,
+      icon: Icons.tune_rounded,
       child: Column(
         children: [
           SettingsItemTile(
-            icon: Icons.language_outlined,
+            icon: Icons.translate_rounded,
             label: strings.language,
             value: strings.languageLabel(preferences.language),
             onTap: () => _pickLanguage(context),
@@ -437,15 +507,10 @@ class AppPreferencesCard extends StatelessWidget {
             onTap: () => _pickTheme(context),
           ),
           SettingsItemTile(
-            icon: Icons.format_size_outlined,
+            icon: Icons.text_fields_rounded,
             label: strings.fontSize,
             value: strings.fontLabel(preferences.fontSize),
             onTap: () => _pickFontSize(context),
-          ),
-          SettingsSwitchTile(
-            label: strings.autoPlayVideo,
-            value: preferences.autoPlayVideo,
-            onChanged: (v) => onChanged('auto_play_video', v),
           ),
           SettingsItemTile(
             icon: Icons.high_quality_outlined,
@@ -454,12 +519,19 @@ class AppPreferencesCard extends StatelessWidget {
             onTap: () => _pickVideoQuality(context),
           ),
           SettingsSwitchTile(
+            icon: Icons.play_circle_outline_rounded,
+            label: strings.autoPlayVideo,
+            value: preferences.autoPlayVideo,
+            onChanged: (v) => onChanged('auto_play_video', v),
+          ),
+          SettingsSwitchTile(
+            icon: Icons.history_rounded,
             label: strings.saveWatchPosition,
             value: preferences.saveWatchPosition,
             onChanged: (v) => onChanged('save_watch_position', v),
           ),
           SettingsItemTile(
-            icon: Icons.schedule_outlined,
+            icon: Icons.public_rounded,
             label: strings.timezone,
             value: preferences.timezone,
             onTap: () => _pickTimezone(context),
@@ -483,79 +555,100 @@ class NotificationSettingsCard extends StatelessWidget {
   final void Function(String key, dynamic value) onChanged;
   final VoidCallback onToggleAll;
 
-  bool get _allEnabled => _allNotificationsEnabled(preferences);
-
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+    final p = preferences;
+    final flags = [
+      p.notifyLessons,
+      p.notifyAssignments,
+      p.notifyAssignmentReminders,
+      p.notifyQuizzes,
+      p.notifyQuizReminders,
+      p.notifyGrades,
+      p.notifyMessages,
+      p.notifyAnnouncements,
+      p.notifyPlatformUpdates,
+      p.notificationSound,
+      p.notificationVibration,
+    ];
+    final enabled = flags.where((f) => f).length;
+
+    // One master switch up front; the eleven individual switches sit behind a
+    // single expandable row instead of filling the screen.
     return SettingsSectionCard(
       title: strings.notifications,
-      icon: Icons.notifications_outlined,
-      trailing: TextButton(
-        onPressed: onToggleAll,
-        child: Text(
-          AppStrings.of(
-            context,
-          ).t(_allEnabled ? strings.disableAll : strings.enableAll),
-        ),
-      ),
+      icon: Icons.notifications_none_rounded,
       child: Column(
         children: [
           SettingsSwitchTile(
-            label: strings.notifyNewLessons,
-            value: preferences.notifyLessons,
-            onChanged: (v) => onChanged('notify_lessons', v),
+            icon: Icons.notifications_active_outlined,
+            label: strings.allNotifications,
+            value: _allNotificationsEnabled(p),
+            onChanged: (_) => onToggleAll(),
           ),
-          SettingsSwitchTile(
-            label: strings.notifyAssignments,
-            value: preferences.notifyAssignments,
-            onChanged: (v) => onChanged('notify_assignments', v),
-          ),
-          SettingsSwitchTile(
-            label: strings.notifyAssignmentReminders,
-            value: preferences.notifyAssignmentReminders,
-            onChanged: (v) => onChanged('notify_assignment_reminders', v),
-          ),
-          SettingsSwitchTile(
-            label: strings.notifyQuizzes,
-            value: preferences.notifyQuizzes,
-            onChanged: (v) => onChanged('notify_quizzes', v),
-          ),
-          SettingsSwitchTile(
-            label: strings.notifyQuizReminders,
-            value: preferences.notifyQuizReminders,
-            onChanged: (v) => onChanged('notify_quiz_reminders', v),
-          ),
-          SettingsSwitchTile(
-            label: strings.notifyGrades,
-            value: preferences.notifyGrades,
-            onChanged: (v) => onChanged('notify_grades', v),
-          ),
-          SettingsSwitchTile(
-            label: strings.notifyMessages,
-            value: preferences.notifyMessages,
-            onChanged: (v) => onChanged('notify_messages', v),
-          ),
-          SettingsSwitchTile(
-            label: strings.notifyAnnouncements,
-            value: preferences.notifyAnnouncements,
-            onChanged: (v) => onChanged('notify_announcements', v),
-          ),
-          SettingsSwitchTile(
-            label: strings.notifyPlatformUpdates,
-            value: preferences.notifyPlatformUpdates,
-            onChanged: (v) => onChanged('notify_platform_updates', v),
-          ),
-          SettingsSwitchTile(
-            label: strings.sound,
-            value: preferences.notificationSound,
-            onChanged: (v) => onChanged('notification_sound', v),
-          ),
-          SettingsSwitchTile(
-            label: strings.vibration,
-            value: preferences.notificationVibration,
-            onChanged: (v) => onChanged('notification_vibration', v),
-            showDivider: false,
+          SettingsExpandableRow(
+            icon: Icons.tune_rounded,
+            label: strings.customizeNotifications,
+            value: strings.enabledOf(enabled, flags.length),
+            children: [
+              SettingsSwitchTile(
+                label: strings.notifyNewLessons,
+                value: p.notifyLessons,
+                onChanged: (v) => onChanged('notify_lessons', v),
+              ),
+              SettingsSwitchTile(
+                label: strings.notifyAssignments,
+                value: p.notifyAssignments,
+                onChanged: (v) => onChanged('notify_assignments', v),
+              ),
+              SettingsSwitchTile(
+                label: strings.notifyAssignmentReminders,
+                value: p.notifyAssignmentReminders,
+                onChanged: (v) => onChanged('notify_assignment_reminders', v),
+              ),
+              SettingsSwitchTile(
+                label: strings.notifyQuizzes,
+                value: p.notifyQuizzes,
+                onChanged: (v) => onChanged('notify_quizzes', v),
+              ),
+              SettingsSwitchTile(
+                label: strings.notifyQuizReminders,
+                value: p.notifyQuizReminders,
+                onChanged: (v) => onChanged('notify_quiz_reminders', v),
+              ),
+              SettingsSwitchTile(
+                label: strings.notifyGrades,
+                value: p.notifyGrades,
+                onChanged: (v) => onChanged('notify_grades', v),
+              ),
+              SettingsSwitchTile(
+                label: strings.notifyMessages,
+                value: p.notifyMessages,
+                onChanged: (v) => onChanged('notify_messages', v),
+              ),
+              SettingsSwitchTile(
+                label: strings.notifyAnnouncements,
+                value: p.notifyAnnouncements,
+                onChanged: (v) => onChanged('notify_announcements', v),
+              ),
+              SettingsSwitchTile(
+                label: strings.notifyPlatformUpdates,
+                value: p.notifyPlatformUpdates,
+                onChanged: (v) => onChanged('notify_platform_updates', v),
+              ),
+              SettingsSwitchTile(
+                label: strings.sound,
+                value: p.notificationSound,
+                onChanged: (v) => onChanged('notification_sound', v),
+              ),
+              SettingsSwitchTile(
+                label: strings.vibration,
+                value: p.notificationVibration,
+                onChanged: (v) => onChanged('notification_vibration', v),
+                showDivider: false,
+              ),
+            ],
           ),
         ],
       ),
@@ -628,17 +721,19 @@ class PrivacySettingsCard extends StatelessWidget {
             onTap: () => _pickProfileVisibility(context),
           ),
           SettingsItemTile(
-            icon: Icons.chat_outlined,
+            icon: Icons.chat_bubble_outline_rounded,
             label: strings.whoCanMessage,
             value: strings.messagingLabel(preferences.messagingPermission),
             onTap: () => _pickMessagingPermission(context),
           ),
           SettingsSwitchTile(
+            icon: Icons.circle_outlined,
             label: strings.showActivityStatus,
             value: preferences.showActivityStatus,
             onChanged: (v) => onChanged('show_activity_status', v),
           ),
           SettingsSwitchTile(
+            icon: Icons.portrait_outlined,
             label: strings.allowProfilePhotoUse,
             value: preferences.allowProfilePhotoUse,
             onChanged: (v) => onChanged('allow_profile_photo_use', v),
@@ -686,35 +781,35 @@ class SupportLegalCard extends StatelessWidget {
     final strings = AppStrings.of(context);
     return SettingsSectionCard(
       title: strings.supportAndInfo,
-      icon: Icons.help_outline,
-      child: Wrap(
-        spacing: 10,
-        runSpacing: 10,
+      icon: Icons.support_agent_rounded,
+      child: Column(
         children: [
-          _SupportChip(
-            icon: Icons.help_center_outlined,
+          SettingsItemTile(
+            icon: Icons.help_outline_rounded,
             label: strings.helpCenter,
             onTap: onHelp,
           ),
-          _SupportChip(
-            icon: Icons.contact_support_outlined,
+          SettingsItemTile(
+            icon: Icons.mail_outline_rounded,
             label: strings.contactUs,
             onTap: onContact,
           ),
-          _SupportChip(
+          SettingsItemTile(
             icon: Icons.description_outlined,
             label: strings.terms,
             onTap: onTerms,
           ),
-          _SupportChip(
+          SettingsItemTile(
             icon: Icons.privacy_tip_outlined,
             label: strings.privacyPolicy,
             onTap: onPrivacy,
           ),
-          _SupportChip(
-            icon: Icons.info_outline,
-            label: strings.aboutApp(appVersion),
+          SettingsItemTile(
+            icon: Icons.info_outline_rounded,
+            label: strings.aboutAppTitle,
+            value: appVersion,
             onTap: onAbout,
+            showDivider: false,
           ),
         ],
       ),
@@ -722,47 +817,8 @@ class SupportLegalCard extends StatelessWidget {
   }
 }
 
-class _SupportChip extends StatelessWidget {
-  const _SupportChip({required this.icon, required this.label, this.onTap});
-
-  final IconData icon;
-  final String label;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.of(context).background,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          width: 150,
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
-          ),
-          child: Column(
-            children: [
-              Icon(icon, color: AppColors.of(context).darkGold, size: 24),
-              const SizedBox(height: 8),
-              Text(
-                AppStrings.of(context).t(label),
-                style: AppTextStyles.bodyOf(
-                  context,
-                ).copyWith(fontSize: 12, fontWeight: FontWeight.w600),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
+/// Quiet, unmistakable exit: tinted rather than a solid red slab, so it reads
+/// as available without shouting over the rest of the page.
 class SettingsLogoutButton extends StatelessWidget {
   const SettingsLogoutButton({
     super.key,
@@ -775,33 +831,38 @@ class SettingsLogoutButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 52,
-      child: ElevatedButton.icon(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF991B1B),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+    final colors = AppColors.of(context);
+    final strings = AppStrings.of(context);
+
+    return Material(
+      color: colors.error.withValues(alpha: 0.08),
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: isLoading ? null : onPressed,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          height: 56,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: colors.error.withValues(alpha: 0.22)),
           ),
-        ),
-        icon: isLoading
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isLoading)
+                RshdLoader(size: 11.2, color: colors.error)
+              else
+                Icon(Icons.logout_rounded, size: 20, color: colors.error),
+              const SizedBox(width: 10),
+              Text(
+                isLoading ? strings.loggingOut : strings.logout,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: colors.error,
                 ),
-              )
-            : const Icon(Icons.logout_rounded),
-        label: Text(
-          AppStrings.of(context).t(
-            isLoading
-                ? AppStrings.of(context).loggingOut
-                : AppStrings.of(context).logout,
+              ),
+            ],
           ),
         ),
       ),

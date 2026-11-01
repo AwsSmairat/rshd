@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'route_page.dart';
+import '../navigation/student_shell.dart';
 import '../../features/announcements/data/models/announcement_model.dart';
 import '../../features/announcements/presentation/announcement_details_screen.dart';
 import '../../features/announcements/presentation/announcements_screen.dart';
@@ -13,8 +14,8 @@ import '../../core/platform/platform_settings_controller.dart';
 import '../../features/auth/presentation/auth_controller.dart';
 import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
+import '../../features/auth/presentation/widgets/auth_mode_tabs.dart';
 import '../../features/auth/presentation/password_reset_verification_screen.dart';
-import '../../features/auth/presentation/register_screen.dart';
 import '../../features/auth/presentation/reset_password_screen.dart';
 import '../../features/auth/presentation/verify_email_screen.dart';
 import '../../features/grades/presentation/grade_details_screen.dart';
@@ -60,8 +61,7 @@ class AppRoutes {
   static const home = '/home';
   static const subjects = '/subjects';
 
-  static String subjectsByCategory(String category) =>
-      '/subjects?category=$category';
+  static String subjectsByCategory(String category) => '/departments/$category';
 
   static String subjectDetails(int id) => '/subjects/$id';
 
@@ -316,9 +316,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        // Sign-in and create-account share one screen. This route is kept so
+        // existing deep links and the onboarding hand-off still resolve; it
+        // opens the unified screen with the register tab preselected.
         path: AppRoutes.register,
-        pageBuilder: (context, state) =>
-            buildAppRoutePage(state: state, child: const RegisterScreen()),
+        pageBuilder: (context, state) => buildAppRoutePage(
+          state: state,
+          child: const LoginScreen(initialTab: AuthTab.register),
+        ),
       ),
       GoRoute(
         path: AppRoutes.verifyEmail,
@@ -330,20 +335,78 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
-        path: AppRoutes.home,
-        pageBuilder: (context, state) =>
-            buildAppRoutePage(state: state, child: const HomeScreen()),
+      // The five top-level tabs share one shell with the bottom navigation
+      // bar; each tab keeps its own navigation stack and scroll position.
+      StatefulShellRoute(
+        builder: (context, state, navigationShell) =>
+            StudentShell(navigationShell: navigationShell),
+        navigatorContainerBuilder: (context, navigationShell, children) =>
+            AnimatedTabSwitcher(
+              currentIndex: navigationShell.currentIndex,
+              children: children,
+            ),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.home,
+                pageBuilder: (context, state) =>
+                    buildAppRoutePage(state: state, child: const HomeScreen()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.subjects,
+                pageBuilder: (context, state) => buildAppRoutePage(
+                  state: state,
+                  child: const MySubjectsScreen(),
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.assignments,
+                pageBuilder: (context, state) => buildAppRoutePage(
+                  state: state,
+                  child: const AssignmentsScreen(),
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.quizzes,
+                pageBuilder: (context, state) => buildAppRoutePage(
+                  state: state,
+                  child: const QuizzesScreen(),
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.profile,
+                pageBuilder: (context, state) => buildAppRoutePage(
+                  state: state,
+                  child: const StudentSettingsScreen(),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
-        path: AppRoutes.subjects,
-        pageBuilder: (context, state) {
-          final category = state.uri.queryParameters['category'];
-          return buildAppRoutePage(
-            state: state,
-            child: MySubjectsScreen(category: category),
-          );
-        },
+        path: '/departments/:category',
+        pageBuilder: (context, state) => buildAppRoutePage(
+          state: state,
+          child: MySubjectsScreen(category: state.pathParameters['category']),
+        ),
       ),
       GoRoute(
         path: '/subjects/:id',
@@ -425,11 +488,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: AppRoutes.assignments,
-        pageBuilder: (context, state) =>
-            buildAppRoutePage(state: state, child: const AssignmentsScreen()),
-      ),
-      GoRoute(
         path: '/assignments/:id/submit',
         pageBuilder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
@@ -448,11 +506,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             child: AssignmentDetailsScreen(assignmentId: id),
           );
         },
-      ),
-      GoRoute(
-        path: AppRoutes.quizzes,
-        pageBuilder: (context, state) =>
-            buildAppRoutePage(state: state, child: const QuizzesScreen()),
       ),
       GoRoute(
         path: '/quizzes/:id/attempt',
@@ -540,13 +593,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ),
           );
         },
-      ),
-      GoRoute(
-        path: AppRoutes.profile,
-        pageBuilder: (context, state) => buildAppRoutePage(
-          state: state,
-          child: const StudentSettingsScreen(),
-        ),
       ),
       GoRoute(
         path: AppRoutes.helpCenter,

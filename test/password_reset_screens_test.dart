@@ -37,11 +37,15 @@ void main() {
       await tester.tap(find.text('إرسال رمز الاستعادة'));
       await tester.pumpAndSettle();
       expect(find.text('البريد الإلكتروني مطلوب'), findsOneWidget);
+      // The button flashes failure for 900ms before settling back.
+      await tester.pump(const Duration(seconds: 1));
 
-      await tester.enterText(find.byType(TextFormField), 'not-an-email');
+      // The field is a TextField inside a FormField, not a TextFormField.
+      await tester.enterText(find.byType(TextField), 'not-an-email');
       await tester.tap(find.text('إرسال رمز الاستعادة'));
       await tester.pumpAndSettle();
       expect(find.text('صيغة البريد غير صحيحة'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 1));
     });
   });
 

@@ -27,14 +27,17 @@ class RecentSubjectsSection extends StatelessWidget {
         children: [
           HomeSectionHeader(
             title: AppStrings.of(context).currentCourses,
-            onViewAll: () => context.push(AppRoutes.subjects),
+            onViewAll: () => context.go(AppRoutes.subjects),
           ),
           const SizedBox(height: 8),
           if (subjects.isEmpty)
             LiquidGlassSurface(
               borderRadius: BorderRadius.circular(16),
               padding: const EdgeInsets.all(18),
-              child: Text(AppStrings.of(context).t(AppStrings.of(context).noActiveCourses),
+              child: Text(
+                AppStrings.of(
+                  context,
+                ).t(AppStrings.of(context).noActiveCourses),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(color: AppColors.of(context).textMuted),

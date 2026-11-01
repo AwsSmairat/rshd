@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/widgets/rshd_loader.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -62,7 +63,8 @@ class PrivacyPolicyContactCard extends StatelessWidget {
                 size: 22,
               ),
               const SizedBox(width: 8),
-              Text(AppStrings.of(context).t('بيانات التواصل'),
+              Text(
+                AppStrings.of(context).t('بيانات التواصل'),
                 style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -138,7 +140,8 @@ class _ContactRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppStrings.of(context).t(label),
+                Text(
+                  AppStrings.of(context).t(label),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
                     color: AppColors.of(context).textMuted,
@@ -146,7 +149,8 @@ class _ContactRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(AppStrings.of(context).t(value),
+                Text(
+                  AppStrings.of(context).t(value),
                   style: AppTextStyles.bodyOf(
                     context,
                   ).copyWith(fontSize: 14, height: 1.4),
@@ -255,13 +259,12 @@ class DeleteAccountButton extends StatelessWidget {
         child: OutlinedButton.icon(
           onPressed: isLoading ? null : onPressed,
           icon: isLoading
-              ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
+              ? RshdLoader(size: 11.2)
               : const Icon(Icons.delete_outline, color: Color(0xFF991B1B)),
-          label: Text(AppStrings.of(context).t(isLoading ? 'جارٍ المعالجة...' : 'طلب حذف الحساب'),
+          label: Text(
+            AppStrings.of(
+              context,
+            ).t(isLoading ? 'جارٍ المعالجة...' : 'طلب حذف الحساب'),
             style: const TextStyle(
               color: Color(0xFF991B1B),
               fontWeight: FontWeight.w700,
@@ -287,7 +290,11 @@ Future<void> launchPrivacyEmail({
   if (email.isEmpty) {
     if (context != null && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.of(context).t('بريد التواصل غير متوفر حالياً'))),
+        SnackBar(
+          content: Text(
+            AppStrings.of(context).t('بريد التواصل غير متوفر حالياً'),
+          ),
+        ),
       );
     }
     return;
@@ -301,7 +308,9 @@ Future<void> launchPrivacyEmail({
 
   final launched = await launchUrl(uri);
   if (!launched && context != null && context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(email))));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(email))));
   }
 }
 

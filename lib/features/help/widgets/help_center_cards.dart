@@ -38,12 +38,16 @@ class HelpSupportCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(AppStrings.of(context).t('الدعم الفني'),
+                    Text(
+                      AppStrings.of(context).t('الدعم الفني'),
                       style: AppTextStyles.subtitleOf(
                         context,
                       ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
                     ),
-                    Text(AppStrings.of(context).t('تواصل مع إدارة المنصة للمساعدة التقنية'),
+                    Text(
+                      AppStrings.of(
+                        context,
+                      ).t('تواصل مع إدارة المنصة للمساعدة التقنية'),
                       style: AppTextStyles.bodyOf(context).copyWith(
                         fontSize: 12,
                         color: AppColors.of(context).textMuted,
@@ -109,20 +113,23 @@ class HelpTeacherContactTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppStrings.of(context).t(teacher.subjectTitle),
+                Text(
+                  AppStrings.of(context).t(teacher.subjectTitle),
                   style: AppTextStyles.bodyOf(
                     context,
                   ).copyWith(fontWeight: FontWeight.w800, fontSize: 14),
                 ),
                 const SizedBox(height: 4),
-                Text(AppStrings.of(context).t(teacher.instructorName),
+                Text(
+                  AppStrings.of(context).t(teacher.instructorName),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
                     color: AppColors.of(context).textMuted,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(AppStrings.of(context).t('رسالة داخل المنصة'),
+                Text(
+                  AppStrings.of(context).t('رسالة داخل المنصة'),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 11,
                     color: AppColors.of(context).darkGold,
@@ -143,7 +150,10 @@ class HelpTeacherContactTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: Text(AppStrings.of(context).t('تواصل'), style: TextStyle(fontSize: 12)),
+            child: Text(
+              AppStrings.of(context).t('تواصل'),
+              style: TextStyle(fontSize: 12),
+            ),
           ),
         ],
       ),

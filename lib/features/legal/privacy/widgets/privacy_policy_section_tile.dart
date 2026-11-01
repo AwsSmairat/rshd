@@ -72,7 +72,8 @@ class PrivacyPolicySectionTile extends StatelessWidget {
                 size: 18,
               ),
             ),
-            title: Text(AppStrings.of(context).t(section.title),
+            title: Text(
+              AppStrings.of(context).t(section.title),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,

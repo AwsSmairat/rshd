@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
@@ -52,7 +53,7 @@ class _AnnouncementsScreenState extends ConsumerState<AnnouncementsScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: RefreshIndicator(
+      body: RshdRefreshIndicator(
         onRefresh: _refresh,
         color: AppColors.of(context).secondary,
         child: CustomScrollView(
@@ -76,12 +77,16 @@ class _AnnouncementsScreenState extends ConsumerState<AnnouncementsScreen> {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
         return SliverFillRemaining(
-          child: LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الإعلانات...')),
+          child: LoadingWidget(
+            message: AppStrings.of(context).t('جاري تحميل الإعلانات...'),
+          ),
         );
       case FeatureLoadStatus.empty:
         return SliverFillRemaining(
           hasScrollBody: false,
-          child: Center(child: Text(AppStrings.of(context).t('لا توجد إعلانات حالياً'))),
+          child: Center(
+            child: Text(AppStrings.of(context).t('لا توجد إعلانات حالياً')),
+          ),
         );
       case FeatureLoadStatus.error:
         return SliverFillRemaining(
@@ -115,14 +120,18 @@ class _AnnouncementsScreenState extends ConsumerState<AnnouncementsScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    Text(AppStrings.of(context).t('آخر الإعلانات'),
+                    Text(
+                      AppStrings.of(context).t('آخر الإعلانات'),
                       style: AppTextStyles.subtitleOf(context).copyWith(
                         fontSize: metrics.sectionTitleFontSize,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     const Spacer(),
-                    Text(AppStrings.of(context).t('${state.announcements.length} إعلان'),
+                    Text(
+                      AppStrings.of(
+                        context,
+                      ).t('${state.announcements.length} إعلان'),
                       style: AppTextStyles.bodyOf(context).copyWith(
                         fontSize: 12,
                         color: AppColors.of(context).textMuted,

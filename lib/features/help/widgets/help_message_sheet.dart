@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../../core/widgets/rshd_loader.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../data/help_center_model.dart';
@@ -110,13 +111,17 @@ class _HelpMessageSheetState extends State<_HelpMessageSheet> {
             ),
           ),
           const SizedBox(height: 16),
-          Text(AppStrings.of(context).t('رسالة إلى ${widget.teacher.instructorName}'),
+          Text(
+            AppStrings.of(
+              context,
+            ).t('رسالة إلى ${widget.teacher.instructorName}'),
             style: AppTextStyles.subtitleOf(
               context,
             ).copyWith(fontWeight: FontWeight.w800, fontSize: 17),
           ),
           const SizedBox(height: 4),
-          Text(AppStrings.of(context).t(widget.teacher.subjectTitle),
+          Text(
+            AppStrings.of(context).t(widget.teacher.subjectTitle),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
@@ -152,7 +157,8 @@ class _HelpMessageSheetState extends State<_HelpMessageSheet> {
           ),
           if (_error != null) ...[
             const SizedBox(height: 8),
-            Text(AppStrings.of(context).t(_error!),
+            Text(
+              AppStrings.of(context).t(_error!),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(fontSize: 12, color: AppColors.of(context).error),
@@ -185,14 +191,7 @@ class _HelpMessageSheetState extends State<_HelpMessageSheet> {
                     ),
                   ),
                   child: _sending
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
+                      ? RshdLoader(size: 12.4, color: Colors.white)
                       : Text(AppStrings.of(context).t('إرسال')),
                 ),
               ),

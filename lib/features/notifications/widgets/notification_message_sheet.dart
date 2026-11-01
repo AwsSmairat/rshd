@@ -79,7 +79,10 @@ class _NotificationMessageSheet extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(AppStrings.of(context).t(isReply ? 'رد من المدرّس' : 'رسالة'),
+                      Text(
+                        AppStrings.of(
+                          context,
+                        ).t(isReply ? 'رد من المدرّس' : 'رسالة'),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
                           color: AppColors.of(context).darkGold,
@@ -87,14 +90,16 @@ class _NotificationMessageSheet extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(AppStrings.of(context).t(senderName),
+                      Text(
+                        AppStrings.of(context).t(senderName),
                         style: AppTextStyles.subtitleOf(
                           context,
                         ).copyWith(fontWeight: FontWeight.w800, fontSize: 17),
                       ),
                       if (subjectTitle.isNotEmpty) ...[
                         const SizedBox(height: 4),
-                        Text(AppStrings.of(context).t(subjectTitle),
+                        Text(
+                          AppStrings.of(context).t(subjectTitle),
                           style: AppTextStyles.bodyOf(context).copyWith(
                             fontSize: 13,
                             color: AppColors.of(context).textMuted,
@@ -115,7 +120,8 @@ class _NotificationMessageSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFE8DFCF)),
               ),
-              child: Text(AppStrings.of(context).t(message),
+              child: Text(
+                AppStrings.of(context).t(message),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(fontSize: 15, height: 1.7),

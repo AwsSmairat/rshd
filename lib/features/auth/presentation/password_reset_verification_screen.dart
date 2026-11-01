@@ -4,17 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/layout/auth_layout_metrics.dart';
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
 import 'password_reset_controller.dart';
-import 'widgets/auth_screen_shell.dart';
-import 'widgets/gold_gradient_button.dart';
-import 'widgets/login_header.dart';
-import 'widgets/luxury_login_card.dart';
+import 'widgets/auth_form_parts.dart';
+import 'widgets/auth_page_scaffold.dart';
+import 'widgets/auth_primary_button.dart';
 import 'widgets/otp_input_row.dart';
-import '../../../core/l10n/app_strings.dart';
 
 class PasswordResetVerificationScreen extends ConsumerStatefulWidget {
   const PasswordResetVerificationScreen({super.key, required this.email});
@@ -34,6 +31,7 @@ class _PasswordResetVerificationScreenState
   bool _isResending = false;
   bool _isVerifying = false;
   String _code = '';
+  AuthButtonState _buttonState = AuthButtonState.idle;
 
   @override
   void initState() {
@@ -64,6 +62,18 @@ class _PasswordResetVerificationScreenState
     });
   }
 
+  /// Drops the button back to its resting state after a rejection.
+  Future<void> _flashFailure() async {
+    if (!mounted) {
+      return;
+    }
+    setState(() => _buttonState = AuthButtonState.failure);
+    await Future<void>.delayed(const Duration(milliseconds: 900));
+    if (mounted) {
+      setState(() => _buttonState = AuthButtonState.idle);
+    }
+  }
+
   Future<void> _verify() async {
     // `onCompleted` can fire while a manual verify is already in flight.
     if (_isVerifying) {
@@ -71,13 +81,13 @@ class _PasswordResetVerificationScreenState
     }
 
     if (_code.length != 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.of(context).t('يرجى إدخال رمز مكوّن من 6 أرقام'))),
-      );
+      await _flashFailure();
       return;
     }
 
     _isVerifying = true;
+    setState(() => _buttonState = AuthButtonState.loading);
+
     final bool success;
     try {
       success = await ref
@@ -87,108 +97,112 @@ class _PasswordResetVerificationScreenState
       _isVerifying = false;
     }
 
-    if (!mounted || !success) return;
+    if (!mounted) {
+      return;
+    }
+
+    if (!success) {
+      await _flashFailure();
+      return;
+    }
+
+    setState(() => _buttonState = AuthButtonState.success);
+    await Future<void>.delayed(const Duration(milliseconds: 620));
+    if (!mounted) {
+      return;
+    }
 
     context.push(
-      '${AppRoutes.passwordResetNew}?email=${Uri.encodeComponent(widget.email.trim())}',
+      '${AppRoutes.passwordResetNew}'
+      '?email=${Uri.encodeComponent(widget.email.trim())}',
     );
   }
 
   Future<void> _resend() async {
-    if (_secondsRemaining > 0 || _isResending) return;
+    if (_secondsRemaining > 0 || _isResending) {
+      return;
+    }
 
     setState(() => _isResending = true);
     final success = await ref
         .read(passwordResetControllerProvider.notifier)
         .resendCode(widget.email);
 
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     setState(() => _isResending = false);
 
     if (success) {
       _otpKey.currentState?.clear();
+      setState(() => _code = '');
       _startResendTimer();
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تم إرسال رمز جديد'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.of(context).t('تم إرسال رمز جديد'))),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(passwordResetControllerProvider);
-    final metrics = AuthLayoutMetrics.of(context);
+    final strings = AppStrings.of(context);
+    final colors = AppColors.of(context);
 
-    return Scaffold(
-      body: AuthScreenShell(
-        header: const LoginHeader(),
-        body: LuxuryLoginCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: IconButton(
-                  tooltip: AppStrings.of(context).t('رجوع'),
-                  onPressed: () => context.pop(),
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                  color: AppColors.of(context).primary,
-                ),
-              ),
-              Text(AppStrings.of(context).t('تحقق من الرمز'),
-                style: AppTextStyles.titleOf(
-                  context,
-                ).copyWith(color: AppColors.of(context).primary),
-                textAlign: TextAlign.right,
-              ),
-              SizedBox(height: metrics.fieldSpacing * 0.5),
-              Text(AppStrings.of(context).t('أدخل رمز الاستعادة المرسل إلى\n${widget.email}'),
-                style: AppTextStyles.bodyOf(
-                  context,
-                ).copyWith(color: AppColors.of(context).textMuted),
-                textAlign: TextAlign.right,
-              ),
-              SizedBox(height: metrics.sectionSpacing),
-              SizedBox(
-                width: double.infinity,
-                child: OtpInputRow(
-                  key: _otpKey,
-                  length: 6,
-                  onChanged: (value) => _code = value,
-                  onCompleted: (value) {
-                    _code = value;
-                    _verify();
-                  },
-                ),
-              ),
-              if (state.errorMessage != null) ...[
-                SizedBox(height: metrics.fieldSpacing),
-                Text(AppStrings.of(context).t(state.errorMessage!),
-                  style: AppTextStyles.errorOf(context),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-              SizedBox(height: metrics.sectionSpacing),
-              GoldGradientButton(
-                label: AppStrings.of(context).t('تحقق'),
-                isLoading: state.isLoading,
-                onPressed: state.isLoading ? null : _verify,
-              ),
-              SizedBox(height: metrics.fieldSpacing),
-              TextButton(
-                onPressed: (_secondsRemaining > 0 || _isResending)
-                    ? null
-                    : _resend,
-                child: Text(AppStrings.of(context).t(_secondsRemaining > 0
-                      ? 'إعادة الإرسال بعد $_secondsRemaining ث'
-                      : 'إعادة إرسال الرمز'),
-                ),
-              ),
-            ],
-          ),
+    return AuthPageScaffold(
+      title: strings.verifyCodeTitle,
+      subtitle: strings.verifyCodeSubtitle,
+      footer: TextButton(
+        onPressed: () => context.go(AppRoutes.login),
+        style: TextButton.styleFrom(
+          foregroundColor: colors.darkGold,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        ),
+        child: Text(
+          strings.backToSignIn,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
         ),
       ),
+      children: [
+        AuthEmailChip(email: widget.email),
+        const SizedBox(height: 22),
+
+        OtpInputRow(
+          key: _otpKey,
+          length: 6,
+          // Turns every cell green with a check the moment the code is
+          // accepted, before the route changes.
+          status: _buttonState == AuthButtonState.success
+              ? OtpStatus.verified
+              : OtpStatus.idle,
+          onChanged: (value) => _code = value,
+          onCompleted: (value) {
+            _code = value;
+            _verify();
+          },
+        ),
+
+        if (state.errorMessage != null) ...[
+          const SizedBox(height: 18),
+          AuthErrorBanner(message: strings.t(state.errorMessage!)),
+        ],
+        const SizedBox(height: 24),
+
+        AuthPrimaryButton(
+          label: strings.verifyAction,
+          variant: AuthButtonVariant.gold,
+          state: _buttonState,
+          onPressed: _verify,
+        ),
+        const SizedBox(height: 10),
+
+        AuthResendRow(
+          secondsRemaining: _secondsRemaining,
+          isResending: _isResending,
+          onResend: _resend,
+        ),
+      ],
     );
   }
 }

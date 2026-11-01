@@ -22,9 +22,9 @@ class AppStrings {
     if (exact != null) {
       return exact;
     }
-    final questionProgress = RegExp(r'^السؤال (\d+) من (\d+)$').firstMatch(
-      source,
-    );
+    final questionProgress = RegExp(
+      r'^السؤال (\d+) من (\d+)$',
+    ).firstMatch(source);
     if (questionProgress != null) {
       return 'Question ${questionProgress[1]} of ${questionProgress[2]}';
     }
@@ -191,11 +191,35 @@ class AppStrings {
   String get navHome => _t('الرئيسية', 'Home');
   String get navGrades => _t('درجاتي', 'Grades');
   String get navMore => _t('المزيد', 'More');
+  String get navQuizzes => _t('اختباراتي', 'Quizzes');
+  String get greetingHello => _t('مرحباً،', 'Hello,');
+  String get homeSearchHint =>
+      _t('ابحث عن مادة أو مدرّس...', 'Search a course or instructor...');
+  String get suggestedForYou => _t('مقترح لك', 'Suggested for you');
+  String get startLearningTitle =>
+      _t('ابدأ رحلتك التعليمية', 'Start your learning journey');
+  String get startLearningHint => _t(
+    'لم تسجّل في أي مادة بعد. تصفّح المواد واختر ما يناسبك.',
+    "You haven't joined a course yet. Browse and pick one.",
+  );
+  String get browseCourses => _t('تصفّح المواد', 'Browse courses');
+  String get upcomingEmptyHint => _t(
+    'ستظهر هنا الواجبات والاختبارات القادمة',
+    'Upcoming assignments and quizzes will appear here',
+  );
+  String percentComplete(int percent) =>
+      _t('$percent% مكتمل', '$percent% complete');
+  String get myGrades => _t('درجاتي', 'My grades');
+  String get announcementsShort => _t('الإعلانات', 'Announcements');
+  String get supportShort => _t('الدعم الفني', 'Support');
+  String get searchNoResults =>
+      _t('لا توجد نتائج مطابقة', 'No matching results');
+  String get navAccount => _t('حسابي', 'Account');
 
   String welcomePrefix(String name) => _t('مرحباً، $name', 'Welcome, $name');
   String get welcomeGreeting => _t('مرحباً، ', 'Welcome, ');
   String get continueLearningToday =>
-      _t('تابع تعلمك اليوم من منصة RSHD', 'Continue learning today on RSHD');
+      _t('تابع تعلمك اليوم', 'Continue learning today');
   String get profileTooltip => _t('الملف الشخصي', 'Profile');
   String get rshdStudentFallback => _t('طالب RSHD', 'RSHD student');
   String get loadingHome =>
@@ -398,6 +422,124 @@ class AppStrings {
     'blocked' => statusBlocked,
     _ => status,
   };
+
+  // --- Login screen ---------------------------------------------------------
+
+  String get emailFieldLabel => _t('البريد الإلكتروني', 'Email address');
+
+  String get emailFieldHint => _t('you@example.com', 'you@example.com');
+
+  String get passwordFieldLabel => _t('كلمة المرور', 'Password');
+
+  String get passwordFieldHint => _t('أدخل كلمة المرور', 'Enter your password');
+
+  String get orDivider => _t('أو', 'OR');
+
+  String get continueWithGoogle =>
+      _t('المتابعة عبر Google', 'Continue with Google');
+
+  String get continueWithApple =>
+      _t('المتابعة عبر Apple', 'Continue with Apple');
+
+  String get comingSoonNotice => _t(
+    'قريبًا — هذه الميزة ستتوفر قريبًا',
+    'Coming soon — This feature will be available soon',
+  );
+
+  String get phoneOptionalLabel =>
+      _t('رقم الهاتف (اختياري)', 'Phone number (optional)');
+
+  String get confirmPasswordLabel =>
+      _t('تأكيد كلمة المرور', 'Confirm password');
+
+  String get noAccountQuestion =>
+      _t('ليس لديك حساب؟', "Don't have an account?");
+
+  String get fullNameHint =>
+      _t('الاسم الأول واسم العائلة', 'First and last name');
+
+  String get phoneRequiredLabel => _t('رقم الهاتف', 'Phone number');
+
+  String get phoneRequiredError =>
+      _t('رقم الهاتف مطلوب', 'Phone number is required');
+
+  String get phoneInvalidError =>
+      _t('أدخل رقم هاتف صالحاً', 'Enter a valid phone number');
+
+  String get birthDateHint =>
+      _t('اختر تاريخ ميلادك', 'Select your date of birth');
+
+  String get birthDateRequiredError =>
+      _t('تاريخ الميلاد مطلوب', 'Date of birth is required');
+
+  String get minimumAgeError => _t(
+    'يجب أن يكون عمرك 18 سنة أو أكثر لإنشاء حساب',
+    'You must be 18 or older to create an account',
+  );
+
+  String get forgotPasswordSubtitle => _t(
+    'أدخل بريدك الإلكتروني وسنرسل لك رمز الاستعادة للوصول إلى حسابك.',
+    "Enter your email and we'll send you a recovery code to get back into "
+        'your account.',
+  );
+
+  String get sendRecoveryCode =>
+      _t('إرسال رمز الاستعادة', 'Send recovery code');
+
+  String resendIn(int seconds) =>
+      _t('إعادة الإرسال بعد $seconds ث', 'Resend in ${seconds}s');
+
+  String get resendCode => _t('إعادة إرسال الرمز', 'Resend code');
+
+  String get sending => _t('جارٍ الإرسال...', 'Sending...');
+
+  String get verifyCodeTitle => _t('تحقق من الرمز', 'Verify the code');
+
+  String get verifyEmailTitle =>
+      _t('تأكيد البريد الإلكتروني', 'Confirm your email');
+
+  String get verifyCodeSubtitle => _t(
+    'أدخل الرمز المكوّن من 6 أرقام الذي أرسلناه إلى بريدك.',
+    "Enter the 6-digit code we sent to your email.",
+  );
+
+  String get verifyAction => _t('تحقق', 'Verify');
+
+  String get confirmCodeAction => _t('تأكيد الرمز', 'Confirm code');
+
+  String get newPasswordTitle => _t('كلمة مرور جديدة', 'New password');
+
+  String get newPasswordSubtitle => _t(
+    'اختر كلمة مرور قوية: 8 أحرف على الأقل، حرف كبير، ورقم.',
+    'Choose a strong password: at least 8 characters, one uppercase letter '
+        'and one number.',
+  );
+
+  String get newPasswordLabel => _t('كلمة المرور الجديدة', 'New password');
+
+  String get changePasswordAction => _t('تغيير كلمة المرور', 'Change password');
+
+  String get registerGreetingSubtitle => _t(
+    'أنشئ حسابك وابدأ رحلتك التعليمية معنا',
+    'Create your account and start learning with us',
+  );
+
+  String get allNotifications => _t('جميع الإشعارات', 'All notifications');
+
+  String get customizeNotifications =>
+      _t('تخصيص الإشعارات', 'Customize notifications');
+
+  String enabledOf(int on, int total) => _t('$on من $total', '$on of $total');
+
+  String get confirm => _t('تأكيد', 'Confirm');
+
+  String ageYears(int years) => _t('العمر $years سنة', 'Age $years');
+
+  String get backToSignIn => _t('العودة إلى تسجيل الدخول', 'Back to sign in');
+
+  String get showPassword => _t('إظهار كلمة المرور', 'Show password');
+
+  String get hidePassword => _t('إخفاء كلمة المرور', 'Hide password');
 
   String get dateLocale => isEnglish ? 'en' : 'ar';
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../core/widgets/cached_image.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -40,7 +41,8 @@ class AnnouncementCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppStrings.of(context).t(announcement.title),
+                Text(
+                  AppStrings.of(context).t(announcement.title),
                   style: AppTextStyles.titleOf(
                     context,
                   ).copyWith(fontSize: 16, fontWeight: FontWeight.w800),
@@ -50,7 +52,8 @@ class AnnouncementCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 if (announcement.body != null &&
                     announcement.body!.trim().isNotEmpty)
-                  Text(AppStrings.of(context).t(announcement.shortBody),
+                  Text(
+                    AppStrings.of(context).t(announcement.shortBody),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       color: AppColors.of(context).textMuted,
                       fontSize: 13,
@@ -68,7 +71,8 @@ class AnnouncementCard extends StatelessWidget {
                     AnnouncementTypeBadge(type: announcement.type),
                     if (announcement.subjectTitle != null &&
                         announcement.subjectTitle!.isNotEmpty)
-                      Text(AppStrings.of(context).t(announcement.subjectTitle!),
+                      Text(
+                        AppStrings.of(context).t(announcement.subjectTitle!),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
                           color: AppColors.of(context).secondary,
@@ -77,7 +81,10 @@ class AnnouncementCard extends StatelessWidget {
                       ),
                     if (announcement.createdAt != null &&
                         announcement.createdAt!.isNotEmpty)
-                      Text(AppStrings.of(context).t(_formatDate(context, announcement.createdAt!)),
+                      Text(
+                        AppStrings.of(
+                          context,
+                        ).t(_formatDate(context, announcement.createdAt!)),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 11,
                           color: AppColors.of(context).textMuted,
@@ -104,7 +111,10 @@ class AnnouncementCard extends StatelessWidget {
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd', AppStrings.of(context).dateLocale).format(parsed.toLocal());
+    return DateFormat(
+      'yyyy/MM/dd',
+      AppStrings.of(context).dateLocale,
+    ).format(parsed.toLocal());
   }
 }
 
@@ -117,8 +127,8 @@ class _AnnouncementThumb extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
-      child: Image.network(
-        imageUrl,
+      child: Image(
+        image: cachedImage(imageUrl),
         width: 72,
         height: 72,
         fit: BoxFit.cover,

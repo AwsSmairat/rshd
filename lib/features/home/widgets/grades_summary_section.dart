@@ -42,7 +42,8 @@ class GradesSummarySection extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFE5E7EB)),
               ),
-              child: Text(AppStrings.of(context).t(AppStrings.of(context).noGradesYet),
+              child: Text(
+                AppStrings.of(context).t(AppStrings.of(context).noGradesYet),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(color: AppColors.of(context).textMuted),
@@ -105,13 +106,15 @@ class _SummaryStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(AppStrings.of(context).t(value),
+        Text(
+          AppStrings.of(context).t(value),
           style: AppTextStyles.titleOf(
             context,
           ).copyWith(fontSize: 20, color: AppColors.of(context).primary),
         ),
         const SizedBox(height: 4),
-        Text(AppStrings.of(context).t(label),
+        Text(
+          AppStrings.of(context).t(label),
           style: AppTextStyles.bodyOf(
             context,
           ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),

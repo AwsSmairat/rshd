@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/rshd_refresh_indicator.dart';
 
 import '../../../core/network/api_exception.dart';
 import '../../../core/theme/app_colors.dart';
@@ -83,23 +84,31 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppStrings.of(context).t('تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.')),
+          content: Text(
+            AppStrings.of(
+              context,
+            ).t('تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.'),
+          ),
         ),
       );
     } on ApiException catch (error) {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(mapSubjectsError(error)))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.of(context).t(mapSubjectsError(error))),
+        ),
+      );
     } catch (_) {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تعذر إرسال طلب الشراء'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.of(context).t('تعذر إرسال طلب الشراء')),
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isRequesting = false);
@@ -112,7 +121,10 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(AppStrings.of(context).t('إلغاء طلب الشراء')),
-        content: Text(AppStrings.of(context).t('هل تريد إلغاء طلب شراء هذه المادة؟ يمكنك إرسال طلب جديد لاحقاً.'),
+        content: Text(
+          AppStrings.of(context).t(
+            'هل تريد إلغاء طلب شراء هذه المادة؟ يمكنك إرسال طلب جديد لاحقاً.',
+          ),
         ),
         actions: [
           TextButton(
@@ -159,23 +171,29 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
           .read(subjectsListControllerProvider.notifier)
           .syncEnrollmentStatus(widget.subjectId, updated.enrollmentStatus);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تم إلغاء طلب الشراء.'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.of(context).t('تم إلغاء طلب الشراء.')),
+        ),
+      );
     } on ApiException catch (error) {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(mapSubjectsError(error)))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.of(context).t(mapSubjectsError(error))),
+        ),
+      );
     } catch (_) {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تعذر إلغاء طلب الشراء'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.of(context).t('تعذر إلغاء طلب الشراء')),
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isCancelling = false);
@@ -226,7 +244,9 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
     switch (detailsState.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
-        return LoadingWidget(message: AppStrings.of(context).t('جاري تحميل بيانات المادة...'));
+        return LoadingWidget(
+          message: AppStrings.of(context).t('جاري تحميل بيانات المادة...'),
+        );
       case FeatureLoadStatus.error:
         return ErrorView(
           message: detailsState.errorMessage ?? 'تعذر عرض بيانات المادة',
@@ -235,9 +255,12 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
       case FeatureLoadStatus.empty:
       case FeatureLoadStatus.loaded:
         if (subject == null) {
-          return ErrorView(message: AppStrings.of(context).t('تعذر عرض بيانات المادة'), onRetry: _retry);
+          return ErrorView(
+            message: AppStrings.of(context).t('تعذر عرض بيانات المادة'),
+            onRetry: _retry,
+          );
         }
-        return RefreshIndicator(
+        return RshdRefreshIndicator(
           onRefresh: _retry,
           child: _buildSubjectContent(subject, lessonsState),
         );
@@ -296,13 +319,16 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
       case FeatureLoadStatus.loading:
         return Padding(
           padding: EdgeInsets.symmetric(vertical: 24),
-          child: LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الأجزاء...')),
+          child: LoadingWidget(
+            message: AppStrings.of(context).t('جاري تحميل الأجزاء...'),
+          ),
         );
       case FeatureLoadStatus.empty:
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 28),
           child: Center(
-            child: Text(AppStrings.of(context).t('لا توجد أجزاء في هذه المادة'),
+            child: Text(
+              AppStrings.of(context).t('لا توجد أجزاء في هذه المادة'),
               style: TextStyle(
                 color: AppColors.of(context).textMuted.withValues(alpha: 0.9),
               ),

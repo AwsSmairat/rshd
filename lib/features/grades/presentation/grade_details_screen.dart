@@ -106,7 +106,10 @@ class _GradeDetailsScreenState extends ConsumerState<GradeDetailsScreen> {
             children: [
               GradeTypeBadge(sourceType: grade.sourceType),
               const SizedBox(height: 16),
-              Text(AppStrings.of(context).t(grade.displayTitle), style: AppTextStyles.titleOf(context)),
+              Text(
+                AppStrings.of(context).t(grade.displayTitle),
+                style: AppTextStyles.titleOf(context),
+              ),
               const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.all(20),
@@ -116,13 +119,15 @@ class _GradeDetailsScreenState extends ConsumerState<GradeDetailsScreen> {
                 ),
                 child: Column(
                   children: [
-                    Text(AppStrings.of(context).t('الدرجة'),
+                    Text(
+                      AppStrings.of(context).t('الدرجة'),
                       style: AppTextStyles.bodyOf(
                         context,
                       ).copyWith(color: AppColors.of(context).textMuted),
                     ),
                     const SizedBox(height: 8),
-                    Text(AppStrings.of(context).t('${grade.grade}%'),
+                    Text(
+                      AppStrings.of(context).t('${grade.grade}%'),
                       style: AppTextStyles.titleOf(context).copyWith(
                         fontSize: 32,
                         color: AppColors.of(context).primary,
@@ -132,8 +137,14 @@ class _GradeDetailsScreenState extends ConsumerState<GradeDetailsScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              _InfoRow(label: AppStrings.of(context).t('نوع الدرجة'), value: grade.sourceTypeLabel),
-              _InfoRow(label: AppStrings.of(context).t('المادة'), value: grade.subjectTitle ?? '—'),
+              _InfoRow(
+                label: AppStrings.of(context).t('نوع الدرجة'),
+                value: grade.sourceTypeLabel,
+              ),
+              _InfoRow(
+                label: AppStrings.of(context).t('المادة'),
+                value: grade.subjectTitle ?? '—',
+              ),
               if (grade.createdAt != null && grade.createdAt!.isNotEmpty)
                 _InfoRow(
                   label: AppStrings.of(context).t('التاريخ'),
@@ -141,9 +152,15 @@ class _GradeDetailsScreenState extends ConsumerState<GradeDetailsScreen> {
                 ),
               if (grade.notes != null && grade.notes!.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                Text(AppStrings.of(context).t('الملاحظات'), style: AppTextStyles.subtitleOf(context)),
+                Text(
+                  AppStrings.of(context).t('الملاحظات'),
+                  style: AppTextStyles.subtitleOf(context),
+                ),
                 const SizedBox(height: 8),
-                Text(AppStrings.of(context).t(grade.notes!), style: AppTextStyles.bodyOf(context)),
+                Text(
+                  AppStrings.of(context).t(grade.notes!),
+                  style: AppTextStyles.bodyOf(context),
+                ),
               ],
             ],
           ),
@@ -156,7 +173,10 @@ class _GradeDetailsScreenState extends ConsumerState<GradeDetailsScreen> {
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd – HH:mm', AppStrings.of(context).dateLocale).format(parsed.toLocal());
+    return DateFormat(
+      'yyyy/MM/dd – HH:mm',
+      AppStrings.of(context).dateLocale,
+    ).format(parsed.toLocal());
   }
 }
 
@@ -173,13 +193,17 @@ class _InfoRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppStrings.of(context).t(label),
+          Text(
+            AppStrings.of(context).t(label),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(color: AppColors.of(context).textMuted, fontSize: 13),
           ),
           const SizedBox(height: 4),
-          Text(AppStrings.of(context).t(value), style: AppTextStyles.bodyOf(context)),
+          Text(
+            AppStrings.of(context).t(value),
+            style: AppTextStyles.bodyOf(context),
+          ),
         ],
       ),
     );

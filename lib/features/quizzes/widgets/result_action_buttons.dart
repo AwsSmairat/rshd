@@ -55,7 +55,8 @@ class QuizActionButton extends StatelessWidget {
               children: [
                 Icon(icon, color: AppColors.of(context).accent, size: 22),
                 const SizedBox(width: 8),
-                Text(AppStrings.of(context).t(label),
+                Text(
+                  AppStrings.of(context).t(label),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -90,7 +91,8 @@ class QuizActionButton extends StatelessWidget {
           children: [
             Icon(icon, color: AppColors.of(context).darkGold, size: 20),
             const SizedBox(width: 8),
-            Text(AppStrings.of(context).t(label),
+            Text(
+              AppStrings.of(context).t(label),
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
           ],

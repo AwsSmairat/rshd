@@ -65,7 +65,8 @@ class SubjectsHeader extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Text(AppStrings.of(context).t(title),
+                    Text(
+                      AppStrings.of(context).t(title),
                       style: TextStyle(
                         fontSize: metrics.pageHeaderTitleFontSize,
                         fontWeight: FontWeight.w700,

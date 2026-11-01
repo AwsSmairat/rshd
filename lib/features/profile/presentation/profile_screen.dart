@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/app_strings.dart';
@@ -52,7 +53,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text(AppStrings.of(context).t(strings.logout),
+              child: Text(
+                AppStrings.of(context).t(strings.logout),
                 style: const TextStyle(color: Color(0xFF991B1B)),
               ),
             ),
@@ -103,7 +105,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
         final metrics = AppLayoutMetrics.of(context);
 
-        return RefreshIndicator(
+        return RshdRefreshIndicator(
           onRefresh: _refresh,
           color: AppColors.of(context).secondary,
           child: CustomScrollView(

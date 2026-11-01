@@ -35,7 +35,8 @@ class GradesEmptyState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Text(AppStrings.of(context).t('لا توجد درجات حالياً'),
+          Text(
+            AppStrings.of(context).t('لا توجد درجات حالياً'),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 17,
               fontWeight: FontWeight.w700,
@@ -44,7 +45,10 @@ class GradesEmptyState extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-          Text(AppStrings.of(context).t('ستظهر درجاتك هنا بعد تقييم الواجبات والاختبارات'),
+          Text(
+            AppStrings.of(
+              context,
+            ).t('ستظهر درجاتك هنا بعد تقييم الواجبات والاختبارات'),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 13,
               height: 1.5,

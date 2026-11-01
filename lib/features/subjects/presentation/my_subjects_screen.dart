@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../home/home_controller.dart';
+import '../../home/widgets/academic_departments_section.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/router/app_router.dart';
@@ -79,12 +83,18 @@ class _MySubjectsScreenState extends ConsumerState<MySubjectsScreen> {
 
     final messenger = ScaffoldMessenger.of(context);
     if (error != null) {
-      messenger.showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(error))));
+      messenger.showSnackBar(
+        SnackBar(content: Text(AppStrings.of(context).t(error))),
+      );
       return;
     }
     messenger.showSnackBar(
       SnackBar(
-        content: Text(AppStrings.of(context).t('تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.')),
+        content: Text(
+          AppStrings.of(
+            context,
+          ).t('تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.'),
+        ),
       ),
     );
   }
@@ -100,7 +110,7 @@ class _MySubjectsScreenState extends ConsumerState<MySubjectsScreen> {
   }
 
   Widget _buildBody(SubjectsListState state) {
-    return RefreshIndicator(
+    return RshdRefreshIndicator(
       onRefresh: _refresh,
       color: AppColors.of(context).darkGold,
       backgroundColor: AppColors.of(context).cardWhite,
@@ -109,6 +119,22 @@ class _MySubjectsScreenState extends ConsumerState<MySubjectsScreen> {
         slivers: [
           SliverToBoxAdapter(child: SubjectsHeader(title: _screenTitle)),
           ResponsiveSliverContent(sliver: _buildContent(state)),
+          // Browsing the catalogue by department lives on this tab.
+          if (!_isCatalogMode)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 32, bottom: 28),
+                child: AcademicDepartmentsSection(
+                  subjects:
+                      ref
+                          .watch(homeControllerProvider)
+                          .dashboard
+                          ?.catalogSubjects ??
+                      const [],
+                  showViewAll: false,
+                ),
+              ),
+            ),
         ],
       ),
     );

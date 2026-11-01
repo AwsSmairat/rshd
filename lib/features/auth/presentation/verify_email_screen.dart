@@ -4,17 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/layout/auth_layout_metrics.dart';
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
 import 'auth_controller.dart';
-import 'widgets/auth_screen_shell.dart';
-import 'widgets/gold_gradient_button.dart';
-import 'widgets/login_header.dart';
-import 'widgets/luxury_login_card.dart';
+import 'widgets/auth_form_parts.dart';
+import 'widgets/auth_page_scaffold.dart';
+import 'widgets/auth_primary_button.dart';
 import 'widgets/otp_input_row.dart';
-import '../../../core/l10n/app_strings.dart';
 
 class VerifyEmailScreen extends ConsumerStatefulWidget {
   const VerifyEmailScreen({super.key, required this.email});
@@ -32,6 +29,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   bool _isResending = false;
   bool _isSubmitting = false;
   String _code = '';
+  AuthButtonState _buttonState = AuthButtonState.idle;
 
   @override
   void initState() {
@@ -62,6 +60,18 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     });
   }
 
+  /// Drops the button back to its resting state after a rejection.
+  Future<void> _flashFailure() async {
+    if (!mounted) {
+      return;
+    }
+    setState(() => _buttonState = AuthButtonState.failure);
+    await Future<void>.delayed(const Duration(milliseconds: 900));
+    if (mounted) {
+      setState(() => _buttonState = AuthButtonState.idle);
+    }
+  }
+
   Future<void> _submit() async {
     // `onCompleted` can fire while a manual submit is already in flight.
     if (_isSubmitting) {
@@ -69,21 +79,33 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     }
 
     if (_code.length != 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.of(context).t('يرجى إدخال رمز مكوّن من 6 أرقام'))),
-      );
+      await _flashFailure();
       return;
     }
 
     _isSubmitting = true;
+    setState(() => _buttonState = AuthButtonState.loading);
+
     try {
       final success = await ref
           .read(authControllerProvider.notifier)
           .verifyEmail(email: widget.email, code: _code);
 
-      if (success && mounted) {
-        context.go(AppRoutes.home);
+      if (!mounted) {
+        return;
       }
+
+      if (!success) {
+        await _flashFailure();
+        return;
+      }
+
+      setState(() => _buttonState = AuthButtonState.success);
+      await Future<void>.delayed(const Duration(milliseconds: 620));
+      if (!mounted) {
+        return;
+      }
+      context.go(AppRoutes.home);
     } finally {
       _isSubmitting = false;
     }
@@ -110,138 +132,71 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       _otpKey.currentState?.clear();
       setState(() => _code = '');
       _startResendTimer();
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تم إرسال رمز جديد'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.of(context).t('تم إرسال رمز جديد'))),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
-    final isVerifying = authState.status == AuthStatus.authenticating;
-    final metrics = AuthLayoutMetrics.of(context);
+    final strings = AppStrings.of(context);
+    final colors = AppColors.of(context);
 
-    return Scaffold(
-      body: AuthScreenShell(
-        header: const LoginHeader(),
-        footer: const LoginFooter(),
-        body: LuxuryLoginCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: IconButton(
-                  tooltip: AppStrings.of(context).t('رجوع'),
-                  onPressed: () => context.go(AppRoutes.login),
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                  color: AppColors.of(context).primary,
-                ),
-              ),
-              Text(AppStrings.of(context).t('تأكيد البريد الإلكتروني'),
-                style: AppTextStyles.titleOf(
-                  context,
-                ).copyWith(color: AppColors.of(context).primary),
-                textAlign: TextAlign.right,
-              ),
-              SizedBox(height: metrics.fieldSpacing * 0.5),
-              Text(AppStrings.of(context).t('أدخل رمز التحقق المرسل إلى\n${widget.email}'),
-                style: AppTextStyles.bodyOf(
-                  context,
-                ).copyWith(color: AppColors.of(context).textMuted),
-                textAlign: TextAlign.right,
-              ),
-              SizedBox(height: metrics.sectionSpacing),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                  horizontal: metrics.isTablet ? 16 : 14,
-                  vertical: metrics.isTablet ? 14 : 12,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.of(context).background,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: AppColors.of(context).accent.withValues(alpha: 0.35),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.mail_outline_rounded,
-                      color: AppColors.of(context).accent,
-                      size: metrics.isTablet ? 22 : 20,
-                    ),
-                    SizedBox(width: metrics.fieldSpacing * 0.75),
-                    Expanded(
-                      child: Text(AppStrings.of(context).t(widget.email),
-                        style: AppTextStyles.bodyOf(context).copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.of(context).primary,
-                        ),
-                        textAlign: TextAlign.right,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: metrics.sectionSpacing),
-              SizedBox(
-                width: double.infinity,
-                child: OtpInputRow(
-                  key: _otpKey,
-                  length: 6,
-                  onChanged: (value) => _code = value,
-                  onCompleted: (value) {
-                    _code = value;
-                    _submit();
-                  },
-                ),
-              ),
-              if (authState.errorMessage != null) ...[
-                SizedBox(height: metrics.fieldSpacing),
-                Container(
-                  padding: EdgeInsets.all(metrics.isTablet ? 14 : 12),
-                  decoration: BoxDecoration(
-                    color: AppColors.of(context).error.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.of(context).error.withValues(alpha: 0.2),
-                    ),
-                  ),
-                  child: Text(AppStrings.of(context).t(authState.errorMessage!),
-                    style: AppTextStyles.errorOf(context),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-              SizedBox(height: metrics.sectionSpacing),
-              GoldGradientButton(
-                label: AppStrings.of(context).t('تأكيد الرمز'),
-                isLoading: isVerifying,
-                onPressed: isVerifying ? null : _submit,
-              ),
-              SizedBox(height: metrics.fieldSpacing),
-              TextButton(
-                onPressed: (_secondsRemaining > 0 || _isResending)
-                    ? null
-                    : _resend,
-                child: Text(AppStrings.of(context).t(_secondsRemaining > 0
-                      ? 'إعادة الإرسال بعد $_secondsRemaining ث'
-                      : 'إعادة إرسال الرمز'),
-                ),
-              ),
-              SizedBox(height: metrics.fieldSpacing * 0.5),
-              TextButton(
-                onPressed: () => context.go(AppRoutes.login),
-                child: Text(AppStrings.of(context).t('العودة لتسجيل الدخول')),
-              ),
-            ],
-          ),
+    return AuthPageScaffold(
+      title: strings.verifyEmailTitle,
+      subtitle: strings.verifyCodeSubtitle,
+      footer: TextButton(
+        onPressed: () => context.go(AppRoutes.login),
+        style: TextButton.styleFrom(
+          foregroundColor: colors.darkGold,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        ),
+        child: Text(
+          strings.backToSignIn,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
         ),
       ),
+      children: [
+        AuthEmailChip(email: widget.email),
+        const SizedBox(height: 22),
+
+        OtpInputRow(
+          key: _otpKey,
+          length: 6,
+          // Turns every cell green with a check the moment the code is
+          // accepted, before the route changes.
+          status: _buttonState == AuthButtonState.success
+              ? OtpStatus.verified
+              : OtpStatus.idle,
+          onChanged: (value) => _code = value,
+          onCompleted: (value) {
+            _code = value;
+            _submit();
+          },
+        ),
+
+        if (authState.errorMessage != null) ...[
+          const SizedBox(height: 18),
+          AuthErrorBanner(message: strings.t(authState.errorMessage!)),
+        ],
+        const SizedBox(height: 24),
+
+        AuthPrimaryButton(
+          label: strings.confirmCodeAction,
+          variant: AuthButtonVariant.gold,
+          state: _buttonState,
+          onPressed: _submit,
+        ),
+        const SizedBox(height: 10),
+
+        AuthResendRow(
+          secondsRemaining: _secondsRemaining,
+          isResending: _isResending,
+          onResend: _resend,
+        ),
+      ],
     );
   }
 }

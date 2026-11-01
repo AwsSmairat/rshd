@@ -61,7 +61,8 @@ class ContactChannelCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(AppStrings.of(context).t(title),
+                  Text(
+                    AppStrings.of(context).t(title),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -69,7 +70,8 @@ class ContactChannelCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(AppStrings.of(context).t(value),
+                  Text(
+                    AppStrings.of(context).t(value),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,

@@ -45,7 +45,8 @@ class ProtectedContentOverlay extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Text(AppStrings.of(context).t('المحتوى محمي'),
+                  Text(
+                    AppStrings.of(context).t('المحتوى محمي'),
                     textAlign: TextAlign.center,
                     style: AppTextStyles.titleOf(context).copyWith(
                       color: AppColors.of(context).white,
@@ -54,9 +55,12 @@ class ProtectedContentOverlay extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Text(AppStrings.of(context).t(showScreenshotNotice
-                        ? 'تم التقاط لقطة شاشة. المحتوى التعليمي محمي ولا يجوز مشاركته.'
-                        : 'أوقف تسجيل أو مشاركة الشاشة لعرض المحتوى.'),
+                  Text(
+                    AppStrings.of(context).t(
+                      showScreenshotNotice
+                          ? 'تم التقاط لقطة شاشة. المحتوى التعليمي محمي ولا يجوز مشاركته.'
+                          : 'أوقف تسجيل أو مشاركة الشاشة لعرض المحتوى.',
+                    ),
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodyOf(context).copyWith(
                       color: AppColors.of(

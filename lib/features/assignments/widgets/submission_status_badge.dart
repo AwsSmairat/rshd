@@ -25,7 +25,8 @@ class SubmissionStatusBadge extends StatelessWidget {
         children: [
           Icon(style.icon, size: 14, color: style.foreground),
           const SizedBox(width: 5),
-          Text(AppStrings.of(context).t(style.label),
+          Text(
+            AppStrings.of(context).t(style.label),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 12,
               color: style.foreground,

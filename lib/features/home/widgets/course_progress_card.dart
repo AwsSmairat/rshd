@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/cached_image.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 import '../../subjects/data/models/subject_model.dart';
@@ -78,8 +79,8 @@ class CourseProgressCard extends StatelessWidget {
                   height: 110,
                   width: double.infinity,
                   child: coverUrl != null
-                      ? Image.network(
-                          coverUrl,
+                      ? Image(
+                          image: cachedImage(coverUrl),
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
                               _CoverFallback(
@@ -123,7 +124,8 @@ class CourseProgressCard extends StatelessWidget {
                     color: Colors.black.withValues(alpha: 0.45),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(AppStrings.of(context).t(_badgeLabel(context)),
+                  child: Text(
+                    AppStrings.of(context).t(_badgeLabel(context)),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 11,
@@ -139,7 +141,8 @@ class CourseProgressCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppStrings.of(context).t(subject.title),
+                Text(
+                  AppStrings.of(context).t(subject.title),
                   style: AppTextStyles.subtitleOf(context).copyWith(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -150,7 +153,8 @@ class CourseProgressCard extends StatelessWidget {
                 ),
                 if (instructorName != null && instructorName.isNotEmpty) ...[
                   const SizedBox(height: 4),
-                  Text(AppStrings.of(context).t(instructorName),
+                  Text(
+                    AppStrings.of(context).t(instructorName),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       fontSize: 12,
                       color: AppColors.of(context).textMuted,
@@ -177,7 +181,10 @@ class CourseProgressCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text(AppStrings.of(context).t('${(progress! * 100).round()}%'),
+                      Text(
+                        AppStrings.of(
+                          context,
+                        ).t('${(progress! * 100).round()}%'),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/rshd_loader.dart';
 import '../../../../core/l10n/app_strings.dart';
 
 class GoldGradientButton extends StatelessWidget {
@@ -49,18 +50,12 @@ class GoldGradientButton extends StatelessWidget {
           ),
           child: Center(
             child: isLoading
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
+                ? RshdLoader(size: 13.6, color: Colors.white)
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(AppStrings.of(context).t(label),
+                      Text(
+                        AppStrings.of(context).t(label),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,

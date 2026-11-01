@@ -53,7 +53,7 @@ class NotificationNavigation {
       context.push(AppRoutes.subjectDetails(subjectId));
       return;
     }
-    context.push(AppRoutes.subjects);
+    context.go(AppRoutes.subjects);
   }
 
   static void _openAnnouncement(
@@ -77,7 +77,7 @@ class NotificationNavigation {
       context.push(AppRoutes.assignmentDetails(assignmentId));
       return;
     }
-    context.push(AppRoutes.assignments);
+    context.go(AppRoutes.assignments);
   }
 
   static void _openQuiz(BuildContext context, NotificationModel notification) {
@@ -86,7 +86,7 @@ class NotificationNavigation {
       context.push(AppRoutes.quizDetails(quizId));
       return;
     }
-    context.push(AppRoutes.quizzes);
+    context.go(AppRoutes.quizzes);
   }
 
   static void _openGrade(BuildContext context, NotificationModel notification) {

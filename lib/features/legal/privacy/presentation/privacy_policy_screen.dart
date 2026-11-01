@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/layout/app_layout_metrics.dart';
@@ -89,8 +90,10 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
     return Scaffold(
       backgroundColor: AppColors.of(context).background,
       body: switch (state.status) {
-        PrivacyPolicyLoadStatus.initial || PrivacyPolicyLoadStatus.loading =>
-          LoadingWidget(message: AppStrings.of(context).t('جاري تحميل سياسة الخصوصية...')),
+        PrivacyPolicyLoadStatus.initial ||
+        PrivacyPolicyLoadStatus.loading => LoadingWidget(
+          message: AppStrings.of(context).t('جاري تحميل سياسة الخصوصية...'),
+        ),
         PrivacyPolicyLoadStatus.error => ErrorView(
           message: state.errorMessage ?? 'تعذر تحميل سياسة الخصوصية',
           onRetry: () => ref
@@ -128,7 +131,7 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
         .where((s) => s.id != 'contact')
         .toList();
 
-    return RefreshIndicator(
+    return RshdRefreshIndicator(
       onRefresh: () => ref
           .read(privacyPolicyControllerProvider.notifier)
           .load(refresh: true),
@@ -265,7 +268,8 @@ class _PrivacyPolicyPageState extends ConsumerState<PrivacyPolicyPage> {
 
     return Row(
       children: [
-        Text(AppStrings.of(context).t('الأقسام'),
+        Text(
+          AppStrings.of(context).t('الأقسام'),
           style: AppTextStyles.subtitleOf(context).copyWith(
             fontWeight: FontWeight.w700,
             color: AppColors.of(context).primary,
@@ -310,9 +314,12 @@ class _OfflineBanner extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(AppStrings.of(context).t(isLocal
-                  ? 'يتم عرض النسخة المحلية من سياسة الخصوصية.'
-                  : 'تعذر الاتصال — يتم عرض النسخة المحلية الاحتياطية.'),
+            child: Text(
+              AppStrings.of(context).t(
+                isLocal
+                    ? 'يتم عرض النسخة المحلية من سياسة الخصوصية.'
+                    : 'تعذر الاتصال — يتم عرض النسخة المحلية الاحتياطية.',
+              ),
               style: AppTextStyles.bodyOf(context).copyWith(fontSize: 13),
             ),
           ),

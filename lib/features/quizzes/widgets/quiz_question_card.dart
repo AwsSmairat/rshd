@@ -27,13 +27,15 @@ class QuizQuestionCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(AppStrings.of(context).t('السؤال $questionNumber من $totalQuestions'),
+        Text(
+          AppStrings.of(context).t('السؤال $questionNumber من $totalQuestions'),
           style: AppTextStyles.bodyOf(
             context,
           ).copyWith(color: AppColors.of(context).textMuted, fontSize: 13),
         ),
         const SizedBox(height: 12),
-        Text(AppStrings.of(context).t(question.questionText),
+        Text(
+          AppStrings.of(context).t(question.questionText),
           style: AppTextStyles.titleOf(context).copyWith(fontSize: 18),
         ),
         const SizedBox(height: 20),

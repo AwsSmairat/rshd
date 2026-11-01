@@ -54,7 +54,8 @@ class DepartmentCard extends StatelessWidget {
             child: Icon(icon, color: titleColor, size: 26),
           ),
           const SizedBox(height: 14),
-          Text(AppStrings.of(context).t(title),
+          Text(
+            AppStrings.of(context).t(title),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -62,7 +63,8 @@ class DepartmentCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          Text(AppStrings.of(context).t(subtitle),
+          Text(
+            AppStrings.of(context).t(subtitle),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 12,
               height: 1.45,
@@ -78,7 +80,8 @@ class DepartmentCard extends StatelessWidget {
               color: badgeColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Text(AppStrings.of(context).t(countLabel),
+            child: Text(
+              AppStrings.of(context).t(countLabel),
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,

@@ -78,7 +78,8 @@ class ContactUsHeader extends StatelessWidget {
                         else
                           const SizedBox(width: 48),
                         Expanded(
-                          child: Text(AppStrings.of(context).t('تواصل معنا'),
+                          child: Text(
+                            AppStrings.of(context).t('تواصل معنا'),
                             style: AppTextStyles.titleOf(
                               context,
                             ).copyWith(color: Colors.white, fontSize: 22),
@@ -89,7 +90,10 @@ class ContactUsHeader extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Text(AppStrings.of(context).t('نحن هنا لمساعدتك — اختر وسيلة التواصل المناسبة'),
+                    Text(
+                      AppStrings.of(
+                        context,
+                      ).t('نحن هنا لمساعدتك — اختر وسيلة التواصل المناسبة'),
                       style: AppTextStyles.bodyOf(context).copyWith(
                         color: Colors.white.withValues(alpha: 0.88),
                         height: 1.5,

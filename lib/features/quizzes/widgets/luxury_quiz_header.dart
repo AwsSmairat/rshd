@@ -89,7 +89,8 @@ class LuxuryQuizHeader extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Text(AppStrings.of(context).t(title),
+                    Text(
+                      AppStrings.of(context).t(title),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,

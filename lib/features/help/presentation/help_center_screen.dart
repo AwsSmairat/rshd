@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/layout/app_layout_metrics.dart';
@@ -41,15 +42,17 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
     return Scaffold(
       backgroundColor: AppColors.of(context).background,
       body: switch (state.status) {
-        FeatureLoadStatus.initial || FeatureLoadStatus.loading =>
-          LoadingWidget(message: AppStrings.of(context).t('جاري تحميل مركز المساعدة...')),
+        FeatureLoadStatus.initial || FeatureLoadStatus.loading => LoadingWidget(
+          message: AppStrings.of(context).t('جاري تحميل مركز المساعدة...'),
+        ),
         FeatureLoadStatus.error => ErrorView(
           message: state.errorMessage ?? 'تعذر تحميل مركز المساعدة',
           onRetry: () => ref
               .read(helpCenterControllerProvider.notifier)
               .load(refresh: true),
         ),
-        FeatureLoadStatus.empty || FeatureLoadStatus.loaded => RefreshIndicator(
+        FeatureLoadStatus.empty ||
+        FeatureLoadStatus.loaded => RshdRefreshIndicator(
           onRefresh: () => ref
               .read(helpCenterControllerProvider.notifier)
               .load(refresh: true),
@@ -90,14 +93,18 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(AppStrings.of(context).t('كيف يمكننا مساعدتك؟'),
+        Text(
+          AppStrings.of(context).t('كيف يمكننا مساعدتك؟'),
           style: AppTextStyles.subtitleOf(context).copyWith(
             fontWeight: FontWeight.w700,
             color: AppColors.of(context).primary,
           ),
         ),
         const SizedBox(height: 6),
-        Text(AppStrings.of(context).t('تواصل مع مدرّس مادتك أو مع فريق الدعم الفني'),
+        Text(
+          AppStrings.of(
+            context,
+          ).t('تواصل مع مدرّس مادتك أو مع فريق الدعم الفني'),
           style: AppTextStyles.bodyOf(
             context,
           ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
@@ -107,7 +114,8 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
           onContact: () => context.push(AppRoutes.technicalSupport),
         ),
         const SizedBox(height: 20),
-        Text(AppStrings.of(context).t('المدرسون — موادك المفعّلة'),
+        Text(
+          AppStrings.of(context).t('المدرسون — موادك المفعّلة'),
           style: AppTextStyles.subtitleOf(
             context,
           ).copyWith(fontWeight: FontWeight.w700, fontSize: 15),
@@ -121,7 +129,10 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: const Color(0xFFE5E7EB)),
             ),
-            child: Text(AppStrings.of(context).t('لا توجد مواد مفعّلة حالياً. فعّل مادة أولاً لتتمكن من التواصل مع مدرّسها.'),
+            child: Text(
+              AppStrings.of(context).t(
+                'لا توجد مواد مفعّلة حالياً. فعّل مادة أولاً لتتمكن من التواصل مع مدرّسها.',
+              ),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 13,
                 color: AppColors.of(context).textMuted,
@@ -153,7 +164,9 @@ class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
     if (!mounted || !sent) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppStrings.of(context).t('تم إرسال رسالتك إلى المدرّس'))),
+      SnackBar(
+        content: Text(AppStrings.of(context).t('تم إرسال رسالتك إلى المدرّس')),
+      ),
     );
   }
 }

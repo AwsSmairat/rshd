@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
@@ -58,7 +59,9 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
-        return LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الملف...'));
+        return LoadingWidget(
+          message: AppStrings.of(context).t('جاري تحميل الملف...'),
+        );
       case FeatureLoadStatus.error:
         return ErrorView(
           message: state.errorMessage ?? 'تعذر تحميل الملف',
@@ -68,10 +71,12 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
       case FeatureLoadStatus.loaded:
         final file = state.file;
         if (file == null) {
-          return ErrorView(message: AppStrings.of(context).t('الملف غير موجود'));
+          return ErrorView(
+            message: AppStrings.of(context).t('الملف غير موجود'),
+          );
         }
 
-        return RefreshIndicator(
+        return RshdRefreshIndicator(
           color: AppColors.of(context).accent,
           backgroundColor: AppColors.of(context).cardWhite,
           onRefresh: _reloadFile,
@@ -108,7 +113,9 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
       return _FileStatusCard(
         icon: Icons.lock_outline_rounded,
         title: AppStrings.of(context).t('ملف مقفل'),
-        message: AppStrings.of(context).t('فعّل المادة لفتح هذا الملف والاطلاع عليه.'),
+        message: AppStrings.of(
+          context,
+        ).t('فعّل المادة لفتح هذا الملف والاطلاع عليه.'),
         tone: _FileStatusTone.locked,
       );
     }
@@ -125,8 +132,9 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
           const SizedBox(height: 12),
           _InfoNote(
             icon: Icons.visibility_outlined,
-            text:
-                AppStrings.of(context).t('الملفات متاحة للعرض داخل التطبيق فقط ولا يمكن تنزيلها أو حفظها.'),
+            text: AppStrings.of(context).t(
+              'الملفات متاحة للعرض داخل التطبيق فقط ولا يمكن تنزيلها أو حفظها.',
+            ),
           ),
         ],
       );
@@ -136,8 +144,9 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
       return _FileStatusCard(
         icon: Icons.hourglass_top_rounded,
         title: AppStrings.of(context).t('جاري تجهيز الملف'),
-        message:
-            AppStrings.of(context).t('الملف قيد المعالجة حالياً. اسحب للأسفل للتحديث أو حاول بعد لحظات.'),
+        message: AppStrings.of(context).t(
+          'الملف قيد المعالجة حالياً. اسحب للأسفل للتحديث أو حاول بعد لحظات.',
+        ),
         tone: _FileStatusTone.pending,
         onRetry: _reloadFile,
       );
@@ -146,9 +155,9 @@ class _FileDetailsScreenState extends ConsumerState<FileDetailsScreen> {
     return _FileStatusCard(
       icon: Icons.info_outline_rounded,
       title: AppStrings.of(context).t('عرض غير متاح'),
-      message: AppStrings.of(context).t(
-        'هذا النوع من الملفات غير متاح للعرض حالياً داخل التطبيق.',
-      ),
+      message: AppStrings.of(
+        context,
+      ).t('هذا النوع من الملفات غير متاح للعرض حالياً داخل التطبيق.'),
       tone: _FileStatusTone.pending,
     );
   }
@@ -174,7 +183,8 @@ class _FileDetailsHero extends StatelessWidget {
       scrolledUnderElevation: 0,
       backgroundColor: AppColors.of(context).primary,
       foregroundColor: AppColors.of(context).white,
-      title: Text(AppStrings.of(context).t(title),
+      title: Text(
+        AppStrings.of(context).t(title),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
@@ -263,7 +273,8 @@ class _FilePreviewCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(AppStrings.of(context).t(file.title),
+              Text(
+                AppStrings.of(context).t(file.title),
                 textAlign: TextAlign.center,
                 style: AppTextStyles.titleOf(
                   context,
@@ -279,7 +290,8 @@ class _FilePreviewCard extends StatelessWidget {
                   color: _accentColor(context).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: Text(AppStrings.of(context).t(file.fileTypeLabel),
+                child: Text(
+                  AppStrings.of(context).t(file.fileTypeLabel),
                   style: AppTextStyles.captionOf(context).copyWith(
                     color: _accentColor(context),
                     fontWeight: FontWeight.w700,
@@ -361,13 +373,15 @@ class _MetaChip extends StatelessWidget {
         children: [
           Icon(icon, size: 18, color: AppColors.of(context).secondary),
           const SizedBox(height: 8),
-          Text(AppStrings.of(context).t(label),
+          Text(
+            AppStrings.of(context).t(label),
             style: AppTextStyles.captionOf(
               context,
             ).copyWith(color: AppColors.of(context).textMuted, fontSize: 11),
           ),
           const SizedBox(height: 2),
-          Text(AppStrings.of(context).t(value),
+          Text(
+            AppStrings.of(context).t(value),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTextStyles.bodyOf(context).copyWith(
@@ -423,14 +437,16 @@ class _FileStatusCard extends StatelessWidget {
             child: Icon(icon, size: 26, color: accent),
           ),
           const SizedBox(height: 12),
-          Text(AppStrings.of(context).t(title),
+          Text(
+            AppStrings.of(context).t(title),
             style: AppTextStyles.subtitleOf(context).copyWith(
               color: AppColors.of(context).primary,
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 6),
-          Text(AppStrings.of(context).t(message),
+          Text(
+            AppStrings.of(context).t(message),
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyOf(context).copyWith(
               color: AppColors.of(context).textMuted,
@@ -506,7 +522,8 @@ class _PrimaryActionButton extends StatelessWidget {
               children: [
                 Icon(icon, color: AppColors.of(context).white, size: 22),
                 const SizedBox(width: 10),
-                Text(AppStrings.of(context).t(label),
+                Text(
+                  AppStrings.of(context).t(label),
                   style: AppTextStyles.buttonOf(context).copyWith(fontSize: 15),
                 ),
               ],
@@ -536,7 +553,8 @@ class _InfoNote extends StatelessWidget {
           Icon(icon, size: 18, color: AppColors.of(context).textMuted),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(AppStrings.of(context).t(text),
+            child: Text(
+              AppStrings.of(context).t(text),
               style: AppTextStyles.captionOf(context).copyWith(
                 color: AppColors.of(context).textMuted,
                 height: 1.5,

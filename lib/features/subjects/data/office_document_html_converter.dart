@@ -19,7 +19,9 @@ class OfficeDocumentHtmlConverter {
     if (paragraphs.isEmpty) {
       return null;
     }
-    return _wrap(paragraphs.map((text) => '<p>${_escape(text)}</p>').join('\n'));
+    return _wrap(
+      paragraphs.map((text) => '<p>${_escape(text)}</p>').join('\n'),
+    );
   }
 
   List<String> _docxParagraphs(Uint8List bytes) {
@@ -46,14 +48,15 @@ class OfficeDocumentHtmlConverter {
 
   List<String> _pptxParagraphs(Uint8List bytes) {
     final archive = ZipDecoder().decodeBytes(bytes, verify: false);
-    final slides = archive.files
-        .where(
-          (file) =>
-              file.name.startsWith('ppt/slides/slide') &&
-              file.name.endsWith('.xml'),
-        )
-        .toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+    final slides =
+        archive.files
+            .where(
+              (file) =>
+                  file.name.startsWith('ppt/slides/slide') &&
+                  file.name.endsWith('.xml'),
+            )
+            .toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
 
     if (slides.isEmpty) {
       throw const FormatException('ملف العرض غير صالح');
@@ -62,10 +65,9 @@ class OfficeDocumentHtmlConverter {
     final paragraphs = <String>[];
     for (var index = 0; index < slides.length; index++) {
       final xml = utf8.decode(slides[index].content, allowMalformed: true);
-      final texts = _xmlTexts(xml, const ['a:t'])
-          .map((text) => text.trim())
-          .where((text) => text.isNotEmpty)
-          .toList();
+      final texts = _xmlTexts(xml, const [
+        'a:t',
+      ]).map((text) => text.trim()).where((text) => text.isNotEmpty).toList();
       paragraphs.add('شريحة ${index + 1}');
       if (texts.isEmpty) {
         paragraphs.add('—');

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/rshd_loader.dart';
 import '../../../../core/l10n/app_strings.dart';
 
 class RegisterSubmitButton extends StatelessWidget {
@@ -44,18 +45,12 @@ class RegisterSubmitButton extends StatelessWidget {
           ),
           child: Center(
             child: isLoading
-                ? SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.of(context).accent,
-                    ),
-                  )
+                ? RshdLoader(size: 13.6, color: AppColors.of(context).accent)
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(AppStrings.of(context).t(label),
+                      Text(
+                        AppStrings.of(context).t(label),
                         style: TextStyle(
                           color: AppColors.of(context).accent,
                           fontSize: 16,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
@@ -37,7 +38,7 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: RefreshIndicator(
+      body: RshdRefreshIndicator(
         onRefresh: _refresh,
         color: AppColors.of(context).darkGold,
         backgroundColor: AppColors.of(context).cardWhite,

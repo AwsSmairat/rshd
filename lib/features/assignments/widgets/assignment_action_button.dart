@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/rshd_loader.dart';
 import '../../../core/l10n/app_strings.dart';
 
 class AssignmentActionButton extends StatelessWidget {
@@ -53,20 +54,14 @@ class AssignmentActionButton extends StatelessWidget {
               ),
             ),
             child: isLoading
-                ? SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.of(context).white,
-                    ),
-                  )
+                ? RshdLoader(size: 13.6, color: AppColors.of(context).white)
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(icon, color: AppColors.of(context).accent, size: 22),
                       const SizedBox(width: 8),
-                      Text(AppStrings.of(context).t(label),
+                      Text(
+                        AppStrings.of(context).t(label),
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -85,7 +80,8 @@ class AssignmentActionButton extends StatelessWidget {
       child: OutlinedButton.icon(
         onPressed: isLoading ? null : onPressed,
         icon: Icon(icon, color: AppColors.of(context).darkGold, size: 20),
-        label: Text(AppStrings.of(context).t(label),
+        label: Text(
+          AppStrings.of(context).t(label),
           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
         style: OutlinedButton.styleFrom(

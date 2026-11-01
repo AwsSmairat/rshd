@@ -53,7 +53,8 @@ class DeviceInfoCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              Text(AppStrings.of(context).t(strings.linkedDevice),
+              Text(
+                AppStrings.of(context).t(strings.linkedDevice),
                 style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
@@ -77,7 +78,8 @@ class DeviceInfoCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Text(AppStrings.of(context).t(strings.noLinkedDevice),
+                    child: Text(
+                      AppStrings.of(context).t(strings.noLinkedDevice),
                       style: AppTextStyles.bodyOf(
                         context,
                       ).copyWith(color: AppColors.of(context).textMuted),

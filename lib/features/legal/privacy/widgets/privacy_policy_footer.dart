@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/rshd_loader.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/l10n/app_strings.dart';
 
@@ -41,13 +42,12 @@ class PrivacyPolicyFooter extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: isDeleting ? null : onDeleteAccount,
               icon: isDeleting
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
+                  ? RshdLoader(size: 11.2)
                   : const Icon(Icons.delete_outline, color: Color(0xFF991B1B)),
-              label: Text(AppStrings.of(context).t(isDeleting ? 'جارٍ المعالجة...' : 'طلب حذف الحساب'),
+              label: Text(
+                AppStrings.of(
+                  context,
+                ).t(isDeleting ? 'جارٍ المعالجة...' : 'طلب حذف الحساب'),
                 style: const TextStyle(
                   color: Color(0xFF991B1B),
                   fontWeight: FontWeight.w700,
@@ -85,7 +85,8 @@ class PrivacyPolicyFooter extends StatelessWidget {
             color: AppColors.of(context).textMuted.withValues(alpha: 0.2),
           ),
           const SizedBox(height: 12),
-          Text(AppStrings.of(context).t(platformName),
+          Text(
+            AppStrings.of(context).t(platformName),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontWeight: FontWeight.w700,
               color: AppColors.of(context).primary,
@@ -93,13 +94,15 @@ class PrivacyPolicyFooter extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
-          Text(AppStrings.of(context).t('إصدار السياسة: $version'),
+          Text(
+            AppStrings.of(context).t('إصدار السياسة: $version'),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),
             textAlign: TextAlign.center,
           ),
-          Text(AppStrings.of(context).t('آخر تحديث: $lastUpdated'),
+          Text(
+            AppStrings.of(context).t('آخر تحديث: $lastUpdated'),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),

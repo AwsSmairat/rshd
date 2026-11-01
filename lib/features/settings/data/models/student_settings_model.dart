@@ -218,7 +218,10 @@ class StudentPreferencesModel {
           json['messaging_permission']?.toString() ?? 'teachers_only',
       showActivityStatus: _asBool(json['show_activity_status']),
       allowProfilePhotoUse: _asBool(json['allow_profile_photo_use']),
-      twoFactorEnabled: _asBool(json['two_factor_enabled'], defaultValue: false),
+      twoFactorEnabled: _asBool(
+        json['two_factor_enabled'],
+        defaultValue: false,
+      ),
     );
   }
 

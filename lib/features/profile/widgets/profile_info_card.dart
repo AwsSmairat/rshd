@@ -65,7 +65,8 @@ class ProfileInfoCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              Text(AppStrings.of(context).t(strings.accountDetails),
+              Text(
+                AppStrings.of(context).t(strings.accountDetails),
                 style: AppTextStyles.subtitleOf(context).copyWith(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,

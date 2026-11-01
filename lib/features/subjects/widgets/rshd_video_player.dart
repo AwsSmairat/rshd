@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chewie/chewie.dart';
+import '../../../core/widgets/rshd_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -413,7 +414,8 @@ class RshdVideoPlayerState extends State<RshdVideoPlayer> {
                 ),
               ),
               SizedBox(height: compact ? 6 : 8),
-              Text(AppStrings.of(context).t(title),
+              Text(
+                AppStrings.of(context).t(title),
                 style: AppTextStyles.subtitleOf(context).copyWith(
                   color: AppColors.of(context).primary,
                   fontWeight: FontWeight.w700,
@@ -421,7 +423,8 @@ class RshdVideoPlayerState extends State<RshdVideoPlayer> {
                 ),
               ),
               SizedBox(height: compact ? 4 : 6),
-              Text(AppStrings.of(context).t(message),
+              Text(
+                AppStrings.of(context).t(message),
                 textAlign: TextAlign.center,
                 maxLines: compact ? 2 : 3,
                 overflow: TextOverflow.ellipsis,
@@ -436,13 +439,12 @@ class RshdVideoPlayerState extends State<RshdVideoPlayer> {
                 OutlinedButton.icon(
                   onPressed: _isRefreshing ? null : _retryPlayback,
                   icon: _isRefreshing
-                      ? const SizedBox(
-                          width: 14,
-                          height: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
+                      ? RshdLoader(size: 10)
                       : Icon(Icons.refresh_rounded, size: compact ? 15 : 17),
-                  label: Text(AppStrings.of(context).t(_isRefreshing ? 'جاري التحديث...' : 'إعادة المحاولة'),
+                  label: Text(
+                    AppStrings.of(
+                      context,
+                    ).t(_isRefreshing ? 'جاري التحديث...' : 'إعادة المحاولة'),
                   ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.of(context).secondary,
@@ -490,9 +492,10 @@ class RshdVideoPlayerState extends State<RshdVideoPlayer> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: AppColors.of(context).accent),
+            RshdLoader(size: 30, color: AppColors.of(context).accent),
             const SizedBox(height: 12),
-            Text(AppStrings.of(context).t('جاري تجهيز الفيديو...'),
+            Text(
+              AppStrings.of(context).t('جاري تجهيز الفيديو...'),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(color: AppColors.of(context).white),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/rshd_loader.dart';
+import '../../../core/widgets/cached_image.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 import '../data/models/subject_model.dart';
@@ -45,7 +47,8 @@ class SubjectDetailsHero extends StatelessWidget {
       scrolledUnderElevation: 0,
       backgroundColor: AppColors.of(context).primary,
       foregroundColor: AppColors.of(context).white,
-      title: Text(AppStrings.of(context).t(subject.title),
+      title: Text(
+        AppStrings.of(context).t(subject.title),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
@@ -59,8 +62,8 @@ class SubjectDetailsHero extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             if (coverUrl != null)
-              Image.network(
-                coverUrl,
+              Image(
+                image: cachedImage(coverUrl),
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) =>
                     _GradientCover(start: gradientStart, end: gradientEnd),
@@ -84,7 +87,9 @@ class SubjectDetailsHero extends StatelessWidget {
             Positioned(
               top: topInset + 56,
               right: 20,
-              child: _HeroBadge(label: AppStrings.of(context).t(subject.categoryLabel)),
+              child: _HeroBadge(
+                label: AppStrings.of(context).t(subject.categoryLabel),
+              ),
             ),
             Positioned(
               left: 20,
@@ -115,7 +120,8 @@ class SubjectDetailsHero extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(AppStrings.of(context).t(subject.title),
+                        Text(
+                          AppStrings.of(context).t(subject.title),
                           style: AppTextStyles.titleOf(context).copyWith(
                             color: AppColors.of(context).white,
                             fontSize: 24,
@@ -126,7 +132,8 @@ class SubjectDetailsHero extends StatelessWidget {
                         ),
                         if (subject.instructor?.name != null) ...[
                           const SizedBox(height: 6),
-                          Text(AppStrings.of(context).t(subject.instructor!.name),
+                          Text(
+                            AppStrings.of(context).t(subject.instructor!.name),
                             style: AppTextStyles.bodyOf(context).copyWith(
                               color: Colors.white.withValues(alpha: 0.88),
                               fontSize: 13,
@@ -194,7 +201,9 @@ class SubjectDetailsMetaCard extends StatelessWidget {
               if (lessonsCount > 0)
                 _MetaChip(
                   icon: Icons.view_module_outlined,
-                  label: AppStrings.of(context).t('$lessonsCount ${lessonsCount == 1 ? 'جزء' : 'أجزاء'}'),
+                  label: AppStrings.of(
+                    context,
+                  ).t('$lessonsCount ${lessonsCount == 1 ? 'جزء' : 'أجزاء'}'),
                 ),
               if (subject.isEnrollmentActive)
                 _MetaChip(
@@ -213,7 +222,8 @@ class SubjectDetailsMetaCard extends StatelessWidget {
           if (subject.description != null &&
               subject.description!.isNotEmpty) ...[
             const SizedBox(height: 16),
-            Text(AppStrings.of(context).t(subject.description!),
+            Text(
+              AppStrings.of(context).t(subject.description!),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(color: AppColors.of(context).text, height: 1.55),
@@ -224,14 +234,18 @@ class SubjectDetailsMetaCard extends StatelessWidget {
             const SizedBox(height: 18),
             Row(
               children: [
-                Text(AppStrings.of(context).t('التقدم'),
+                Text(
+                  AppStrings.of(context).t('التقدم'),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontWeight: FontWeight.w700,
                     color: AppColors.of(context).primary,
                   ),
                 ),
                 const Spacer(),
-                Text(AppStrings.of(context).t('${subject.progressPercent!.round()}%'),
+                Text(
+                  AppStrings.of(
+                    context,
+                  ).t('${subject.progressPercent!.round()}%'),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontWeight: FontWeight.w800,
                     color: AppColors.of(context).darkGold,
@@ -280,7 +294,10 @@ class SubjectDetailsMetaCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: Text(AppStrings.of(context).t('طلب الشراء قيد المراجعة. يمكنك مشاهدة الفيديوهات المجانية حتى يتم تفعيل المادة.'),
+                          child: Text(
+                            AppStrings.of(context).t(
+                              'طلب الشراء قيد المراجعة. يمكنك مشاهدة الفيديوهات المجانية حتى يتم تفعيل المادة.',
+                            ),
                             style: AppTextStyles.bodyOf(context).copyWith(
                               color: AppColors.of(context).primary,
                               fontWeight: FontWeight.w600,
@@ -297,13 +314,12 @@ class SubjectDetailsMetaCard extends StatelessWidget {
                         ? null
                         : onCancelPurchase,
                     icon: isCancelling
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
+                        ? RshdLoader(size: 11.2)
                         : const Icon(Icons.close_rounded, size: 18),
-                    label: Text(AppStrings.of(context).t(isCancelling ? 'جاري الإلغاء...' : 'إلغاء طلب الشراء'),
+                    label: Text(
+                      AppStrings.of(context).t(
+                        isCancelling ? 'جاري الإلغاء...' : 'إلغاء طلب الشراء',
+                      ),
                     ),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.of(context).error,
@@ -327,7 +343,10 @@ class SubjectDetailsMetaCard extends StatelessWidget {
               ),
             if (!subject.isEnrollmentPending) ...[
               const SizedBox(height: 10),
-              Text(AppStrings.of(context).t('معاينة المحتوى — الفيديوهات المجانية متاحة للمشاهدة'),
+              Text(
+                AppStrings.of(
+                  context,
+                ).t('معاينة المحتوى — الفيديوهات المجانية متاحة للمشاهدة'),
                 style: AppTextStyles.bodyOf(context).copyWith(
                   color: AppColors.of(context).textMuted,
                   fontSize: 13,
@@ -372,7 +391,8 @@ class SubjectDetailsSectionHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        Text(AppStrings.of(context).t(title),
+        Text(
+          AppStrings.of(context).t(title),
           style: AppTextStyles.titleOf(context).copyWith(fontSize: 20),
         ),
         if (count != null && count! > 0) ...[
@@ -383,7 +403,8 @@ class SubjectDetailsSectionHeader extends StatelessWidget {
               color: AppColors.of(context).primary.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(999),
             ),
-            child: Text(AppStrings.of(context).t('$count'),
+            child: Text(
+              AppStrings.of(context).t('$count'),
               style: AppTextStyles.bodyOf(context).copyWith(
                 color: AppColors.of(context).primary,
                 fontWeight: FontWeight.w800,
@@ -431,7 +452,8 @@ class _HeroBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
       ),
-      child: Text(AppStrings.of(context).t(label),
+      child: Text(
+        AppStrings.of(context).t(label),
         style: const TextStyle(
           color: Colors.white,
           fontSize: 12,
@@ -479,7 +501,8 @@ class _MetaChip extends StatelessWidget {
                 : AppColors.of(context).secondary,
           ),
           const SizedBox(width: 6),
-          Text(AppStrings.of(context).t(label),
+          Text(
+            AppStrings.of(context).t(label),
             style: AppTextStyles.bodyOf(context).copyWith(
               color: highlighted
                   ? AppColors.of(context).primary
@@ -532,15 +555,9 @@ class _PurchaseButton extends StatelessWidget {
           ),
           child: Center(
             child: isRequesting
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : Text(AppStrings.of(context).t('طلب شراء المادة'),
+                ? RshdLoader(size: 13.6, color: Colors.white)
+                : Text(
+                    AppStrings.of(context).t('طلب شراء المادة'),
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,

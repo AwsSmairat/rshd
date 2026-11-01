@@ -54,7 +54,8 @@ class PdfEditorHeader extends StatelessWidget implements PreferredSizeWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(AppStrings.of(context).t(fileName),
+                    Text(
+                      AppStrings.of(context).t(fileName),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.subtitleOf(context).copyWith(
@@ -63,9 +64,12 @@ class PdfEditorHeader extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(AppStrings.of(context).t(totalPages > 0
-                          ? 'الصفحة: $currentPage من $totalPages'
-                          : 'الصفحة: $currentPage'),
+                    Text(
+                      AppStrings.of(context).t(
+                        totalPages > 0
+                            ? 'الصفحة: $currentPage من $totalPages'
+                            : 'الصفحة: $currentPage',
+                      ),
                       style: AppTextStyles.captionOf(
                         context,
                       ).copyWith(color: AppColors.of(context).textMuted),
@@ -150,7 +154,8 @@ class _SaveStatusChip extends StatelessWidget {
           children: [
             Icon(icon, size: 14, color: color),
             const SizedBox(width: 4),
-            Text(AppStrings.of(context).t(label),
+            Text(
+              AppStrings.of(context).t(label),
               style: AppTextStyles.captionOf(
                 context,
               ).copyWith(color: color, fontSize: 11),
@@ -443,7 +448,8 @@ class _ToolButton extends StatelessWidget {
                 children: [
                   Icon(icon, size: 22, color: iconColor),
                   const SizedBox(height: 4),
-                  Text(AppStrings.of(context).t(label),
+                  Text(
+                    AppStrings.of(context).t(label),
                     style: AppTextStyles.captionOf(context).copyWith(
                       fontSize: 10,
                       color: labelColor,

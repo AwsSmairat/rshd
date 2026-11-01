@@ -68,7 +68,9 @@ class _AssignmentDetailsScreenState
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
-            child: LuxuryAssignmentHeader(title: AppStrings.of(context).t('تفاصيل الواجب')),
+            child: LuxuryAssignmentHeader(
+              title: AppStrings.of(context).t('تفاصيل الواجب'),
+            ),
           ),
           ResponsiveSliverContent(
             padding: AppLayoutMetrics.of(
@@ -137,7 +139,8 @@ class _AssignmentDetailsScreenState
                 AssignmentSectionCard(
                   title: AppStrings.of(context).t('الوصف'),
                   icon: Icons.description_outlined,
-                  child: Text(AppStrings.of(context).t(assignment.description!),
+                  child: Text(
+                    AppStrings.of(context).t(assignment.description!),
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.5,

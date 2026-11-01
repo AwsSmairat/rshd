@@ -43,19 +43,22 @@ void main() {
     return controller;
   }
 
-  test('failed submit keeps the attempt loaded instead of erroring out', () async {
-    final controller = controllerWith(
-      ApiException(message: 'Network down', statusCode: 500),
-    );
+  test(
+    'failed submit keeps the attempt loaded instead of erroring out',
+    () async {
+      final controller = controllerWith(
+        ApiException(message: 'Network down', statusCode: 500),
+      );
 
-    final result = await controller.submit();
+      final result = await controller.submit();
 
-    expect(result, isNull);
-    // An `error` status would swap the questions for the "start quiz" screen,
-    // whose retry discards the attempt.
-    expect(controller.state.status, QuizAttemptStatus.loaded);
-    expect(controller.state.errorMessage, isNotNull);
-  });
+      expect(result, isNull);
+      // An `error` status would swap the questions for the "start quiz" screen,
+      // whose retry discards the attempt.
+      expect(controller.state.status, QuizAttemptStatus.loaded);
+      expect(controller.state.errorMessage, isNotNull);
+    },
+  );
 
   test('failed submit preserves answers, attempt id and progress', () async {
     final controller = controllerWith(Exception('boom'));

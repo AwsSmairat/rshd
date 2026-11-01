@@ -83,7 +83,10 @@ class ProfileHeader extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Text(AppStrings.of(context).t(AppStrings.of(context).profileTooltip),
+                  Text(
+                    AppStrings.of(
+                      context,
+                    ).t(AppStrings.of(context).profileTooltip),
                     style: AppTextStyles.subtitleOf(context).copyWith(
                       fontSize: metrics.pageHeaderTitleFontSize,
                       fontWeight: FontWeight.w700,
@@ -117,7 +120,8 @@ class ProfileHeader extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(AppStrings.of(context).t(name),
+                            Text(
+                              AppStrings.of(context).t(name),
                               style: AppTextStyles.titleOf(context).copyWith(
                                 fontSize: metrics.isTablet ? 24 : 22,
                                 color: AppColors.of(context).white,
@@ -148,7 +152,10 @@ class ProfileHeader extends StatelessWidget {
                                     ).white.withValues(alpha: 0.95),
                                   ),
                                   const SizedBox(width: 4),
-                                  Text(AppStrings.of(context).t(AppStrings.of(context).studentRole),
+                                  Text(
+                                    AppStrings.of(
+                                      context,
+                                    ).t(AppStrings.of(context).studentRole),
                                     style: AppTextStyles.bodyOf(context)
                                         .copyWith(
                                           fontSize: 12,

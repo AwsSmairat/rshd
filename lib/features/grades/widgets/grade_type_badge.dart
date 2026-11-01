@@ -19,7 +19,8 @@ class GradeTypeBadge extends StatelessWidget {
         color: colors.background,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(AppStrings.of(context).t(_label()),
+      child: Text(
+        AppStrings.of(context).t(_label()),
         style: AppTextStyles.bodyOf(context).copyWith(
           fontSize: 12,
           color: colors.foreground,

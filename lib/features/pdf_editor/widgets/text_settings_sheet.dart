@@ -73,7 +73,8 @@ class _TextSettingsSheetState extends State<TextSettingsSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            Text(AppStrings.of(context).t('إعدادات النص'),
+            Text(
+              AppStrings.of(context).t('إعدادات النص'),
               style: AppTextStyles.subtitleOf(
                 context,
               ).copyWith(color: AppColors.of(context).primary),

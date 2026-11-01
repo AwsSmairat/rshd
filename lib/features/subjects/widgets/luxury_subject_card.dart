@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import '../../../core/widgets/cached_image.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -66,8 +67,8 @@ class LuxurySubjectCard extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 if (coverUrl != null)
-                  Image.network(
-                    coverUrl,
+                  Image(
+                    image: cachedImage(coverUrl),
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return _FallbackCover(
@@ -115,7 +116,11 @@ class LuxurySubjectCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          _OverlayChip(label: AppStrings.of(context).t(subject.categoryLabel)),
+                          _OverlayChip(
+                            label: AppStrings.of(
+                              context,
+                            ).t(subject.categoryLabel),
+                          ),
                           const Spacer(),
                           Icon(
                             Icons.arrow_back_ios_new_rounded,
@@ -125,7 +130,8 @@ class LuxurySubjectCard extends StatelessWidget {
                         ],
                       ),
                       const Spacer(),
-                      Text(AppStrings.of(context).t(subject.title),
+                      Text(
+                        AppStrings.of(context).t(subject.title),
                         style: AppTextStyles.titleOf(context).copyWith(
                           fontSize: 20,
                           height: 1.2,
@@ -144,7 +150,8 @@ class LuxurySubjectCard extends StatelessWidget {
                       if (instructorName != null &&
                           instructorName.isNotEmpty) ...[
                         const SizedBox(height: 6),
-                        Text(AppStrings.of(context).t('المدرّس: $instructorName'),
+                        Text(
+                          AppStrings.of(context).t('المدرّس: $instructorName'),
                           style: AppTextStyles.bodyOf(context).copyWith(
                             fontSize: 13,
                             color: Colors.white.withValues(alpha: 0.88),
@@ -157,7 +164,9 @@ class LuxurySubjectCard extends StatelessWidget {
                         const SizedBox(height: 10),
                         if (subject.isEnrollmentPending)
                           _OverlayChip(
-                            label: AppStrings.of(context).t('بانتظار تفعيل الإدارة'),
+                            label: AppStrings.of(
+                              context,
+                            ).t('بانتظار تفعيل الإدارة'),
                             emphasize: true,
                           )
                         else if (onRequestPurchase != null)
@@ -177,7 +186,10 @@ class LuxurySubjectCard extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              child: Text(AppStrings.of(context).t(isRequesting ? 'جاري الإرسال...' : 'طلب شراء'),
+                              child: Text(
+                                AppStrings.of(context).t(
+                                  isRequesting ? 'جاري الإرسال...' : 'طلب شراء',
+                                ),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w800,
                                   fontSize: 13,
@@ -219,7 +231,8 @@ class _OverlayChip extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
           ),
-          child: Text(AppStrings.of(context).t(label),
+          child: Text(
+            AppStrings.of(context).t(label),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 12,
               fontWeight: FontWeight.w700,

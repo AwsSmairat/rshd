@@ -39,7 +39,8 @@ class ResultProgressCircle extends StatelessWidget {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(AppStrings.of(context).t(centerText),
+              Text(
+                AppStrings.of(context).t(centerText),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -47,7 +48,8 @@ class ResultProgressCircle extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              Text(AppStrings.of(context).t(subtitle),
+              Text(
+                AppStrings.of(context).t(subtitle),
                 style: TextStyle(
                   fontSize: 11,
                   color: AppColors.of(context).accent.withValues(alpha: 0.85),

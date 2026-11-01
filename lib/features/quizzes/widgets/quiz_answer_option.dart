@@ -53,7 +53,8 @@ class QuizAnswerOption extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(AppStrings.of(context).t(answerText),
+                  child: Text(
+                    AppStrings.of(context).t(answerText),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       fontWeight: isSelected
                           ? FontWeight.w600

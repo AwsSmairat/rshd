@@ -19,7 +19,8 @@ class StudentDevicesScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(AppStrings.of(context).t('الجلسات والأجهزة'))),
       body: devices.isEmpty
           ? Center(
-              child: Text(AppStrings.of(context).t('لا توجد أجهزة مسجّلة'),
+              child: Text(
+                AppStrings.of(context).t('لا توجد أجهزة مسجّلة'),
                 style: AppTextStyles.bodyOf(
                   context,
                 ).copyWith(color: AppColors.of(context).textMuted),
@@ -38,7 +39,10 @@ class StudentDevicesScreen extends ConsumerWidget {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: Text(AppStrings.of(context).t('إلغاء الجهاز')),
-                        content: Text(AppStrings.of(context).t('هل تريد تسجيل الخروج من "${device.deviceName ?? device.platform ?? 'جهاز'}"؟'),
+                        content: Text(
+                          AppStrings.of(context).t(
+                            'هل تريد تسجيل الخروج من "${device.deviceName ?? device.platform ?? 'جهاز'}"؟',
+                          ),
                         ),
                         actions: [
                           TextButton(
@@ -98,7 +102,10 @@ class _DeviceTile extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(AppStrings.of(context).t(device.deviceName ?? device.platform ?? 'جهاز'),
+                child: Text(
+                  AppStrings.of(
+                    context,
+                  ).t(device.deviceName ?? device.platform ?? 'جهاز'),
                   style: AppTextStyles.subtitleOf(
                     context,
                   ).copyWith(fontWeight: FontWeight.w700),
@@ -114,19 +121,22 @@ class _DeviceTile extends StatelessWidget {
                     color: AppColors.of(context).accent.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(AppStrings.of(context).t('نشط'),
+                  child: Text(
+                    AppStrings.of(context).t('نشط'),
                     style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
                   ),
                 ),
             ],
           ),
           const SizedBox(height: 6),
-          Text(AppStrings.of(context).t('النظام: ${device.platform ?? '—'}'),
+          Text(
+            AppStrings.of(context).t('النظام: ${device.platform ?? '—'}'),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),
           ),
-          Text(AppStrings.of(context).t('آخر نشاط: $formatted'),
+          Text(
+            AppStrings.of(context).t('آخر نشاط: $formatted'),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 13, color: AppColors.of(context).textMuted),

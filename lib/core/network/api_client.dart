@@ -58,10 +58,7 @@ class ApiClient {
     handler.next(options);
   }
 
-  void _onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) {
+  void _onError(DioException err, ErrorInterceptorHandler handler) {
     if (err.response?.statusCode == 401 &&
         err.requestOptions.path != ApiEndpoints.logout &&
         _hasBearerAuthorization(err.requestOptions)) {

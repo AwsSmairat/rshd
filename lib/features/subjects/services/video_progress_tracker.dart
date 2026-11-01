@@ -15,7 +15,8 @@ typedef VideoProgressSyncCallback =
 class VideoProgressTracker {
   VideoProgressTracker({required this.durationSeconds, required this.onSync});
 
-  final int durationSeconds;
+  /// Updated once the player reports the real length (the API can send 0).
+  int durationSeconds;
   final VideoProgressSyncCallback onSync;
 
   Timer? _periodicTimer;
@@ -92,7 +93,9 @@ class VideoProgressTracker {
     }
   }
 
-  void dispose() {
+  /// Stops tracking; the returned future completes once the final position
+  /// has been sent, so callers can refresh progress shown elsewhere.
+  Future<void> dispose() async {
     if (_disposed) {
       return;
     }
@@ -104,12 +107,10 @@ class VideoProgressTracker {
     _disposed = true;
 
     if (shouldFlush) {
-      unawaited(
-        onSync(
-          currentPositionSeconds: _currentPositionSeconds,
-          durationSeconds: durationSeconds,
-          showSuccessMessage: true,
-        ),
+      await onSync(
+        currentPositionSeconds: _currentPositionSeconds,
+        durationSeconds: durationSeconds,
+        showSuccessMessage: true,
       );
     }
   }

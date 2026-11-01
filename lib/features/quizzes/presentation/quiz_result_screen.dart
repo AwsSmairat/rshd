@@ -70,9 +70,13 @@ class QuizResultScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
                         ResultActionButtons(
-                          primaryLabel: AppStrings.of(context).t('العودة للاختبارات'),
+                          primaryLabel: AppStrings.of(
+                            context,
+                          ).t('العودة للاختبارات'),
                           onPrimary: () => context.go(AppRoutes.quizzes),
-                          secondaryLabel: AppStrings.of(context).t('بدء الاختبار مرة أخرى'),
+                          secondaryLabel: AppStrings.of(
+                            context,
+                          ).t('بدء الاختبار مرة أخرى'),
                           onSecondary: () =>
                               context.push(AppRoutes.quizAttempt(quizId)),
                           tertiaryLabel: 'الصفحة الرئيسية',

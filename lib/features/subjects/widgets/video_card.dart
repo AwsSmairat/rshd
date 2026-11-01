@@ -39,13 +39,15 @@ class VideoCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppStrings.of(context).t(video.title),
+                Text(
+                  AppStrings.of(context).t(video.title),
                   style: AppTextStyles.bodyOf(
                     context,
                   ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
                 ),
                 const SizedBox(height: 6),
-                Text(AppStrings.of(context).t('المدة: ${video.formattedDuration}'),
+                Text(
+                  AppStrings.of(context).t('المدة: ${video.formattedDuration}'),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     color: AppColors.of(context).textMuted,
                     fontSize: 12,
@@ -103,7 +105,8 @@ class _Badge extends StatelessWidget {
         color: color.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(AppStrings.of(context).t(label),
+      child: Text(
+        AppStrings.of(context).t(label),
         style: AppTextStyles.bodyOf(
           context,
         ).copyWith(color: color, fontSize: 11, fontWeight: FontWeight.w700),

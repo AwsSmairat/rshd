@@ -36,14 +36,16 @@ class QuizSubmissionSuccessCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          Text(AppStrings.of(context).t('تم تسليم الاختبار'),
+          Text(
+            AppStrings.of(context).t('تم تسليم الاختبار'),
             style: AppTextStyles.titleOf(
               context,
             ).copyWith(fontSize: 20, color: AppColors.of(context).primary),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
-          Text(AppStrings.of(context).t(quizTitle),
+          Text(
+            AppStrings.of(context).t(quizTitle),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(color: AppColors.of(context).textMuted),

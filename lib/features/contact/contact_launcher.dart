@@ -162,8 +162,10 @@ class ContactLauncher {
   }
 
   void _showError(BuildContext context, [String? message]) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(message ?? launchFailedMessage))));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppStrings.of(context).t(message ?? launchFailedMessage)),
+      ),
+    );
   }
 }

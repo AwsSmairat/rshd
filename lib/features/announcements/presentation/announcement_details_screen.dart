@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/cached_image.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -73,7 +74,11 @@ class _AnnouncementDetailsScreenState
         return Column(
           children: [
             SubjectsHeader(title: AppStrings.of(context).t('تفاصيل الإعلان')),
-            Expanded(child: LoadingWidget(message: AppStrings.of(context).t('جاري تحميل الإعلان...'))),
+            Expanded(
+              child: LoadingWidget(
+                message: AppStrings.of(context).t('جاري تحميل الإعلان...'),
+              ),
+            ),
           ],
         );
       case FeatureLoadStatus.error:
@@ -108,7 +113,9 @@ class _AnnouncementDetailsScreenState
         return CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: SubjectsHeader(title: AppStrings.of(context).t('تفاصيل الإعلان')),
+              child: SubjectsHeader(
+                title: AppStrings.of(context).t('تفاصيل الإعلان'),
+              ),
             ),
             ResponsiveSliverContent(
               padding: AppLayoutMetrics.of(
@@ -144,8 +151,10 @@ class _AnnouncementDetailsScreenState
                           borderRadius: BorderRadius.circular(16),
                           child: AspectRatio(
                             aspectRatio: 1,
-                            child: Image.network(
-                              announcement.resolvedImageUrl!,
+                            child: Image(
+                              image: cachedImage(
+                                announcement.resolvedImageUrl!,
+                              ),
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
                                 return Container(
@@ -165,7 +174,8 @@ class _AnnouncementDetailsScreenState
                       Row(
                         children: [
                           Expanded(
-                            child: Text(AppStrings.of(context).t(announcement.title),
+                            child: Text(
+                              AppStrings.of(context).t(announcement.title),
                               style: AppTextStyles.titleOf(context).copyWith(
                                 fontSize: 22,
                                 color: AppColors.of(context).primary,
@@ -176,7 +186,10 @@ class _AnnouncementDetailsScreenState
                         ],
                       ),
                       const SizedBox(height: 16),
-                      _InfoRow(label: AppStrings.of(context).t('النوع'), value: AppStrings.of(context).t(announcement.typeLabel)),
+                      _InfoRow(
+                        label: AppStrings.of(context).t('النوع'),
+                        value: AppStrings.of(context).t(announcement.typeLabel),
+                      ),
                       if (announcement.subjectTitle != null &&
                           announcement.subjectTitle!.isNotEmpty)
                         _InfoRow(
@@ -190,14 +203,16 @@ class _AnnouncementDetailsScreenState
                           value: _formatDate(context, announcement.createdAt!),
                         ),
                       const SizedBox(height: 8),
-                      Text(AppStrings.of(context).t('نص الإعلان'),
+                      Text(
+                        AppStrings.of(context).t('نص الإعلان'),
                         style: AppTextStyles.subtitleOf(context).copyWith(
                           fontWeight: FontWeight.w700,
                           color: AppColors.of(context).primary,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(AppStrings.of(context).t(announcement.body ?? '—'),
+                      Text(
+                        AppStrings.of(context).t(announcement.body ?? '—'),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           height: 1.6,
                           color: AppColors.of(context).text,
@@ -218,7 +233,10 @@ class _AnnouncementDetailsScreenState
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd – HH:mm', AppStrings.of(context).dateLocale).format(parsed.toLocal());
+    return DateFormat(
+      'yyyy/MM/dd – HH:mm',
+      AppStrings.of(context).dateLocale,
+    ).format(parsed.toLocal());
   }
 }
 
@@ -235,13 +253,17 @@ class _InfoRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppStrings.of(context).t(label),
+          Text(
+            AppStrings.of(context).t(label),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(color: AppColors.of(context).textMuted, fontSize: 13),
           ),
           const SizedBox(height: 4),
-          Text(AppStrings.of(context).t(value), style: AppTextStyles.bodyOf(context)),
+          Text(
+            AppStrings.of(context).t(value),
+            style: AppTextStyles.bodyOf(context),
+          ),
         ],
       ),
     );

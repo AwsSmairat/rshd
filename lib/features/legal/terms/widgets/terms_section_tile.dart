@@ -18,7 +18,8 @@ class TermsSection extends StatelessWidget {
         ...section.paragraphs.map(
           (p) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: Text(AppStrings.of(context).t(p),
+            child: Text(
+              AppStrings.of(context).t(p),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(fontSize: 14, height: 1.65),
@@ -50,7 +51,8 @@ class TermsSection extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(AppStrings.of(context).t(item),
+            child: Text(
+              AppStrings.of(context).t(item),
               style: AppTextStyles.bodyOf(
                 context,
               ).copyWith(fontSize: 14, height: 1.6),
@@ -67,7 +69,8 @@ class TermsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(AppStrings.of(context).t(subsection.title),
+          Text(
+            AppStrings.of(context).t(subsection.title),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 14,
               fontWeight: FontWeight.w700,
@@ -139,7 +142,8 @@ class TermsSectionTile extends StatelessWidget {
               size: 18,
             ),
           ),
-          title: Text(AppStrings.of(context).t(section.title),
+          title: Text(
+            AppStrings.of(context).t(section.title),
             style: AppTextStyles.bodyOf(
               context,
             ).copyWith(fontSize: 14, fontWeight: FontWeight.w700),

@@ -34,7 +34,8 @@ class LoginRememberRow extends StatelessWidget {
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: Text(AppStrings.of(context).t('نسيت كلمة المرور؟'),
+              child: Text(
+                AppStrings.of(context).t('نسيت كلمة المرور؟'),
                 style: TextStyle(
                   fontSize: fontSize,
                   fontWeight: FontWeight.w600,
@@ -51,7 +52,8 @@ class LoginRememberRow extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(AppStrings.of(context).t('تذكرني'),
+                Text(
+                  AppStrings.of(context).t('تذكرني'),
                   style: TextStyle(
                     fontSize: fontSize,
                     fontWeight: FontWeight.w600,

@@ -12,9 +12,11 @@ Future<void> launchHelpEmail({
 }) async {
   if (email.isEmpty) {
     if (context != null && context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('بريد التواصل غير متوفر'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.of(context).t('بريد التواصل غير متوفر')),
+        ),
+      );
     }
     return;
   }
@@ -27,7 +29,9 @@ Future<void> launchHelpEmail({
   final uri = Uri(scheme: 'mailto', path: email, queryParameters: params);
   final launched = await launchUrl(uri);
   if (!launched && context != null && context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(email))));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t(email))));
   }
 }
 

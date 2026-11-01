@@ -53,7 +53,8 @@ class AnnouncementTypeBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: _textColor(context).withValues(alpha: 0.2)),
       ),
-      child: Text(AppStrings.of(context).t(_label),
+      child: Text(
+        AppStrings.of(context).t(_label),
         style: AppTextStyles.bodyOf(context).copyWith(
           fontSize: 11,
           fontWeight: FontWeight.w700,

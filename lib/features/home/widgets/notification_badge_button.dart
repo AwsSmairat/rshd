@@ -22,7 +22,8 @@ class NotificationBadgeButton extends StatelessWidget {
       onPressed: () => context.push(AppRoutes.notifications),
       icon: Badge(
         isLabelVisible: unreadCount > 0,
-        label: Text(AppStrings.of(context).t(unreadCount > 9 ? '9+' : '$unreadCount'),
+        label: Text(
+          AppStrings.of(context).t(unreadCount > 9 ? '9+' : '$unreadCount'),
           style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
         ),
         backgroundColor: AppColors.of(context).accent,

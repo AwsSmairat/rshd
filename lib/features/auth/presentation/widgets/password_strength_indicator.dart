@@ -49,7 +49,8 @@ class PasswordStrengthIndicator extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        Text(AppStrings.of(context).t('قوة كلمة المرور: $label'),
+        Text(
+          AppStrings.of(context).t('قوة كلمة المرور: $label'),
           textAlign: TextAlign.right,
           style: TextStyle(fontSize: 12, color: color),
         ),

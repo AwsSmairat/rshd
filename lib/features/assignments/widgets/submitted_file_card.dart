@@ -24,9 +24,9 @@ class SubmittedFileCard extends StatelessWidget {
 
     final uri = Uri.tryParse(url);
     if (uri == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تعذر فتح الملف'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.of(context).t('تعذر فتح الملف'))),
+      );
       return;
     }
 
@@ -38,9 +38,9 @@ class SubmittedFileCard extends StatelessWidget {
       return;
     }
     if (!launched) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.of(context).t('تعذر فتح الملف'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.of(context).t('تعذر فتح الملف'))),
+      );
     }
   }
 
@@ -92,7 +92,8 @@ class SubmittedFileCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(AppStrings.of(context).t(fileName),
+                      Text(
+                        AppStrings.of(context).t(fileName),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontWeight: FontWeight.w700,
                           color: AppColors.of(context).primary,
@@ -101,7 +102,8 @@ class SubmittedFileCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
-                      Text(AppStrings.of(context).t('$size • $mime'),
+                      Text(
+                        AppStrings.of(context).t('$size • $mime'),
                         style: AppTextStyles.bodyOf(context).copyWith(
                           fontSize: 12,
                           color: AppColors.of(context).textMuted,
@@ -194,7 +196,10 @@ class AssignmentSubmissionDetailsCard extends StatelessWidget {
     if (parsed == null) {
       return raw;
     }
-    return DateFormat('yyyy/MM/dd – HH:mm', AppStrings.of(context).dateLocale).format(parsed.toLocal());
+    return DateFormat(
+      'yyyy/MM/dd – HH:mm',
+      AppStrings.of(context).dateLocale,
+    ).format(parsed.toLocal());
   }
 }
 
@@ -224,14 +229,16 @@ class _DetailRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppStrings.of(context).t(label),
+                Text(
+                  AppStrings.of(context).t(label),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
                     color: AppColors.of(context).textMuted,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(AppStrings.of(context).t(value),
+                Text(
+                  AppStrings.of(context).t(value),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontWeight: FontWeight.w600,
                     color: valueColor ?? AppColors.of(context).primary,

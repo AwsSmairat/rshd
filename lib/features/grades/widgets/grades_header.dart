@@ -88,7 +88,10 @@ class GradesHeader extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Text(AppStrings.of(context).t(AppStrings.of(context).navGrades),
+                    Text(
+                      AppStrings.of(
+                        context,
+                      ).t(AppStrings.of(context).navGrades),
                       style: TextStyle(
                         fontSize: metrics.pageHeaderTitleFontSize,
                         fontWeight: FontWeight.w700,

@@ -39,13 +39,17 @@ class LessonFileCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppStrings.of(context).t(file.title),
+                Text(
+                  AppStrings.of(context).t(file.title),
                   style: AppTextStyles.bodyOf(
                     context,
                   ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
                 ),
                 const SizedBox(height: 6),
-                Text(AppStrings.of(context).t(locked ? 'متاح بعد تفعيل المادة' : file.fileTypeLabel),
+                Text(
+                  AppStrings.of(
+                    context,
+                  ).t(locked ? 'متاح بعد تفعيل المادة' : file.fileTypeLabel),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     color: AppColors.of(context).textMuted,
                     fontSize: 12,
@@ -53,7 +57,8 @@ class LessonFileCard extends StatelessWidget {
                 ),
                 if (!locked) ...[
                   const SizedBox(height: 2),
-                  Text(AppStrings.of(context).t('الحجم: ${file.formattedSize}'),
+                  Text(
+                    AppStrings.of(context).t('الحجم: ${file.formattedSize}'),
                     style: AppTextStyles.bodyOf(context).copyWith(
                       color: AppColors.of(context).secondary,
                       fontSize: 12,

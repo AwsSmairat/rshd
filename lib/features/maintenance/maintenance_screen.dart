@@ -33,14 +33,16 @@ class MaintenanceScreen extends ConsumerWidget {
                 color: AppColors.of(context).accent,
               ),
               const SizedBox(height: 24),
-              Text(AppStrings.of(context).t('المنصة تحت الصيانة'),
+              Text(
+                AppStrings.of(context).t('المنصة تحت الصيانة'),
                 style: AppTextStyles.titleOf(
                   context,
                 ).copyWith(color: AppColors.of(context).primary),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              Text(AppStrings.of(context).t(message),
+              Text(
+                AppStrings.of(context).t(message),
                 style: AppTextStyles.subtitleOf(context),
                 textAlign: TextAlign.center,
               ),

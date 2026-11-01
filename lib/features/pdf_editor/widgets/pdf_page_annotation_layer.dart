@@ -65,6 +65,7 @@ class PdfPageAnnotationLayer extends StatefulWidget {
   final void Function(String id, double x, double y) onMoveAnnotation;
   final VoidCallback onBatchBegin;
   final VoidCallback onBatchEnd;
+
   /// Fired once, on pointer up, when a lasso tap lands on an annotation.
   final void Function(PdfEditorAnnotation annotation) onAnnotationTap;
 
@@ -89,28 +90,33 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
         children: [
           Positioned.fromRect(
             rect: widget.metrics.pageRect,
-            child: RepaintBoundary(
-              child: CustomPaint(
-                painter: ShapeAnnotationPainter(
-                  annotations: widget.annotations,
-                  metrics: widget.metrics,
-                  previewRect: _previewRect,
-                  previewShape: widget.shapeTool,
-                  previewColor: widget.penSettings.color,
-                  selectedId: widget.selectedAnnotationId,
+            // Paint only. A CustomPaint with a background painter claims every
+            // touch, which would stop two-finger zoom from reaching the viewer;
+            // input is handled by the Listener below.
+            child: IgnorePointer(
+              child: RepaintBoundary(
+                child: CustomPaint(
+                  painter: ShapeAnnotationPainter(
+                    annotations: widget.annotations,
+                    metrics: widget.metrics,
+                    previewRect: _previewRect,
+                    previewShape: widget.shapeTool,
+                    previewColor: widget.penSettings.color,
+                    selectedId: widget.selectedAnnotationId,
+                  ),
+                  foregroundPainter: InkAnnotationPainter(
+                    annotations: widget.annotations,
+                    metrics: widget.metrics,
+                    currentStroke: _currentStroke.isEmpty
+                        ? null
+                        : List.of(_currentStroke),
+                    currentColor: _activeColor,
+                    currentStrokeWidth: _activeStrokeWidth,
+                    currentOpacity: _activeOpacity,
+                    selectedId: widget.selectedAnnotationId,
+                  ),
+                  child: const SizedBox.expand(),
                 ),
-                foregroundPainter: InkAnnotationPainter(
-                  annotations: widget.annotations,
-                  metrics: widget.metrics,
-                  currentStroke: _currentStroke.isEmpty
-                      ? null
-                      : List.of(_currentStroke),
-                  currentColor: _activeColor,
-                  currentStrokeWidth: _activeStrokeWidth,
-                  currentOpacity: _activeOpacity,
-                  selectedId: widget.selectedAnnotationId,
-                ),
-                child: const SizedBox.expand(),
               ),
             ),
           ),
@@ -204,7 +210,12 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
 
   void _onPointerDown(PointerDownEvent event) {
     _activePointers++;
-    if (_activePointers > 1) return;
+    if (_activePointers > 1) {
+      // A second finger means pinch or two-finger pan, not writing: drop what
+      // the first finger started so no stray mark is left on the page.
+      _abandonPointerAction();
+      return;
+    }
     if (!_allowPointer(event)) return;
     if (!_isInsidePageViewport(event.localPosition)) return;
 
@@ -307,6 +318,20 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
     _activePointers = _activePointers > 0 ? _activePointers - 1 : 0;
     if (_activePointers > 0) return;
     _completePointerAction(cancelled: true);
+  }
+
+  void _abandonPointerAction() {
+    _movingAnnotationId = null;
+    _moveStartNormalized = null;
+    _finishBatchIfNeeded();
+    if (_currentStroke.isEmpty && _dragStart == null && _previewRect == null) {
+      return;
+    }
+    setState(() {
+      _currentStroke.clear();
+      _dragStart = null;
+      _previewRect = null;
+    });
   }
 
   void _completePointerAction({bool cancelled = false}) {
@@ -471,7 +496,10 @@ class _PdfPageAnnotationLayerState extends State<PdfPageAnnotationLayer> {
                     : const BoxDecoration(),
                 child: Padding(
                   padding: const EdgeInsets.all(2),
-                  child: Text(AppStrings.of(context).t(textBox.data['text']?.toString() ?? ''),
+                  child: Text(
+                    AppStrings.of(
+                      context,
+                    ).t(textBox.data['text']?.toString() ?? ''),
                     textAlign: TextAlign.right,
                     textDirection: textDirection,
                     style: TextStyle(

@@ -66,26 +66,36 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(AppStrings.of(context).t('تم تحديث الشروط والأحكام'),
+                    Text(
+                      AppStrings.of(context).t('تم تحديث الشروط والأحكام'),
                       style: AppTextStyles.titleOf(context).copyWith(
                         fontSize: 20,
                         color: AppColors.of(context).primary,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(AppStrings.of(context).t('يرجى قراءة النسخة الحالية والموافقة عليها لمتابعة استخدام التطبيق.'),
+                    Text(
+                      AppStrings.of(context).t(
+                        'يرجى قراءة النسخة الحالية والموافقة عليها لمتابعة استخدام التطبيق.',
+                      ),
                       style: AppTextStyles.bodyOf(context),
                     ),
                     const SizedBox(height: 12),
                     if (gate.status != null) ...[
-                      Text(AppStrings.of(context).t('الإصدار الحالي: ${gate.status!.currentVersion}'),
+                      Text(
+                        AppStrings.of(
+                          context,
+                        ).t('الإصدار الحالي: ${gate.status!.currentVersion}'),
                         style: AppTextStyles.bodyOf(
                           context,
                         ).copyWith(fontWeight: FontWeight.w600),
                       ),
                       if (gate.status!.lastUpdated != null &&
                           gate.status!.lastUpdated!.isNotEmpty)
-                        Text(AppStrings.of(context).t('آخر تحديث: ${gate.status!.lastUpdated}'),
+                        Text(
+                          AppStrings.of(
+                            context,
+                          ).t('آخر تحديث: ${gate.status!.lastUpdated}'),
                           style: AppTextStyles.bodyOf(
                             context,
                           ).copyWith(color: AppColors.of(context).textMuted),
@@ -115,7 +125,11 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
                   if (success && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(AppStrings.of(context).t('تم تسجيل موافقتك على الشروط')),
+                        content: Text(
+                          AppStrings.of(
+                            context,
+                          ).t('تم تسجيل موافقتك على الشروط'),
+                        ),
                       ),
                     );
                   }
@@ -123,7 +137,8 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
               ),
               if (gate.errorMessage != null) ...[
                 const SizedBox(height: 12),
-                Text(AppStrings.of(context).t(gate.errorMessage!),
+                Text(
+                  AppStrings.of(context).t(gate.errorMessage!),
                   style: AppTextStyles.bodyOf(
                     context,
                   ).copyWith(color: Colors.red),
@@ -132,7 +147,10 @@ class _TermsAcceptanceScreenState extends ConsumerState<TermsAcceptanceScreen> {
               ],
               const Spacer(),
               if (document != null)
-                Text(AppStrings.of(context).t('النسخة المعروضة: ${document.version}'),
+                Text(
+                  AppStrings.of(
+                    context,
+                  ).t('النسخة المعروضة: ${document.version}'),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 12,
                     color: AppColors.of(context).textMuted,

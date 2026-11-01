@@ -43,7 +43,8 @@ class DashboardSummaryCard extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          Text(AppStrings.of(context).t(value),
+          Text(
+            AppStrings.of(context).t(value),
             style: AppTextStyles.titleOf(context).copyWith(
               fontSize: metrics.isTablet ? 28 : 24,
               color: AppColors.of(context).text,
@@ -58,7 +59,8 @@ class DashboardSummaryCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(999),
             ),
           ),
-          Text(AppStrings.of(context).t(label),
+          Text(
+            AppStrings.of(context).t(label),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: metrics.isTablet ? 12 : 11,
               height: 1.3,

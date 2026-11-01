@@ -89,7 +89,8 @@ class QuizzesHeader extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Text(AppStrings.of(context).t('الاختبارات'),
+                    Text(
+                      AppStrings.of(context).t('الاختبارات'),
                       style: TextStyle(
                         fontSize: metrics.pageHeaderTitleFontSize,
                         fontWeight: FontWeight.w700,

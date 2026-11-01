@@ -18,7 +18,8 @@ class PrivacyPolicySection extends StatelessWidget {
         ...section.paragraphs.map(
           (paragraph) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: Text(AppStrings.of(context).t(paragraph),
+            child: Text(
+              AppStrings.of(context).t(paragraph),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 14,
                 height: 1.65,
@@ -56,7 +57,8 @@ class PrivacyPolicySection extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(AppStrings.of(context).t(item),
+            child: Text(
+              AppStrings.of(context).t(item),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 14,
                 height: 1.6,
@@ -75,7 +77,8 @@ class PrivacyPolicySection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(AppStrings.of(context).t(subsection.title),
+          Text(
+            AppStrings.of(context).t(subsection.title),
             style: AppTextStyles.subtitleOf(context).copyWith(
               fontSize: 14,
               fontWeight: FontWeight.w700,

@@ -25,9 +25,7 @@ void main() {
 </w:document>
 ''';
     final archive = Archive()
-      ..addFile(
-        ArchiveFile('word/document.xml', xml.length, utf8.encode(xml)),
-      );
+      ..addFile(ArchiveFile('word/document.xml', xml.length, utf8.encode(xml)));
     final bytes = Uint8List.fromList(ZipEncoder().encode(archive));
     final html = const OfficeDocumentHtmlConverter().convert(bytes);
 
@@ -47,13 +45,14 @@ void main() {
 </w:document>
 ''';
     final archive = Archive()
-      ..addFile(
-        ArchiveFile('word/document.xml', xml.length, utf8.encode(xml)),
-      );
+      ..addFile(ArchiveFile('word/document.xml', xml.length, utf8.encode(xml)));
     final bytes = Uint8List.fromList(ZipEncoder().encode(archive));
     final pdf = await OfficeDocumentPdfConverter().convert(bytes);
 
     expect(detectDocumentFormat(pdf), DocumentFormat.pdf);
-    expect(utf8.decode(pdf.take(8).toList(), allowMalformed: true), contains('%PDF'));
+    expect(
+      utf8.decode(pdf.take(8).toList(), allowMalformed: true),
+      contains('%PDF'),
+    );
   });
 }

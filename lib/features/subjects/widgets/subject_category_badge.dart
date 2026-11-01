@@ -52,7 +52,8 @@ class SubjectCategoryBadge extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: Colors.white.withValues(alpha: 0.52)),
           ),
-          child: Text(AppStrings.of(context).t(label),
+          child: Text(
+            AppStrings.of(context).t(label),
             style: AppTextStyles.bodyOf(context).copyWith(
               fontSize: 11,
               fontWeight: FontWeight.w700,

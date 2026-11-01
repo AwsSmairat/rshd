@@ -72,7 +72,8 @@ class LoginCardTitle extends StatelessWidget {
           children: [
             _Diamond(size: metrics.isTablet ? 8 : 7),
             SizedBox(width: metrics.isTablet ? 12 : 10),
-            Text(AppStrings.of(context).t('تسجيل الدخول'),
+            Text(
+              AppStrings.of(context).t('تسجيل الدخول'),
               style: TextStyle(
                 fontSize: metrics.titleFontSize,
                 fontWeight: FontWeight.w800,
@@ -84,7 +85,8 @@ class LoginCardTitle extends StatelessWidget {
           ],
         ),
         SizedBox(height: metrics.isTablet ? 10 : 8),
-        Text(AppStrings.of(context).t('أهلاً بك في منصة RSHD التعليمية'),
+        Text(
+          AppStrings.of(context).t('أهلاً بك في منصة RSHD التعليمية'),
           style: TextStyle(
             fontSize: metrics.subtitleFontSize,
             color: AppColors.of(context).textMuted.withValues(alpha: 0.95),
@@ -159,7 +161,8 @@ class LoginFooter extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Text(AppStrings.of(context).t('RSHD LEARNING PLATFORM'),
+          Text(
+            AppStrings.of(context).t('RSHD LEARNING PLATFORM'),
             style: TextStyle(
               fontSize: 11,
               letterSpacing: 2,

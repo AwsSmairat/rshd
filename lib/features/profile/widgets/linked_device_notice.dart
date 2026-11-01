@@ -29,7 +29,10 @@ class LinkedDeviceNotice extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(AppStrings.of(context).t(AppStrings.of(context).linkedDeviceNotice),
+            child: Text(
+              AppStrings.of(
+                context,
+              ).t(AppStrings.of(context).linkedDeviceNotice),
               style: AppTextStyles.bodyOf(context).copyWith(
                 fontSize: 13,
                 height: 1.45,

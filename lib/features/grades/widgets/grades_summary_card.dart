@@ -67,7 +67,8 @@ class GradesSummaryCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    Text(AppStrings.of(context).t('ملخص الدرجات'),
+                    Text(
+                      AppStrings.of(context).t('ملخص الدرجات'),
                       style: AppTextStyles.subtitleOf(context).copyWith(
                         color: AppColors.of(context).white,
                         fontWeight: FontWeight.w700,
@@ -76,7 +77,10 @@ class GradesSummaryCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 18),
-                Text(AppStrings.of(context).t(average != null ? '${average.toStringAsFixed(1)}%' : '—'),
+                Text(
+                  AppStrings.of(
+                    context,
+                  ).t(average != null ? '${average.toStringAsFixed(1)}%' : '—'),
                   style: AppTextStyles.titleOf(context).copyWith(
                     fontSize: 42,
                     fontWeight: FontWeight.w800,
@@ -85,7 +89,8 @@ class GradesSummaryCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text(AppStrings.of(context).t('المتوسط العام'),
+                Text(
+                  AppStrings.of(context).t('المتوسط العام'),
                   style: AppTextStyles.bodyOf(context).copyWith(
                     fontSize: 13,
                     color: AppColors.of(context).white.withValues(alpha: 0.72),
@@ -145,7 +150,8 @@ class _SummaryStatTile extends StatelessWidget {
       children: [
         Icon(icon, size: 18, color: AppColors.of(context).darkGold),
         const SizedBox(height: 6),
-        Text(AppStrings.of(context).t(value),
+        Text(
+          AppStrings.of(context).t(value),
           style: AppTextStyles.titleOf(context).copyWith(
             fontSize: 20,
             color: AppColors.of(context).primary,
@@ -153,7 +159,8 @@ class _SummaryStatTile extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(AppStrings.of(context).t(label),
+        Text(
+          AppStrings.of(context).t(label),
           style: AppTextStyles.bodyOf(
             context,
           ).copyWith(fontSize: 12, color: AppColors.of(context).textMuted),

@@ -78,24 +78,15 @@ class UpcomingAssignmentsSection extends StatelessWidget {
         children: [
           HomeSectionHeader(
             title: strings.upcomingTasks,
-            onViewAll: () => context.push(AppRoutes.assignments),
+            onViewAll: tasks.isEmpty
+                ? null
+                : () => context.go(AppRoutes.assignments),
           ),
           const SizedBox(height: 8),
           if (tasks.isEmpty)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: AppColors.of(context).cardWhite,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE5E7EB)),
-              ),
-              child: Text(AppStrings.of(context).t(strings.noUpcomingTasks),
-                style: AppTextStyles.bodyOf(
-                  context,
-                ).copyWith(color: AppColors.of(context).textMuted),
-                textAlign: TextAlign.center,
-              ),
+            _EmptyTasks(
+              title: AppStrings.of(context).t(strings.noUpcomingTasks),
+              hint: strings.upcomingEmptyHint,
             )
           else
             ...List.generate(
@@ -105,6 +96,68 @@ class UpcomingAssignmentsSection extends StatelessWidget {
                 isLast: index == tasks.length - 1,
               ),
             ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Nothing due: a quiet card with an icon and one line of guidance.
+class _EmptyTasks extends StatelessWidget {
+  const _EmptyTasks({required this.title, required this.hint});
+
+  final String title;
+  final String hint;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.cardWhite,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.primary.withValues(alpha: 0.06)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: const Color(0xFF15803D).withValues(alpha: 0.10),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.task_alt_rounded,
+              color: Color(0xFF15803D),
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppTextStyles.bodyOf(context).copyWith(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: colors.text,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  hint,
+                  style: AppTextStyles.bodyOf(
+                    context,
+                  ).copyWith(fontSize: 12.5, color: colors.textMuted),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
