@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/app_page_header.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
@@ -170,37 +171,9 @@ class _FileDetailsHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final topInset = MediaQuery.paddingOf(context).top;
-    final barHeight = kToolbarHeight + topInset;
-
-    return SliverAppBar(
-      expandedHeight: barHeight,
-      collapsedHeight: barHeight,
-      toolbarHeight: kToolbarHeight,
-      pinned: true,
-      stretch: false,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      backgroundColor: AppColors.of(context).primary,
-      foregroundColor: AppColors.of(context).white,
-      title: Text(
-        AppStrings.of(context).t(title),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-      ),
-      flexibleSpace: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.centerRight,
-            end: Alignment.centerLeft,
-            colors: [
-              AppColors.of(context).primary,
-              AppColors.of(context).secondaryNavy,
-            ],
-          ),
-        ),
-      ),
+    // The app's light page header instead of the navy bar.
+    return SliverToBoxAdapter(
+      child: AppPageHeader(title: AppStrings.of(context).t(title)),
     );
   }
 }

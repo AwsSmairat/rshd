@@ -2,67 +2,35 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/app_empty_state.dart';
 import '../../../core/widgets/liquid_glass_surface.dart';
 import '../../../core/l10n/app_strings.dart';
 
+/// Courses empty state; see [AppEmptyState].
 class SubjectsEmptyState extends StatelessWidget {
   const SubjectsEmptyState({
     super.key,
     this.message = 'لا توجد مواد مفعلة حالياً',
     this.subtitle = 'سيتم عرض المواد هنا بعد تفعيلها من الإدارة',
+    this.icon = Icons.auto_stories_outlined,
+    this.actionLabel,
+    this.onAction,
   });
 
   final String message;
   final String subtitle;
+  final IconData icon;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
-  Widget build(BuildContext context) {
-    return LiquidGlassSurface(
-      borderRadius: BorderRadius.circular(22),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      fillOpacity: 0.32,
-      borderOpacity: 0.55,
-      tintColor: AppColors.of(context).accent,
-      tintOpacity: 0.06,
-      child: Column(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: AppColors.of(context).accent.withValues(alpha: 0.16),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.menu_book_outlined,
-              color: AppColors.of(context).darkGold,
-              size: 32,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            AppStrings.of(context).t(message),
-            style: AppTextStyles.subtitleOf(context).copyWith(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-              color: AppColors.of(context).primary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            AppStrings.of(context).t(subtitle),
-            style: AppTextStyles.bodyOf(context).copyWith(
-              fontSize: 13,
-              height: 1.5,
-              color: AppColors.of(context).textMuted,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => AppEmptyState(
+    message: message,
+    subtitle: subtitle,
+    icon: icon,
+    actionLabel: actionLabel,
+    onAction: onAction,
+  );
 }
 
 class SubjectsLoadingSkeleton extends StatelessWidget {

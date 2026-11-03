@@ -12,6 +12,7 @@ class SubjectModel {
     this.price,
     this.enrollmentStatus = 'none',
     this.progressPercent,
+    this.studyYear,
     this.instructor,
     this.createdAt,
     this.updatedAt,
@@ -28,6 +29,10 @@ class SubjectModel {
   /// none | pending | active
   final String enrollmentStatus;
   final double? progressPercent;
+
+  /// Study year 1–6 for medicine courses (`study_year` from the API); null
+  /// when the server does not send it or the course has no year.
+  final int? studyYear;
   final UserModel? instructor;
   final String? createdAt;
   final String? updatedAt;
@@ -63,6 +68,7 @@ class SubjectModel {
     String? price,
     String? enrollmentStatus,
     double? progressPercent,
+    int? studyYear,
     UserModel? instructor,
     String? createdAt,
     String? updatedAt,
@@ -77,6 +83,7 @@ class SubjectModel {
       price: price ?? this.price,
       enrollmentStatus: enrollmentStatus ?? this.enrollmentStatus,
       progressPercent: progressPercent ?? this.progressPercent,
+      studyYear: studyYear ?? this.studyYear,
       instructor: instructor ?? this.instructor,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -106,10 +113,16 @@ class SubjectModel {
       progressPercent:
           _asDouble(json['progress_percent']) ??
           (_enrollmentIsActive(json['enrollment_status']) ? 0 : null),
+      studyYear: _studyYear(json['study_year']),
       instructor: instructor,
       createdAt: json['created_at']?.toString(),
       updatedAt: json['updated_at']?.toString(),
     );
+  }
+
+  static int? _studyYear(Object? value) {
+    final year = value is num ? value.toInt() : int.tryParse('${value ?? ''}');
+    return year != null && year >= 1 && year <= 6 ? year : null;
   }
 
   String get categoryLabel => categoryLabels[category] ?? category;

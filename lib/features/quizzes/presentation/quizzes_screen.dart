@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/stagger_reveal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
@@ -84,9 +85,12 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
               padding: EdgeInsets.only(
                 bottom: index == state.quizzes.length - 1 ? 0 : 16,
               ),
-              child: QuizCard(
-                quiz: quiz,
-                onTap: () => context.push(AppRoutes.quizDetails(quiz.id)),
+              child: StaggerReveal(
+                order: index,
+                child: QuizCard(
+                  quiz: quiz,
+                  onTap: () => context.push(AppRoutes.quizDetails(quiz.id)),
+                ),
               ),
             );
           }, childCount: state.quizzes.length),

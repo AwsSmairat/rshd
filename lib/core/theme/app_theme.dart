@@ -38,10 +38,17 @@ class AppTheme {
       canvasColor: colors.background,
       dividerColor: isDark ? const Color(0x33F6F1E7) : const Color(0xFFE5E7EB),
       extensions: [colors],
+      // Plain bars on the page colour, matching the light page headers.
       appBarTheme: AppBarTheme(
-        backgroundColor: colors.glassToolbar,
+        backgroundColor: colors.background,
         foregroundColor: colors.text,
         centerTitle: true,
+        titleTextStyle: TextStyle(
+          fontFamily: appFontFamily,
+          fontSize: 18,
+          fontWeight: FontWeight.w800,
+          color: colors.text,
+        ),
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
@@ -69,48 +76,110 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
+      // Soft filled fields: a gentle surface and a faint edge at rest, a
+      // warm gold edge while typing — easy on the eye, clear when active.
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: isDark
-            ? colors.white.withValues(alpha: 0.08)
-            : colors.white.withValues(alpha: 0.55),
+            ? colors.white.withValues(alpha: 0.06)
+            : colors.cardWhite,
+        hoverColor: Colors.transparent,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: isDark ? const Color(0x33F6F1E7) : const Color(0xFFE5E7EB),
-          ),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: colors.primary.withValues(alpha: 0.08)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: isDark ? const Color(0x33F6F1E7) : const Color(0xFFE5E7EB),
+            color: isDark
+                ? colors.white.withValues(alpha: 0.10)
+                : colors.primary.withValues(alpha: 0.08),
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colors.secondary, width: 1.5),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: colors.darkGold, width: 1.6),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colors.error),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: colors.error.withValues(alpha: 0.7)),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: colors.error, width: 1.6),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: colors.primary.withValues(alpha: 0.04)),
         ),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
+          horizontal: 18,
+          vertical: 18,
         ),
         labelStyle: AppTextStyles.body(
           colors,
-        ).copyWith(color: colors.textMuted),
+        ).copyWith(color: colors.textMuted, fontWeight: FontWeight.w600),
+        floatingLabelStyle: AppTextStyles.body(
+          colors,
+        ).copyWith(color: colors.darkGold, fontWeight: FontWeight.w700),
+        hintStyle: AppTextStyles.body(
+          colors,
+        ).copyWith(color: colors.textMuted.withValues(alpha: 0.7)),
+        prefixIconColor: WidgetStateColor.resolveWith(
+          (states) => states.contains(WidgetState.focused)
+              ? colors.darkGold
+              : colors.textMuted,
+        ),
+        suffixIconColor: colors.textMuted,
+        errorStyle: TextStyle(color: colors.error, fontSize: 12, height: 1.3),
       ),
+      // Primary buttons: tall, rounded, navy (gold in dark mode), with a
+      // calm disabled state instead of grey-on-grey.
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: colors.primary,
+          backgroundColor: isDark ? colors.accent : colors.primary,
           foregroundColor: isDark ? const Color(0xFF0B1F3A) : colors.white,
-          minimumSize: const Size.fromHeight(48),
+          disabledBackgroundColor: (isDark ? colors.accent : colors.primary)
+              .withValues(alpha: 0.35),
+          disabledForegroundColor:
+              (isDark ? const Color(0xFF0B1F3A) : colors.white).withValues(
+                alpha: 0.85,
+              ),
+          elevation: 0,
+          minimumSize: const Size.fromHeight(54),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
-          textStyle: AppTextStyles.button(colors),
+          textStyle: AppTextStyles.button(
+            colors,
+          ).copyWith(fontSize: 15.5, fontWeight: FontWeight.w800),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          textStyle: AppTextStyles.button(
+            colors,
+          ).copyWith(fontWeight: FontWeight.w800),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: isDark ? colors.accent : colors.primary,
+          minimumSize: const Size(0, 50),
+          side: BorderSide(
+            color: (isDark ? colors.accent : colors.primary).withValues(
+              alpha: 0.22,
+            ),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          textStyle: AppTextStyles.button(
+            colors,
+          ).copyWith(fontWeight: FontWeight.w700),
         ),
       ),
       textButtonTheme: TextButtonThemeData(

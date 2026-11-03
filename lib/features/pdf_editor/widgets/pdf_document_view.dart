@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdfrx/pdfrx.dart';
 
+import 'reader_chrome.dart' show readerFitZoom;
+
 /// How the student moves through the document.
 enum PdfReadingDirection {
   /// Pages stacked top to bottom, scrolled continuously.
@@ -47,6 +49,7 @@ class PdfDocumentView extends StatefulWidget {
     required this.onReady,
     required this.onPageChanged,
     this.initialPage = 1,
+    this.canvasColor = Colors.transparent,
   });
 
   final Uint8List bytes;
@@ -65,6 +68,9 @@ class PdfDocumentView extends StatefulWidget {
   final void Function(int pageCount, Map<int, PdfPageInfo> pages) onReady;
   final ValueChanged<int> onPageChanged;
   final int initialPage;
+
+  /// The surface around the pages.
+  final Color canvasColor;
 
   @override
   State<PdfDocumentView> createState() => _PdfDocumentViewState();
@@ -139,6 +145,33 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
     return PdfPageLayout(pageLayouts: rects, documentSize: Size(x, height));
   }
 
+  /// Double tap zooms in on that spot; double tap again returns to the
+  /// fitted page. Only while reading — with a pen, two quick strokes must not
+  /// zoom the page.
+  bool _onGeneralTap(
+    BuildContext context,
+    PdfViewerController controller,
+    PdfViewerGeneralTapHandlerDetails details,
+  ) {
+    if (details.type != PdfViewerGeneralTapType.doubleTap ||
+        !widget.interactive) {
+      return false;
+    }
+    final fit = readerFitZoom(
+      controller,
+      horizontal: widget.direction == PdfReadingDirection.horizontal,
+    );
+    final zoomedIn = controller.currentZoom > fit * 1.15;
+    controller.setZoom(
+      details.documentPosition,
+      zoomedIn
+          ? fit
+          : math.min(controller.currentZoom * 2.2, controller.maxScale),
+      duration: const Duration(milliseconds: 260),
+    );
+    return true;
+  }
+
   /// In horizontal mode a swipe should land on a whole page, like turning a
   /// page, rather than stopping half-way between two.
   void _snapToPage(ScaleEndDetails details) {
@@ -188,7 +221,14 @@ class _PdfDocumentViewState extends State<PdfDocumentView> {
       initialPageNumber: widget.initialPage,
       params: PdfViewerParams(
         margin: _pageGap,
-        backgroundColor: Colors.transparent,
+        backgroundColor: widget.canvasColor,
+        // Pages sit on the canvas like paper: a soft, low shadow.
+        pageDropShadow: BoxShadow(
+          color: Colors.black.withValues(alpha: 0.10),
+          blurRadius: 14,
+          offset: const Offset(0, 4),
+        ),
+        onGeneralTap: _onGeneralTap,
         panEnabled: widget.interactive || _multiTouch,
         scaleEnabled: true,
         layoutPages: horizontal ? _horizontalLayout : null,

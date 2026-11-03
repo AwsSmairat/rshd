@@ -6,6 +6,7 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/cached_image.dart';
+import '../../../core/widgets/card_grid.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../../subjects/data/models/subject_model.dart';
 import 'home_section_header.dart';
@@ -43,13 +44,16 @@ class ContinueLearningSection extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           if (shown.isEmpty) const _StartLearningCard(),
-          for (var i = 0; i < shown.length; i++) ...[
-            if (i > 0) const SizedBox(height: 12),
-            ContinueLearningCard(
-              subject: shown[i],
-              progressPercent: progressFor(shown[i]),
+          if (shown.isNotEmpty)
+            CardGrid(
+              children: [
+                for (final subject in shown)
+                  ContinueLearningCard(
+                    subject: subject,
+                    progressPercent: progressFor(subject),
+                  ),
+              ],
             ),
-          ],
         ],
       ),
     );

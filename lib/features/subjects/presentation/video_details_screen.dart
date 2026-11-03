@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/preferences/app_display_preferences.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/security/screen_protection_provider.dart';
@@ -17,7 +19,6 @@ import '../../home/home_controller.dart';
 import '../data/models/video_model.dart';
 import '../playback/floating_playback_controller.dart';
 import '../services/video_progress_tracker.dart';
-import '../widgets/floating_playback_launch_button.dart';
 import '../widgets/rshd_embed_video_player.dart';
 import '../widgets/rshd_video_player.dart';
 import 'subjects_controller.dart';
@@ -314,40 +315,53 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
         final playbackUrl = video.playback?.url.trim() ?? '';
         final canFloat = playbackUrl.isNotEmpty && video.status == 'ready';
 
-        return RshdRefreshIndicator(
-          color: AppColors.of(context).accent,
-          backgroundColor: AppColors.of(context).cardWhite,
-          onRefresh: _reloadVideo,
-          edgeOffset: MediaQuery.paddingOf(context).top + kToolbarHeight,
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            slivers: [
-              _VideoDetailsHero(
-                title: video.title,
-                onFloat: canFloat ? _onFloatPressed : null,
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          // Light status bar icons over the dark stage.
+          value: SystemUiOverlayStyle.light,
+          child: RshdRefreshIndicator(
+            color: AppColors.of(context).accent,
+            backgroundColor: AppColors.of(context).cardWhite,
+            onRefresh: _reloadVideo,
+            edgeOffset: MediaQuery.paddingOf(context).top,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
               ),
-              ResponsiveSliverContent(
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    _buildPlayerSection(video),
-                    const SizedBox(height: 20),
-                    _VideoInfoSection(video: video),
-                    const SizedBox(height: 16),
-                    _ProgressSection(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: _CinemaStage(
+                    video: video,
+                    player: _buildPlayerSection(video),
+                    onBack: _goBack,
+                    onFloat: canFloat ? _onFloatPressed : null,
+                  ),
+                ),
+                ResponsiveSliverContent(
+                  padding: AppLayoutMetrics.of(
+                    context,
+                  ).pagePadding(top: 20, bottom: 32),
+                  sliver: SliverToBoxAdapter(
+                    child: _WatchProgressCard(
                       percentage: livePercentage,
                       positionSeconds: livePosition,
-                      durationLabel: video.formattedDuration,
+                      durationSeconds: video.durationSeconds,
                     ),
-                    const SizedBox(height: 24),
-                  ]),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
     }
+  }
+
+  void _goBack() {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+      return;
+    }
+    context.go(AppRoutes.home);
   }
 
   Widget _buildPlayerSection(VideoModel video) {
@@ -360,35 +374,27 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
       playback?.expiresAt,
     );
 
-    final playerCard = DecoratedBox(
+    return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.of(context).glassShadow.withValues(alpha: 0.14),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 30,
+            offset: const Offset(0, 14),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
-        child: showsVideoPlayer
-            ? AspectRatio(aspectRatio: 16 / 9, child: content)
-            : content,
+        borderRadius: BorderRadius.circular(20),
+        child: ColoredBox(
+          color: Colors.black,
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: showsVideoPlayer ? content : Center(child: content),
+          ),
+        ),
       ),
-    );
-
-    if (!showsVideoPlayer) {
-      return playerCard;
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        playerCard,
-        FloatingPlaybackLaunchBar(onPressed: _onFloatPressed),
-      ],
     );
   }
 
@@ -482,7 +488,9 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
         if (current == null || current.session?.videoId != video.id) {
           return;
         }
-        current.playerDetached(keepPlaying: keepPlaying);
+        // The player detaches while the tree is being torn down; providers
+        // may only change once that is over.
+        Future(() => current.playerDetached(keepPlaying: keepPlaying));
       },
       onHandoffFloating: () {
         _floatingPlayback?.minimizeNative();
@@ -506,49 +514,147 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
   }
 }
 
-class _VideoDetailsHero extends StatelessWidget {
-  const _VideoDetailsHero({required this.title, this.onFloat});
+/// "1:02:44" or "12:05": the clock a player shows, without a leading zero hour.
+String _clock(int totalSeconds) {
+  final seconds = totalSeconds < 0 ? 0 : totalSeconds;
+  final hours = seconds ~/ 3600;
+  final minutes = (seconds % 3600) ~/ 60;
+  final rest = (seconds % 60).toString().padLeft(2, '0');
+  if (hours > 0) {
+    return '$hours:${minutes.toString().padLeft(2, '0')}:$rest';
+  }
+  return '$minutes:$rest';
+}
 
-  final String title;
+/// The stage stays navy in both themes: video reads best on a dark surround.
+const _stageTop = Color(0xFF0B1F3A);
+const _stageBottom = Color(0xFF12294A);
+
+/// Dark, full-width top of the page: back, the player, then the title and
+/// the facts about the video, like a cinema screen above the page.
+class _CinemaStage extends StatelessWidget {
+  const _CinemaStage({
+    required this.video,
+    required this.player,
+    required this.onBack,
+    this.onFloat,
+  });
+
+  final VideoModel video;
+  final Widget player;
+  final VoidCallback onBack;
   final VoidCallback? onFloat;
 
   @override
   Widget build(BuildContext context) {
-    final topInset = MediaQuery.paddingOf(context).top;
-    final barHeight = kToolbarHeight + topInset;
+    final strings = AppStrings.of(context);
+    final metrics = AppLayoutMetrics.of(context);
+    const gold = Color(0xFFD6B56D);
 
-    return SliverAppBar(
-      expandedHeight: barHeight,
-      collapsedHeight: barHeight,
-      toolbarHeight: kToolbarHeight,
-      pinned: true,
-      stretch: false,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      backgroundColor: AppColors.of(context).primary,
-      foregroundColor: AppColors.of(context).white,
-      title: Text(
-        AppStrings.of(context).t(title),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [_stageTop, _stageBottom],
+        ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
       ),
-      actions: [
-        if (onFloat != null)
-          IconButton(
-            tooltip: AppStrings.of(context).t('تشغيل عائم'),
-            onPressed: onFloat,
-            icon: const Icon(Icons.picture_in_picture_alt_rounded),
+      child: SafeArea(
+        bottom: false,
+        child: ResponsiveHeaderContent(
+          padding: EdgeInsets.fromLTRB(
+            metrics.horizontalPadding,
+            8,
+            metrics.horizontalPadding,
+            26,
           ),
-      ],
-      flexibleSpace: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.centerRight,
-            end: Alignment.centerLeft,
-            colors: [
-              AppColors.of(context).primary,
-              AppColors.of(context).secondaryNavy,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  _StageIconButton(
+                    // Same back glyph as the app's other page headers.
+                    icon: Directionality.of(context) == TextDirection.rtl
+                        ? Icons.arrow_forward_ios_rounded
+                        : Icons.arrow_back_ios_new_rounded,
+                    tooltip: strings.t('رجوع'),
+                    onPressed: onBack,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      strings.t('محاضرة فيديو'),
+                      style: AppTextStyles.captionOf(context).copyWith(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              player,
+              const SizedBox(height: 20),
+              Text(
+                strings.t(video.title),
+                style: AppTextStyles.titleOf(context).copyWith(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  height: 1.3,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  _StatusChip(
+                    label: strings.t(video.statusLabel),
+                    status: video.status,
+                  ),
+                  if (video.durationSeconds > 0)
+                    _StageChip(
+                      icon: Icons.schedule_rounded,
+                      label: _clock(video.durationSeconds),
+                    ),
+                  if (video.isFree)
+                    _StageChip(
+                      icon: Icons.lock_open_rounded,
+                      label: strings.t('مجاني'),
+                    ),
+                ],
+              ),
+              if (onFloat != null) ...[
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: onFloat,
+                    icon: const Icon(
+                      Icons.picture_in_picture_alt_rounded,
+                      size: 19,
+                    ),
+                    label: Text(strings.t('تابع المشاهدة أثناء التصفح')),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: gold,
+                      side: BorderSide(color: gold.withValues(alpha: 0.45)),
+                      backgroundColor: gold.withValues(alpha: 0.08),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      textStyle: AppTextStyles.bodyOf(
+                        context,
+                      ).copyWith(fontWeight: FontWeight.w800, fontSize: 14),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -557,8 +663,116 @@ class _VideoDetailsHero extends StatelessWidget {
   }
 }
 
+class _StageIconButton extends StatelessWidget {
+  const _StageIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white.withValues(alpha: 0.1),
+      shape: const CircleBorder(),
+      child: IconButton(
+        tooltip: tooltip,
+        onPressed: onPressed,
+        color: Colors.white,
+        iconSize: 18,
+        constraints: const BoxConstraints.tightFor(width: 44, height: 44),
+        icon: Icon(icon),
+      ),
+    );
+  }
+}
+
+class _StageChip extends StatelessWidget {
+  const _StageChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 15, color: Colors.white.withValues(alpha: 0.75)),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: AppTextStyles.captionOf(context).copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.label, required this.status});
+
+  final String label;
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    // Light tones that hold up on the navy stage.
+    final Color color = switch (status) {
+      'ready' => const Color(0xFF4ADE80),
+      'processing' => const Color(0xFFFBBF24),
+      'uploading' => const Color(0xFF60A5FA),
+      'failed' => const Color(0xFFF87171),
+      _ => Colors.white70,
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 7,
+            height: 7,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 7),
+          Text(
+            label,
+            style: AppTextStyles.captionOf(
+              context,
+            ).copyWith(color: color, fontWeight: FontWeight.w800),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 enum _PlaceholderTone { pending, locked, error }
 
+/// Shown in the player frame when there is nothing to play yet.
 class _PlayerPlaceholder extends StatelessWidget {
   const _PlayerPlaceholder({
     required this.icon,
@@ -577,42 +791,32 @@ class _PlayerPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color accent = switch (tone) {
-      _PlaceholderTone.error => AppColors.of(context).error,
-      _PlaceholderTone.locked => AppColors.of(context).secondary,
-      _PlaceholderTone.pending => AppColors.of(context).darkGold,
+      _PlaceholderTone.error => const Color(0xFFF87171),
+      _PlaceholderTone.locked => Colors.white,
+      _PlaceholderTone.pending => const Color(0xFFD6B56D),
     };
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.of(context).cardWhite,
-            accent.withValues(alpha: 0.07),
-          ],
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.12),
               shape: BoxShape.circle,
+              border: Border.all(color: accent.withValues(alpha: 0.25)),
             ),
             child: Icon(icon, size: 24, color: accent),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Text(
             AppStrings.of(context).t(title),
             style: AppTextStyles.subtitleOf(context).copyWith(
-              color: AppColors.of(context).primary,
-              fontWeight: FontWeight.w700,
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
               fontSize: 15,
             ),
           ),
@@ -624,23 +828,19 @@ class _PlayerPlaceholder extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: AppTextStyles.captionOf(
               context,
-            ).copyWith(color: AppColors.of(context).textMuted, height: 1.35),
+            ).copyWith(color: Colors.white.withValues(alpha: 0.7), height: 1.4),
           ),
           if (onRetry != null) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded, size: 16),
               label: Text(AppStrings.of(context).t('تحديث')),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.of(context).secondary,
-                side: BorderSide(
-                  color: AppColors.of(
-                    context,
-                  ).secondary.withValues(alpha: 0.35),
-                ),
+                foregroundColor: Colors.white,
+                side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
+                  horizontal: 16,
                   vertical: 8,
                 ),
                 visualDensity: VisualDensity.compact,
@@ -653,293 +853,177 @@ class _PlayerPlaceholder extends StatelessWidget {
   }
 }
 
-class _VideoInfoSection extends StatelessWidget {
-  const _VideoInfoSection({required this.video});
-
-  final VideoModel video;
-
-  @override
-  Widget build(BuildContext context) {
-    return _SurfaceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionHeading(
-            icon: Icons.info_outline_rounded,
-            title: AppStrings.of(context).t('معلومات الفيديو'),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            AppStrings.of(context).t(video.title),
-            style: AppTextStyles.titleOf(
-              context,
-            ).copyWith(fontSize: 22, height: 1.25),
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              _StatusChip(
-                label: AppStrings.of(context).t(video.statusLabel),
-                status: video.status,
-              ),
-              _InfoPill(
-                icon: Icons.schedule_rounded,
-                label: video.formattedDuration,
-                caption: 'المدة',
-              ),
-              if (video.isFree)
-                _InfoPill(
-                  icon: Icons.visibility_outlined,
-                  label: AppStrings.of(context).t('مجاني'),
-                  caption: 'الوصول',
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProgressSection extends StatelessWidget {
-  const _ProgressSection({
+/// Where the student is in this video: a ring with the share watched, the
+/// spot they reached, and a bar from the start to the end.
+class _WatchProgressCard extends StatelessWidget {
+  const _WatchProgressCard({
     required this.percentage,
     required this.positionSeconds,
-    required this.durationLabel,
+    required this.durationSeconds,
   });
 
   final int percentage;
   final int positionSeconds;
-  final String durationLabel;
+  final int durationSeconds;
 
   @override
   Widget build(BuildContext context) {
-    final progress = (percentage.clamp(0, 100)) / 100;
+    final strings = AppStrings.of(context);
+    final colors = AppColors.of(context);
+    final percent = percentage.clamp(0, 100);
+    final done = percent >= 100;
+    final started = positionSeconds > 0;
+    final remaining = (durationSeconds - positionSeconds).clamp(
+      0,
+      durationSeconds,
+    );
+    const green = Color(0xFF16A34A);
+    final tone = done ? green : colors.accent;
 
-    return _SurfaceCard(
+    final headline = done
+        ? strings.t('أكملت هذا الفيديو')
+        : started
+        ? strings.t('وصلت إلى ${_clock(positionSeconds)}')
+        : strings.t('لم تبدأ المشاهدة بعد');
+    final caption = done
+        ? strings.t('يمكنك إعادة المشاهدة في أي وقت')
+        : started && durationSeconds > 0
+        ? strings.t('متبقٍ ${_clock(remaining)}')
+        : strings.t('سيُحفظ تقدّمك تلقائياً أثناء المشاهدة');
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colors.cardWhite,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: colors.primary.withValues(alpha: 0.06)),
+        boxShadow: [
+          BoxShadow(
+            color: colors.glassShadow.withValues(alpha: 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Expanded(
-                child: _SectionHeading(
-                  icon: Icons.auto_graph_rounded,
-                  title: AppStrings.of(context).t('تقدم المشاهدة'),
-                ),
-              ),
-              _ProgressBadge(percentage: percentage),
-            ],
-          ),
-          const SizedBox(height: 18),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: LinearProgressIndicator(
-              minHeight: 10,
-              value: progress > 0 ? progress : null,
-              backgroundColor: AppColors.of(context).background,
-              color: AppColors.of(context).accent,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  AppStrings.of(context).t(
-                    positionSeconds > 0
-                        ? 'توقفت عند $positionSeconds ثانية'
-                        : 'لم تبدأ المشاهدة بعد',
+              SizedBox.square(
+                dimension: 64,
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(end: percent / 100),
+                  duration: const Duration(milliseconds: 700),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, _) => Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      CircularProgressIndicator(
+                        value: value,
+                        strokeWidth: 6,
+                        strokeCap: StrokeCap.round,
+                        color: tone,
+                        backgroundColor: tone.withValues(alpha: 0.14),
+                      ),
+                      Center(
+                        child: done
+                            ? const Icon(
+                                Icons.check_rounded,
+                                color: green,
+                                size: 28,
+                              )
+                            : Text(
+                                '$percent%',
+                                textDirection: TextDirection.ltr,
+                                style: AppTextStyles.bodyOf(context).copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                  color: colors.text,
+                                ),
+                              ),
+                      ),
+                    ],
                   ),
-                  style: AppTextStyles.captionOf(context),
                 ),
               ),
-              Text(
-                AppStrings.of(context).t('من $durationLabel'),
-                style: AppTextStyles.captionOf(context).copyWith(
-                  color: AppColors.of(context).secondary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SurfaceCard extends StatelessWidget {
-  const _SurfaceCard({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.of(context).cardWhite,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.of(context).white, width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.of(context).glassShadow.withValues(alpha: 0.07),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
-}
-
-class _SectionHeading extends StatelessWidget {
-  const _SectionHeading({required this.icon, required this.title});
-
-  final IconData icon;
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 34,
-          height: 34,
-          decoration: BoxDecoration(
-            color: AppColors.of(context).accent.withValues(alpha: 0.16),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, size: 18, color: AppColors.of(context).darkGold),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          AppStrings.of(context).t(title),
-          style: AppTextStyles.bodyOf(context).copyWith(
-            fontWeight: FontWeight.w700,
-            color: AppColors.of(context).primary,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ProgressBadge extends StatelessWidget {
-  const _ProgressBadge({required this.percentage});
-
-  final int percentage;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.of(context).background,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        AppStrings.of(context).t('$percentage%'),
-        style: AppTextStyles.captionOf(context).copyWith(
-          color: AppColors.of(context).secondary,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-    );
-  }
-}
-
-class _StatusChip extends StatelessWidget {
-  const _StatusChip({required this.label, required this.status});
-
-  final String label;
-  final String status;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color color = switch (status) {
-      'ready' => const Color(0xFF067647),
-      'processing' => const Color(0xFFB54708),
-      'uploading' => const Color(0xFF175CD3),
-      'failed' => AppColors.of(context).error,
-      _ => AppColors.of(context).textMuted,
-    };
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withValues(alpha: 0.18)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 7,
-            height: 7,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 7),
-          Text(
-            AppStrings.of(context).t(label),
-            style: AppTextStyles.captionOf(
-              context,
-            ).copyWith(color: color, fontWeight: FontWeight.w700),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _InfoPill extends StatelessWidget {
-  const _InfoPill({
-    required this.icon,
-    required this.label,
-    required this.caption,
-  });
-
-  final IconData icon;
-  final String label;
-  final String caption;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.of(context).background,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: AppColors.of(context).secondary),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppStrings.of(context).t(caption),
-                style: AppTextStyles.captionOf(context).copyWith(fontSize: 10),
-              ),
-              Text(
-                AppStrings.of(context).t(label),
-                style: AppTextStyles.captionOf(context).copyWith(
-                  color: AppColors.of(context).primary,
-                  fontWeight: FontWeight.w700,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      strings.t('تقدم المشاهدة'),
+                      style: AppTextStyles.captionOf(context).copyWith(
+                        color: colors.textMuted,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      headline,
+                      style: AppTextStyles.bodyOf(context).copyWith(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: colors.text,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      caption,
+                      style: AppTextStyles.captionOf(
+                        context,
+                      ).copyWith(color: colors.textMuted),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
+          if (durationSeconds > 0) ...[
+            const SizedBox(height: 18),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(end: percent / 100),
+                duration: const Duration(milliseconds: 700),
+                curve: Curves.easeOutCubic,
+                builder: (context, value, _) => LinearProgressIndicator(
+                  minHeight: 8,
+                  // Always determinate: 0% is an empty track, not a spinner.
+                  value: value,
+                  color: tone,
+                  backgroundColor: colors.background,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Text(
+                  _clock(positionSeconds),
+                  textDirection: TextDirection.ltr,
+                  style: _timeStyle(context, colors.text),
+                ),
+                const Spacer(),
+                Text(
+                  _clock(durationSeconds),
+                  textDirection: TextDirection.ltr,
+                  style: _timeStyle(context, colors.textMuted),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
+    );
+  }
+
+  TextStyle _timeStyle(BuildContext context, Color color) {
+    return AppTextStyles.captionOf(context).copyWith(
+      color: color,
+      fontWeight: FontWeight.w700,
+      fontFeatures: const [FontFeature.tabularFigures()],
     );
   }
 }

@@ -7,6 +7,8 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../subjects/data/models/subject_model.dart';
+import '../../../core/layout/app_layout_metrics.dart';
+import '../../../core/widgets/responsive_content.dart';
 import 'home_section_header.dart';
 
 /// Catalogue courses the student is not enrolled in yet.
@@ -20,12 +22,18 @@ class SuggestedSubjectsSection extends StatelessWidget {
     if (subjects.isEmpty) return const SizedBox.shrink();
     final strings = AppStrings.of(context);
 
+    final inset = AppLayoutMetrics.of(context).outerHorizontalInset;
+
+    // Edge to edge: the header keeps the page margin, the cards start at it
+    // and scroll out to the screen edge.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        HomeSectionHeader(
-          title: strings.suggestedForYou,
-          onViewAll: () => context.go(AppRoutes.subjects),
+        ResponsiveContent(
+          child: HomeSectionHeader(
+            title: strings.suggestedForYou,
+            onViewAll: () => context.go(AppRoutes.subjects),
+          ),
         ),
         const SizedBox(height: 12),
         SizedBox(
@@ -34,6 +42,7 @@ class SuggestedSubjectsSection extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             clipBehavior: Clip.none,
             physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.symmetric(horizontal: inset),
             itemCount: subjects.length,
             separatorBuilder: (_, _) => const SizedBox(width: 12),
             itemBuilder: (context, index) =>

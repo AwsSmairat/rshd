@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../data/models/lesson_file_model.dart';
+import '../utils/open_lesson_file.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
@@ -72,20 +75,6 @@ class _LessonCardState extends State<LessonCard>
       return;
     }
     context.push(AppRoutes.videoDetails(videoId));
-  }
-
-  void _openFile(BuildContext context, int fileId, {required bool locked}) {
-    if (locked) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppStrings.of(context).t('الملف مقفل. فعّل المادة لفتحه.'),
-          ),
-        ),
-      );
-      return;
-    }
-    context.push(AppRoutes.fileDetails(fileId));
   }
 
   void _openAssignment(BuildContext context, int assignmentId) {
@@ -186,7 +175,7 @@ class _LessonCardState extends State<LessonCard>
               lesson: lesson,
               hasContent: hasContent,
               onVideoTap: _openVideo,
-              onFileTap: _openFile,
+              onFileTap: openLessonFile,
               onAssignmentTap: _openAssignment,
               onQuizTap: _openQuiz,
             ),
@@ -236,8 +225,7 @@ class _ExpandedBody extends StatelessWidget {
   final bool hasContent;
   final void Function(BuildContext context, int videoId, {required bool locked})
   onVideoTap;
-  final void Function(BuildContext context, int fileId, {required bool locked})
-  onFileTap;
+  final void Function(BuildContext context, LessonFileModel file) onFileTap;
   final void Function(BuildContext context, int assignmentId) onAssignmentTap;
   final void Function(BuildContext context, int quizId) onQuizTap;
 
@@ -298,8 +286,7 @@ class _ExpandedBody extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: LessonFileCard(
                     file: file,
-                    onTap: () =>
-                        onFileTap(context, file.id, locked: file.isLocked),
+                    onTap: () => onFileTap(context, file),
                   ),
                 ),
               ),

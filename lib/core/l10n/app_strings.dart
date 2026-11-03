@@ -161,6 +161,18 @@ class AppStrings {
   String get aboutAppTitle => _t('حول التطبيق', 'About the app');
   String aboutAppMessage(String name, String version) =>
       _t('$name\nالإصدار: $version', '$name\nVersion: $version');
+  String get aboutTagline =>
+      _t('منصة تعليمية ذكية', 'A smart learning platform');
+  String aboutVersion(String version, String build) => build.isEmpty
+      ? _t('الإصدار $version', 'Version $version')
+      : _t('الإصدار $version ($build)', 'Version $version ($build)');
+  String get aboutWebsite => _t('الموقع الإلكتروني', 'Website');
+  String get aboutSupportEmail => _t('بريد الدعم', 'Support email');
+  String get aboutSupportPhone => _t('هاتف الدعم', 'Support phone');
+  String aboutCopyright(int year, String name) => _t(
+    '© $year $name. جميع الحقوق محفوظة.',
+    '© $year $name. All rights reserved.',
+  );
 
   String get logout => _t('تسجيل خروج', 'Log out');
   String get loggingOut => _t('جارٍ تسجيل الخروج...', 'Signing out...');
@@ -203,6 +215,71 @@ class AppStrings {
     "You haven't joined a course yet. Browse and pick one.",
   );
   String get browseCourses => _t('تصفّح المواد', 'Browse courses');
+  String get allYears => _t('الكل', 'All');
+  String studyYearLabel(int year) => _t(
+    'السنة ${const ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة'][year - 1]}',
+    'Year $year',
+  );
+  String noCoursesForYear(int year) => _t(
+    'لا توجد مواد لـ${studyYearLabel(year)} حالياً',
+    'No courses for year $year yet',
+  );
+  String get emptyDepartmentTitle =>
+      _t('لا توجد مواد في هذا القسم بعد', 'No courses in this department yet');
+  String get emptyDepartmentHint => _t(
+    'نعمل على إضافة مواد جديدة قريباً. ستظهر هنا فور نشرها ويمكنك طلبها مباشرة.',
+    'New courses are on the way. They will appear here as soon as they are published.',
+  );
+  String get emptyMyCoursesTitle =>
+      _t('لم تشترك في أي مادة بعد', "You haven't joined a course yet");
+  String get emptyMyCoursesHint => _t(
+    'تصفّح الأقسام بالأسفل واطلب المادة التي تناسبك، وستظهر هنا بعد تفعيلها.',
+    'Browse the departments below and request a course; it appears here once activated.',
+  );
+  String get browseOtherDepartments =>
+      _t('تصفّح الأقسام الأخرى', 'Browse other departments');
+  String get showAllYears => _t('عرض كل السنوات', 'Show all years');
+  String get tryAnotherYear => _t(
+    'جرّب سنة أخرى أو اعرض مواد كل السنوات.',
+    'Try another year or show all years.',
+  );
+  String get notificationsTitle => _t('الإشعارات', 'Notifications');
+  String unreadNotificationsLabel(int count) => count == 0
+      ? _t('أنت على اطلاع بكل جديد', "You're all caught up")
+      : _t(
+          count == 1 ? 'إشعار جديد واحد' : '$count إشعارات جديدة',
+          count == 1 ? '1 new notification' : '$count new notifications',
+        );
+  String get markAllRead => _t('تحديد الكل كمقروء', 'Mark all as read');
+  String get markAllReadFailed =>
+      _t('تعذر تحديث بعض الإشعارات', "Some notifications couldn't be updated");
+  String get filterAll => _t('الكل', 'All');
+  String get filterUnread => _t('غير مقروءة', 'Unread');
+  String get filterCourses => _t('المواد', 'Courses');
+  String get filterTasks => _t('المهام والدرجات', 'Tasks & grades');
+  String get filterAnnouncements => _t('الإعلانات', 'Announcements');
+  String get filterMessages => _t('الرسائل', 'Messages');
+  String get groupToday => _t('اليوم', 'Today');
+  String get groupYesterday => _t('أمس', 'Yesterday');
+  String get groupThisWeek => _t('هذا الأسبوع', 'This week');
+  String get groupEarlier => _t('أقدم', 'Earlier');
+  String get timeNow => _t('الآن', 'Now');
+  String minutesAgo(int n) => _t('منذ $n د', '${n}m ago');
+  String hoursAgo(int n) => _t('منذ $n س', '${n}h ago');
+  String get noNotificationsTitle =>
+      _t('لا توجد إشعارات بعد', 'No notifications yet');
+  String get noNotificationsHint => _t(
+    'سنخبرك هنا بكل جديد: تفعيل المواد، الواجبات، الدرجات والإعلانات.',
+    "We'll tell you here about course activations, tasks, grades and announcements.",
+  );
+  String get noNotificationsInFilter =>
+      _t('لا توجد إشعارات في هذا التصنيف', 'Nothing in this category');
+  String get showAllNotifications => _t('عرض كل الإشعارات', 'Show all');
+  String get requestPurchase => _t('طلب شراء', 'Request access');
+  String get requestSending => _t('جاري الإرسال...', 'Sending...');
+  String get awaitingActivation =>
+      _t('بانتظار تفعيل الإدارة', 'Awaiting activation');
+  String get enrolledBadge => _t('مسجّل', 'Enrolled');
   String get upcomingEmptyHint => _t(
     'ستظهر هنا الواجبات والاختبارات القادمة',
     'Upcoming assignments and quizzes will appear here',

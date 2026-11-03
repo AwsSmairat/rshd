@@ -14,11 +14,25 @@ import '../services/video_progress_tracker.dart';
 import '../utils/playback_refresh_scheduler.dart';
 
 const floatingMiniPlayerWidth = 196.0;
-const floatingMiniPlayerBarHeight = 36.0;
 
-Size floatingMiniPlayerSize(double videoAspectRatio) {
+/// Smallest and largest mini player widths the student can pick.
+const floatingMiniPlayerMinWidth = 160.0;
+const floatingMiniPlayerMaxWidth = 560.0;
+
+Size floatingMiniPlayerSize(
+  double videoAspectRatio, {
+  double width = floatingMiniPlayerWidth,
+}) {
   final ratio = videoAspectRatio > 0 ? videoAspectRatio : 16 / 9;
-  return Size(floatingMiniPlayerWidth, floatingMiniPlayerWidth / ratio);
+  return Size(width, width / ratio);
+}
+
+/// Keeps a chosen width inside the limits and inside the screen.
+double clampFloatingWidth(double width, {required double available}) {
+  final maxWidth = available
+      .clamp(floatingMiniPlayerMinWidth, floatingMiniPlayerMaxWidth)
+      .toDouble();
+  return width.clamp(floatingMiniPlayerMinWidth, maxWidth).toDouble();
 }
 
 Offset clampFloatingOffset({
@@ -27,17 +41,13 @@ Offset clampFloatingOffset({
   required Size playerSize,
   required EdgeInsets padding,
 }) {
-  final maxX = (screenSize.width - playerSize.width).clamp(
-    0.0,
-    double.infinity,
-  );
-  final maxY = (screenSize.height - playerSize.height).clamp(
-    0.0,
-    double.infinity,
-  );
+  // Keep clear of the safe area on every side, the bottom home indicator
+  // included; a player too big to fit stays pinned to the top-left inset.
+  final maxX = screenSize.width - playerSize.width - padding.right;
+  final maxY = screenSize.height - playerSize.height - padding.bottom;
   return Offset(
-    offset.dx.clamp(padding.left, maxX == 0 ? offset.dx : maxX),
-    offset.dy.clamp(padding.top, maxY == 0 ? offset.dy : maxY),
+    offset.dx.clamp(padding.left, maxX < padding.left ? padding.left : maxX),
+    offset.dy.clamp(padding.top, maxY < padding.top ? padding.top : maxY),
   );
 }
 
@@ -111,6 +121,18 @@ class FloatingPlaybackController extends ChangeNotifier {
   VideoProgressTracker? _progressTracker;
   Timer? _refreshTimer;
   bool _isRefreshing = false;
+
+  /// Width the student gave the mini player; kept for the next video too.
+  double? _miniWidth;
+  double? get miniWidth => _miniWidth;
+
+  void updateMiniWidth(double width) {
+    if (_miniWidth == width) {
+      return;
+    }
+    _miniWidth = width;
+    notifyListeners();
+  }
 
   FloatingPlaybackSession? get session => _session;
   VideoPlayerController? get nativeController => _nativeController;
@@ -289,6 +311,11 @@ class FloatingPlaybackController extends ChangeNotifier {
       );
       _scheduleRefreshTimer();
       notifyListeners();
+      // While the mini player owns the video it must move onto the new link
+      // itself; the old one stops loading once it lapses.
+      if (_ownsNative && session.minimized && !session.usesEmbed) {
+        await _swapNativeTo(playback.url);
+      }
       return playback;
     } on ApiException catch (error) {
       debugPrint(
@@ -303,6 +330,52 @@ class FloatingPlaybackController extends ChangeNotifier {
     } finally {
       _isRefreshing = false;
     }
+  }
+
+  /// Moves the mini player's video onto [url] without a visible break: the
+  /// new player gets ready at the same spot while the old one keeps playing,
+  /// then replaces it. The old player is kept if the new link fails to open.
+  Future<void> _swapNativeTo(String url) async {
+    final old = _nativeController;
+    final uri = Uri.tryParse(url.trim());
+    if (old == null || !old.value.isInitialized || uri == null) {
+      return;
+    }
+    if (!uri.hasScheme) {
+      return;
+    }
+
+    final next = VideoPlayerController.networkUrl(uri);
+    try {
+      await next.initialize();
+      await next.seekTo(old.value.position);
+    } catch (_) {
+      await next.dispose();
+      return;
+    }
+    if (_nativeController != old || !_ownsNative) {
+      await next.dispose();
+      return;
+    }
+
+    final wasPlaying = old.value.isPlaying;
+    await old.pause();
+    // Catch up with what played while the new player was getting ready.
+    await next.seekTo(old.value.position);
+    await next.setPlaybackSpeed(old.value.playbackSpeed);
+    await next.setVolume(old.value.volume);
+
+    old.removeListener(_onNativeTick);
+    _nativeController = next;
+    _bindNativeListener();
+    if (wasPlaying) {
+      await next.play();
+    }
+    notifyListeners();
+
+    // The old player is off screen after this frame.
+    await WidgetsBinding.instance.endOfFrame;
+    await old.dispose();
   }
 
   void close() {
@@ -326,6 +399,12 @@ class FloatingPlaybackController extends ChangeNotifier {
   void _onNativeTick() {
     final controller = _nativeController;
     if (controller == null || !controller.value.isInitialized) {
+      return;
+    }
+    // Timers stop while the app is in the background, so the link can lapse
+    // unnoticed; the player then fails to load the next part.
+    if (controller.value.hasError && _ownsNative && !_isRefreshing) {
+      unawaited(refreshPlayback());
       return;
     }
     _progressTracker?.updatePosition(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/stagger_reveal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
@@ -111,15 +112,6 @@ class _AnnouncementsScreenState extends ConsumerState<AnnouncementsScreen> {
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 4,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: AppColors.of(context).accent,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
                     Text(
                       AppStrings.of(context).t('آخر الإعلانات'),
                       style: AppTextStyles.subtitleOf(context).copyWith(
@@ -156,9 +148,12 @@ class _AnnouncementsScreenState extends ConsumerState<AnnouncementsScreen> {
                       const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final announcement = state.announcements[index];
-                    return AnnouncementCard(
-                      announcement: announcement,
-                      onTap: () => _openAnnouncement(announcement),
+                    return StaggerReveal(
+                      order: index,
+                      child: AnnouncementCard(
+                        announcement: announcement,
+                        onTap: () => _openAnnouncement(announcement),
+                      ),
                     );
                   },
                 ),

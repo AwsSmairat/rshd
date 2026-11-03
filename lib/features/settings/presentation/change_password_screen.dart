@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/form_width.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -85,8 +86,12 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       onChanged: onChanged != null ? (_) => onChanged() : null,
       decoration: InputDecoration(
         labelText: label,
+        prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
         suffixIcon: IconButton(
-          icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+          icon: Icon(
+            obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+            size: 20,
+          ),
           onPressed: toggle,
         ),
       ),
@@ -111,53 +116,56 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     });
 
     return Scaffold(
+      backgroundColor: AppColors.of(context).background,
       appBar: AppBar(
         title: Text(AppStrings.of(context).t('تغيير كلمة المرور')),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          _passwordField(
-            controller: _currentController,
-            label: AppStrings.of(context).t('كلمة المرور الحالية'),
-            obscure: _obscureCurrent,
-            toggle: () => setState(() => _obscureCurrent = !_obscureCurrent),
-          ),
-          const SizedBox(height: 16),
-          _passwordField(
-            controller: _passwordController,
-            label: AppStrings.of(context).t('كلمة المرور الجديدة'),
-            obscure: _obscureNew,
-            toggle: () => setState(() => _obscureNew = !_obscureNew),
-            onChanged: () => setState(() {}),
-          ),
-          const SizedBox(height: 8),
-          LinearProgressIndicator(
-            value: strength / 4,
-            color: switch (strength) {
-              <= 1 => Colors.red,
-              2 => Colors.orange,
-              3 => AppColors.of(context).darkGold,
-              _ => Colors.green,
-            },
-            backgroundColor: AppColors.of(context).background,
-          ),
-          const SizedBox(height: 8),
-          Text(AppStrings.of(context).t('يجب أن تكون 8 أحرف على الأقل.')),
-          const SizedBox(height: 16),
-          _passwordField(
-            controller: _confirmController,
-            label: AppStrings.of(context).t('تأكيد كلمة المرور'),
-            obscure: _obscureConfirm,
-            toggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
-            onChanged: () => setState(() {}),
-          ),
-          const SizedBox(height: 24),
-          AppButton(
-            label: isSaving ? 'جارٍ الحفظ...' : 'حفظ كلمة المرور',
-            onPressed: isSaving || !_canSave ? null : _save,
-          ),
-        ],
+      body: FormWidth(
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            _passwordField(
+              controller: _currentController,
+              label: AppStrings.of(context).t('كلمة المرور الحالية'),
+              obscure: _obscureCurrent,
+              toggle: () => setState(() => _obscureCurrent = !_obscureCurrent),
+            ),
+            const SizedBox(height: 16),
+            _passwordField(
+              controller: _passwordController,
+              label: AppStrings.of(context).t('كلمة المرور الجديدة'),
+              obscure: _obscureNew,
+              toggle: () => setState(() => _obscureNew = !_obscureNew),
+              onChanged: () => setState(() {}),
+            ),
+            const SizedBox(height: 8),
+            LinearProgressIndicator(
+              value: strength / 4,
+              color: switch (strength) {
+                <= 1 => Colors.red,
+                2 => Colors.orange,
+                3 => AppColors.of(context).darkGold,
+                _ => Colors.green,
+              },
+              backgroundColor: AppColors.of(context).background,
+            ),
+            const SizedBox(height: 8),
+            Text(AppStrings.of(context).t('يجب أن تكون 8 أحرف على الأقل.')),
+            const SizedBox(height: 16),
+            _passwordField(
+              controller: _confirmController,
+              label: AppStrings.of(context).t('تأكيد كلمة المرور'),
+              obscure: _obscureConfirm,
+              toggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
+              onChanged: () => setState(() {}),
+            ),
+            const SizedBox(height: 24),
+            AppButton(
+              label: isSaving ? 'جارٍ الحفظ...' : 'حفظ كلمة المرور',
+              onPressed: isSaving || !_canSave ? null : _save,
+            ),
+          ],
+        ),
       ),
     );
   }

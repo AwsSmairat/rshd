@@ -32,19 +32,19 @@ class AppLayoutMetrics {
 
   bool get isExtraLargeTablet => shortestSide >= 1024;
 
-  /// Maximum width for primary page content (centered on tablet).
+  /// Maximum width for page content. Tablets use the whole screen (minus
+  /// the page margins); only very wide screens are capped so lines of text
+  /// don't stretch across the full width.
   double get contentMaxWidth {
     if (isPhone) {
       return width;
     }
-    if (isExtraLargeTablet) {
-      return math.min(1100, width * 0.88);
-    }
-    if (isLargeTablet) {
-      return math.min(960, width * 0.9);
-    }
-    return math.min(760, width * 0.92);
+    return math.min(width, 1280);
   }
+
+  /// Columns for image cards (courses): two once the content is wide enough
+  /// that a single card would stretch edge to edge.
+  int get cardColumns => width - horizontalPadding * 2 >= 880 ? 2 : 1;
 
   /// Inner padding inside the content column.
   double get horizontalPadding {

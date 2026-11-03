@@ -40,6 +40,7 @@ void _invalidateProtectedSessionState(Ref ref) {
   ref.invalidate(announcementsListControllerProvider);
   ref.invalidate(profileControllerProvider);
   ref.invalidate(subjectsListControllerProvider);
+  ref.invalidate(subjectsCatalogControllerProvider);
   ref.invalidate(quizzesListControllerProvider);
   ref.invalidate(notificationsListControllerProvider);
   ref.invalidate(studentSettingsControllerProvider);

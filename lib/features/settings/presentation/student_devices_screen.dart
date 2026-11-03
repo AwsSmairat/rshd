@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/form_width.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -16,60 +17,64 @@ class StudentDevicesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
+      backgroundColor: AppColors.of(context).background,
       appBar: AppBar(title: Text(AppStrings.of(context).t('الجلسات والأجهزة'))),
-      body: devices.isEmpty
-          ? Center(
-              child: Text(
-                AppStrings.of(context).t('لا توجد أجهزة مسجّلة'),
-                style: AppTextStyles.bodyOf(
-                  context,
-                ).copyWith(color: AppColors.of(context).textMuted),
-              ),
-            )
-          : ListView.separated(
-              padding: const EdgeInsets.all(20),
-              itemCount: devices.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final device = devices[index];
-                return _DeviceTile(
-                  device: device,
-                  onRevoke: () async {
-                    final ok = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(AppStrings.of(context).t('إلغاء الجهاز')),
-                        content: Text(
-                          AppStrings.of(context).t(
-                            'هل تريد تسجيل الخروج من "${device.deviceName ?? device.platform ?? 'جهاز'}"؟',
+      body: FormWidth(
+        child: devices.isEmpty
+            ? Center(
+                child: Text(
+                  AppStrings.of(context).t('لا توجد أجهزة مسجّلة'),
+                  style: AppTextStyles.bodyOf(
+                    context,
+                  ).copyWith(color: AppColors.of(context).textMuted),
+                ),
+              )
+            : ListView.separated(
+                padding: const EdgeInsets.all(20),
+                itemCount: devices.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final device = devices[index];
+                  return _DeviceTile(
+                    device: device,
+                    onRevoke: () async {
+                      final ok = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(AppStrings.of(context).t('إلغاء الجهاز')),
+                          content: Text(
+                            AppStrings.of(context).t(
+                              'هل تريد تسجيل الخروج من "${device.deviceName ?? device.platform ?? 'جهاز'}"؟',
+                            ),
                           ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: Text(AppStrings.of(context).t('إلغاء')),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: Text(AppStrings.of(context).t('تأكيد')),
+                            ),
+                          ],
                         ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: Text(AppStrings.of(context).t('إلغاء')),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: Text(AppStrings.of(context).t('تأكيد')),
-                          ),
-                        ],
-                      ),
-                    );
-                    if (ok == true) {
-                      final success = await ref
-                          .read(studentSettingsControllerProvider.notifier)
-                          .revokeDevice(device.id);
-                      if (context.mounted) {
-                        if (success) {
-                          Navigator.pop(context);
+                      );
+                      if (ok == true) {
+                        final success = await ref
+                            .read(studentSettingsControllerProvider.notifier)
+                            .revokeDevice(device.id);
+                        if (context.mounted) {
+                          if (success) {
+                            Navigator.pop(context);
+                          }
                         }
                       }
-                    }
-                  },
-                );
-              },
-            ),
+                    },
+                  );
+                },
+              ),
+      ),
     );
   }
 }

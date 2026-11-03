@@ -157,12 +157,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               top: gap,
             ),
           if (suggested.isNotEmpty)
-            section(
-              ResponsiveContent(
-                child: SuggestedSubjectsSection(subjects: suggested),
-              ),
-              top: gap,
-            ),
+            section(SuggestedSubjectsSection(subjects: suggested), top: gap),
           section(
             UpcomingAssignmentsSection(
               assignments: dashboard?.upcomingAssignments ?? const [],

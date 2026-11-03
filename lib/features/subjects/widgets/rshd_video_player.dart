@@ -238,12 +238,84 @@ class RshdVideoPlayerState extends State<RshdVideoPlayer> {
 
       _activePlaybackUrl = refreshedUrl;
       _activeExpiresAt = refreshedPlayback?.expiresAt ?? widget.expiresAt;
-      await _reloadPlayer(preservePosition: true);
+      // A healthy video moves to the new link without stopping; only a
+      // broken or missing one is rebuilt from scratch.
+      final swapped = await _swapToActiveUrl();
+      if (!swapped) {
+        await _reloadPlayer(preservePosition: true);
+      }
       _scheduleRefreshTimer();
       return true;
     } finally {
       _isRefreshing = false;
     }
+  }
+
+  /// Moves a working video onto the freshly signed link. The new player is
+  /// prepared in the background at the same spot while the old one keeps
+  /// playing, then takes over in a single frame, so the student sees no
+  /// loading state. Returns false when there is no healthy video to carry
+  /// over, or the new link fails to open (the old player is then left as is).
+  Future<bool> _swapToActiveUrl() async {
+    final old = _videoController;
+    if (old == null || !old.value.isInitialized || old.value.hasError) {
+      return false;
+    }
+    final uri = Uri.tryParse(_activePlaybackUrl);
+    if (uri == null || !uri.hasScheme) {
+      return false;
+    }
+
+    final next = VideoPlayerController.networkUrl(uri);
+    try {
+      await next.initialize();
+      await next.seekTo(old.value.position);
+    } catch (_) {
+      await next.dispose();
+      return false;
+    }
+    if (!mounted || _videoController != old) {
+      await next.dispose();
+      return false;
+    }
+
+    // The full-screen route shows the old controls; leave it before the
+    // swap and return once the new player is attached.
+    final wasFullScreen = _chewieController?.isFullScreen ?? false;
+    if (wasFullScreen) {
+      _chewieController?.exitFullScreen();
+      await Future<void>.delayed(const Duration(milliseconds: 350));
+      if (!mounted || _videoController != old) {
+        await next.dispose();
+        return false;
+      }
+    }
+
+    final wasPlaying = old.value.isPlaying;
+    await old.pause();
+    // Catch up with what played while the new player was getting ready.
+    await next.seekTo(old.value.position);
+    await next.setPlaybackSpeed(old.value.playbackSpeed);
+    await next.setVolume(old.value.volume);
+
+    old.removeListener(_onVideoTick);
+    widget.onWillReplaceController?.call();
+    _videoController = next;
+    next.addListener(_onVideoTick);
+    if (wasPlaying) {
+      await next.play();
+    }
+    await _attachChewie(next);
+    widget.onControllerReady?.call(next);
+
+    // The old player is off screen after this frame, and the new controls
+    // are on screen to take the student back to full screen.
+    await WidgetsBinding.instance.endOfFrame;
+    await old.dispose();
+    if (wasFullScreen && mounted) {
+      _chewieController?.enterFullScreen();
+    }
+    return true;
   }
 
   Future<void> _retryPlayback() async {
@@ -294,6 +366,13 @@ class RshdVideoPlayerState extends State<RshdVideoPlayer> {
   void _onVideoTick() {
     final controller = _videoController;
     if (controller == null || !controller.value.isInitialized) {
+      return;
+    }
+
+    // Timers stop while the app is in the background, so the signed link can
+    // lapse unnoticed; the player then fails to load the next part.
+    if (controller.value.hasError && !_isRefreshing) {
+      unawaited(_refreshPlaybackAndRetry());
       return;
     }
 

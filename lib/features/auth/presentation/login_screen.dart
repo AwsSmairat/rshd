@@ -105,9 +105,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     // Sized so the panel's lower edge lands just above the home indicator:
     // a taller band for the short sign-in form, a shorter one for the long
     // register form (which scrolls anyway).
+    // On tablets the photo takes more of the tall screen, so the card that
+    // hangs from it doesn't leave a long empty stretch below.
     final bandHeight = (media.size.height * (compactCopy ? 0.42 : 0.52)).clamp(
       240.0,
-      isTablet ? 520.0 : 520.0,
+      isTablet ? media.size.height * 0.5 : 520.0,
     );
 
     final hPad = isTablet ? 40.0 : 18.0;
@@ -158,22 +160,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           ),
 
           // Floating layer: the only thing that moves or scrolls.
+          // Phones: anchored to the bottom and stretched up to the photo.
+          // Tablets: a wider card that hangs from the photo's edge and is as
+          // tall as its form, instead of a narrow strip down the screen.
           Positioned(
             left: hPad,
             right: hPad,
-            bottom: bottomPad,
+            top: isTablet ? restingTop : null,
+            bottom: isTablet ? null : bottomPad,
             child: Align(
-              alignment: Alignment.bottomCenter,
+              alignment: isTablet
+                  ? Alignment.topCenter
+                  : Alignment.bottomCenter,
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxWidth: 460,
-                  maxHeight: maxPanelHeight,
+                  maxWidth: isTablet ? 560 : 460,
+                  maxHeight: isTablet
+                      ? math.max(
+                          240.0,
+                          media.size.height - restingTop - bottomPad,
+                        )
+                      : maxPanelHeight,
                   // Keeps the resting composition: with the short sign-in
                   // form the panel still meets the photo's lower edge.
-                  minHeight: math.min(
-                    maxPanelHeight,
-                    media.size.height - bottomPad - restingTop,
-                  ),
+                  minHeight: isTablet
+                      ? 0
+                      : math.min(
+                          maxPanelHeight,
+                          media.size.height - bottomPad - restingTop,
+                        ),
                 ),
                 child: _GlassPanel(
                   animation: _entranceController,

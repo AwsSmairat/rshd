@@ -50,22 +50,6 @@ class GradeCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 3,
-                      height: 26,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(999),
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            accent.withValues(alpha: 0.45),
-                            AppColors.of(context).darkGold,
-                          ],
-                        ),
-                      ),
-                    ),
                   ],
                 ),
                 if (grade.subjectTitle != null &&

@@ -11,6 +11,8 @@ use App\Filament\Resources\SubjectResource\Pages;
 use App\Models\Subject;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -40,6 +42,13 @@ class SubjectResource extends Resource
         return static::scopeSubjectsQuery(parent::getEloquentQuery());
     }
 
+    protected static function categoryHasStudyYears(mixed $category): bool
+    {
+        $value = $category instanceof SubjectCategory ? $category : SubjectCategory::tryFrom((string) $category);
+
+        return $value?->hasStudyYears() ?? false;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -58,7 +67,23 @@ class SubjectResource extends Resource
                         Forms\Components\Select::make('category')
                             ->label('التصنيف')
                             ->options(SubjectCategory::options())
-                            ->required(),
+                            ->required()
+                            ->live()
+                            // A year only means something for medicine.
+                            ->afterStateUpdated(function (Set $set, ?string $state): void {
+                                if (! static::categoryHasStudyYears($state)) {
+                                    $set('study_year', null);
+                                }
+                            }),
+                        Forms\Components\Select::make('study_year')
+                            ->label('السنة الدراسية')
+                            ->options(SubjectCategory::studyYearOptions())
+                            ->helperText('تظهر المادة للطالب ضمن هذه السنة في التطبيق.')
+                            ->visible(fn (Get $get): bool => static::categoryHasStudyYears($get('category')))
+                            ->required(fn (Get $get): bool => static::categoryHasStudyYears($get('category')))
+                            // Saved while hidden too, so switching away from
+                            // medicine clears a year that was set before.
+                            ->dehydratedWhenHidden(),
                         Forms\Components\FileUpload::make('cover_image')
                             ->label('صورة الغلاف')
                             ->image()
@@ -138,6 +163,12 @@ class SubjectResource extends Resource
                         SubjectCategory::Engineering => 'warning',
                         default => 'gray',
                     }),
+                Tables\Columns\TextColumn::make('study_year')
+                    ->label('السنة')
+                    ->formatStateUsing(fn (?int $state): string => SubjectCategory::studyYearOptions()[$state] ?? '—')
+                    ->placeholder('—')
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label('الحالة')
                     ->badge()
@@ -175,6 +206,9 @@ class SubjectResource extends Resource
                 Tables\Filters\SelectFilter::make('category')
                     ->label('التصنيف')
                     ->options(SubjectCategory::options()),
+                Tables\Filters\SelectFilter::make('study_year')
+                    ->label('السنة الدراسية')
+                    ->options(SubjectCategory::studyYearOptions()),
                 Tables\Filters\SelectFilter::make('status')
                     ->label('الحالة')
                     ->options(ContentStatus::options()),

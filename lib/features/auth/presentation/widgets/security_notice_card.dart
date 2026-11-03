@@ -10,6 +10,7 @@ class SecurityNoticeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LiquidGlassSurface(
+      frosted: true,
       borderRadius: BorderRadius.circular(16),
       padding: const EdgeInsets.all(14),
       tintColor: AppColors.of(context).accent,

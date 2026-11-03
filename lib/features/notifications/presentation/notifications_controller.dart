@@ -113,6 +113,33 @@ class NotificationsListController
     return null;
   }
 
+  /// Marks every unread notification as read. The API has no bulk call, so
+  /// each one is sent in parallel; whatever succeeds is applied, and the
+  /// result says whether all of them did.
+  Future<bool> markAllAsRead() async {
+    final unread = state.notifications.where((n) => !n.isRead).toList();
+    if (unread.isEmpty) return true;
+
+    final results = await Future.wait(
+      unread.map((n) async {
+        try {
+          return await _repository.markAsRead(n.id);
+        } catch (_) {
+          return null;
+        }
+      }),
+    );
+    if (!mounted) return false;
+
+    final updated = {
+      for (final n in results.whereType<NotificationModel>()) n.id: n,
+    };
+    state = state.copyWith(
+      notifications: [for (final n in state.notifications) updated[n.id] ?? n],
+    );
+    return updated.length == unread.length;
+  }
+
   Future<bool> markAsRead(int notificationId) async {
     try {
       final updated = await _repository.markAsRead(notificationId);

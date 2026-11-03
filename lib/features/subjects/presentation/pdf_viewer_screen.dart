@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pdfrx/pdfrx.dart' show PdfViewerController;
+import 'package:pdfrx/pdfrx.dart' show PdfPageAnchor, PdfViewerController;
 
 import '../../../core/network/api_client.dart';
 import '../../../core/theme/app_colors.dart';
@@ -20,7 +20,7 @@ import '../data/subjects_repository.dart';
 import '../../pdf_editor/widgets/annotation_text_dialog.dart';
 import '../../pdf_editor/widgets/pdf_document_view.dart';
 import '../../pdf_editor/widgets/pdf_page_annotation_layer.dart';
-import '../../pdf_editor/widgets/pdf_editor_toolbar.dart';
+import '../../pdf_editor/widgets/reader_chrome.dart';
 import '../../pdf_editor/widgets/pen_settings_sheet.dart';
 import '../../pdf_editor/widgets/text_settings_sheet.dart';
 import '../../../core/l10n/app_strings.dart';
@@ -67,9 +67,6 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
   /// Student's chosen way of moving through pages; remembered per device.
   PdfReadingDirection _direction = PdfReadingDirection.vertical;
 
-  /// Header and toolbar are shown. Picking a writing tool hides them so the
-  /// page fills the screen; the side rail brings them back.
-  bool _chromeVisible = true;
   static const _directionKey = 'pdf_reading_direction';
 
   @override
@@ -595,33 +592,25 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
     );
   }
 
+  /// Picking a tool just switches to it; tapping the tool that is already
+  /// active opens its settings (shape, text style, colour and thickness).
   void _handleToolSelected(PdfEditorTool tool) {
-    final previousTool = _state.currentTool;
+    final reselected = tool == _state.currentTool;
     _editor.setTool(tool);
-    setState(() => _chromeVisible = tool == PdfEditorTool.view);
+    if (!reselected) return;
 
-    if (tool == PdfEditorTool.shapes) {
-      if (previousTool != PdfEditorTool.shapes) {
+    switch (tool) {
+      case PdfEditorTool.shapes:
         _showShapePicker();
-      }
-      return;
-    }
-
-    if (tool == PdfEditorTool.text) {
-      if (previousTool != PdfEditorTool.text) {
+      case PdfEditorTool.text:
         showTextSettingsSheet(
           context,
           settings: _state.textSettings,
           onChanged: _editor.setTextSettings,
         );
-      }
-      return;
-    }
-
-    if (tool == PdfEditorTool.pen ||
-        tool == PdfEditorTool.highlighter ||
-        tool == PdfEditorTool.eraser) {
-      if (previousTool != tool) {
+      case PdfEditorTool.pen ||
+          PdfEditorTool.highlighter ||
+          PdfEditorTool.eraser:
         showPenSettingsSheet(
           context,
           tool: tool,
@@ -634,9 +623,43 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
           onEraserModeChanged: _editor.setEraserMode,
           onEraserSizeChanged: _editor.setEraserSize,
         );
-      }
+      default:
+        break;
     }
   }
+
+  /// A colour picked straight from the palette for the active pen.
+  void _handlePaletteColor(Color color) {
+    if (_state.currentTool == PdfEditorTool.highlighter) {
+      _editor.setHighlighterSettings(
+        _state.highlighterSettings.copyWith(color: color),
+      );
+    } else {
+      _editor.setPenSettings(_state.penSettings.copyWith(color: color));
+    }
+  }
+
+  /// Opens the page overview and glides to the picked page.
+  void _openPages() {
+    if (!_pdfController.isReady) return;
+    showReaderPages(
+      context,
+      document: _pdfController.document,
+      currentPage: _state.currentPage,
+      onSelect: (page) => _pdfController.goToPage(
+        pageNumber: page,
+        anchor: _direction == PdfReadingDirection.horizontal
+            ? PdfPageAnchor.center
+            : PdfPageAnchor.top,
+        duration: const Duration(milliseconds: 420),
+      ),
+    );
+  }
+
+  /// The surface behind the pages: a soft warm grey, darker in dark mode.
+  Color get _canvasColor => Theme.of(context).brightness == Brightness.dark
+      ? const Color(0xFF0E1622)
+      : const Color(0xFFE9E6E0);
 
   void _showShapePicker() {
     showModalBottomSheet<void>(
@@ -723,10 +746,6 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
       }
     });
 
-    final isTabletLandscape =
-        MediaQuery.sizeOf(context).shortestSide >= 600 &&
-        MediaQuery.orientationOf(context) == Orientation.landscape;
-
     return CallbackShortcuts(
       bindings: {
         const SingleActivator(LogicalKeyboardKey.keyZ, control: true): () {
@@ -756,37 +775,44 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
       child: Focus(
         autofocus: true,
         child: Scaffold(
-          backgroundColor: AppColors.of(context).background,
-          appBar: !_chromeVisible
-              ? null
-              : PdfEditorHeader(
-                  fileName: widget.title,
-                  currentPage: _state.currentPage,
-                  totalPages: _state.totalPages,
-                  saveStatus: _state.saveStatus,
-                  onBack: () => Navigator.maybePop(context),
-                  onSearch: _openSearch,
-                  onMore: _openMoreMenu,
-                  onSave: _handleSave,
-                  onRetrySave: _handleSave,
+          backgroundColor: _canvasColor,
+          body: Column(
+            children: [
+              ReaderTopBar(
+                title: widget.title,
+                currentPage: _state.currentPage,
+                totalPages: _state.totalPages,
+                saveStatus: _state.saveStatus,
+                onBack: () => Navigator.maybePop(context),
+                onPages: _openPages,
+                onSearch: _openSearch,
+                onSave: _handleSave,
+                onMore: _openMoreMenu,
+              ),
+              // The tool palette sits on its own strip, so it never covers
+              // the top of a page.
+              if (_pdfBytes != null && !_hasError)
+                Container(
+                  width: double.infinity,
+                  color: AppColors.of(context).background,
+                  padding: const EdgeInsets.fromLTRB(12, 2, 12, 10),
+                  child: Center(
+                    child: ReaderToolPalette(
+                      currentTool: _state.currentTool,
+                      penColor: _state.penSettings.color,
+                      highlighterColor: _state.highlighterSettings.color,
+                      canUndo: _editor.canUndo,
+                      canRedo: _editor.canRedo,
+                      onToolSelected: _handleToolSelected,
+                      onColorSelected: _handlePaletteColor,
+                      onUndo: _editor.undo,
+                      onRedo: _editor.redo,
+                    ),
+                  ),
                 ),
-          body: _buildBody(),
-          bottomNavigationBar: isTabletLandscape || !_chromeVisible
-              ? null
-              : PdfEditorToolbar(
-                  currentTool: _state.currentTool,
-                  canUndo: _editor.canUndo,
-                  canRedo: _editor.canRedo,
-                  visible: _state.toolbarVisible,
-                  expanded: _state.toolbarExpanded,
-                  isTabletLandscape: false,
-                  onToolSelected: _handleToolSelected,
-                  onUndo: _editor.undo,
-                  onRedo: _editor.redo,
-                  onToggleExpanded: _editor.toggleToolbarExpanded,
-                  onToggleVisibility: _editor.toggleToolbar,
-                ),
-          floatingActionButton: null,
+              Expanded(child: _buildBody()),
+            ],
+          ),
         ),
       ),
     );
@@ -817,46 +843,28 @@ class _PdfViewerScreenState extends ConsumerState<PdfViewerScreen>
             controller: _pdfController,
             direction: _direction,
             interactive: isViewTool,
+            canvasColor: _canvasColor,
             onReady: _handleDocumentReady,
             onPageChanged: _editor.setCurrentPage,
             pageOverlayBuilder: _buildPageOverlay,
           ),
         ),
-        if (_chromeVisible &&
-            MediaQuery.sizeOf(context).shortestSide >= 600 &&
-            MediaQuery.orientationOf(context) == Orientation.landscape)
-          PdfEditorToolbar(
-            currentTool: _state.currentTool,
-            canUndo: _editor.canUndo,
-            canRedo: _editor.canRedo,
-            visible: _state.toolbarVisible,
-            expanded: _state.toolbarExpanded,
-            isTabletLandscape: true,
-            onToolSelected: _handleToolSelected,
-            onUndo: _editor.undo,
-            onRedo: _editor.redo,
-            onToggleExpanded: _editor.toggleToolbarExpanded,
-            onToggleVisibility: _editor.toggleToolbar,
-          ),
-        if (!_chromeVisible)
-          PositionedDirectional(
-            end: 10,
-            top: 0,
-            bottom: 0,
-            child: SafeArea(
-              child: Center(
-                child: _WritingRail(
-                  tool: _state.currentTool,
-                  canUndo: _editor.canUndo,
-                  canRedo: _editor.canRedo,
-                  onShowTools: () => setState(() => _chromeVisible = true),
-                  onUndo: _editor.undo,
-                  onRedo: _editor.redo,
-                  onDone: () => _handleToolSelected(PdfEditorTool.view),
-                ),
-              ),
+        Positioned(
+          left: 12,
+          right: 12,
+          bottom: 0,
+          child: SafeArea(
+            top: false,
+            minimum: const EdgeInsets.only(bottom: 12),
+            child: ReaderBottomBar(
+              controller: _pdfController,
+              currentPage: _state.currentPage,
+              totalPages: _state.totalPages,
+              onPages: _openPages,
+              horizontal: _direction == PdfReadingDirection.horizontal,
             ),
           ),
+        ),
       ],
     );
   }
@@ -1110,106 +1118,6 @@ class _ReadingDirectionPicker extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Floating side rail shown while writing full screen: the active tool (tap
-/// to bring back every tool), undo, redo, and done.
-class _WritingRail extends StatelessWidget {
-  const _WritingRail({
-    required this.tool,
-    required this.canUndo,
-    required this.canRedo,
-    required this.onShowTools,
-    required this.onUndo,
-    required this.onRedo,
-    required this.onDone,
-  });
-
-  final PdfEditorTool tool;
-  final bool canUndo;
-  final bool canRedo;
-  final VoidCallback onShowTools;
-  final VoidCallback onUndo;
-  final VoidCallback onRedo;
-  final VoidCallback onDone;
-
-  static IconData _toolIcon(PdfEditorTool tool) => switch (tool) {
-    PdfEditorTool.pen => Icons.draw_outlined,
-    PdfEditorTool.highlighter => Icons.highlight_outlined,
-    PdfEditorTool.eraser => Icons.auto_fix_off_outlined,
-    PdfEditorTool.lasso => Icons.crop_free_outlined,
-    PdfEditorTool.text => Icons.text_fields_outlined,
-    PdfEditorTool.note => Icons.sticky_note_2_outlined,
-    PdfEditorTool.shapes => Icons.category_outlined,
-    _ => Icons.pan_tool_alt_outlined,
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppColors.of(context);
-    final strings = AppStrings.of(context);
-    const navy = Color(0xFF0B1F3A);
-
-    Widget action(
-      IconData icon,
-      String tooltip,
-      VoidCallback? onPressed, {
-      Color? color,
-    }) {
-      return IconButton(
-        tooltip: strings.t(tooltip),
-        onPressed: onPressed,
-        icon: Icon(icon, size: 22),
-        color: color ?? navy,
-        disabledColor: navy.withValues(alpha: 0.25),
-      );
-    }
-
-    return Material(
-      color: colors.cardWhite.withValues(alpha: 0.96),
-      elevation: 6,
-      shadowColor: navy.withValues(alpha: 0.3),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(28),
-        side: BorderSide(color: navy.withValues(alpha: 0.08)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Tooltip(
-              message: strings.t('الأدوات'),
-              child: InkWell(
-                onTap: onShowTools,
-                customBorder: const CircleBorder(),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  margin: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: navy,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: colors.accent, width: 1.5),
-                  ),
-                  child: Icon(_toolIcon(tool), color: colors.accent, size: 22),
-                ),
-              ),
-            ),
-            const SizedBox(height: 4),
-            action(Icons.undo_rounded, 'تراجع', canUndo ? onUndo : null),
-            action(Icons.redo_rounded, 'إعادة', canRedo ? onRedo : null),
-            action(
-              Icons.check_rounded,
-              'إنهاء الكتابة',
-              onDone,
-              color: colors.accent,
-            ),
-          ],
-        ),
       ),
     );
   }

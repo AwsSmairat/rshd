@@ -19,6 +19,7 @@ class SubjectResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'category' => $this->category?->value,
+            'study_year' => $this->study_year,
             'cover_image' => $this->resolvedCoverImageUrl(),
             'status' => $this->status?->value,
             'price' => $this->price,

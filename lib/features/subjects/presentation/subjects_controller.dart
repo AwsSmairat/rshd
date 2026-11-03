@@ -131,7 +131,14 @@ class SubjectsListController extends StateNotifier<SubjectsListState> {
       return;
     }
 
-    state = state.copyWith(status: FeatureLoadStatus.loading, clearError: true);
+    // With courses already on screen, refresh in the background instead of
+    // swapping the list for a loading skeleton (that flash read as a freeze).
+    if (state.subjects.isEmpty) {
+      state = state.copyWith(
+        status: FeatureLoadStatus.loading,
+        clearError: true,
+      );
+    }
 
     try {
       final subjects = (category != null && category.isNotEmpty)
@@ -429,6 +436,14 @@ class LessonDetailsController extends StateNotifier<LessonDetailsState>
 
 final subjectsListControllerProvider =
     StateNotifierProvider<SubjectsListController, SubjectsListState>((ref) {
+      return SubjectsListController(ref.watch(subjectsRepositoryProvider));
+    });
+
+/// One department's catalogue (e.g. medicine), kept apart from the student's
+/// own courses in [subjectsListControllerProvider] so opening a department
+/// never replaces "My courses". Dropped when the department page closes.
+final subjectsCatalogControllerProvider = StateNotifierProvider.autoDispose
+    .family<SubjectsListController, SubjectsListState, String>((ref, category) {
       return SubjectsListController(ref.watch(subjectsRepositoryProvider));
     });
 

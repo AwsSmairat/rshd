@@ -11,7 +11,6 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/loading_widget.dart';
 import '../../../../core/widgets/responsive_content.dart';
-import '../data/terms_and_conditions_config.dart';
 import '../data/terms_and_conditions_model.dart';
 import '../presentation/terms_and_conditions_controller.dart';
 import '../widgets/terms_contact_card.dart';
@@ -117,10 +116,6 @@ class _TermsAndConditionsPageState
   ) {
     final doc = state.document!;
     final metrics = AppLayoutMetrics.of(context);
-    final contact = resolveTermsContactInfo(
-      platformSupportEmail: supportEmail,
-      platformSupportPhone: supportPhone,
-    );
     final accordionSections = doc.sections
         .where((s) => s.id != 'contact')
         .toList();
@@ -247,20 +242,6 @@ class _TermsAndConditionsPageState
                       }
                       return null;
                     },
-                  ),
-                  const SizedBox(height: 12),
-                  TermsContactCard(
-                    contact: contact,
-                    onContact: () => launchTermsEmail(
-                      email: contact.supportEmail,
-                      subject: TermsAndConditionsConfig.supportEmailSubject,
-                      context: context,
-                    ),
-                    onReport: () => launchTermsEmail(
-                      email: contact.legalEmail,
-                      subject: TermsAndConditionsConfig.reportViolationSubject,
-                      context: context,
-                    ),
                   ),
                   const SizedBox(height: 12),
                   TermsFooter(

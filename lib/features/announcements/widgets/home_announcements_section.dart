@@ -31,18 +31,6 @@ class HomeAnnouncementsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: Container(
-              width: 4,
-              height: 20,
-              decoration: BoxDecoration(
-                color: AppColors.of(context).accent,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
           AnnouncementImageCarousel(announcements: carouselItems),
           if (loadFailed)
             Padding(

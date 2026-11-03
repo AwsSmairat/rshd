@@ -19,6 +19,25 @@ enum SubjectCategory: string
         };
     }
 
+    /** Study years a medicine subject can belong to, as value => label. */
+    public static function studyYearOptions(): array
+    {
+        return [
+            1 => 'السنة الأولى',
+            2 => 'السنة الثانية',
+            3 => 'السنة الثالثة',
+            4 => 'السنة الرابعة',
+            5 => 'السنة الخامسة',
+            6 => 'السنة السادسة',
+        ];
+    }
+
+    /** Only medicine subjects are split by study year. */
+    public function hasStudyYears(): bool
+    {
+        return $this === self::Medicine;
+    }
+
     public static function options(): array
     {
         return collect(self::cases())

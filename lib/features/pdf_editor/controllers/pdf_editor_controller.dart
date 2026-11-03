@@ -253,35 +253,42 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
 
       if (_isDisposed) return;
 
-      state = PdfEditorState(
-        status: PdfAnnotationStatus.loaded,
-        annotationJson: merged,
-        saveStatus: (local?['pending_sync'] == true)
-            ? PdfSaveStatus.offlinePending
-            : PdfSaveStatus.saved,
-        pendingSync: local?['pending_sync'] == true,
+      state = _keepViewState(
+        PdfEditorState(
+          status: PdfAnnotationStatus.loaded,
+          annotationJson: merged,
+          saveStatus: (local?['pending_sync'] == true)
+              ? PdfSaveStatus.offlinePending
+              : PdfSaveStatus.saved,
+          pendingSync: local?['pending_sync'] == true,
+        ),
       );
       _history.clear();
     } on ApiException catch (error) {
       if (_isDisposed) return;
 
       if (local != null) {
-        state = PdfEditorState(
-          status: PdfAnnotationStatus.loaded,
-          annotationJson: local,
-          saveStatus: PdfSaveStatus.offlinePending,
-          pendingSync: true,
-          loadFailed: true,
-          errorMessage: 'تم تحميل نسخة محلية — سيتم المزامنة عند عودة الإنترنت',
+        state = _keepViewState(
+          PdfEditorState(
+            status: PdfAnnotationStatus.loaded,
+            annotationJson: local,
+            saveStatus: PdfSaveStatus.offlinePending,
+            pendingSync: true,
+            loadFailed: true,
+            errorMessage:
+                'تم تحميل نسخة محلية — سيتم المزامنة عند عودة الإنترنت',
+          ),
         );
         return;
       }
 
-      state = PdfEditorState(
-        status: PdfAnnotationStatus.loaded,
-        annotationJson: PdfAnnotationDocumentV2.empty(documentId: _fileId),
-        loadFailed: true,
-        errorMessage: mapPdfEditorError(error),
+      state = _keepViewState(
+        PdfEditorState(
+          status: PdfAnnotationStatus.loaded,
+          annotationJson: PdfAnnotationDocumentV2.empty(documentId: _fileId),
+          loadFailed: true,
+          errorMessage: mapPdfEditorError(error),
+        ),
       );
     } catch (error) {
       if (_isDisposed) return;
@@ -291,11 +298,13 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
       }
 
       if (local != null) {
-        state = PdfEditorState(
-          status: PdfAnnotationStatus.loaded,
-          annotationJson: local,
-          saveStatus: PdfSaveStatus.offlinePending,
-          pendingSync: true,
+        state = _keepViewState(
+          PdfEditorState(
+            status: PdfAnnotationStatus.loaded,
+            annotationJson: local,
+            saveStatus: PdfSaveStatus.offlinePending,
+            pendingSync: true,
+          ),
         );
         return;
       }
@@ -378,7 +387,38 @@ class PdfEditorController extends StateNotifier<PdfEditorState> {
     state = state.copyWith(eraserSize: size);
   }
 
+  /// Page sizes reported by the viewer, kept so they survive [load]
+  /// replacing the annotation document (the viewer often reports first).
+  final Map<int, Size> _pageSizes = {};
+
+  /// A freshly loaded state that keeps what the viewer and the student have
+  /// already set: page count and position, the tool and its settings, zoom,
+  /// and the page sizes.
+  PdfEditorState _keepViewState(PdfEditorState next) {
+    final document = PdfAnnotationDocumentV2(
+      Map<String, dynamic>.from(next.annotationJson),
+    );
+    for (final entry in _pageSizes.entries) {
+      document.ensurePageSize(entry.key, entry.value.width, entry.value.height);
+    }
+    return next.copyWith(
+      annotationJson: document.toJson(),
+      currentPage: state.currentPage,
+      totalPages: state.totalPages,
+      currentTool: state.currentTool,
+      penSettings: state.penSettings,
+      highlighterSettings: state.highlighterSettings,
+      eraserMode: state.eraserMode,
+      eraserSize: state.eraserSize,
+      allowFingerDrawing: state.allowFingerDrawing,
+      shapeTool: state.shapeTool,
+      textSettings: state.textSettings,
+      zoomLevel: state.zoomLevel,
+    );
+  }
+
   void registerPageSize(int pageNumber, double width, double height) {
+    _pageSizes[pageNumber] = Size(width, height);
     final document = PdfAnnotationDocumentV2(
       Map<String, dynamic>.from(state.annotationJson),
     );

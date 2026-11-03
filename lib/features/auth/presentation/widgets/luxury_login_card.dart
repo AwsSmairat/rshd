@@ -19,6 +19,7 @@ class LuxuryLoginCard extends StatelessWidget {
       child: Transform.translate(
         offset: Offset(0, metrics.isTablet ? 10 : 6),
         child: LiquidGlassSurface(
+          frosted: true,
           borderRadius: BorderRadius.circular(metrics.isTablet ? 28 : 24),
           padding: EdgeInsets.zero,
           fillOpacity: 0.3,

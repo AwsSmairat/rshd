@@ -19,6 +19,7 @@ class Subject extends Model
         'title',
         'description',
         'category',
+        'study_year',
         'cover_image',
         'status',
         'price',
@@ -31,6 +32,7 @@ class Subject extends Model
     {
         return [
             'category' => SubjectCategory::class,
+            'study_year' => 'integer',
             'status' => ContentStatus::class,
             'price' => 'decimal:2',
         ];

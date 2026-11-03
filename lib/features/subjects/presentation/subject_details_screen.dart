@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/stagger_reveal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/rshd_refresh_indicator.dart';
 
@@ -350,11 +351,14 @@ class _SubjectDetailsScreenState extends ConsumerState<SubjectDetailsScreen> {
               .map(
                 (entry) => Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: LessonCard(
-                    lesson: entry.value,
-                    displayOrder: entry.key + 1,
-                    initiallyExpanded:
-                        entry.key == 0 && state.lessons.length == 1,
+                  child: StaggerReveal(
+                    order: entry.key,
+                    child: LessonCard(
+                      lesson: entry.value,
+                      displayOrder: entry.key + 1,
+                      initiallyExpanded:
+                          entry.key == 0 && state.lessons.length == 1,
+                    ),
                   ),
                 ),
               )

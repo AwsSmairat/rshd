@@ -34,6 +34,29 @@ void main() {
     expect(size.height, closeTo(floatingMiniPlayerWidth * 9 / 16, 0.01));
   });
 
+  test('mini player width stays between the limits and inside the screen', () {
+    expect(clampFloatingWidth(40, available: 800), floatingMiniPlayerMinWidth);
+    expect(
+      clampFloatingWidth(2000, available: 1200),
+      floatingMiniPlayerMaxWidth,
+    );
+    // A phone narrower than the largest size caps it at the room available.
+    expect(clampFloatingWidth(2000, available: 350), 350);
+    expect(clampFloatingWidth(300, available: 800), 300);
+  });
+
+  test('mini player keeps clear of the bottom and right safe areas', () {
+    final offset = clampFloatingOffset(
+      offset: const Offset(900, 900),
+      screenSize: const Size(390, 844),
+      playerSize: const Size(196, 110),
+      padding: const EdgeInsets.fromLTRB(12, 59, 12, 46),
+    );
+
+    expect(offset.dx, 390 - 196 - 12);
+    expect(offset.dy, 844 - 110 - 46);
+  });
+
   test('session copyWith can mark playback as minimized', () {
     const session = FloatingPlaybackSession(
       videoId: 7,

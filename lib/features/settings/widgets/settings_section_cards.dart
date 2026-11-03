@@ -3,12 +3,12 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/widgets/rshd_loader.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/layout/app_layout_metrics.dart';
+import '../../../core/widgets/app_page_header.dart';
 import '../../../core/theme/app_colors.dart';
 import '../data/models/student_settings_model.dart';
 import 'settings_shared_widgets.dart';
 import 'student_avatar_image.dart';
-
-const _activeGreen = Color(0xFF17865A);
 
 /// Top of the settings page: who you are, at a glance.
 ///
@@ -66,174 +66,174 @@ class SettingsProfileHero extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
     final strings = AppStrings.of(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
     final isActive = profile.status == 'active';
-    final statusColor = isActive ? _activeGreen : colors.error;
+    const navy = Color(0xFF0B1F3A);
 
+    // Same side margins as the cards below it, on phones and tablets.
+    final inset = AppLayoutMetrics.of(context).outerHorizontalInset;
     return SafeArea(
       bottom: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+        padding: EdgeInsets.fromLTRB(inset, 4, inset, 4),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (onBack != null)
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: Material(
-                  color: isDark
-                      ? colors.white.withValues(alpha: 0.07)
-                      : colors.darkGold.withValues(alpha: 0.10),
-                  shape: const CircleBorder(),
-                  child: InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: onBack,
-                    child: SizedBox(
-                      width: 42,
-                      height: 42,
-                      child: Icon(
-                        isRtl
-                            ? Icons.arrow_forward_ios_rounded
-                            : Icons.arrow_back_ios_new_rounded,
-                        size: 17,
-                        color: colors.primary,
-                        semanticLabel: strings.back,
-                      ),
-                    ),
-                  ),
+            PageTitleBlock(title: strings.navAccount, onBack: onBack),
+            const SizedBox(height: 18),
+            // Identity card: navy, with the avatar as the photo control.
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                gradient: const LinearGradient(
+                  begin: AlignmentDirectional.topStart,
+                  end: AlignmentDirectional.bottomEnd,
+                  colors: [Color(0xFF1A3A66), navy],
                 ),
-              ),
-
-            GestureDetector(
-              onTap: isUploading ? null : () => _showPhotoOptions(context),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 108,
-                    height: 108,
-                    padding: const EdgeInsets.all(3.5),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [colors.accent, colors.darkGold],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: colors.darkGold.withValues(alpha: 0.25),
-                          blurRadius: 22,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isDark
-                            ? colors.secondaryNavy
-                            : const Color(0xFFFBF8F2),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          StudentAvatarImage(
-                            size: 101,
-                            localPath: localAvatarPath,
-                            placeholder: Icon(
-                              Icons.person_rounded,
-                              size: 52,
-                              color: colors.darkGold.withValues(alpha: 0.55),
-                            ),
-                          ),
-                          if (isUploading)
-                            ColoredBox(
-                              color: Colors.black.withValues(alpha: 0.35),
-                              child: Center(
-                                child: RshdLoader(
-                                  size: 16.1,
-                                  color: colors.accent,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  PositionedDirectional(
-                    bottom: 2,
-                    end: 2,
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: colors.primary,
-                        border: Border.all(
-                          color: isDark
-                              ? colors.background
-                              : const Color(0xFFF7F2E9),
-                          width: 2.5,
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.photo_camera_rounded,
-                        size: 15,
-                        color: isDark ? const Color(0xFF0B1F3A) : colors.white,
-                      ),
-                    ),
+                boxShadow: [
+                  BoxShadow(
+                    color: navy.withValues(alpha: 0.25),
+                    blurRadius: 24,
+                    offset: const Offset(0, 12),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 16),
-
-            Text(
-              profile.name,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Tajawal',
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                height: 1.3,
-                color: colors.primary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              profile.email,
-              textDirection: TextDirection.ltr,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: colors.textMuted),
-            ),
-            const SizedBox(height: 12),
-
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: statusColor.withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(999),
-              ),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 7,
-                    height: 7,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: statusColor,
+                  GestureDetector(
+                    onTap: isUploading
+                        ? null
+                        : () => _showPhotoOptions(context),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: 82,
+                          height: 82,
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [colors.accent, colors.darkGold],
+                            ),
+                          ),
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(0xFF16345C),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                StudentAvatarImage(
+                                  size: 76,
+                                  localPath: localAvatarPath,
+                                  placeholder: Icon(
+                                    Icons.person_rounded,
+                                    size: 40,
+                                    color: colors.accent.withValues(alpha: 0.7),
+                                  ),
+                                ),
+                                if (isUploading)
+                                  ColoredBox(
+                                    color: Colors.black.withValues(alpha: 0.35),
+                                    child: Center(
+                                      child: RshdLoader(
+                                        size: 12,
+                                        color: colors.accent,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        PositionedDirectional(
+                          bottom: -2,
+                          end: -2,
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: colors.accent,
+                              border: Border.all(color: navy, width: 2.5),
+                            ),
+                            child: const Icon(
+                              Icons.photo_camera_rounded,
+                              size: 14,
+                              color: navy,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 7),
-                  Text(
-                    '${strings.studentRole} · ${strings.statusLabel(profile.status)}',
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      color: statusColor,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          profile.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.w800,
+                            height: 1.25,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          profile.email,
+                          textDirection: TextDirection.ltr,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white.withValues(alpha: 0.7),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.10),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 7,
+                                height: 7,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: isActive
+                                      ? const Color(0xFF4ADE80)
+                                      : colors.error,
+                                ),
+                              ),
+                              const SizedBox(width: 7),
+                              Text(
+                                '${strings.studentRole} · '
+                                '${strings.statusLabel(profile.status)}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -295,6 +295,7 @@ class PersonalInformationCard extends StatelessWidget {
     // Name and email already headline the page, so they are not repeated here.
     return SettingsSectionCard(
       title: strings.personalInfo,
+      accent: SettingsAccents.account,
       icon: Icons.person_outline_rounded,
       trailing: _SectionAction(label: strings.edit, onTap: onEdit),
       child: Column(
@@ -352,6 +353,7 @@ class SecuritySettingsCard extends StatelessWidget {
 
     return SettingsSectionCard(
       title: strings.securityPassword,
+      accent: SettingsAccents.security,
       icon: Icons.lock_outline_rounded,
       footer: passwordSetAt == null
           ? null
@@ -392,74 +394,6 @@ class AppPreferencesCard extends StatelessWidget {
   final StudentPreferencesModel preferences;
   final void Function(String key, dynamic value) onChanged;
 
-  Future<void> _pickLanguage(BuildContext context) async {
-    final strings = AppStrings.of(context);
-    final picked = await showSettingsOptionPicker<String>(
-      context: context,
-      title: strings.language,
-      current: preferences.language,
-      options: [
-        SettingsPickerOption(value: 'ar', label: strings.arabic),
-        SettingsPickerOption(value: 'en', label: strings.english),
-      ],
-    );
-    if (picked != null && picked != preferences.language) {
-      onChanged('language', picked);
-    }
-  }
-
-  Future<void> _pickTheme(BuildContext context) async {
-    final strings = AppStrings.of(context);
-    final picked = await showSettingsOptionPicker<String>(
-      context: context,
-      title: strings.appearance,
-      current: preferences.theme,
-      options: [
-        SettingsPickerOption(value: 'light', label: strings.lightMode),
-        SettingsPickerOption(value: 'dark', label: strings.darkMode),
-        SettingsPickerOption(value: 'system', label: strings.systemMode),
-      ],
-    );
-    if (picked != null && picked != preferences.theme) {
-      onChanged('theme', picked);
-    }
-  }
-
-  Future<void> _pickFontSize(BuildContext context) async {
-    final strings = AppStrings.of(context);
-    final picked = await showSettingsOptionPicker<String>(
-      context: context,
-      title: strings.fontSize,
-      current: preferences.fontSize,
-      options: [
-        SettingsPickerOption(value: 'small', label: strings.fontSmall),
-        SettingsPickerOption(value: 'medium', label: strings.fontMedium),
-        SettingsPickerOption(value: 'large', label: strings.fontLarge),
-      ],
-    );
-    if (picked != null && picked != preferences.fontSize) {
-      onChanged('font_size', picked);
-    }
-  }
-
-  Future<void> _pickVideoQuality(BuildContext context) async {
-    final strings = AppStrings.of(context);
-    final picked = await showSettingsOptionPicker<String>(
-      context: context,
-      title: strings.videoQuality,
-      current: preferences.defaultVideoQuality,
-      options: [
-        SettingsPickerOption(value: 'auto', label: strings.qualityAuto),
-        SettingsPickerOption(value: 'low', label: strings.qualityLow),
-        SettingsPickerOption(value: 'medium', label: strings.qualityMedium),
-        SettingsPickerOption(value: 'high', label: strings.qualityHigh),
-      ],
-    );
-    if (picked != null && picked != preferences.defaultVideoQuality) {
-      onChanged('default_video_quality', picked);
-    }
-  }
-
   Future<void> _pickTimezone(BuildContext context) async {
     const zones = [
       SettingsPickerOption(value: 'Asia/Amman', label: 'Asia/Amman'),
@@ -487,36 +421,61 @@ class AppPreferencesCard extends StatelessWidget {
     final strings = AppStrings.of(context);
     return SettingsSectionCard(
       title: strings.appPreferences,
+      accent: SettingsAccents.preferences,
       icon: Icons.tune_rounded,
       child: Column(
         children: [
-          SettingsItemTile(
+          // Short choices are picked in place with a sliding selector.
+          SettingsSegmentedRow<String>(
             icon: Icons.translate_rounded,
             label: strings.language,
-            value: strings.languageLabel(preferences.language),
-            onTap: () => _pickLanguage(context),
+            value: preferences.language,
+            onChanged: (v) => onChanged('language', v),
+            options: [
+              SettingsPickerOption(value: 'ar', label: strings.arabic),
+              SettingsPickerOption(value: 'en', label: strings.english),
+            ],
           ),
-          SettingsItemTile(
+          SettingsSegmentedRow<String>(
             icon: preferences.theme == 'dark'
                 ? Icons.dark_mode_outlined
                 : preferences.theme == 'system'
                 ? Icons.brightness_auto_outlined
                 : Icons.light_mode_outlined,
             label: strings.appearance,
-            value: strings.themeLabel(preferences.theme),
-            onTap: () => _pickTheme(context),
+            value: preferences.theme,
+            onChanged: (v) => onChanged('theme', v),
+            options: [
+              SettingsPickerOption(value: 'light', label: strings.lightMode),
+              SettingsPickerOption(value: 'dark', label: strings.darkMode),
+              SettingsPickerOption(value: 'system', label: strings.systemMode),
+            ],
           ),
-          SettingsItemTile(
+          SettingsSegmentedRow<String>(
             icon: Icons.text_fields_rounded,
             label: strings.fontSize,
-            value: strings.fontLabel(preferences.fontSize),
-            onTap: () => _pickFontSize(context),
+            value: preferences.fontSize,
+            onChanged: (v) => onChanged('font_size', v),
+            options: [
+              SettingsPickerOption(value: 'small', label: strings.fontSmall),
+              SettingsPickerOption(value: 'medium', label: strings.fontMedium),
+              SettingsPickerOption(value: 'large', label: strings.fontLarge),
+            ],
           ),
-          SettingsItemTile(
+          SettingsSegmentedRow<String>(
             icon: Icons.high_quality_outlined,
             label: strings.videoQuality,
-            value: strings.qualityLabel(preferences.defaultVideoQuality),
-            onTap: () => _pickVideoQuality(context),
+            value: preferences.defaultVideoQuality,
+            onChanged: (v) => onChanged('default_video_quality', v),
+            options: [
+              SettingsPickerOption(value: 'auto', label: strings.qualityAuto),
+              SettingsPickerOption(value: 'low', label: strings.qualityLow),
+              SettingsPickerOption(
+                value: 'medium',
+                label: strings.qualityMedium,
+              ),
+              SettingsPickerOption(value: 'high', label: strings.qualityHigh),
+            ],
           ),
           SettingsSwitchTile(
             icon: Icons.play_circle_outline_rounded,
@@ -578,6 +537,7 @@ class NotificationSettingsCard extends StatelessWidget {
     // single expandable row instead of filling the screen.
     return SettingsSectionCard(
       title: strings.notifications,
+      accent: SettingsAccents.notifications,
       icon: Icons.notifications_none_rounded,
       child: Column(
         children: [
@@ -711,6 +671,7 @@ class PrivacySettingsCard extends StatelessWidget {
     final strings = AppStrings.of(context);
     return SettingsSectionCard(
       title: strings.privacy,
+      accent: SettingsAccents.privacy,
       icon: Icons.shield_outlined,
       child: Column(
         children: [
@@ -781,6 +742,7 @@ class SupportLegalCard extends StatelessWidget {
     final strings = AppStrings.of(context);
     return SettingsSectionCard(
       title: strings.supportAndInfo,
+      accent: SettingsAccents.support,
       icon: Icons.support_agent_rounded,
       child: Column(
         children: [

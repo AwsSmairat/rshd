@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../utils/open_lesson_file.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -99,18 +101,13 @@ class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                AppStrings.of(context).t(lesson.title),
-                style: AppTextStyles.titleOf(context),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                AppStrings.of(context).t(
-                  lesson.isActive ? 'الحالة: متاح' : 'الحالة: ${lesson.status}',
-                ),
-                style: AppTextStyles.bodyOf(
+              // The title is already the page header; show the state as a
+              // small badge instead of repeating it.
+              _StatusBadge(
+                label: AppStrings.of(
                   context,
-                ).copyWith(color: AppColors.of(context).secondary),
+                ).t(lesson.isActive ? 'متاح' : lesson.status),
+                active: lesson.isActive,
               ),
               if (lesson.description != null &&
                   lesson.description!.isNotEmpty) ...[
@@ -164,21 +161,7 @@ class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
                         padding: const EdgeInsets.only(bottom: 10),
                         child: LessonFileCard(
                           file: file,
-                          onTap: () {
-                            if (file.isLocked) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    AppStrings.of(
-                                      context,
-                                    ).t('الملف مقفل. فعّل المادة لفتحه.'),
-                                  ),
-                                ),
-                              );
-                              return;
-                            }
-                            context.push(AppRoutes.fileDetails(file.id));
-                          },
+                          onTap: () => openLessonFile(context, file),
                         ),
                       ),
                     )
@@ -272,6 +255,46 @@ class _ContentSection extends StatelessWidget {
         else
           ...children,
       ],
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({required this.label, required this.active});
+
+  final String label;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = active
+        ? const Color(0xFF15803D)
+        : AppColors.of(context).textMuted;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            active ? Icons.check_circle_rounded : Icons.lock_clock_rounded,
+            size: 15,
+            color: color,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

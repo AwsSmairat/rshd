@@ -375,22 +375,6 @@ class SubjectDetailsSectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 4,
-          height: 26,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppColors.of(context).accent,
-                AppColors.of(context).darkGold,
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
         Text(
           AppStrings.of(context).t(title),
           style: AppTextStyles.titleOf(context).copyWith(fontSize: 20),

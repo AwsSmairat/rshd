@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/stagger_reveal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
@@ -110,9 +111,12 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
 
             return Padding(
               padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
-              child: GradeCard(
-                grade: grade,
-                onTap: () => context.push(AppRoutes.gradeDetails(grade.id)),
+              child: StaggerReveal(
+                order: index,
+                child: GradeCard(
+                  grade: grade,
+                  onTap: () => context.push(AppRoutes.gradeDetails(grade.id)),
+                ),
               ),
             );
           }, childCount: state.grades.length + 2),

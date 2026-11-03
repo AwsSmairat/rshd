@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+
+import '../widgets/about_app_sheet.dart';
+
+import '../../../core/widgets/stagger_reveal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/rshd_refresh_indicator.dart';
 import 'package:go_router/go_router.dart';
@@ -35,6 +39,7 @@ class StudentSettingsScreen extends ConsumerStatefulWidget {
 
 class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
   String _appVersion = '';
+  String _buildNumber = '';
 
   @override
   void initState() {
@@ -54,7 +59,10 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
   Future<void> _loadVersion() async {
     final info = await PackageInfo.fromPlatform();
     if (mounted) {
-      setState(() => _appVersion = info.version);
+      setState(() {
+        _appVersion = info.version;
+        _buildNumber = info.buildNumber;
+      });
     }
   }
 
@@ -137,27 +145,6 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
         });
   }
 
-  void _showInfoDialog(
-    BuildContext context, {
-    required String title,
-    required String message,
-  }) {
-    final strings = AppStrings.of(context);
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppStrings.of(context).t(title)),
-        content: Text(AppStrings.of(context).t(message)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppStrings.of(context).t(strings.ok)),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(studentSettingsControllerProvider);
@@ -188,11 +175,10 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
     });
 
     final colors = AppColors.of(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       // Same warm ivory ground as the redesigned auth pages.
-      backgroundColor: isDark ? colors.background : const Color(0xFFF7F2E9),
+      backgroundColor: colors.background,
       // Fade from the loading state to the page rather than swapping at once.
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 220),
@@ -367,17 +353,12 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
       onContact: () => context.push(AppRoutes.contactUs),
       onTerms: () => context.push(AppRoutes.termsAndConditions),
       onPrivacy: () => context.push(AppRoutes.privacyPolicy),
-      onAbout: () {
-        final strings = AppStrings.of(context);
-        _showInfoDialog(
-          context,
-          title: strings.aboutAppTitle,
-          message: strings.aboutAppMessage(
-            platformSettings?.platformName ?? 'RSHD',
-            _appVersion.isEmpty ? '—' : _appVersion,
-          ),
-        );
-      },
+      onAbout: () => showAboutAppSheet(
+        context,
+        platformName: platformSettings?.platformName ?? 'RSHD',
+        version: _appVersion.isEmpty ? '—' : _appVersion,
+        buildNumber: _buildNumber,
+      ),
     );
 
     final logout = SettingsLogoutButton(
@@ -387,15 +368,20 @@ class _StudentSettingsScreenState extends ConsumerState<StudentSettingsScreen> {
 
     Widget buildColumns({required bool twoColumns}) {
       if (!twoColumns) {
+        // Cards rise in one after another when the page opens.
+        final cards = [
+          personalInfo,
+          security,
+          appPreferences,
+          notifications,
+          privacy,
+          support,
+        ];
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            spaced(personalInfo),
-            spaced(security),
-            spaced(appPreferences),
-            spaced(notifications),
-            spaced(privacy),
-            spaced(support),
+            for (var i = 0; i < cards.length; i++)
+              spaced(StaggerReveal(order: i, child: cards[i])),
             logout,
           ],
         );
