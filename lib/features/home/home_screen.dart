@@ -13,6 +13,7 @@ import 'home_controller.dart';
 import 'home_dashboard_model.dart';
 import '../subjects/data/models/subject_model.dart';
 import 'widgets/continue_learning_card.dart';
+import 'widgets/home_loading_skeleton.dart';
 import 'widgets/home_reveal.dart';
 import 'widgets/home_search_field.dart';
 import 'widgets/home_top_bar.dart';
@@ -118,7 +119,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           SliverToBoxAdapter(
             child: AnimatedOpacity(
-              opacity: isBusy ? 1 : 0,
+              // The skeleton shows the first load; this line, a refresh.
+              opacity: isBusy && dashboard != null ? 1 : 0,
               duration: const Duration(milliseconds: 200),
               child: Padding(
                 padding: const EdgeInsets.only(top: 12),
@@ -141,6 +143,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             top: 10,
           ),
+          if (dashboard == null)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.only(top: 24),
+                child: HomeLoadingSkeleton(),
+              ),
+            ),
           if (dashboard != null)
             section(
               ContinueLearningSection(
@@ -158,13 +167,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           if (suggested.isNotEmpty)
             section(SuggestedSubjectsSection(subjects: suggested), top: gap),
-          section(
-            UpcomingAssignmentsSection(
-              assignments: dashboard?.upcomingAssignments ?? const [],
-              quizzes: dashboard?.featuredQuizzes ?? const [],
+          if (dashboard != null)
+            section(
+              UpcomingAssignmentsSection(
+                assignments: dashboard.upcomingAssignments,
+                quizzes: dashboard.featuredQuizzes,
+              ),
+              top: gap,
             ),
-            top: gap,
-          ),
           const SliverToBoxAdapter(child: SizedBox(height: 28)),
         ],
       ),

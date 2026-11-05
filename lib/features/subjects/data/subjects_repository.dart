@@ -66,7 +66,7 @@ class SubjectsRepository {
 
     if (!apiResponse.success || apiResponse.data == null) {
       throw ApiException(
-        message: apiResponse.message ?? 'تعذر إرسال طلب الشراء.',
+        message: apiResponse.message ?? 'تعذر إرسال طلب التفعيل.',
         errors: apiResponse.errors,
       );
     }
@@ -92,7 +92,7 @@ class SubjectsRepository {
 
     if (!apiResponse.success || apiResponse.data == null) {
       throw ApiException(
-        message: apiResponse.message ?? 'تعذر إلغاء طلب الشراء.',
+        message: apiResponse.message ?? 'تعذر إلغاء طلب التفعيل.',
         errors: apiResponse.errors,
       );
     }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../../core/widgets/skeleton.dart';
 import '../../../core/widgets/app_empty_state.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -23,7 +25,9 @@ class AssignmentsLoadingSkeleton extends StatelessWidget {
   final int count;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => Skeleton(child: _shapes(context));
+
+  Widget _shapes(BuildContext context) {
     return Column(
       children: List.generate(count, (index) {
         return Padding(
@@ -42,18 +46,18 @@ class AssignmentsLoadingSkeleton extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _SkeletonBox(width: double.infinity, height: 18),
+                      SkeletonBox(width: double.infinity, height: 18),
                       const SizedBox(height: 10),
-                      _SkeletonBox(width: 120, height: 14),
+                      SkeletonBox(width: 120, height: 14),
                       const SizedBox(height: 10),
-                      _SkeletonBox(width: 170, height: 12),
+                      SkeletonBox(width: 170, height: 12),
                       const SizedBox(height: 12),
-                      _SkeletonBox(width: 96, height: 24, radius: 20),
+                      SkeletonBox(width: 96, height: 24, radius: 20),
                     ],
                   ),
                 ),
                 const SizedBox(width: 12),
-                _SkeletonBox(width: 72, height: 88, radius: 16),
+                SkeletonBox(width: 72, height: 88, radius: 16),
               ],
             ),
           ),
@@ -114,30 +118,6 @@ class AssignmentsErrorState extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _SkeletonBox extends StatelessWidget {
-  const _SkeletonBox({
-    required this.width,
-    required this.height,
-    this.radius = 8,
-  });
-
-  final double width;
-  final double height;
-  final double radius;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: AppColors.of(context).accent.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(radius),
       ),
     );
   }

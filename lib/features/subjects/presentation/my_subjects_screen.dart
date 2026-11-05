@@ -106,7 +106,7 @@ class _MySubjectsScreenState extends ConsumerState<MySubjectsScreen> {
         content: Text(
           AppStrings.of(
             context,
-          ).t('تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.'),
+          ).t('تم إرسال طلب التفعيل. بانتظار موافقة الإدارة.'),
         ),
       ),
     );

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/liquid_glass_surface.dart';
+import '../../../core/widgets/skeleton.dart';
 
+/// Grade cards while they load: the course, the title and the score ring.
 class GradesLoadingSkeleton extends StatelessWidget {
   const GradesLoadingSkeleton({super.key, this.count = 2});
 
@@ -10,56 +10,36 @@ class GradesLoadingSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: List.generate(count, (index) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: index == count - 1 ? 0 : 16),
-          child: LiquidGlassSurface(
-            borderRadius: BorderRadius.circular(24),
-            padding: const EdgeInsets.all(18),
-            fillOpacity: 0.3,
-            borderOpacity: 0.55,
-            blurSigma: 16,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 96,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: AppColors.of(
-                      context,
-                    ).textMuted.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+    return Skeleton(
+      child: Column(
+        children: [
+          for (var i = 0; i < count; i++)
+            Padding(
+              padding: EdgeInsets.only(bottom: i == count - 1 ? 0 : 16),
+              child: const SkeletonCard(
+                radius: 24,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SkeletonBox(width: 96, height: 12),
+                          SizedBox(height: 12),
+                          SkeletonBox(height: 16),
+                          SizedBox(height: 10),
+                          SkeletonBox(width: 140, height: 12),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    SkeletonBox.circle(size: 56),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  height: 18,
-                  decoration: BoxDecoration(
-                    color: AppColors.of(
-                      context,
-                    ).textMuted.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  width: 140,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: AppColors.of(
-                      context,
-                    ).textMuted.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        );
-      }),
+        ],
+      ),
     );
   }
 }

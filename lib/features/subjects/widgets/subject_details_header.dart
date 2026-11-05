@@ -193,11 +193,8 @@ class SubjectDetailsMetaCard extends StatelessWidget {
                 icon: Icons.category_outlined,
                 label: AppStrings.of(context).t(subject.categoryLabel),
               ),
-              if (subject.price != null)
-                _MetaChip(
-                  icon: Icons.payments_outlined,
-                  label: AppStrings.of(context).t('${subject.price} د.أ'),
-                ),
+              // No price: access is activated by the platform, not sold in
+              // the app (App Store guideline 3.1.1).
               if (lessonsCount > 0)
                 _MetaChip(
                   icon: Icons.view_module_outlined,
@@ -296,7 +293,7 @@ class SubjectDetailsMetaCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             AppStrings.of(context).t(
-                              'طلب الشراء قيد المراجعة. يمكنك مشاهدة الفيديوهات المجانية حتى يتم تفعيل المادة.',
+                              'طلب التفعيل قيد المراجعة. يمكنك مشاهدة الفيديوهات المجانية حتى يتم تفعيل المادة.',
                             ),
                             style: AppTextStyles.bodyOf(context).copyWith(
                               color: AppColors.of(context).primary,
@@ -318,7 +315,7 @@ class SubjectDetailsMetaCard extends StatelessWidget {
                         : const Icon(Icons.close_rounded, size: 18),
                     label: Text(
                       AppStrings.of(context).t(
-                        isCancelling ? 'جاري الإلغاء...' : 'إلغاء طلب الشراء',
+                        isCancelling ? 'جاري الإلغاء...' : 'إلغاء طلب التفعيل',
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
@@ -541,7 +538,7 @@ class _PurchaseButton extends StatelessWidget {
             child: isRequesting
                 ? RshdLoader(size: 13.6, color: Colors.white)
                 : Text(
-                    AppStrings.of(context).t('طلب شراء المادة'),
+                    AppStrings.of(context).t('طلب تفعيل المادة'),
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,

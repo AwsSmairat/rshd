@@ -21,7 +21,7 @@ class TermsAndConditionsConfig {
 
   static const String refundRequestPeriod = 'حسب السياسة المعتمدة من الإدارة';
   static const String refundProcessingPeriod =
-      'حسب طريقة الدفع والسياسة المعتمدة';
+      'حسب السياسة المعتمدة من الإدارة';
 
   static const String governingLaw =
       'القوانين المعمول بها في الدولة التي تعتمدها الجهة المالكة للمنصة';

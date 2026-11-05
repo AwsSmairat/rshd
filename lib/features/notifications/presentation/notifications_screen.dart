@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../../core/widgets/skeleton.dart';
 import '../../../core/widgets/stagger_reveal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/rshd_refresh_indicator.dart';
@@ -6,7 +8,6 @@ import '../../../core/widgets/rshd_refresh_indicator.dart';
 import '../../../core/layout/app_layout_metrics.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/error_view.dart';
-import '../../../core/widgets/loading_widget.dart';
 import '../../subjects/presentation/subjects_controller.dart';
 import '../notification_navigation.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -188,9 +189,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
-        return SliverFillRemaining(
-          hasScrollBody: false,
-          child: LoadingWidget(message: strings.t('جاري تحميل الإشعارات...')),
+        return ResponsiveSliverContent(
+          padding: AppLayoutMetrics.of(context).pagePadding(top: 4, bottom: 0),
+          sliver: const SliverToBoxAdapter(child: _NotificationsSkeleton()),
         );
       case FeatureLoadStatus.empty:
         return _empty(
@@ -371,4 +372,38 @@ enum NotificationFilter {
     announcements => s.filterAnnouncements,
     messages => s.filterMessages,
   };
+}
+
+/// Day groups of notification rows while the list loads.
+class _NotificationsSkeleton extends StatelessWidget {
+  const _NotificationsSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    Widget group(int rows) => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SkeletonBox(width: 70, height: 13),
+        const SizedBox(height: 10),
+        SkeletonCard(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            children: [
+              for (var i = 0; i < rows; i++) ...[
+                if (i > 0) const SizedBox(height: 18),
+                SkeletonListRow(
+                  titleWidth: i.isEven ? 200 : 160,
+                  subtitleWidth: i.isEven ? 240 : 190,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+
+    return Skeleton(
+      child: Column(children: [group(3), const SizedBox(height: 22), group(2)]),
+    );
+  }
 }

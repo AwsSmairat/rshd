@@ -275,7 +275,7 @@ class AppStrings {
   String get noNotificationsInFilter =>
       _t('لا توجد إشعارات في هذا التصنيف', 'Nothing in this category');
   String get showAllNotifications => _t('عرض كل الإشعارات', 'Show all');
-  String get requestPurchase => _t('طلب شراء', 'Request access');
+  String get requestPurchase => _t('طلب تفعيل', 'Request access');
   String get requestSending => _t('جاري الإرسال...', 'Sending...');
   String get awaitingActivation =>
       _t('بانتظار تفعيل الإدارة', 'Awaiting activation');

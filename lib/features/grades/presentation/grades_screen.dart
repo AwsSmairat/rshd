@@ -8,10 +8,10 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/error_view.dart';
-import '../../../core/widgets/loading_widget.dart';
 import '../../../core/widgets/responsive_content.dart';
 import '../../subjects/presentation/subjects_controller.dart';
 import '../widgets/grade_card.dart';
+import '../widgets/grades_state_views.dart';
 import '../widgets/grades_empty_state.dart';
 import '../widgets/grades_header.dart';
 import '../widgets/grades_summary_card.dart';
@@ -63,12 +63,10 @@ class _GradesScreenState extends ConsumerState<GradesScreen> {
     switch (state.status) {
       case FeatureLoadStatus.initial:
       case FeatureLoadStatus.loading:
-        return SliverToBoxAdapter(
+        return const SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.only(top: 24),
-            child: LoadingWidget(
-              message: AppStrings.of(context).t('جاري تحميل الدرجات...'),
-            ),
+            padding: EdgeInsets.only(top: 8),
+            child: GradesLoadingSkeleton(count: 4),
           ),
         );
       case FeatureLoadStatus.empty:

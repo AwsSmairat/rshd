@@ -188,7 +188,9 @@ class LuxurySubjectCard extends StatelessWidget {
                               ),
                               child: Text(
                                 AppStrings.of(context).t(
-                                  isRequesting ? 'جاري الإرسال...' : 'طلب شراء',
+                                  isRequesting
+                                      ? 'جاري الإرسال...'
+                                      : 'طلب تفعيل',
                                 ),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w800,

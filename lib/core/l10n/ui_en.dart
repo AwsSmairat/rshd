@@ -2,8 +2,8 @@
 const kUiEnglish = <String, String>{
   'ابدأ محادثة جديدة مع فريق الدعم الفني — سيظهر طلبك لجميع المسؤولين حتى يقبله أحدهم.':
       'Start a new conversation with technical support — your request will be visible to all admins until one accepts it.',
-  'طلب الشراء قيد المراجعة. يمكنك مشاهدة الفيديوهات المجانية حتى يتم تفعيل المادة.':
-      'Your purchase request is under review. You can watch free videos until the course is activated.',
+  'طلب التفعيل قيد المراجعة. يمكنك مشاهدة الفيديوهات المجانية حتى يتم تفعيل المادة.':
+      'Your activation request is under review. You can watch free videos until the course is activated.',
   'الفيديو قيد الرفع إلى Bunny Stream. انتظر قليلاً ثم اسحب للأسفل لتحديث الصفحة.':
       'The video is uploading to Bunny Stream. Please wait, then pull down to refresh.',
   'هذا الحساب متصل على جهاز آخر، يرجى التواصل مع الإدارة لإعادة تعيين الجهاز.':
@@ -38,8 +38,8 @@ const kUiEnglish = <String, String>{
       'Files can only be viewed inside the app and cannot be downloaded or saved.',
   'هل أنت متأكد؟ قد يكون هذا الإجراء نهائياً ولا يمكن التراجع عنه.':
       'Are you sure? This action may be permanent and cannot be undone.',
-  'هل تريد إلغاء طلب شراء هذه المادة؟ يمكنك إرسال طلب جديد لاحقاً.':
-      'Cancel the purchase request for this course? You can send a new request later.',
+  'هل تريد إلغاء طلب تفعيل هذه المادة؟ يمكنك إرسال طلب جديد لاحقاً.':
+      'Cancel the activation request for this course? You can send a new request later.',
   'اختر كلمة مرور قوية لحسابك (8 أحرف على الأقل، حرف كبير، ورقم).':
       'Choose a strong password (at least 8 characters, one uppercase letter, and one number).',
   'طالب يستخدم أدوات RSHD للدراسة ومشاهدة الدروس وتدوين الملاحظات':
@@ -104,7 +104,7 @@ const kUiEnglish = <String, String>{
       'Could not connect to the server. Check your internet connection.',
   'ستظهر درجاتك هنا بعد تقييم الواجبات والاختبارات':
       'Your grades will appear here after assignments and quizzes are graded',
-  'عندما يضيف المدرّس مواداً ستظهر هنا لطلب الشراء':
+  'عندما يضيف المدرّس مواداً ستظهر هنا لطلب التفعيل':
       'When your instructor adds courses, they will appear here to request',
   'تم إنهاء هذه المحادثة — يمكنك بدء محادثة جديدة':
       'This conversation has ended — you can start a new one',
@@ -116,12 +116,12 @@ const kUiEnglish = <String, String>{
       'and you agreed to them through the approved in-app process.',
   'يرجى تأكيد بريدك الإلكتروني قبل تسجيل الدخول.':
       'Please confirm your email before signing in.',
-  'اطلب شراء مادة من الأقسام، ثم فعّلها الإدارة':
-      'Request a course from the departments, then wait for admin activation',
+  'اطلب تفعيل مادة من الأقسام، وستفعّلها الإدارة':
+      'Request a course activation from the departments, then wait for admin approval',
   'لا توجد رسائل بعد. اكتب رسالتك الأولى أدناه.':
       'No messages yet. Write your first message below.',
-  'تم إرسال طلب الشراء. بانتظار تفعيل الإدارة.':
-      'Purchase request sent. Waiting for admin activation.',
+  'تم إرسال طلب التفعيل. بانتظار موافقة الإدارة.':
+      'Activation request sent. Waiting for admin approval.',
   'تواصل مع مدرّس مادتك أو مع فريق الدعم الفني':
       'Contact your course instructor or technical support',
   'ستظهر الاختبارات هنا عند إضافتها من المدرّس':
@@ -303,6 +303,7 @@ const kUiEnglish = <String, String>{
   'تأكيد البريد الإلكتروني': 'Confirm email',
   'تشغيل عائم داخل التطبيق': 'In-app floating play',
   'تابع المشاهدة أثناء التصفح': 'Keep watching while you browse',
+  'جاري التحميل': 'Loading',
   'مشغل الفيديو العائم': 'Floating video player',
   'تغيير الحجم': 'Change size',
   'فتح صفحة الفيديو': 'Open video page',
@@ -335,8 +336,8 @@ const kUiEnglish = <String, String>{
   'بدء محادثة الدعم الفني': 'Start a support conversation',
   'بريد التواصل غير متوفر': 'Contact email is not available',
   'تعذر إرسال رمز التحقق.': 'Could not send the verification code.',
-  'تعذر إرسال طلب الشراء.': 'Could not send the purchase request.',
-  'تعذر إلغاء طلب الشراء.': 'Could not cancel the purchase request.',
+  'تعذر إرسال طلب التفعيل.': 'Could not send the activation request.',
+  'تعذر إلغاء طلب التفعيل.': 'Could not cancel the activation request.',
   'تعذر تحميل الدعم الفني': 'Could not load technical support',
   'تعذر جلب تفاصيل الدرس.': 'Could not fetch lesson details.',
   'تعذر جلب تفاصيل الملف.': 'Could not fetch file details.',
@@ -352,8 +353,8 @@ const kUiEnglish = <String, String>{
   'بانتظار تفعيل الإدارة': 'Waiting for admin activation',
   'بدء الاختبار مرة أخرى': 'Retake quiz',
   'تحديث الشروط والأحكام': 'Updated terms and conditions',
-  'تعذر إرسال طلب الشراء': 'Could not send the purchase request',
-  'تعذر إلغاء طلب الشراء': 'Could not cancel the purchase request',
+  'تعذر إرسال طلب التفعيل': 'Could not send the activation request',
+  'تعذر إلغاء طلب التفعيل': 'Could not cancel the activation request',
   'تعذر الاتصال بالسيرفر': 'Could not connect to the server',
   'تعذر التحقق من الرمز.': 'Could not verify the code.',
   'تعذر تحميل الاختبارات': 'Could not load quizzes',
@@ -381,7 +382,7 @@ const kUiEnglish = <String, String>{
   'العودة لتسجيل الدخول': 'Back to sign in',
   'تعذر تحميل الإعدادات': 'Could not load settings',
   'تعذر تحميل الإعلانات': 'Could not load announcements',
-  'تم إلغاء طلب الشراء.': 'Purchase request cancelled.',
+  'تم إلغاء طلب التفعيل.': 'Activation request cancelled.',
   'تم تغيير كلمة المرور': 'Password changed',
   'تم حفظ تقدم المشاهدة': 'Watch progress saved',
   'جاري بدء الاختبار...': 'Starting quiz...',
@@ -465,7 +466,7 @@ const kUiEnglish = <String, String>{
   'منصة تعليمية ذكية': 'Smart learning platform',
   'نسيت كلمة المرور؟': 'Forgot password?',
   ' تم إنشاء الملف:': ' File created:',
-  'إلغاء طلب الشراء': 'Cancel purchase request',
+  'إلغاء طلب التفعيل': 'Cancel activation request',
   'اكتب ملاحظتك هنا': 'Write your note here',
   'الإبلاغ عن مشكلة': 'Report an issue',
   'الإصدار الحالي: ': 'Current version: ',
@@ -506,7 +507,7 @@ const kUiEnglish = <String, String>{
   'جاري التحديث...': 'Updating...',
   'جارٍ الإرسال...': 'Sending...',
   'حفظ كلمة المرور': 'Save password',
-  'طلب شراء المادة': 'Course purchase request',
+  'طلب تفعيل المادة': 'Request course activation',
   'كلمة مرور جديدة': 'New password',
   'ليس لديك حساب؟ ': 'Don\'t have an account? ',
   'معلومات الفيديو': 'Video information',
@@ -654,7 +655,7 @@ const kUiEnglish = <String, String>{
   'تصدير PDF': 'Export PDF',
   'حذف نهائي': 'Delete permanently',
   'رسالة من ': 'Message from ',
-  'طلب تفعيل': 'Activation request',
+  'طلب تفعيل': 'Request activation',
   'غير مقروء': 'Unread',
   'فتح الملف': 'Open file',
   'فشل الحفظ': 'Save failed',
@@ -675,7 +676,6 @@ const kUiEnglish = <String, String>{
   'تم الحفظ': 'Saved',
   'جهاز آخر': 'Another device',
   'جيد جداً': 'Very good',
-  'طلب شراء': 'Purchase request',
   'غير جاهز': 'Not ready',
   'غير صحيح': 'Incorrect',
   'غير متاح': 'Unavailable',

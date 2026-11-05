@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/widgets/skeleton.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_empty_state.dart';
@@ -39,7 +41,9 @@ class SubjectsLoadingSkeleton extends StatelessWidget {
   final int count;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => Skeleton(child: _shapes(context));
+
+  Widget _shapes(BuildContext context) {
     return Column(
       children: List.generate(count, (index) {
         return Padding(
@@ -57,18 +61,18 @@ class SubjectsLoadingSkeleton extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _SkeletonBox(width: 56, height: 22),
+                        SkeletonBox(width: 56, height: 22),
                         const SizedBox(height: 12),
-                        _SkeletonBox(width: double.infinity, height: 18),
+                        SkeletonBox(width: double.infinity, height: 18),
                         const SizedBox(height: 8),
-                        _SkeletonBox(width: 140, height: 14),
+                        SkeletonBox(width: 140, height: 14),
                         const SizedBox(height: 8),
-                        _SkeletonBox(width: 190, height: 12),
+                        SkeletonBox(width: 190, height: 12),
                       ],
                     ),
                   ),
                   const SizedBox(width: 12),
-                  _SkeletonBox(width: 58, height: 58, radius: 999),
+                  SkeletonBox(width: 58, height: 58, radius: 999),
                 ],
               ),
             ),
@@ -79,26 +83,97 @@ class SubjectsLoadingSkeleton extends StatelessWidget {
   }
 }
 
-class _SkeletonBox extends StatelessWidget {
-  const _SkeletonBox({
-    required this.width,
-    required this.height,
-    this.radius = 8,
-  });
+/// Lesson rows while a course's lessons load: the number and two lines.
+class LessonsLoadingSkeleton extends StatelessWidget {
+  const LessonsLoadingSkeleton({super.key, this.count = 4});
 
-  final double width;
-  final double height;
-  final double radius;
+  final int count;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: AppColors.of(context).accent.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(radius),
+    return Skeleton(
+      child: Column(
+        children: [
+          for (var i = 0; i < count; i++)
+            Padding(
+              padding: EdgeInsets.only(bottom: i == count - 1 ? 0 : 12),
+              child: SkeletonCard(
+                radius: 14,
+                padding: const EdgeInsets.all(14),
+                child: SkeletonListRow(
+                  leadingSize: 36,
+                  leadingRadius: 999,
+                  titleWidth: i.isEven ? 190 : 150,
+                  subtitleWidth: 90,
+                ),
+              ),
+            ),
+        ],
       ),
+    );
+  }
+}
+
+/// A whole course page while it loads: the cover, the facts card and the
+/// lessons. The back button stays real so the student is never stuck.
+class SubjectDetailsLoadingSkeleton extends StatelessWidget {
+  const SubjectDetailsLoadingSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final top = MediaQuery.paddingOf(context).top;
+    return ListView(
+      padding: EdgeInsets.zero,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        Stack(
+          children: [
+            Skeleton(child: SkeletonBox(height: 248 + top, radius: 0)),
+            PositionedDirectional(
+              top: top + 8,
+              start: 8,
+              child: const BackButton(),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
+          child: Skeleton(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SkeletonCard(
+                  radius: 24,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          SkeletonBox(width: 70, height: 30, radius: 999),
+                          SizedBox(width: 8),
+                          SkeletonBox(width: 70, height: 30, radius: 999),
+                          SizedBox(width: 8),
+                          SkeletonBox(width: 70, height: 30, radius: 999),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      SkeletonBox(height: 12),
+                      SizedBox(height: 8),
+                      SkeletonBox(width: 220, height: 12),
+                      SizedBox(height: 20),
+                      SkeletonBox(height: 8, radius: 999),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const SkeletonBox(width: 90, height: 20),
+                const SizedBox(height: 12),
+                const LessonsLoadingSkeleton(),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

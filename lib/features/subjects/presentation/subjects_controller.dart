@@ -189,7 +189,7 @@ class SubjectsListController extends StateNotifier<SubjectsListState> {
     } on ApiException catch (error) {
       return mapSubjectsError(error);
     } catch (_) {
-      return 'تعذر إرسال طلب الشراء';
+      return 'تعذر إرسال طلب التفعيل';
     }
   }
 
