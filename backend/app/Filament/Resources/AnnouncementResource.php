@@ -26,7 +26,7 @@ class AnnouncementResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-megaphone';
 
-    protected static ?string $navigationGroup = 'التقويم والتواصل';
+    protected static ?string $navigationGroup = 'التواصل';
 
     protected static ?string $navigationLabel = 'الإعلانات';
 

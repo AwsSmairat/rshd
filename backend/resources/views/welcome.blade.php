@@ -48,10 +48,13 @@
     <link rel="preconnect" href="//fonts.gstatic.com" crossorigin>
     <link href="//fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset("css/rshd-home.css") }}?v=1">
+    <link rel="stylesheet" href="{{ asset("css/rshd-motion.css") }}?v=2">
 
     <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 </head>
 <body>
+    {{-- A first visit opens with the RSHD intro; see public/js/rshd-motion.js. --}}
+    <x-rshd-curtain :logo="$portal->logoUrl" intro intro-tagline="المنصة الأكاديمية" />
     <div class="home-shell">
         <header class="site-header">
             <a class="brand" href="/" aria-label="RSHD">
@@ -62,7 +65,7 @@
                 </span>
             </a>
 
-            <a class="header-login" href="{{ $loginUrl }}">تسجيل دخول المدرسين والإدارة</a>
+            <a class="header-login" href="{{ $loginUrl }}" data-rshd-title="تسجيل الدخول" data-rshd-group="بوابة المدرسين والإدارة">تسجيل دخول المدرسين والإدارة</a>
         </header>
 
         <main>
@@ -78,7 +81,7 @@
                     </p>
 
                     <div class="hero-actions">
-                        <a class="primary-action" href="{{ $loginUrl }}">الدخول إلى البوابة</a>
+                        <a class="primary-action" href="{{ $loginUrl }}" data-rshd-title="تسجيل الدخول" data-rshd-group="بوابة المدرسين والإدارة">الدخول إلى البوابة</a>
                         <a class="secondary-action" href="#contact">تواصل معنا</a>
                     </div>
 
@@ -146,7 +149,7 @@
                     <p>ادخل إلى البوابة الخاصة بك لإدارة المحتوى والطلاب والمهام الأكاديمية.</p>
                 </div>
 
-                <a href="{{ $loginUrl }}">تسجيل الدخول</a>
+                <a href="{{ $loginUrl }}" data-rshd-title="تسجيل الدخول" data-rshd-group="بوابة المدرسين والإدارة">تسجيل الدخول</a>
             </section>
 
             <section class="contact" id="contact">
@@ -191,5 +194,6 @@
             <p>{{ $portal->copyright }}</p>
         </footer>
     </div>
+    <script src="{{ asset("js/rshd-motion.js") }}?v=2"></script>
 </body>
 </html>

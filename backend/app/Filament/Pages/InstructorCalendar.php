@@ -17,7 +17,7 @@ class InstructorCalendar extends Page
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
-    protected static ?string $navigationGroup = 'التقويم والتواصل';
+    protected static ?string $navigationGroup = 'التواصل';
 
     protected static ?string $navigationLabel = 'التقويم';
 

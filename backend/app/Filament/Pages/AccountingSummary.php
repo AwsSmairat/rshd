@@ -22,7 +22,7 @@ class AccountingSummary extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static ?string $navigationGroup = 'الرئيسية';
+    protected static ?string $navigationGroup = 'المحاسبة';
 
     protected static ?string $navigationLabel = 'ملخص الأرباح';
 

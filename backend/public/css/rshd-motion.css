@@ -1,0 +1,347 @@
+/* RSHD page motion: the curtain between pages, the first-visit intro and the
+   arrival of a page's content. The circle animates a mask; everything else
+   animates only transform, opacity and filter. */
+
+:root {
+    --rshd-settle-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ---------- The curtain ---------- */
+
+.rshd-curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.rshd-curtain.is-closing,
+.rshd-curtain.is-closed,
+.rshd-curtain.is-opening {
+    visibility: visible;
+}
+
+.rshd-curtain.is-closing,
+.rshd-curtain.is-closed {
+    pointer-events: auto;
+}
+
+/* A closed curtain that nothing opens (a script failed) gives way on its own. */
+.rshd-curtain.is-closed {
+    animation: rshd-curtain-failsafe 0s 9s forwards;
+}
+
+@keyframes rshd-curtain-failsafe {
+    to {
+        visibility: hidden;
+        pointer-events: none;
+    }
+}
+
+/* The curtain is drawn as two halves that together make one seamless
+   screen: the same background and content, each showing only its half. */
+.rshd-curtain__half {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(52rem 30rem at 50% 50%, rgba(214, 181, 109, 0.12), transparent 62%),
+        linear-gradient(180deg, #102849 0%, #0B1F3A 48%, #081426 100%);
+}
+
+.rshd-curtain__half--top {
+    clip-path: inset(0 0 50% 0);
+}
+
+.rshd-curtain__half--bottom {
+    clip-path: inset(50% 0 0 0);
+}
+
+/* ---------- The circle ----------
+   A round hole in the curtain, centred on the middle of the words. It grows
+   out of the text to reveal the new page, and shrinks back to the middle to
+   cover the page being left. Its edge carries a soft gold glow. */
+
+@property --rshd-hole {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 0px;
+}
+
+.rshd-curtain.is-opening,
+.rshd-curtain.is-closing {
+    --rshd-iris: radial-gradient(
+        circle at var(--rshd-cx, 50%) var(--rshd-cy, 50%),
+        transparent var(--rshd-hole),
+        #000 calc(var(--rshd-hole) + 1px)
+    );
+    -webkit-mask-image: var(--rshd-iris);
+    mask-image: var(--rshd-iris);
+}
+
+.rshd-curtain.is-opening {
+    animation: rshd-iris-open 1.25s cubic-bezier(0.7, 0, 0.2, 1) both;
+}
+
+.rshd-curtain.is-closing {
+    animation: rshd-iris-close 0.55s cubic-bezier(0.55, 0, 0.35, 1) both;
+}
+
+/* 75vmax reaches the farthest corner from the middle on any screen, so the
+   whole duration is spent where the eye can see the circle. */
+@keyframes rshd-iris-open {
+    from { --rshd-hole: 0px; }
+    to { --rshd-hole: calc(75vmax + 40px); }
+}
+
+@keyframes rshd-iris-close {
+    from { --rshd-hole: calc(75vmax + 40px); }
+    to { --rshd-hole: 0px; }
+}
+
+.rshd-curtain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+        circle at var(--rshd-cx, 50%) var(--rshd-cy, 50%),
+        transparent var(--rshd-hole),
+        rgba(214, 181, 109, 0.55) calc(var(--rshd-hole) + 1px),
+        rgba(214, 181, 109, 0.12) calc(var(--rshd-hole) + 10px),
+        transparent calc(var(--rshd-hole) + 40px)
+    );
+    transition: opacity 0.2s ease;
+}
+
+.rshd-curtain.is-opening::after,
+.rshd-curtain.is-closing::after {
+    opacity: 1;
+}
+
+/* Browsers without @property cannot grow the circle: fade instead. */
+html.rshd-no-iris .rshd-curtain.is-opening,
+html.rshd-no-iris .rshd-curtain.is-closing {
+    -webkit-mask-image: none;
+    mask-image: none;
+}
+
+html.rshd-no-iris .rshd-curtain.is-opening {
+    animation: rshd-fade-out 0.8s ease both;
+}
+
+html.rshd-no-iris .rshd-curtain.is-closing {
+    animation: rshd-fade-in 0.4s ease both;
+}
+
+html.rshd-no-iris .rshd-curtain::after {
+    display: none;
+}
+
+@keyframes rshd-fade-out {
+    to { opacity: 0; }
+}
+
+@keyframes rshd-fade-in {
+    from { opacity: 0; }
+}
+
+/* ---------- What the curtain says ---------- */
+
+.rshd-curtain__stage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    color: #FFFFFF;
+    text-align: center;
+}
+
+/* The title sits exactly on the seam; the rest hangs above and below it. */
+.rshd-curtain__word {
+    position: relative;
+    max-width: min(90vw, 48rem);
+}
+
+.rshd-curtain__above {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 0.9rem;
+}
+
+.rshd-curtain__mark {
+    height: clamp(3rem, 7vw, 4.5rem);
+    width: auto;
+    filter: drop-shadow(0 12px 28px rgba(214, 181, 109, 0.22));
+}
+
+.rshd-curtain__eyebrow {
+    margin: 1rem 0 0;
+    min-height: 1.2em;
+    font-size: clamp(0.8rem, 1.6vw, 0.95rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: rgba(214, 181, 109, 0.92);
+}
+
+.rshd-curtain__title {
+    margin: 0;
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.2;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+}
+
+.rshd-curtain__tagline {
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    margin: 0;
+    padding-top: 1rem;
+    font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+    font-weight: 600;
+    color: rgba(246, 241, 231, 0.75);
+}
+
+.rshd-curtain__tagline:empty {
+    display: none;
+}
+
+/* Words come in softly once the halves have met. */
+.rshd-curtain.is-closing .rshd-curtain__word {
+    animation: rshd-words-in 0.5s 0.22s var(--rshd-settle-ease) both;
+}
+
+@keyframes rshd-words-in {
+    from {
+        opacity: 0;
+        letter-spacing: 0.04em;
+        filter: blur(6px);
+    }
+}
+
+/* As the circle opens out of the words, they swell gently and fade. */
+.rshd-curtain.is-opening .rshd-curtain__word {
+    animation: rshd-words-out 1.25s cubic-bezier(0.7, 0, 0.2, 1) both;
+}
+
+@keyframes rshd-words-out {
+    to {
+        opacity: 0;
+        transform: scale(1.08);
+    }
+}
+
+/* ---------- First-visit intro ---------- */
+
+.rshd-curtain.is-intro .rshd-curtain__title {
+    font-size: clamp(3rem, 11vw, 7rem);
+    letter-spacing: 0.08em;
+    color: #F6E7C1;
+}
+
+.rshd-curtain.is-intro .rshd-curtain__mark {
+    height: clamp(4.5rem, 12vw, 7.5rem);
+    animation: rshd-mark-in 1s 0.1s var(--rshd-settle-ease) both;
+}
+
+.rshd-curtain.is-intro .rshd-curtain__stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(28rem 18rem at 50% 50%, rgba(214, 181, 109, 0.16), transparent 70%);
+    animation: rshd-glow 3s ease-in-out infinite;
+}
+
+.rshd-curtain__char {
+    display: inline-block;
+}
+
+.rshd-curtain.is-intro .rshd-curtain__char {
+    animation: rshd-char-in 0.8s calc(0.45s + var(--rshd-c) * 0.09s) var(--rshd-settle-ease) both;
+}
+
+.rshd-curtain.is-intro .rshd-curtain__tagline {
+    animation: rshd-fade-up 0.8s 1.15s var(--rshd-settle-ease) both;
+}
+
+@keyframes rshd-mark-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+        filter: blur(10px);
+    }
+}
+
+@keyframes rshd-char-in {
+    from {
+        opacity: 0;
+        transform: translateY(0.35em);
+        filter: blur(8px);
+    }
+}
+
+@keyframes rshd-fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
+
+@keyframes rshd-glow {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* ---------- The page around the curtain ---------- */
+
+html.rshd-arriving {
+    overflow: hidden;
+}
+
+/* The page you leave eases back as the curtain closes over it. */
+html.rshd-leaving .fi-main,
+html.rshd-leaving main {
+    transition: opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease;
+    opacity: 0.55;
+    transform: scale(0.985);
+    filter: blur(2px);
+}
+
+/* The new page's blocks rise into place one after another. */
+.rshd-enter {
+    animation: rshd-enter 0.9s calc(0.25s + var(--rshd-i, 0) * 70ms) var(--rshd-settle-ease) both;
+}
+
+@keyframes rshd-enter {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+        filter: blur(6px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rshd-curtain {
+        display: none !important;
+    }
+
+    .rshd-enter {
+        animation: none;
+    }
+
+    html.rshd-leaving .fi-main,
+    html.rshd-leaving main {
+        transition: none;
+        opacity: 1;
+        transform: none;
+        filter: none;
+    }
+}

@@ -21,7 +21,7 @@ class LegalDocumentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationGroup = 'المحتوى القانوني';
+    protected static ?string $navigationGroup = 'النظام';
 
     protected static ?string $navigationLabel = 'الوثائق القانونية';
 

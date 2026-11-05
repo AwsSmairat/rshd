@@ -32,7 +32,8 @@ class SubjectStudentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
 
-    protected static ?string $navigationGroup = 'التعلم';
+    // Top-level link in the top bar, outside any group.
+    protected static ?string $navigationGroup = null;
 
     protected static ?string $navigationLabel = 'طلبات التفعيل';
 

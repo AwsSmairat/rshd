@@ -28,7 +28,7 @@ class StudentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?string $navigationGroup = 'الإدارة';
+    protected static ?string $navigationGroup = 'المستخدمون';
 
     protected static ?string $navigationLabel = 'الطلاب';
 

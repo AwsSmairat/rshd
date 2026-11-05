@@ -20,7 +20,7 @@ class InstructorMessages extends Page
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
-    protected static ?string $navigationGroup = 'التقويم والتواصل';
+    protected static ?string $navigationGroup = 'التواصل';
 
     protected static ?string $navigationLabel = 'الرسائل';
 

@@ -27,7 +27,7 @@ class InstructorResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationGroup = 'الإدارة';
+    protected static ?string $navigationGroup = 'المستخدمون';
 
     protected static ?string $navigationLabel = 'المدرسون';
 

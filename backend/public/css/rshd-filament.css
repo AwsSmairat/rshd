@@ -3252,3 +3252,213 @@
     border-color: #B08A4A;
     box-shadow: inset 0 0 0 3px #fff;
 }
+
+/* ========== Top navigation: a website-style header ==========
+   The admin menu runs along the top. Items are plain text like a site
+   header; the current page carries a gold underline. Each group opens a
+   card of links, in two columns when it is long. */
+
+.fi-topbar.fi-topbar-with-navigation {
+    background: transparent !important;
+    border-bottom: 0 !important;
+}
+
+.fi-topbar-with-navigation > nav {
+    height: 76px !important;
+    gap: 1.25rem !important;
+    padding-inline: clamp(1rem, 3vw, 2.5rem) !important;
+    background: rgba(255, 253, 248, 0.9) !important;
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+    backdrop-filter: saturate(160%) blur(14px);
+    --tw-ring-shadow: 0 0 #0000 !important;
+    box-shadow:
+        0 1px 0 rgba(11, 31, 58, 0.07),
+        0 14px 32px -24px rgba(11, 31, 58, 0.35) !important;
+}
+
+.fi-topbar-with-navigation > nav > div.me-6 {
+    margin-inline-end: 1rem !important;
+}
+
+.fi-topbar-with-navigation > nav > ul {
+    gap: 0.15rem !important;
+    margin-inline-end: 0 !important;
+}
+
+.fi-topbar-item-button {
+    position: relative;
+    padding: 0.6rem 0.85rem !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    transition: background-color 0.2s ease, color 0.2s ease !important;
+}
+
+/* Text only, like a site header; icons stay in the menus. */
+.fi-topbar-item-button .fi-topbar-item-icon {
+    display: none !important;
+}
+
+.fi-topbar-item-button .fi-topbar-item-label {
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    color: #3B4A63 !important;
+    transition: color 0.2s ease;
+}
+
+.fi-topbar-item-button .fi-topbar-group-toggle-icon {
+    width: 1rem !important;
+    height: 1rem !important;
+    color: rgba(11, 31, 58, 0.45) !important;
+    transition: transform 0.2s ease;
+}
+
+.fi-topbar-item-button:hover {
+    background: rgba(11, 31, 58, 0.04) !important;
+}
+
+.fi-topbar-item-button:hover .fi-topbar-item-label,
+.fi-topbar-item.fi-active .fi-topbar-item-label {
+    color: var(--rshd-navy) !important;
+}
+
+.fi-topbar-item.fi-active .fi-topbar-item-label {
+    font-weight: 800 !important;
+}
+
+.fi-topbar-item-button::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0.85rem;
+    bottom: 0.15rem;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--rshd-gold);
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
+}
+
+.fi-topbar-item.fi-active .fi-topbar-item-button::after {
+    transform: scaleX(1);
+}
+
+.fi-topbar-item-button:focus-visible {
+    outline: 2px solid var(--rshd-gold) !important;
+    outline-offset: 2px;
+}
+
+/* The group's menu card. */
+.fi-dropdown-panel.rshd-nav-panel {
+    width: 17.5rem !important;
+    max-width: 17.5rem !important;
+    padding: 0.45rem !important;
+    border-radius: 18px !important;
+    background: #FFFDF8 !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+    box-shadow:
+        0 0 0 1px rgba(11, 31, 58, 0.06),
+        0 28px 56px -20px rgba(11, 31, 58, 0.32) !important;
+    animation: rshd-nav-panel-in 0.18s ease-out;
+}
+
+@keyframes rshd-nav-panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fi-dropdown-panel.rshd-nav-panel {
+        animation: none;
+    }
+}
+
+.rshd-nav-panel .fi-dropdown-list {
+    padding: 0 !important;
+    gap: 2px;
+}
+
+/* Long groups lay out in two columns rather than a tall list. */
+.fi-dropdown-panel.rshd-nav-panel:has(.fi-dropdown-list-item:nth-child(6)) {
+    width: 33rem !important;
+    max-width: 33rem !important;
+}
+
+.rshd-nav-panel:has(.fi-dropdown-list-item:nth-child(6)) .fi-dropdown-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rshd-nav-panel .fi-dropdown-list-item {
+    gap: 0.75rem !important;
+    padding: 0.55rem 0.6rem !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+}
+
+.rshd-nav-panel .fi-dropdown-list-item-icon {
+    box-sizing: content-box;
+    width: 1.15rem !important;
+    height: 1.15rem !important;
+    padding: 0.5rem;
+    border-radius: 10px;
+    background: rgba(214, 181, 109, 0.14);
+    color: var(--rshd-dark-gold) !important;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.rshd-nav-panel .fi-dropdown-list-item-label {
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    color: var(--rshd-navy) !important;
+}
+
+.rshd-nav-panel .fi-dropdown-list-item:hover,
+.rshd-nav-panel .fi-dropdown-list-item:focus-visible {
+    background: rgba(214, 181, 109, 0.1) !important;
+}
+
+.rshd-nav-panel .fi-dropdown-list-item:hover .fi-dropdown-list-item-icon {
+    background: var(--rshd-gold);
+    color: var(--rshd-navy) !important;
+}
+
+/* The page you are on: navy tile, so it reads at a glance. */
+.rshd-nav-panel .fi-dropdown-list-item.fi-color-primary {
+    background: rgba(11, 31, 58, 0.05) !important;
+}
+
+.rshd-nav-panel .fi-dropdown-list-item.fi-color-primary .fi-dropdown-list-item-icon {
+    background: var(--rshd-navy);
+    color: var(--rshd-gold) !important;
+}
+
+/* The current page in the drawer: Filament paints its label gold, which
+   vanished on the gold highlight. */
+.fi-sidebar-item.fi-active > .fi-sidebar-item-button .fi-sidebar-item-label,
+.fi-sidebar-item-button[aria-current="page"] .fi-sidebar-item-label {
+    color: var(--rshd-navy) !important;
+    font-weight: 800 !important;
+}
+
+/* Below desktop width the menu folds into the drawer; keep the logo in the
+   bar so the header still reads as RSHD. */
+@media (max-width: 1023.98px) {
+    .fi-topbar-with-navigation > nav > div.me-6 {
+        display: flex !important;
+        margin-inline-end: auto !important;
+    }
+
+    .fi-topbar-with-navigation > nav > div.me-6 .fi-logo {
+        height: 2.6rem !important;
+    }
+}
+
+/* Drawer items: light enough on navy to read comfortably. */
+.fi-sidebar-item-button .fi-sidebar-item-label {
+    color: rgba(246, 241, 231, 0.86) !important;
+}
+
+.fi-sidebar-item-button:hover .fi-sidebar-item-label {
+    color: #FFFFFF !important;
+}

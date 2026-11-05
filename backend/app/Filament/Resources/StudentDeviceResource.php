@@ -19,7 +19,7 @@ class StudentDeviceResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-device-tablet';
 
-    protected static ?string $navigationGroup = 'الإدارة';
+    protected static ?string $navigationGroup = 'المستخدمون';
 
     protected static ?string $navigationLabel = 'الأجهزة المرتبطة';
 

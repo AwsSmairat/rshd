@@ -24,6 +24,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
@@ -58,20 +59,26 @@ class AdminPanelProvider extends PanelProvider
                 'info' => Color::hex('#102A4C'),
             ])
             ->darkMode(false)
-            ->sidebarCollapsibleOnDesktop()
-            ->collapsedSidebarWidth('5rem')
-            ->collapsibleNavigationGroups(true)
-            ->navigationGroups([
-                NavigationGroup::make('الرئيسية'),
-                NavigationGroup::make('التعليم'),
-                NavigationGroup::make('التقويم والتواصل'),
-                NavigationGroup::make('الإدارة والتحليلات'),
-                NavigationGroup::make('الإعدادات والدعم'),
-                NavigationGroup::make('الإدارة'),
-                NavigationGroup::make('المحاسبة'),
-                NavigationGroup::make('التواصل'),
-                NavigationGroup::make('النظام'),
-            ])
+            // Navigation runs along the top like a website header; on narrow
+            // screens Filament folds it into the side drawer.
+            ->topNavigation()
+            ->navigationGroups(array_map(
+                // Tag each group's menu: it opens detached at the end of the
+                // page, where the stylesheet can no longer tell it apart.
+                fn (string $label): NavigationGroup => NavigationGroup::make($label)
+                    ->extraTopbarAttributes([
+                        'x-init' => "\$nextTick(() => \$refs.panel?.classList.add('rshd-nav-panel'))",
+                    ]),
+                [
+                    'التعليم',
+                    'المستخدمون',
+                    'التواصل',
+                    'المحاسبة',
+                    'النظام',
+                    'الإدارة والتحليلات',
+                    'الإعدادات والدعم',
+                ],
+            ))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([])
@@ -80,8 +87,9 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::STYLES_AFTER,
                 fn (): HtmlString => new HtmlString(
-                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=33">'.
+                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=38">'.
                     '<link rel="stylesheet" href="'.e(asset('css/rshd-auth-portal.css')).'?v=6">'.
+                    '<link rel="stylesheet" href="'.e(asset('css/rshd-motion.css')).'?v=2">'.
                     '<link rel="preconnect" href="https://fonts.googleapis.com">'.
                     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'.
                     '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">'
@@ -138,9 +146,25 @@ class AdminPanelProvider extends PanelProvider
                 ),
             )
             ->renderHook(
+                // The curtain for page transitions and the first-visit intro.
+                // It comes first in the body so a page reached from the menu
+                // opens already covered (see public/js/rshd-motion.js).
+                PanelsRenderHook::BODY_START,
+                fn (): HtmlString => new HtmlString(Blade::render(
+                    '<x-rshd-curtain :logo="$logo" :intro="$intro" intro-title="RSHD" :intro-tagline="$tagline" />',
+                    [
+                        'logo' => $settings->logoUrl() ?? asset('images/rshd_logo_no_bg.png'),
+                        // The login screen greets a first visit with the intro.
+                        'intro' => request()->routeIs('filament.admin.auth.login'),
+                        'tagline' => $settings->platformSubtitle(),
+                    ],
+                )),
+            )
+            ->renderHook(
                 PanelsRenderHook::SCRIPTS_AFTER,
                 fn (): HtmlString => new HtmlString(
-                    '<script src="'.e(asset('js/rshd-filament-menus.js')).'?v=1"></script>'
+                    '<script src="'.e(asset('js/rshd-filament-menus.js')).'?v=3"></script>'.
+                    '<script src="'.e(asset('js/rshd-motion.js')).'?v=2"></script>'
                 ),
             )
             ->middleware([

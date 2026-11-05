@@ -22,7 +22,7 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static ?string $navigationGroup = 'الإدارة';
+    protected static ?string $navigationGroup = 'المستخدمون';
 
     protected static ?string $navigationLabel = 'المسؤولون';
 

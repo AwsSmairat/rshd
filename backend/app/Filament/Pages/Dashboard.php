@@ -31,7 +31,8 @@ class Dashboard extends BaseDashboard
 {
     protected static ?string $navigationIcon = 'heroicon-o-home';
 
-    protected static ?string $navigationGroup = 'الرئيسية';
+    // Top-level link in the top bar, outside any group.
+    protected static ?string $navigationGroup = null;
 
     protected static ?string $navigationLabel = 'لوحة التحكم';
 
