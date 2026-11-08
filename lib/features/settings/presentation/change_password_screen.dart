@@ -3,7 +3,9 @@ import '../../../core/widgets/form_width.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/security/password_policy.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/password_requirements.dart';
 import 'student_settings_controller.dart';
 import '../../../core/l10n/app_strings.dart';
 
@@ -31,32 +33,37 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     super.dispose();
   }
 
-  int _passwordStrength(String value) {
-    var score = 0;
-    if (value.length >= 8) {
-      score++;
-    }
-    if (RegExp(r'[A-Z]').hasMatch(value)) {
-      score++;
-    }
-    if (RegExp(r'[0-9]').hasMatch(value)) {
-      score++;
-    }
-    if (RegExp(r'[^A-Za-z0-9]').hasMatch(value)) {
-      score++;
-    }
-    return score;
-  }
+  String? _passwordError;
+  String? _confirmError;
 
-  bool get _canSave {
-    final password = _passwordController.text;
-    return _currentController.text.isNotEmpty &&
-        password.length >= 8 &&
-        password == _confirmController.text;
-  }
+  bool get _canSave =>
+      _currentController.text.isNotEmpty &&
+      _passwordController.text.isNotEmpty &&
+      _confirmController.text.isNotEmpty;
 
   Future<void> _save() async {
     if (!_canSave) {
+      return;
+    }
+
+    // Warn before sending: what the new password lacks, or a mismatch.
+    final strings = AppStrings.of(context);
+    final policyError = PasswordPolicy.validate(
+      _passwordController.text,
+      strings,
+    );
+    final mismatch = _passwordController.text != _confirmController.text;
+    setState(() {
+      _passwordError = policyError;
+      _confirmError = mismatch ? strings.t('كلمتا المرور غير متطابقتين') : null;
+    });
+    if (policyError != null || mismatch) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(policyError ?? strings.t('كلمتا المرور غير متطابقتين')),
+          backgroundColor: const Color(0xFFB45309),
+        ),
+      );
       return;
     }
 
@@ -79,6 +86,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     required bool obscure,
     required VoidCallback toggle,
     VoidCallback? onChanged,
+    String? errorText,
   }) {
     return TextFormField(
       controller: controller,
@@ -86,6 +94,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       onChanged: onChanged != null ? (_) => onChanged() : null,
       decoration: InputDecoration(
         labelText: label,
+        errorText: errorText,
+        errorMaxLines: 3,
         prefixIcon: const Icon(Icons.lock_outline_rounded, size: 20),
         suffixIcon: IconButton(
           icon: Icon(
@@ -101,7 +111,6 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final isSaving = ref.watch(studentSettingsControllerProvider).isSaving;
-    final strength = _passwordStrength(_passwordController.text);
 
     ref.listen(studentSettingsControllerProvider, (previous, next) {
       if (next.errorMessage != null &&
@@ -129,6 +138,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               label: AppStrings.of(context).t('كلمة المرور الحالية'),
               obscure: _obscureCurrent,
               toggle: () => setState(() => _obscureCurrent = !_obscureCurrent),
+              onChanged: () => setState(() {}),
             ),
             const SizedBox(height: 16),
             _passwordField(
@@ -136,28 +146,19 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               label: AppStrings.of(context).t('كلمة المرور الجديدة'),
               obscure: _obscureNew,
               toggle: () => setState(() => _obscureNew = !_obscureNew),
-              onChanged: () => setState(() {}),
+              onChanged: () => setState(() => _passwordError = null),
+              errorText: _passwordError,
             ),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(
-              value: strength / 4,
-              color: switch (strength) {
-                <= 1 => Colors.red,
-                2 => Colors.orange,
-                3 => AppColors.of(context).darkGold,
-                _ => Colors.green,
-              },
-              backgroundColor: AppColors.of(context).background,
-            ),
-            const SizedBox(height: 8),
-            Text(AppStrings.of(context).t('يجب أن تكون 8 أحرف على الأقل.')),
+            const SizedBox(height: 10),
+            PasswordRequirementsChecklist(password: _passwordController.text),
             const SizedBox(height: 16),
             _passwordField(
               controller: _confirmController,
               label: AppStrings.of(context).t('تأكيد كلمة المرور'),
               obscure: _obscureConfirm,
               toggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
-              onChanged: () => setState(() {}),
+              onChanged: () => setState(() => _confirmError = null),
+              errorText: _confirmError,
             ),
             const SizedBox(height: 24),
             AppButton(

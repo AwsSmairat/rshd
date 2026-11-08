@@ -123,20 +123,35 @@ class QuizController extends Controller
 
         $user = $request->user();
 
-        $attempt = QuizAttempt::query()
-            ->where('quiz_id', $quiz->id)
-            ->where('student_id', $user->id)
-            ->whereNull('submitted_at')
-            ->latest('started_at')
-            ->firstOrFail();
-
         $quiz->load(['questions.answers']);
 
-        $result = DB::transaction(function () use ($request, $quiz, $attempt, $user) {
+        // One answer per question: the request rejects repeats, and only the
+        // first answer for a question is kept should one slip through.
+        $answers = collect($request->validated('answers'))
+            ->unique('question_id')
+            ->values();
+
+        $result = DB::transaction(function () use ($quiz, $answers, $user) {
+            // Locked, so the same attempt cannot be submitted twice at once.
+            $attempt = QuizAttempt::query()
+                ->where('quiz_id', $quiz->id)
+                ->where('student_id', $user->id)
+                ->whereNull('submitted_at')
+                ->latest('started_at')
+                ->lockForUpdate()
+                ->first();
+
+            if ($attempt === null) {
+                return null;
+            }
+
+            // Past the time limit the attempt closes without its answers.
+            $timedOut = $this->isPastTimeLimit($quiz, $attempt);
+
             $totalPoints = $quiz->questions->sum('points');
             $earnedPoints = 0;
 
-            foreach ($request->validated('answers') as $answerData) {
+            foreach ($timedOut ? [] : $answers as $answerData) {
                 $question = $quiz->questions->firstWhere('id', $answerData['question_id']);
 
                 if ($question === null) {
@@ -164,7 +179,7 @@ class QuizController extends Controller
             }
 
             $score = $totalPoints > 0
-                ? round(($earnedPoints / $totalPoints) * 100, 2)
+                ? round(min(1, $earnedPoints / $totalPoints) * 100, 2)
                 : 0.0;
 
             $attempt->update([
@@ -184,16 +199,22 @@ class QuizController extends Controller
                 ],
             );
 
-            $attempt->refresh();
-
             return [
                 'attempt_id' => $attempt->id,
                 'grade_id' => $grade->id,
                 'score' => $score,
-                'submitted_at' => $attempt->submitted_at,
+                'timed_out' => $timedOut,
                 'questions_count' => $quiz->questions->count(),
             ];
         });
+
+        if ($result === null) {
+            return $this->errorResponse('لا توجد محاولة مفتوحة لهذا الاختبار.', 404);
+        }
+
+        if ($result['timed_out']) {
+            return $this->errorResponse('انتهى وقت الاختبار، ولم تُحتسب الإجابات المرسلة بعده.', 422);
+        }
 
         $attempt = QuizAttempt::query()->findOrFail($result['attempt_id']);
 
@@ -223,6 +244,24 @@ class QuizController extends Controller
         return $this->successResponse(
             $payload,
             'تم تسليم الاختبار بنجاح.',
+        );
+    }
+
+    /** Network slack allowed after the time limit before answers are refused. */
+    private const TIME_LIMIT_GRACE_SECONDS = 120;
+
+    private function isPastTimeLimit(Quiz $quiz, QuizAttempt $attempt): bool
+    {
+        $minutes = (int) $quiz->duration_minutes;
+
+        if ($minutes <= 0 || $attempt->started_at === null) {
+            return false;
+        }
+
+        return now()->greaterThan(
+            $attempt->started_at->copy()
+                ->addMinutes($minutes)
+                ->addSeconds(self::TIME_LIMIT_GRACE_SECONDS),
         );
     }
 }

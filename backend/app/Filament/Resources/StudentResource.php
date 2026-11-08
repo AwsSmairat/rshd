@@ -8,7 +8,9 @@ use App\Filament\Resources\StudentResource\Pages;
 use App\Filament\Resources\StudentResource\RelationManagers\DevicesRelationManager;
 use App\Models\User;
 use App\Services\DeviceService;
+use App\Services\PlatformAuditService;
 use App\Services\PlatformSettingsService;
+use App\Services\StudentSessionService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -18,7 +20,6 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Validation\Rules\Password;
 
 class StudentResource extends Resource
 {
@@ -166,13 +167,35 @@ class StudentResource extends Resource
                     ->color('danger')
                     ->requiresConfirmation()
                     ->modalHeading('إعادة تعيين أجهزة الطالب')
-                    ->modalDescription('سيتم تعطيل جميع الأجهزة المسجلة لهذا الطالب.')
+                    ->modalDescription('سيتم تعطيل جميع الأجهزة المسجلة لهذا الطالب وتسجيل خروجه منها، فيستطيع الدخول من أي جهاز جديد.')
                     ->visible($deviceBindingEnabled)
                     ->action(function (User $record): void {
                         app(DeviceService::class)->resetStudentDevices($record, auth()->user());
 
                         Notification::make()
                             ->title('تم إعادة تعيين الأجهزة')
+                            ->success()
+                            ->send();
+                    }),
+                Action::make('signOutEverywhere')
+                    ->label('تسجيل خروج الطالب')
+                    ->icon('heroicon-o-arrow-right-on-rectangle')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('تسجيل خروج الطالب من كل الأجهزة')
+                    ->modalDescription('سيُطلب من الطالب تسجيل الدخول من جديد على كل أجهزته. تبقى أجهزته المسجّلة كما هي، فيستطيع الدخول من نفس الجهاز.')
+                    ->action(function (User $record): void {
+                        $ended = app(StudentSessionService::class)->endAll($record);
+
+                        app(PlatformAuditService::class)->logAuth(
+                            'session.signed_out_by_admin',
+                            auth()->user(),
+                            'تم تسجيل خروج الطالب «'.$record->name.'» من كل الأجهزة.',
+                            $record,
+                        );
+
+                        Notification::make()
+                            ->title($ended > 0 ? 'تم تسجيل خروج الطالب من كل الأجهزة' : 'لا توجد جلسات مفتوحة لهذا الطالب')
                             ->success()
                             ->send();
                     }),
@@ -201,43 +224,14 @@ class StudentResource extends Resource
         ];
     }
 
-    protected static function passwordRule(): Password
+    protected static function passwordRule(): \Closure
     {
-        $settings = app(PlatformSettingsService::class);
-        $rule = Password::min($settings->integer('password_min_length', 8, 'security'));
-
-        if ($settings->enabled('password_require_uppercase', 'security')) {
-            $rule = $rule->mixedCase();
-        }
-
-        if ($settings->enabled('password_require_number', 'security')) {
-            $rule = $rule->numbers();
-        }
-
-        if ($settings->enabled('password_require_special', 'security')) {
-            $rule = $rule->symbols();
-        }
-
-        return $rule;
+        return app(PlatformSettingsService::class)->passwordStrengthRule();
     }
 
     protected static function passwordRequirementsHint(): string
     {
-        $settings = app(PlatformSettingsService::class);
-        $parts = ['الحد الأدنى '.$settings->integer('password_min_length', 8, 'security').' أحرف'];
-
-        if ($settings->enabled('password_require_uppercase', 'security')) {
-            $parts[] = 'حرف كبير';
-        }
-
-        if ($settings->enabled('password_require_number', 'security')) {
-            $parts[] = 'رقم';
-        }
-
-        if ($settings->enabled('password_require_special', 'security')) {
-            $parts[] = 'رمز خاص';
-        }
-
-        return implode('، ', $parts);
+        return 'يجب أن تحتوي على: '
+            .implode('، ', app(PlatformSettingsService::class)->passwordRequirements());
     }
 }

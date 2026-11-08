@@ -2,10 +2,11 @@
 
 namespace App\Services;
 
-use App\Enums\UserStatus;
+use App\Models\AssignmentSubmission;
 use App\Models\StudentDevice;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -177,6 +178,9 @@ class StudentSettingsService
         }
 
         $device->update(['is_active' => false]);
+
+        // A revoked device is signed out at once, not at its next login.
+        app(StudentSessionService::class)->endForDevice($user, (string) $device->device_id);
     }
 
     public function logoutOtherDevices(User $user, string $currentTokenId): int
@@ -201,7 +205,7 @@ class StudentSettingsService
 
         $avatarPath = $user->resolvedAvatarPath();
 
-        $submissionPaths = \App\Models\AssignmentSubmission::query()
+        $submissionPaths = AssignmentSubmission::query()
             ->where('student_id', $user->id)
             ->whereNotNull('file_path')
             ->pluck('file_path')
@@ -209,7 +213,7 @@ class StudentSettingsService
             ->values()
             ->all();
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($user): void {
+        DB::transaction(function () use ($user): void {
             $user->tokens()->delete();
             $user->roles()->detach();
             $user->permissions()->detach();

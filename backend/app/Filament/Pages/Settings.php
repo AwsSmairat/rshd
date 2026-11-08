@@ -18,6 +18,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
 use Livewire\Attributes\Url;
 
 class Settings extends Page implements HasForms
@@ -114,7 +115,15 @@ class Settings extends Page implements HasForms
         $this->studentsForm->fill($settings->getGroup('students'));
         $this->instructorsForm->fill($settings->getGroup('instructors'));
         $this->notificationsForm->fill($settings->getGroup('notifications'));
-        $this->securityForm->fill($settings->getGroup('security'));
+        $this->securityForm->fill(array_merge(
+            $settings->getGroup('security'),
+            // Show the values actually in force, so an out-of-range stored
+            // value is corrected on the next save.
+            [
+                'session_lifetime_minutes' => $settings->panelSessionMinutes(),
+                'password_min_length' => $settings->passwordMinLength(),
+            ],
+        ));
         $this->backupForm->fill($settings->getGroup('backup'));
         $this->auditForm->fill($settings->getGroup('audit'));
 
@@ -336,6 +345,7 @@ class Settings extends Page implements HasForms
             PSF::toggle('device_id_required', 'إلزام إرسال معرف الجهاز'),
             Forms\Components\TextInput::make('max_active_devices')->label('الحد الأقصى للأجهزة النشطة')->numeric()->minValue(1)->maxValue(5),
             PSF::toggle('allow_assignment_resubmission', 'السماح بإعادة تسليم الواجب'),
+            PSF::toggle('allow_late_assignment_submission', 'السماح بالتسليم بعد الموعد النهائي'),
             Forms\Components\TextInput::make('assignment_max_file_size_mb')->label('أقصى حجم لملف الواجب (MB)')->numeric()->minValue(1)->maxValue(100),
             Forms\Components\TagsInput::make('assignment_allowed_file_types')->label('أنواع ملفات الواجب المسموحة')->separator(','),
             PSF::toggle('allow_quiz_retake', 'السماح بإعادة الاختبار'),
@@ -398,15 +408,46 @@ class Settings extends Page implements HasForms
             Forms\Components\Placeholder::make('device_binding_status')
                 ->label('ربط الجهاز')
                 ->content(($students['device_binding_enabled'] ?? true) ? 'مفعّل (من إعدادات الطلاب)' : 'غير مفعّل'),
-            Forms\Components\TextInput::make('session_lifetime_minutes')->label('مدة الجلسة (دقيقة)')->numeric()->minValue(5),
+            Forms\Components\TextInput::make('session_lifetime_minutes')
+                ->label('مدة بقاء لوحة الإدارة مفتوحة بدون نشاط (دقيقة)')
+                ->helperText('من '.PlatformSettingsService::PANEL_SESSION_MIN_MINUTES.' إلى '.PlatformSettingsService::PANEL_SESSION_MAX_MINUTES.' دقيقة. المقترح '.PlatformSettingsService::PANEL_SESSION_DEFAULT_MINUTES.' (8 ساعات). لا تؤثر على تطبيق الطلاب.')
+                ->numeric()
+                ->integer()
+                ->required()
+                ->minValue(PlatformSettingsService::PANEL_SESSION_MIN_MINUTES)
+                ->maxValue(PlatformSettingsService::PANEL_SESSION_MAX_MINUTES)
+                ->suffix('دقيقة'),
+            Forms\Components\Placeholder::make('sessions_explained')
+                ->label('كيف تعمل الجلسات')
+                ->content(new HtmlString(
+                    '<div class="rshd-sessions-help">'.
+                    '<p><strong>لوحة الإدارة (المسؤولون والمدرسون):</strong> '.
+                    'تبقى مفتوحة ما دام المستخدم يعمل فيها. إذا مرّت المدة أعلاه بلا أي نشاط تُغلق ويُطلب تسجيل الدخول من جديد. '.
+                    'خيار «تذكرني» عند الدخول يبقي المتصفح نفسه مسجلاً حتى 30 يوماً.</p>'.
+                    '<p><strong>تطبيق الطلاب:</strong> لا تنتهي الجلسة بمرور الوقت؛ يبقى الطالب مسجلاً حتى يحدث واحد من التالي:</p>'.
+                    '<ul>'.
+                    '<li>يسجّل الطالب خروجه، أو يسجّل خروجه من كل الأجهزة من إعداداته.</li>'.
+                    '<li>تضغط الإدارة «تسجيل خروج الطالب» في صفحة الطلاب (يبقى جهازه مسجلاً فيعود من نفس الجهاز).</li>'.
+                    '<li>تضغط الإدارة «إعادة تعيين الجهاز» (يُسجَّل خروجه ويستطيع الدخول من أي جهاز جديد).</li>'.
+                    '<li>يُلغي الطالب أحد أجهزته من الإعدادات، فيُسجَّل خروج ذلك الجهاز فوراً.</li>'.
+                    '<li>تتغير كلمة المرور (إذا كان خيار «تسجيل الخروج بعد تغيير كلمة المرور» مفعّلاً)، أو يُحظر الحساب، أو يُحذف.</li>'.
+                    '</ul>'.
+                    '</div>'
+                ))
+                ->columnSpanFull(),
             PSF::toggle('force_logout_after_password_change', 'تسجيل الخروج بعد تغيير كلمة المرور'),
             Forms\Components\TextInput::make('max_login_attempts')->label('الحد الأقصى لمحاولات الدخول')->numeric()->minValue(1),
             Forms\Components\TextInput::make('login_lockout_minutes')->label('مدة الحظر (دقيقة)')->numeric()->minValue(1),
             Forms\Components\TextInput::make('instructor_invitation_expiry_hours')->label('صلاحية دعوة المدرس (ساعة)')->numeric()->minValue(1),
-            Forms\Components\TextInput::make('password_min_length')->label('الحد الأدنى لطول كلمة المرور')->numeric()->minValue(6),
-            PSF::toggle('password_require_uppercase', 'إلزام حرف كبير'),
-            PSF::toggle('password_require_number', 'إلزام رقم'),
-            PSF::toggle('password_require_special', 'إلزام رمز خاص'),
+            Forms\Components\TextInput::make('password_min_length')
+                ->label('الحد الأدنى لطول كلمة المرور')
+                ->numeric()
+                ->integer()
+                ->minValue(PlatformSettingsService::PASSWORD_MIN_LENGTH)
+                ->helperText('لا يقل عن '.PlatformSettingsService::PASSWORD_MIN_LENGTH.' أحرف.'),
+            Forms\Components\Placeholder::make('password_rules')
+                ->label('قواعد كلمة المرور')
+                ->content('إلزامية دائماً لكل كلمات المرور (الطلاب والمدرسون والمسؤولون): حرف إنجليزي كبير، ورقم، ورمز خاص، وطول لا يقل عن الحد أعلاه.'),
         ])->columns(2)->statePath('securityData');
     }
 

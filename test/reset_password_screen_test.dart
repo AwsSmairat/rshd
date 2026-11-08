@@ -12,7 +12,7 @@ import 'package:rshd/features/auth/presentation/reset_password_screen.dart';
 import 'package:rshd/features/auth/presentation/widgets/auth_input_field.dart';
 import 'package:rshd/features/auth/presentation/widgets/auth_page_scaffold.dart';
 import 'package:rshd/features/auth/presentation/widgets/auth_primary_button.dart';
-import 'package:rshd/features/auth/presentation/widgets/password_strength_indicator.dart';
+import 'package:rshd/core/widgets/password_requirements.dart';
 
 const _email = 'student-pending@staging.rshd.test';
 
@@ -84,7 +84,7 @@ void main() {
 
     // Both fields are the new shared input, plus the strength meter.
     expect(find.byType(AuthInputField), findsNWidgets(2));
-    expect(find.byType(PasswordStrengthIndicator), findsOneWidget);
+    expect(find.byType(PasswordRequirementsChecklist), findsOneWidget);
 
     // Gold action pill, enabled once the reset token has loaded.
     final button = tester.widget<AuthPrimaryButton>(
@@ -113,7 +113,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.text('يجب أن تكون كلمة المرور 8 أحرف على الأقل'),
+      find.textContaining('كلمة المرور يجب أن تحتوي على:'),
       findsOneWidget,
     );
     expect(find.text('كلمتا المرور غير متطابقتين'), findsOneWidget);

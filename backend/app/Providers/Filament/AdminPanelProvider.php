@@ -87,7 +87,7 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::STYLES_AFTER,
                 fn (): HtmlString => new HtmlString(
-                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=38">'.
+                    '<link rel="stylesheet" href="'.e(asset('css/rshd-filament.css')).'?v=39">'.
                     '<link rel="stylesheet" href="'.e(asset('css/rshd-auth-portal.css')).'?v=6">'.
                     '<link rel="stylesheet" href="'.e(asset('css/rshd-motion.css')).'?v=2">'.
                     '<link rel="preconnect" href="https://fonts.googleapis.com">'.

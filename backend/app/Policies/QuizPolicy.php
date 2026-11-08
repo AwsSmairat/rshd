@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\ContentStatus;
 use App\Models\Quiz;
 use App\Models\User;
 use App\Policies\Concerns\ChecksSubjectAccess;
@@ -24,7 +25,8 @@ class QuizPolicy
 
     public function start(User $user, Quiz $quiz): bool
     {
-        if (! $user->isStudent()) {
+        // Only published quizzes can be taken; drafts and archived ones cannot.
+        if (! $user->isStudent() || $quiz->status !== ContentStatus::Active) {
             return false;
         }
 

@@ -11,6 +11,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\DeviceService;
 use App\Services\StudentEmailVerificationService;
+use App\Services\StudentSessionService;
 use Illuminate\Http\JsonResponse;
 
 class EmailVerificationController extends Controller
@@ -52,7 +53,9 @@ class EmailVerificationController extends Controller
             );
         }
 
-        $token = $user->createToken('api')->plainTextToken;
+        $token = app(StudentSessionService::class)
+            ->issue($user, $this->devicePayload($validated)['device_id'])
+            ->plainTextToken;
 
         return $this->successResponse([
             'token' => $token,

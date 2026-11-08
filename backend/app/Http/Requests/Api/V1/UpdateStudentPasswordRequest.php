@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Services\PlatformSettingsService;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Password;
 
 class UpdateStudentPasswordRequest extends FormRequest
 {
@@ -19,7 +19,7 @@ class UpdateStudentPasswordRequest extends FormRequest
     {
         return [
             'current_password' => ['required', 'string'],
-            'password' => ['required', 'confirmed', Password::defaults()],
+            'password' => app(PlatformSettingsService::class)->passwordRules(confirmed: true),
         ];
     }
 }

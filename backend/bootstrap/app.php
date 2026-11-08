@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\CheckPlatformMaintenance;
 use App\Http\Middleware\EnsureCleanApiResponse;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -23,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->append(SecurityHeaders::class);
         $middleware->prependToGroup('api', CheckPlatformMaintenance::class);
         $middleware->prependToGroup('api', EnsureCleanApiResponse::class);
     })

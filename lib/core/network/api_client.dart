@@ -7,6 +7,7 @@ import '../config/app_config.dart';
 import '../storage/secure_storage_service.dart';
 import 'api_endpoints.dart';
 import 'api_exception.dart';
+import 'maintenance_signal.dart';
 import 'redacted_log_interceptor.dart';
 import 'session_invalidation.dart';
 
@@ -15,8 +16,10 @@ class ApiClient {
     required SecureStorageService secureStorage,
     Dio? dio,
     void Function()? onUnauthorized,
+    void Function()? onMaintenance,
   }) : _secureStorage = secureStorage,
-       _onUnauthorized = onUnauthorized {
+       _onUnauthorized = onUnauthorized,
+       _onMaintenance = onMaintenance {
     _dio =
         dio ??
         Dio(
@@ -43,6 +46,7 @@ class ApiClient {
 
   final SecureStorageService _secureStorage;
   final void Function()? _onUnauthorized;
+  final void Function()? _onMaintenance;
   late final Dio _dio;
 
   Dio get dio => _dio;
@@ -59,6 +63,13 @@ class ApiClient {
   }
 
   void _onError(DioException err, ErrorInterceptorHandler handler) {
+    final data = err.response?.data;
+    if (err.response?.statusCode == 503 &&
+        data is Map &&
+        data['maintenance'] == true) {
+      _onMaintenance?.call();
+    }
+
     if (err.response?.statusCode == 401 &&
         err.requestOptions.path != ApiEndpoints.logout &&
         _hasBearerAuthorization(err.requestOptions)) {
@@ -192,9 +203,11 @@ final secureStorageProvider = Provider<SecureStorageService>(
 final apiClientProvider = Provider<ApiClient>((ref) {
   final storage = ref.watch(secureStorageProvider);
   final sessionInvalidation = ref.read(sessionInvalidationProvider.notifier);
+  final maintenance = ref.read(maintenanceSignalProvider.notifier);
 
   return ApiClient(
     secureStorage: storage,
     onUnauthorized: sessionInvalidation.notifyUnauthorized,
+    onMaintenance: maintenance.notifyMaintenance,
   );
 });

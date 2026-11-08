@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../network/api_client.dart';
 import '../network/api_endpoints.dart';
+import '../network/maintenance_signal.dart';
 import 'platform_settings.dart';
 
 class PlatformSettingsRepository {
@@ -43,6 +44,10 @@ extension ResolvedPlatformSettings on AsyncValue<PlatformSettings> {
 class PlatformSettingsController extends AsyncNotifier<PlatformSettings> {
   @override
   Future<PlatformSettings> build() async {
+    // The API said "under maintenance": re-read the settings, which sends
+    // the router to the maintenance screen.
+    ref.listen(maintenanceSignalProvider, (_, _) => refresh());
+
     try {
       return await ref
           .read(platformSettingsRepositoryProvider)

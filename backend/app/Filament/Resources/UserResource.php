@@ -14,7 +14,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Validation\Rules\Password;
 
 class UserResource extends Resource
 {
@@ -150,43 +149,14 @@ class UserResource extends Resource
         ];
     }
 
-    protected static function passwordRule(): Password
+    protected static function passwordRule(): \Closure
     {
-        $settings = app(PlatformSettingsService::class);
-        $rule = Password::min($settings->integer('password_min_length', 8, 'security'));
-
-        if ($settings->enabled('password_require_uppercase', 'security')) {
-            $rule = $rule->mixedCase();
-        }
-
-        if ($settings->enabled('password_require_number', 'security')) {
-            $rule = $rule->numbers();
-        }
-
-        if ($settings->enabled('password_require_special', 'security')) {
-            $rule = $rule->symbols();
-        }
-
-        return $rule;
+        return app(PlatformSettingsService::class)->passwordStrengthRule();
     }
 
     protected static function passwordRequirementsHint(): string
     {
-        $settings = app(PlatformSettingsService::class);
-        $parts = ['الحد الأدنى '.$settings->integer('password_min_length', 8, 'security').' أحرف'];
-
-        if ($settings->enabled('password_require_uppercase', 'security')) {
-            $parts[] = 'حرف كبير';
-        }
-
-        if ($settings->enabled('password_require_number', 'security')) {
-            $parts[] = 'رقم';
-        }
-
-        if ($settings->enabled('password_require_special', 'security')) {
-            $parts[] = 'رمز خاص';
-        }
-
-        return implode('، ', $parts);
+        return 'يجب أن تحتوي على: '
+            .implode('، ', app(PlatformSettingsService::class)->passwordRequirements());
     }
 }

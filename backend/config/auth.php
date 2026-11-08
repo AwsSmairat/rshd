@@ -41,6 +41,9 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+            // "Remember me" on the admin panel lasts 30 days, not Laravel's
+            // default of 400.
+            'remember' => 60 * 24 * 30,
         ],
     ],
 

@@ -18,6 +18,7 @@ use App\Services\LoginThrottleService;
 use App\Services\PlatformAuditService;
 use App\Services\PlatformSettingsService;
 use App\Services\StudentEmailVerificationService;
+use App\Services\StudentSessionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -81,7 +82,9 @@ class AuthController extends Controller
             );
         }
 
-        $token = $user->createToken('api')->plainTextToken;
+        $token = app(StudentSessionService::class)
+            ->issue($user, $this->devicePayload($validated)['device_id'])
+            ->plainTextToken;
 
         return $this->successResponse([
             'token' => $token,
@@ -168,7 +171,9 @@ class AuthController extends Controller
             );
         }
 
-        $token = $user->createToken('api')->plainTextToken;
+        $token = app(StudentSessionService::class)
+            ->issue($user, $this->devicePayload($validated)['device_id'])
+            ->plainTextToken;
 
         $throttle->clear($email);
         $audit->logAuth('login.success', $user, 'دخول ناجح للحساب «'.$email.'».', $user);
@@ -203,7 +208,9 @@ class AuthController extends Controller
             );
         }
 
-        $token = $user->createToken('api')->plainTextToken;
+        $token = app(StudentSessionService::class)
+            ->issue($user, $this->devicePayload($validated)['device_id'])
+            ->plainTextToken;
 
         return $this->successResponse([
             'token' => $token,
@@ -237,7 +244,9 @@ class AuthController extends Controller
             );
         }
 
-        $token = $user->createToken('api')->plainTextToken;
+        $token = app(StudentSessionService::class)
+            ->issue($user, $this->devicePayload($validated)['device_id'])
+            ->plainTextToken;
 
         return $this->successResponse([
             'token' => $token,

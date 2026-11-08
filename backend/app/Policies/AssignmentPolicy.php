@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\ContentStatus;
 use App\Models\Assignment;
 use App\Models\User;
 use App\Policies\Concerns\ChecksSubjectAccess;
@@ -24,7 +25,8 @@ class AssignmentPolicy
 
     public function submit(User $user, Assignment $assignment): bool
     {
-        if (! $user->isStudent()) {
+        // Only published assignments take submissions.
+        if (! $user->isStudent() || $assignment->status !== ContentStatus::Active) {
             return false;
         }
 

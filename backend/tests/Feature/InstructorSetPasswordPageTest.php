@@ -68,13 +68,13 @@ class InstructorSetPasswordPageTest extends TestCase
         ]))->post(route('instructor.set-password.store'), [
             'email' => $instructor->email,
             'token' => $token,
-            'password' => 'Newpassword1',
-            'password_confirmation' => 'Newpassword1',
+            'password' => 'Newpassword1!',
+            'password_confirmation' => 'Newpassword1!',
         ])
             ->assertRedirect('/admin/login')
             ->assertSessionHas('success');
 
-        $this->assertTrue(Hash::check('Newpassword1', $instructor->fresh()->password));
+        $this->assertTrue(Hash::check('Newpassword1!', $instructor->fresh()->password));
     }
 
     public function test_password_confirmation_mismatch_returns_to_form(): void
@@ -87,8 +87,8 @@ class InstructorSetPasswordPageTest extends TestCase
         ]))->post(route('instructor.set-password.store'), [
             'email' => $instructor->email,
             'token' => $token,
-            'password' => 'Newpassword1',
-            'password_confirmation' => 'Mismatch1',
+            'password' => 'Newpassword1!',
+            'password_confirmation' => 'Mismatch1!',
         ])
             ->assertRedirect()
             ->assertSessionHasErrors('password');

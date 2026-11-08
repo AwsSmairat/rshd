@@ -137,12 +137,18 @@ class DeviceService
         }
 
         if ($activeDevices->count() >= $maxDevices) {
+            $evicted = $activeDevices
+                ->sortBy('last_login_at')
+                ->take($activeDevices->count() - $maxDevices + 1);
+
             StudentDevice::query()
-                ->where('student_id', $student->id)
-                ->where('is_active', true)
-                ->orderBy('last_login_at')
-                ->limit($activeDevices->count() - $maxDevices + 1)
+                ->whereKey($evicted->modelKeys())
                 ->update(['is_active' => false]);
+
+            // A device pushed out of its slot loses its session too.
+            foreach ($evicted as $device) {
+                app(StudentSessionService::class)->endForDevice($student, (string) $device->device_id);
+            }
         }
 
         return StudentDevice::query()->updateOrCreate(
@@ -164,11 +170,17 @@ class DeviceService
         return $user->preference(self::DEVICE_BINDING_EXEMPT_PREFERENCE, false) === true;
     }
 
+    /**
+     * Frees every device slot and signs the student out everywhere, so the
+     * next login (on any phone) starts afresh.
+     */
     public function resetStudentDevices(User $student, ?User $actor = null): void
     {
         StudentDevice::query()
             ->where('student_id', $student->id)
             ->update(['is_active' => false]);
+
+        app(StudentSessionService::class)->endAll($student);
 
         app(PlatformAuditService::class)->logDevice(
             'device.reset',

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/security/password_policy.dart';
+import '../../../core/widgets/password_requirements.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -11,7 +13,6 @@ import 'widgets/auth_form_parts.dart';
 import 'widgets/auth_input_field.dart';
 import 'widgets/auth_page_scaffold.dart';
 import 'widgets/auth_primary_button.dart';
-import 'widgets/password_strength_indicator.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key, required this.email});
@@ -181,26 +182,11 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   onToggle: () =>
                       setState(() => _obscurePassword = !_obscurePassword),
                 ),
-                validator: (value) {
-                  if (value == null || value.length < 8) {
-                    return strings.t(
-                      'يجب أن تكون كلمة المرور 8 أحرف على الأقل',
-                    );
-                  }
-                  if (!RegExp(r'[A-Z]').hasMatch(value)) {
-                    return strings.t(
-                      'يجب أن تحتوي على حرف كبير واحد على الأقل',
-                    );
-                  }
-                  if (!RegExp(r'[0-9]').hasMatch(value)) {
-                    return strings.t('يجب أن تحتوي على رقم واحد على الأقل');
-                  }
-                  return null;
-                },
+                validator: (value) => PasswordPolicy.validate(value, strings),
               ),
               const SizedBox(height: 14),
 
-              PasswordStrengthIndicator(password: _passwordController.text),
+              PasswordRequirementsChecklist(password: _passwordController.text),
               const SizedBox(height: 14),
 
               AuthInputField(

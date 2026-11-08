@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Filament\Concerns\InstructorOnlyPage;
 use App\Models\User;
+use App\Services\PlatformSettingsService;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -13,7 +14,6 @@ use Filament\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
 
 class InstructorProfile extends Page implements HasForms
 {
@@ -114,7 +114,8 @@ class InstructorProfile extends Page implements HasForms
                             ->label('كلمة المرور الجديدة')
                             ->password()
                             ->revealable()
-                            ->rule(Password::defaults()),
+                            ->rule(app(PlatformSettingsService::class)->passwordStrengthRule())
+                            ->helperText('يجب أن تحتوي على: '.implode('، ', app(PlatformSettingsService::class)->passwordRequirements())),
                         Forms\Components\TextInput::make('password_confirmation')
                             ->label('تأكيد كلمة المرور')
                             ->password()

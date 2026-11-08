@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\PlatformSetting;
+use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
@@ -98,6 +99,7 @@ class PlatformSettingsService
                 'device_id_required' => ['type' => 'boolean', 'value' => true, 'is_public' => false],
                 'max_active_devices' => ['type' => 'integer', 'value' => 1, 'is_public' => false],
                 'allow_assignment_resubmission' => ['type' => 'boolean', 'value' => false, 'is_public' => false],
+                'allow_late_assignment_submission' => ['type' => 'boolean', 'value' => false, 'is_public' => false],
                 'assignment_max_file_size_mb' => ['type' => 'integer', 'value' => 10, 'is_public' => true],
                 'assignment_allowed_file_types' => ['type' => 'json', 'value' => ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'zip'], 'is_public' => true],
                 'allow_quiz_retake' => ['type' => 'boolean', 'value' => true, 'is_public' => true],
@@ -140,15 +142,15 @@ class PlatformSettingsService
                 'number_format_locale' => ['type' => 'string', 'value' => 'ar-JO', 'is_public' => false],
             ],
             'security' => [
-                'session_lifetime_minutes' => ['type' => 'integer', 'value' => 120, 'is_public' => false],
+                'session_lifetime_minutes' => ['type' => 'integer', 'value' => self::PANEL_SESSION_DEFAULT_MINUTES, 'is_public' => false],
                 'force_logout_after_password_change' => ['type' => 'boolean', 'value' => true, 'is_public' => false],
                 'max_login_attempts' => ['type' => 'integer', 'value' => 5, 'is_public' => false],
                 'login_lockout_minutes' => ['type' => 'integer', 'value' => 15, 'is_public' => false],
                 'instructor_invitation_expiry_hours' => ['type' => 'integer', 'value' => 72, 'is_public' => false],
-                'password_min_length' => ['type' => 'integer', 'value' => 8, 'is_public' => false],
+                'password_min_length' => ['type' => 'integer', 'value' => self::PASSWORD_MIN_LENGTH, 'is_public' => false],
                 'password_require_uppercase' => ['type' => 'boolean', 'value' => true, 'is_public' => false],
                 'password_require_number' => ['type' => 'boolean', 'value' => true, 'is_public' => false],
-                'password_require_special' => ['type' => 'boolean', 'value' => false, 'is_public' => false],
+                'password_require_special' => ['type' => 'boolean', 'value' => true, 'is_public' => false],
             ],
             'backup' => [
                 'auto_backup_enabled' => ['type' => 'boolean', 'value' => false, 'is_public' => false],
@@ -461,13 +463,33 @@ class PlatformSettingsService
         }
     }
 
+    /** Bounds of the admin-panel idle timeout, in minutes. */
+    public const PANEL_SESSION_MIN_MINUTES = 15;
+
+    public const PANEL_SESSION_MAX_MINUTES = 1440;
+
+    public const PANEL_SESSION_DEFAULT_MINUTES = 480;
+
+    /**
+     * How long the admin panel stays signed in without activity.
+     * Out-of-range stored values (an old 100000, say) are pulled back inside
+     * the bounds rather than trusted.
+     */
+    public function panelSessionMinutes(): int
+    {
+        $minutes = $this->integer('session_lifetime_minutes', self::PANEL_SESSION_DEFAULT_MINUTES, 'security');
+
+        return max(self::PANEL_SESSION_MIN_MINUTES, min(self::PANEL_SESSION_MAX_MINUTES, $minutes));
+    }
+
     public function applySecurityPreferences(): void
     {
-        $minutes = max(5, $this->integer('session_lifetime_minutes', 120, 'security'));
-
         config([
-            'session.lifetime' => $minutes,
-            'sanctum.expiration' => $minutes,
+            // Admin and instructor panel: ends after this much inactivity.
+            'session.lifetime' => $this->panelSessionMinutes(),
+            // Student app: no time limit. The session ends only when the
+            // student or an admin ends it (see StudentSessionService).
+            'sanctum.expiration' => null,
         ]);
     }
 
@@ -479,21 +501,82 @@ class PlatformSettingsService
     /**
      * @return list<string|ValidationRule>
      */
+    /** The shortest password anyone may set; the setting can only raise it. */
+    public const PASSWORD_MIN_LENGTH = 9;
+
+    public function passwordMinLength(): int
+    {
+        return max(
+            self::PASSWORD_MIN_LENGTH,
+            $this->integer('password_min_length', self::PASSWORD_MIN_LENGTH, 'security'),
+        );
+    }
+
+    /**
+     * Every password must have the minimum length, an uppercase English
+     * letter, a digit and a special character.
+     *
+     * @return list<string> What the password still lacks; empty when it is
+     *                      strong enough. Arabic, unless $english.
+     */
+    public function passwordProblems(string $password, bool $english = false): array
+    {
+        $min = $this->passwordMinLength();
+        $problems = [];
+
+        if (mb_strlen($password) < $min) {
+            $problems[] = $english ? "at least {$min} characters" : "{$min} أحرف على الأقل";
+        }
+        if (! preg_match('/[A-Z]/', $password)) {
+            $problems[] = $english ? 'an uppercase letter (A-Z)' : 'حرف إنجليزي كبير '.self::ltr('(A-Z)');
+        }
+        if (! preg_match('/[0-9]/', $password)) {
+            $problems[] = $english ? 'a number (0-9)' : 'رقم '.self::ltr('(0-9)');
+        }
+        if (! preg_match('/[^A-Za-z0-9\s]/u', $password)) {
+            $problems[] = $english ? 'a special character such as ! @ # $' : 'رمز خاص مثل '.self::ltr('! @ # $');
+        }
+
+        return $problems;
+    }
+
+    /**
+     * Keeps a Latin run in its own order inside Arabic text, which would
+     * otherwise show "(0-9)" as "(9-0)".
+     */
+    private static function ltr(string $text): string
+    {
+        return "\u{2066}".$text."\u{2069}";
+    }
+
+    /**
+     * A validation rule naming exactly what the password is missing.
+     */
+    public function passwordStrengthRule(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail): void {
+            $problems = $this->passwordProblems((string) $value);
+
+            if ($problems !== []) {
+                $fail('كلمة المرور يجب أن تحتوي على: '.implode('، ', $problems).'.');
+            }
+        };
+    }
+
+    /**
+     * @return list<string> The requirements, for hints next to the field.
+     */
+    public function passwordRequirements(bool $english = false): array
+    {
+        return $this->passwordProblems('', $english);
+    }
+
+    /**
+     * @return list<string|Closure>
+     */
     public function passwordRules(bool $confirmed = false): array
     {
-        $rules = ['required', 'string', 'min:'.$this->integer('password_min_length', 8, 'security')];
-
-        if ($this->enabled('password_require_uppercase', 'security')) {
-            $rules[] = 'regex:/[A-Z]/u';
-        }
-
-        if ($this->enabled('password_require_number', 'security')) {
-            $rules[] = 'regex:/[0-9]/';
-        }
-
-        if ($this->enabled('password_require_special', 'security')) {
-            $rules[] = 'regex:/[^A-Za-z0-9]/u';
-        }
+        $rules = ['required', 'string', 'max:255', $this->passwordStrengthRule()];
 
         if ($confirmed) {
             $rules[] = 'confirmed';

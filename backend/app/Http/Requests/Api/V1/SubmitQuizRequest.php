@@ -17,10 +17,11 @@ class SubmitQuizRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'answers' => ['required', 'array', 'min:1'],
-            'answers.*.question_id' => ['required', 'integer', 'exists:quiz_questions,id'],
+            'answers' => ['required', 'array', 'min:1', 'max:500'],
+            // `distinct`: a question may be answered once per submission.
+            'answers.*.question_id' => ['required', 'integer', 'distinct', 'exists:quiz_questions,id'],
             'answers.*.answer_id' => ['nullable', 'integer', 'exists:quiz_answers,id'],
-            'answers.*.answer_text' => ['nullable', 'string'],
+            'answers.*.answer_text' => ['nullable', 'string', 'max:5000'],
         ];
     }
 }

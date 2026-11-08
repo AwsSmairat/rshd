@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AssignmentSubmissionFileController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\InstructorSetPasswordController;
 use App\Http\Controllers\PublicLegalController;
@@ -15,3 +16,8 @@ Route::get('/account-deletion', [PublicLegalController::class, 'accountDeletion'
 
 Route::get('/set-password', [InstructorSetPasswordController::class, 'show'])->name('instructor.set-password.show');
 Route::post('/set-password', [InstructorSetPasswordController::class, 'store'])->name('instructor.set-password.store');
+
+// A student's submitted file, for the staff grading it (signed, signed-in).
+Route::get('/admin/assignment-submissions/{submission}/file', AssignmentSubmissionFileController::class)
+    ->middleware(['signed', 'throttle:60,1'])
+    ->name('admin.assignment-submissions.file');

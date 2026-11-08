@@ -3462,3 +3462,30 @@
 .fi-sidebar-item-button:hover .fi-sidebar-item-label {
     color: #FFFFFF !important;
 }
+
+/* Settings: how sessions work. */
+.rshd-sessions-help {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1rem 1.15rem;
+    border-radius: 14px;
+    background: rgba(11, 31, 58, 0.04);
+    border: 1px solid rgba(11, 31, 58, 0.08);
+    color: #33415C;
+    font-size: 0.875rem;
+    line-height: 1.75;
+}
+
+.rshd-sessions-help strong {
+    color: var(--rshd-navy);
+}
+
+.rshd-sessions-help ul {
+    margin: 0;
+    padding-inline-start: 1.25rem;
+    list-style: disc;
+}
+
+.rshd-sessions-help li::marker {
+    color: var(--rshd-dark-gold);
+}

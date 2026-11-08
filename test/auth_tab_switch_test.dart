@@ -230,7 +230,10 @@ void main() {
 
     expect(find.text('الاسم مطلوب'), findsOneWidget);
     expect(find.text('البريد الإلكتروني مطلوب'), findsOneWidget);
-    expect(find.text('كلمة المرور 8 أحرف على الأقل'), findsOneWidget);
+    expect(
+      find.textContaining('كلمة المرور يجب أن تحتوي على:'),
+      findsOneWidget,
+    );
     expect(find.byType(RegisterForm), findsOneWidget);
   });
 

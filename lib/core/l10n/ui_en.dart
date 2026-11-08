@@ -303,6 +303,19 @@ const kUiEnglish = <String, String>{
   'تأكيد البريد الإلكتروني': 'Confirm email',
   'تشغيل عائم داخل التطبيق': 'In-app floating play',
   'تابع المشاهدة أثناء التصفح': 'Keep watching while you browse',
+  '9 أحرف مع حرف كبير ورقم ورمز':
+      '9+ characters with an uppercase letter, a number and a symbol',
+  'متحقق': 'met',
+  'غير متحقق': 'not met',
+  'نعمل على تحسين المنصة': 'We are improving the platform',
+  'تحقق الآن': 'Check now',
+  'جاري التحقق من عودة المنصة…': 'Checking whether the platform is back…',
+  'انتهى وقت الاختبار، ولم تُحتسب الإجابات المرسلة بعده.':
+      'The quiz time is over; answers sent after it were not counted.',
+  'لا توجد محاولة مفتوحة لهذا الاختبار.':
+      'There is no open attempt for this quiz.',
+  'انتهى موعد تسليم هذا الواجب.':
+      'The deadline for this assignment has passed.',
   'جاري التحميل': 'Loading',
   'مشغل الفيديو العائم': 'Floating video player',
   'تغيير الحجم': 'Change size',

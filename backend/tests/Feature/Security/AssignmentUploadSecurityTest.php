@@ -2,19 +2,19 @@
 
 namespace Tests\Feature\Security;
 
-
-use PHPUnit\Framework\Attributes\Group;
 use App\Enums\AccessStatus;
 use App\Enums\ContentStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Assignment;
 use App\Models\SubjectStudent;
 use App\Models\User;
+use App\Services\PlatformSettingsService;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\Feature\Security\Concerns\CreatesEnrollmentScenario;
 use Tests\TestCase;
 
@@ -87,6 +87,41 @@ class AssignmentUploadSecurityTest extends TestCase
     /**
      * @return array{0: User, 1: Assignment}
      */
+    public function test_submission_after_the_deadline_is_refused(): void
+    {
+        [$student, $assignment] = $this->createAssignmentScenario();
+        $assignment->update(['due_date' => now()->subHour()]);
+        Sanctum::actingAs($student);
+
+        $this->postJson('/api/v1/assignments/'.$assignment->id.'/submit', [
+            'answer_text' => 'متأخر',
+        ])->assertUnprocessable();
+    }
+
+    public function test_submission_after_the_deadline_is_taken_when_allowed(): void
+    {
+        [$student, $assignment] = $this->createAssignmentScenario();
+        $assignment->update(['due_date' => now()->subHour()]);
+        app(PlatformSettingsService::class)
+            ->set('allow_late_assignment_submission', true, 'students');
+        Sanctum::actingAs($student);
+
+        $this->postJson('/api/v1/assignments/'.$assignment->id.'/submit', [
+            'answer_text' => 'متأخر بإذن',
+        ])->assertOk();
+    }
+
+    public function test_unpublished_assignment_takes_no_submissions(): void
+    {
+        [$student, $assignment] = $this->createAssignmentScenario();
+        $assignment->update(['status' => ContentStatus::Inactive]);
+        Sanctum::actingAs($student);
+
+        $this->postJson('/api/v1/assignments/'.$assignment->id.'/submit', [
+            'answer_text' => 'مسودة',
+        ])->assertForbidden();
+    }
+
     protected function createAssignmentScenario(): array
     {
         $student = $this->createStudent();

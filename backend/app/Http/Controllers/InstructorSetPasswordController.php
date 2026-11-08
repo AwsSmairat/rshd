@@ -109,25 +109,6 @@ class InstructorSetPasswordController extends Controller
      */
     protected function passwordHints(PlatformSettingsService $settings, bool $isArabic): array
     {
-        $min = $settings->integer('password_min_length', 8, 'security');
-        $hints = [
-            $isArabic ? $min.' أحرف على الأقل' : 'At least '.$min.' characters',
-        ];
-
-        if ($settings->enabled('password_require_uppercase', 'security')) {
-            $hints[] = $isArabic
-                ? 'حرف إنجليزي كبير واحد على الأقل'
-                : 'At least one uppercase letter';
-        }
-
-        if ($settings->enabled('password_require_number', 'security')) {
-            $hints[] = $isArabic ? 'رقم واحد على الأقل' : 'At least one number';
-        }
-
-        if ($settings->enabled('password_require_special', 'security')) {
-            $hints[] = $isArabic ? 'رمز خاص واحد على الأقل' : 'At least one special character';
-        }
-
-        return $hints;
+        return $settings->passwordRequirements(english: ! $isArabic);
     }
 }

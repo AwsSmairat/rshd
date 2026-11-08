@@ -10,7 +10,9 @@ import 'package:rshd/features/auth/presentation/forgot_password_screen.dart';
 import 'package:rshd/features/auth/presentation/password_reset_controller.dart';
 import 'package:rshd/features/auth/presentation/password_reset_verification_screen.dart';
 import 'package:rshd/features/auth/presentation/widgets/otp_input_row.dart';
-import 'package:rshd/features/auth/presentation/widgets/password_strength_indicator.dart';
+import 'package:rshd/core/l10n/app_locale_controller.dart';
+import 'package:rshd/core/l10n/app_strings.dart';
+import 'package:rshd/core/security/password_policy.dart';
 
 class OfflineAuthRepository extends AuthRepository {
   OfflineAuthRepository()
@@ -92,17 +94,25 @@ void main() {
     });
   });
 
-  group('PasswordStrengthIndicator', () {
-    testWidgets('shows strength label for valid password', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: PasswordStrengthIndicator(password: 'Strongpass1'),
-          ),
-        ),
-      );
+  group('PasswordPolicy', () {
+    final strings = AppStrings(appLocaleArabic);
 
-      expect(find.textContaining('قوة كلمة المرور'), findsOneWidget);
+    test('a strong password meets every requirement', () {
+      expect(PasswordPolicy.isValid('Rshd@2026x'), isTrue);
+      expect(PasswordPolicy.validate('Rshd@2026x', strings), isNull);
+    });
+
+    test('the warning names exactly what is missing', () {
+      // Direction marks keep "(A-Z)" in order; compare without them.
+      final message = PasswordPolicy.validate(
+        'abcdefgh1',
+        strings,
+      )!.replaceAll(RegExp('[\u2066\u2069]'), '');
+      expect(
+        message,
+        'كلمة المرور يجب أن تحتوي على: حرف إنجليزي كبير (A-Z)، رمز خاص مثل ! @ # \$.',
+      );
+      expect(PasswordPolicy.validate('Ab1!', strings), contains('9 أحرف'));
     });
   });
 

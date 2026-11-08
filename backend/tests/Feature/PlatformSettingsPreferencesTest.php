@@ -34,7 +34,8 @@ class PlatformSettingsPreferencesTest extends TestCase
         $this->assertSame('RSHD Mail', config('mail.from.name'));
         $this->assertSame('reply@rshd.test', config('mail.reply_to.address'));
         $this->assertSame(90, config('session.lifetime'));
-        $this->assertSame(90, config('sanctum.expiration'));
+        // Student app sessions have no time limit; the setting is the panel's.
+        $this->assertNull(config('sanctum.expiration'));
 
         $settings->set('sender_display_name', 'RSHD Updated', 'email');
         $settings->set('session_lifetime_minutes', 45, 'security');
@@ -43,7 +44,7 @@ class PlatformSettingsPreferencesTest extends TestCase
 
         $this->assertSame('RSHD Updated', config('mail.from.name'));
         $this->assertSame(45, config('session.lifetime'));
-        $this->assertSame(45, config('sanctum.expiration'));
+        $this->assertNull(config('sanctum.expiration'));
     }
 
     public function test_cached_settings_reads_skip_schema_and_table_queries(): void

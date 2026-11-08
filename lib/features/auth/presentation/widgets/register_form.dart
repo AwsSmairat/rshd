@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/security/password_policy.dart';
+import '../../../../core/widgets/password_requirements.dart';
 import '../../../../core/platform/platform_settings_controller.dart';
 import '../../../../core/router/app_router.dart';
 import '../auth_controller.dart';
@@ -53,7 +55,17 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
   static const _minimumAge = 18;
 
   @override
+  void initState() {
+    super.initState();
+    // Ticks the password checklist as the student types.
+    _passwordController.addListener(_onPasswordChanged);
+  }
+
+  void _onPasswordChanged() => setState(() {});
+
+  @override
   void dispose() {
+    _passwordController.removeListener(_onPasswordChanged);
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
@@ -292,7 +304,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
           AuthInputField(
             controller: _passwordController,
             label: strings.passwordFieldLabel,
-            hintText: strings.t('8 أحرف على الأقل'),
+            hintText: strings.t('9 أحرف مع حرف كبير ورقم ورمز'),
             icon: Icons.lock_outline_rounded,
             obscureText: _obscurePassword,
             textInputAction: TextInputAction.next,
@@ -303,12 +315,21 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
               onToggle: () =>
                   setState(() => _obscurePassword = !_obscurePassword),
             ),
-            validator: (value) {
-              if (value == null || value.length < 8) {
-                return strings.t('كلمة المرور 8 أحرف على الأقل');
-              }
-              return null;
-            },
+            validator: (value) => PasswordPolicy.validate(value, strings),
+          ),
+          // Appears once a password is being typed, so the form opens at
+          // its usual height.
+          AnimatedSize(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+            child: _passwordController.text.isEmpty
+                ? const SizedBox(width: double.infinity)
+                : Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: PasswordRequirementsChecklist(
+                      password: _passwordController.text,
+                    ),
+                  ),
           ),
           const SizedBox(height: 10),
 
