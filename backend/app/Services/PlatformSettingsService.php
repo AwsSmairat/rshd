@@ -99,7 +99,6 @@ class PlatformSettingsService
                 'device_id_required' => ['type' => 'boolean', 'value' => true, 'is_public' => false],
                 'max_active_devices' => ['type' => 'integer', 'value' => 1, 'is_public' => false],
                 'allow_assignment_resubmission' => ['type' => 'boolean', 'value' => false, 'is_public' => false],
-                'allow_late_assignment_submission' => ['type' => 'boolean', 'value' => false, 'is_public' => false],
                 'assignment_max_file_size_mb' => ['type' => 'integer', 'value' => 10, 'is_public' => true],
                 'assignment_allowed_file_types' => ['type' => 'json', 'value' => ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'zip'], 'is_public' => true],
                 'allow_quiz_retake' => ['type' => 'boolean', 'value' => true, 'is_public' => true],

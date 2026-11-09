@@ -6,13 +6,14 @@ use App\Enums\UserRole;
 use App\Mail\PlatformNotificationMail;
 use App\Models\AppNotification;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
+use App\Services\Push\PushNotificationService;
 use Illuminate\Support\Facades\Mail;
 
 class PlatformNotificationService
 {
     public function __construct(
         protected PlatformSettingsService $settings,
+        protected PushNotificationService $push,
     ) {}
 
     public function notifyUser(
@@ -32,8 +33,9 @@ class PlatformNotificationService
             return;
         }
 
+        $notification = null;
         if ($this->settings->enabled('in_app_notifications_enabled', 'notifications')) {
-            AppNotification::query()->create([
+            $notification = AppNotification::query()->create([
                 'user_id' => $user->id,
                 'title' => $title,
                 'body' => $body,
@@ -44,7 +46,7 @@ class PlatformNotificationService
         }
 
         $this->sendEmailNotification($user, $title, $body);
-        $this->queuePushNotification($user, $title, $body, $type);
+        $this->queuePushNotification($user, $title, $body, $type, $notification, $data, $userPreferenceKey);
     }
 
     public function notifyAdmins(
@@ -60,8 +62,9 @@ class PlatformNotificationService
         User::query()
             ->where('role', UserRole::Admin)
             ->each(function (User $admin) use ($title, $body, $type): void {
+                $notification = null;
                 if ($this->settings->enabled('in_app_notifications_enabled', 'notifications')) {
-                    AppNotification::query()->create([
+                    $notification = AppNotification::query()->create([
                         'user_id' => $admin->id,
                         'title' => $title,
                         'body' => $body,
@@ -71,7 +74,7 @@ class PlatformNotificationService
                 }
 
                 $this->sendEmailNotification($admin, $title, $body);
-                $this->queuePushNotification($admin, $title, $body, $type);
+                $this->queuePushNotification($admin, $title, $body, $type, $notification);
             });
     }
 
@@ -89,37 +92,52 @@ class PlatformNotificationService
         Mail::to($user->email)->send(new PlatformNotificationMail($user, $title, $body));
     }
 
-    protected function queuePushNotification(User $user, string $title, string $body, string $type): void
-    {
-        if (! $this->settings->enabled('push_notifications_enabled', 'notifications')) {
-            return;
-        }
-
-        Log::info('Platform push notification queued', [
-            'user_id' => $user->id,
-            'title' => $title,
-            'body' => $body,
-            'type' => $type,
-        ]);
+    /**
+     * @param  array<string, mixed>|null  $data
+     */
+    protected function queuePushNotification(
+        User $user,
+        string $title,
+        string $body,
+        string $type,
+        ?AppNotification $notification = null,
+        ?array $data = null,
+        ?string $preferenceKey = null,
+    ): bool {
+        return $this->push->queue($user, $title, $body, $type, $notification, $data, $preferenceKey);
     }
 
+    /**
+     * A notification an admin writes by hand. The in-app copy is always kept;
+     * the push respects the student's preference for that type.
+     *
+     * @param  array<string, mixed>|null  $data
+     */
     public function deliverAdminNotification(
         User $user,
         string $title,
         string $body,
         string $type,
         bool $isRead = false,
+        ?array $data = null,
+        bool $sendEmail = true,
     ): AppNotification {
         $notification = AppNotification::query()->create([
             'user_id' => $user->id,
             'title' => $title,
             'body' => $body,
             'type' => $type,
+            'data' => $data === [] ? null : $data,
             'is_read' => $isRead,
         ]);
 
-        $this->sendEmailNotification($user, $title, $body);
-        $this->queuePushNotification($user, $title, $body, $type);
+        if ($sendEmail) {
+            $this->sendEmailNotification($user, $title, $body);
+        }
+
+        if (! $isRead) {
+            $this->queuePushNotification($user, $title, $body, $type, $notification, $data);
+        }
 
         return $notification;
     }

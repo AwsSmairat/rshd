@@ -29,7 +29,9 @@ class AssignmentResource extends JsonResource
             'original_file_name' => $this->original_file_name,
             'file_size' => $this->file_size,
             'file_mime_type' => $this->file_mime_type,
-            'due_date' => $this->due_date,
+            // Assignments have no deadline. Kept (always empty) so app
+            // versions already in the stores show no date and no "late".
+            'due_date' => null,
             'status' => $this->status?->value,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

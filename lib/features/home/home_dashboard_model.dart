@@ -125,8 +125,9 @@ class HomeDashboardModel {
       if (a.isSubmitted != b.isSubmitted) {
         return a.isSubmitted ? 1 : -1;
       }
-      final aDate = DateTime.tryParse(a.dueDate ?? '');
-      final bDate = DateTime.tryParse(b.dueDate ?? '');
+      // No deadlines: the one waiting longest comes first.
+      final aDate = DateTime.tryParse(a.createdAt ?? '');
+      final bDate = DateTime.tryParse(b.createdAt ?? '');
       if (aDate == null && bDate == null) {
         return 0;
       }

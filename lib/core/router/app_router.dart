@@ -138,10 +138,15 @@ Widget _protectedContent({required String scopeId, required Widget child}) {
   return ProtectedContentScope(scopeId: scopeId, child: child);
 }
 
+/// The root navigator, used to open a page from outside the widget tree
+/// (a tapped push notification).
+final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final notifier = ref.watch(routerNotifierProvider);
 
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: AppRoutes.splash,
     refreshListenable: notifier,
     redirect: (context, state) {

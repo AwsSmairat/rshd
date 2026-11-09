@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -73,33 +72,6 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
-                if (assignment.dueDate != null &&
-                    assignment.dueDate!.isNotEmpty) ...[
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today_outlined,
-                        size: 14,
-                        color: AppColors.of(context).darkGold,
-                      ),
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          AppStrings.of(context).t(
-                            'تاريخ التسليم: ${_formatDate(context, assignment.dueDate!)}',
-                          ),
-                          style: AppTextStyles.bodyOf(context).copyWith(
-                            fontSize: 12,
-                            color: AppColors.of(context).textMuted,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
                 const SizedBox(height: 12),
                 SubmissionStatusBadge(assignment: assignment),
               ],
@@ -116,16 +88,5 @@ class LiquidGlassAssignmentCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatDate(BuildContext context, String raw) {
-    final parsed = DateTime.tryParse(raw);
-    if (parsed == null) {
-      return raw;
-    }
-    return DateFormat(
-      'yyyy/MM/dd',
-      AppStrings.of(context).dateLocale,
-    ).format(parsed.toLocal());
   }
 }

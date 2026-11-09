@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -77,8 +76,6 @@ class AssignmentInfoGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final submissionStatus = assignment.isSubmitted
         ? 'تم التسليم'
-        : assignment.isOverdue
-        ? 'منتهي'
         : 'لم يتم التسليم';
 
     final stats = [
@@ -93,18 +90,11 @@ class AssignmentInfoGrid extends StatelessWidget {
         value: assignment.lessonTitle ?? '—',
       ),
       _GridItem(
-        icon: Icons.calendar_today_outlined,
-        label: AppStrings.of(context).t('تاريخ التسليم'),
-        value: _formatDate(context, assignment.dueDate),
-      ),
-      _GridItem(
         icon: Icons.fact_check_outlined,
         label: AppStrings.of(context).t('حالة التسليم'),
         value: submissionStatus,
         valueColor: assignment.isSubmitted
             ? const Color(0xFF15803D)
-            : assignment.isOverdue
-            ? const Color(0xFF991B1B)
             : AppColors.of(context).darkGold,
       ),
     ];
@@ -151,12 +141,8 @@ class AssignmentInfoGrid extends StatelessWidget {
               Expanded(child: _buildCell(context, stats[1], showBottom: true)),
             ],
           ),
-          Row(
-            children: [
-              Expanded(child: _buildCell(context, stats[2], showRight: true)),
-              Expanded(child: _buildCell(context, stats[3])),
-            ],
-          ),
+          // No due date: the status gets the whole second row.
+          _buildCell(context, stats[2]),
         ],
       ),
     );
@@ -220,20 +206,6 @@ class AssignmentInfoGrid extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _formatDate(BuildContext context, String? raw) {
-    if (raw == null || raw.isEmpty) {
-      return '—';
-    }
-    final parsed = DateTime.tryParse(raw);
-    if (parsed == null) {
-      return raw;
-    }
-    return DateFormat(
-      'yyyy/MM/dd',
-      AppStrings.of(context).dateLocale,
-    ).format(parsed.toLocal());
   }
 }
 

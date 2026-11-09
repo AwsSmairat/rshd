@@ -245,23 +245,6 @@ class InstructorDashboardService
             ]);
         }
 
-        if ($subjectIds->isNotEmpty()) {
-            $dueSoon = Assignment::query()
-                ->whereIn('subject_id', $subjectIds)
-                ->where('status', ContentStatus::Active)
-                ->whereBetween('due_date', [now(), now()->addDays(3)])
-                ->count();
-
-            if ($dueSoon > 0) {
-                $alerts->push([
-                    'type' => 'info',
-                    'title' => 'مواعيد تسليم قريبة',
-                    'message' => $dueSoon.' واجب/واجبات تنتهي خلال 3 أيام.',
-                    'url' => AssignmentResource::getUrl('index'),
-                ]);
-            }
-        }
-
         if ($subjectIds->isEmpty()) {
             $alerts->push([
                 'type' => 'info',

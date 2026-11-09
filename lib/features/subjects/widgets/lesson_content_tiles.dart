@@ -48,19 +48,6 @@ class LessonAssignmentTile extends StatelessWidget {
                     context,
                   ).copyWith(fontWeight: FontWeight.w700, fontSize: 16),
                 ),
-                if (assignment.dueDate != null &&
-                    assignment.dueDate!.isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    AppStrings.of(
-                      context,
-                    ).t('موعد التسليم: ${_formatDate(assignment.dueDate!)}'),
-                    style: AppTextStyles.bodyOf(context).copyWith(
-                      color: AppColors.of(context).textMuted,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
                 const SizedBox(height: 6),
                 SubmissionStatusBadge(assignment: assignment),
               ],
@@ -73,14 +60,6 @@ class LessonAssignmentTile extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatDate(String value) {
-    final parsed = DateTime.tryParse(value);
-    if (parsed == null) {
-      return value;
-    }
-    return '${parsed.year}/${parsed.month.toString().padLeft(2, '0')}/${parsed.day.toString().padLeft(2, '0')}';
   }
 }
 

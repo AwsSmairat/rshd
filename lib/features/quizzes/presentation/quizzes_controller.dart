@@ -385,6 +385,14 @@ class QuizAttemptController extends StateNotifier<QuizAttemptState> {
     );
   }
 
+  void goToQuestion(int index) {
+    final questions = state.quiz?.questions ?? [];
+    if (index < 0 || index >= questions.length) {
+      return;
+    }
+    state = state.copyWith(currentQuestionIndex: index);
+  }
+
   void tickTimer() {
     final remaining = state.remainingSeconds;
     if (remaining == null || remaining <= 0) {

@@ -18,6 +18,9 @@ class NotificationNavigation {
       case 'subject_activated':
         _openSubject(context, notification);
         return;
+      case 'lesson_published':
+        _openLesson(context, notification);
+        return;
       case 'announcement':
         _openAnnouncement(context, notification);
         return;
@@ -54,6 +57,15 @@ class NotificationNavigation {
       return;
     }
     context.go(AppRoutes.subjects);
+  }
+
+  static void _openLesson(BuildContext context, NotificationModel notification) {
+    final lessonId = notification.lessonId;
+    if (lessonId != null) {
+      context.push(AppRoutes.lessonDetails(lessonId));
+      return;
+    }
+    _openSubject(context, notification);
   }
 
   static void _openAnnouncement(

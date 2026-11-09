@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\LessonFileController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PasswordResetController;
 use App\Http\Controllers\Api\V1\PublicSettingsController;
+use App\Http\Controllers\Api\V1\PushTokenController;
 use App\Http\Controllers\Api\V1\QuizController;
 use App\Http\Controllers\Api\V1\StudentSettingsController;
 use App\Http\Controllers\Api\V1\StudentTermsController;
@@ -96,6 +97,10 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:api-authenticated'])-
 
         Route::get('notifications', [NotificationController::class, 'index']);
         Route::post('notifications/{notification}/read', [NotificationController::class, 'markAsRead'])
+            ->middleware('throttle:notifications-mutations');
+        Route::post('push-tokens', [PushTokenController::class, 'store'])
+            ->middleware('throttle:notifications-mutations');
+        Route::delete('push-tokens', [PushTokenController::class, 'destroy'])
             ->middleware('throttle:notifications-mutations');
 
         Route::prefix('student')->group(function () {

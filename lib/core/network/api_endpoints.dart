@@ -53,6 +53,8 @@ class ApiEndpoints {
   static String markNotificationRead(int notificationId) =>
       '/notifications/$notificationId/read';
 
+  static const pushTokens = '/push-tokens';
+
   static const announcements = '/announcements';
 
   static const publicSettings = '/settings/public';

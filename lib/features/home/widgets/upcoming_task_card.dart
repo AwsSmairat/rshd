@@ -14,6 +14,7 @@ class UpcomingTaskItem {
     required this.subtitle,
     required this.onTap,
     this.date,
+    this.showDate = true,
   });
 
   final UpcomingTaskType type;
@@ -21,6 +22,10 @@ class UpcomingTaskItem {
   final String subtitle;
   final DateTime? date;
   final VoidCallback onTap;
+
+  /// Assignments have no deadline: their date only orders the list and is
+  /// not shown; the badge shows the assignment icon instead.
+  final bool showDate;
 }
 
 class UpcomingTaskCard extends StatelessWidget {
@@ -82,24 +87,33 @@ class UpcomingTaskCard extends StatelessWidget {
                   child: LiquidGlassSurface(
                     borderRadius: BorderRadius.circular(12),
                     padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Column(
-                      children: [
-                        Text(
-                          AppStrings.of(context).t(_dayLabel()),
-                          style: AppTextStyles.titleOf(context).copyWith(
-                            fontSize: 18,
-                            color: AppColors.of(context).primary,
+                    child: !task.showDate
+                        ? SizedBox(
+                            height: 34,
+                            child: Icon(
+                              _icon,
+                              size: 22,
+                              color: AppColors.of(context).darkGold,
+                            ),
+                          )
+                        : Column(
+                            children: [
+                              Text(
+                                AppStrings.of(context).t(_dayLabel()),
+                                style: AppTextStyles.titleOf(context).copyWith(
+                                  fontSize: 18,
+                                  color: AppColors.of(context).primary,
+                                ),
+                              ),
+                              Text(
+                                AppStrings.of(context).t(_monthLabel(context)),
+                                style: AppTextStyles.bodyOf(context).copyWith(
+                                  fontSize: 10,
+                                  color: AppColors.of(context).textMuted,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        Text(
-                          AppStrings.of(context).t(_monthLabel(context)),
-                          style: AppTextStyles.bodyOf(context).copyWith(
-                            fontSize: 10,
-                            color: AppColors.of(context).textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
                 if (!isLast)

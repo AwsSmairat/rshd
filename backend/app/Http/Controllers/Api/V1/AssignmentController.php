@@ -63,12 +63,8 @@ class AssignmentController extends Controller
     ): JsonResponse {
         $this->authorize('submit', $assignment);
 
-        if ($assignment->due_date !== null
-            && now()->greaterThan($assignment->due_date)
-            && ! $settings->enabled('allow_late_assignment_submission', 'students')) {
-            return $this->errorResponse('انتهى موعد تسليم هذا الواجب.', 422);
-        }
-
+        // Assignments have no deadline: a student can hand one in any time
+        // while it is published.
         $validated = $request->validated();
         $studentId = $request->user()->id;
 

@@ -12,7 +12,6 @@ class AssignmentModel {
     this.originalFileName,
     this.fileSize,
     this.fileMimeType,
-    this.dueDate,
     this.status = 'active',
     this.subjectTitle,
     this.lessonTitle,
@@ -30,7 +29,6 @@ class AssignmentModel {
   final String? originalFileName;
   final int? fileSize;
   final String? fileMimeType;
-  final String? dueDate;
   final String status;
   final String? subjectTitle;
   final String? lessonTitle;
@@ -64,17 +62,6 @@ class AssignmentModel {
     }
 
     return '${AppConfig.appOrigin}/storage$path';
-  }
-
-  bool get isOverdue {
-    if (dueDate == null || dueDate!.isEmpty) {
-      return false;
-    }
-    final parsed = DateTime.tryParse(dueDate!);
-    if (parsed == null) {
-      return false;
-    }
-    return parsed.isBefore(DateTime.now());
   }
 
   factory AssignmentModel.fromJson(Map<String, dynamic> json) {
@@ -122,7 +109,6 @@ class AssignmentModel {
       originalFileName: json['original_file_name']?.toString(),
       fileSize: _asNullableInt(json['file_size']),
       fileMimeType: json['file_mime_type']?.toString(),
-      dueDate: json['due_date']?.toString(),
       status: json['status']?.toString() ?? 'active',
       subjectTitle: subjectTitle,
       lessonTitle: lessonTitle,
@@ -146,7 +132,6 @@ class AssignmentModel {
       originalFileName: originalFileName,
       fileSize: fileSize,
       fileMimeType: fileMimeType,
-      dueDate: dueDate,
       status: status,
       subjectTitle: subjectTitle,
       lessonTitle: lessonTitle,

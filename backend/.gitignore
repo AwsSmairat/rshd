@@ -21,3 +21,8 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Firebase server credentials never go to git.
+/storage/app/private/firebase
+*firebase-adminsdk*.json
+*service-account*.json

@@ -78,16 +78,16 @@ class InstructorCalendarService
         Assignment::query()
             ->with('subject:id,title')
             ->whereIn('subject_id', $subjectIds)
-            ->whereDate('due_date', $date)
-            ->orderBy('due_date')
+            ->whereDate('created_at', $date)
+            ->orderBy('created_at')
             ->get()
             ->each(function (Assignment $assignment) use (&$events): void {
                 $events[] = [
                     'title' => $assignment->title,
                     'type' => 'assignment',
-                    'type_label' => 'موعد تسليم واجب',
+                    'type_label' => 'نشر واجب',
                     'subject_title' => $assignment->subject?->title,
-                    'time' => $assignment->due_date?->timezone(config('app.timezone'))->format('H:i'),
+                    'time' => $assignment->created_at?->timezone(config('app.timezone'))->format('H:i'),
                     'url' => AssignmentResource::getUrl('edit', ['record' => $assignment->id]),
                 ];
             });

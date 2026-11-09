@@ -48,3 +48,11 @@ app.*.map.json
 oauth_defines.json
 ios/Flutter/OAuth.xcconfig
 tool/staging_defines.json
+
+# Server-side push credentials never belong in the app repo. (The client
+# configs google-services.json / GoogleService-Info.plist are app config,
+# not secrets.)
+*firebase-adminsdk*.json
+*service-account*.json
+AuthKey_*.p8
+*.p8

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "353270987285",
+    "project_id": "rshd-academy",
+    "storage_bucket": "rshd-academy.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:353270987285:android:eb2fd9896b19ea9b4cec1c",
+        "android_client_info": {
+          "package_name": "com.rshdacademy.rshd"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqU-zNF3_BLx-84ralFa-yde8rGuyu4QI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

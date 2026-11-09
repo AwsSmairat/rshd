@@ -20,6 +20,7 @@ class NotificationModel {
   final String? createdAt;
 
   int? get subjectId => _dataInt('subject_id');
+  int? get lessonId => _dataInt('lesson_id');
   int? get assignmentId => _dataInt('assignment_id');
   int? get quizId => _dataInt('quiz_id');
   int? get gradeId => _dataInt('grade_id');
@@ -60,6 +61,8 @@ class NotificationModel {
     switch (effectiveType) {
       case 'subject_activated':
         return 'تفعيل مادة';
+      case 'lesson_published':
+        return 'محاضرة جديدة';
       case 'activation_request':
         return 'طلب تفعيل';
       case 'assignment_created':

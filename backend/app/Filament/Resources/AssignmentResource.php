@@ -90,9 +90,6 @@ class AssignmentResource extends Resource
                             ->openable()
                             ->helperText('ارفع ملف الواجب (PDF، Word، PowerPoint، Excel، صورة، ZIP). الحد الأقصى 50 ميجابايت.')
                             ->columnSpanFull(),
-                        Forms\Components\DateTimePicker::make('due_date')
-                            ->label('تاريخ التسليم')
-                            ->helperText('اختياري — يُستخدم لتذكير الطلاب بموعد التسليم.'),
                         Forms\Components\Select::make('status')
                             ->label('الحالة')
                             ->options(ContentStatus::options())
@@ -107,7 +104,7 @@ class AssignmentResource extends Resource
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount('submissions'))
-            ->defaultSort('due_date', 'desc')
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('subject.title')
                     ->label('المادة')
@@ -135,16 +132,6 @@ class AssignmentResource extends Resource
                     ->placeholder('—')
                     ->limit(28)
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('due_date')
-                    ->label('تاريخ التسليم')
-                    ->dateTime('Y-m-d H:i')
-                    ->sortable()
-                    ->placeholder('—')
-                    ->color(fn (Assignment $record): string => $record->due_date
-                        && $record->due_date->isPast()
-                        && $record->status === ContentStatus::Active
-                        ? 'danger'
-                        : 'gray'),
                 Tables\Columns\TextColumn::make('submissions_count')
                     ->label('التسليمات')
                     ->sortable()
@@ -165,10 +152,10 @@ class AssignmentResource extends Resource
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('تاريخ الإنشاء')
+                    ->label('تاريخ النشر')
                     ->dateTime('Y-m-d H:i')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('subject_id')
@@ -183,12 +170,6 @@ class AssignmentResource extends Resource
                 Tables\Filters\SelectFilter::make('status')
                     ->label('الحالة')
                     ->options(ContentStatus::options()),
-                Tables\Filters\Filter::make('overdue')
-                    ->label('متأخرة')
-                    ->query(fn (Builder $query): Builder => $query
-                        ->where('status', ContentStatus::Active)
-                        ->whereNotNull('due_date')
-                        ->where('due_date', '<', now())),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/platform/platform_settings_controller.dart';
 import 'core/router/app_router.dart';
+import 'core/push/push_notifications_controller.dart';
 import 'core/security/protected_session_state_reset.dart';
 import 'core/startup/startup_coordinator.dart';
 import 'core/theme/app_theme.dart';
@@ -29,6 +30,8 @@ class _RshdAppState extends ConsumerState<RshdApp> {
       // Keep session-bound feature state isolated between authenticated users.
       ref.read(protectedSessionStateResetProvider);
       ref.read(platformSettingsProvider);
+      // Push notifications: token per session, and opening tapped pushes.
+      ref.read(pushNotificationsControllerProvider);
       ref
           .read(startupCoordinatorProvider.notifier)
           .ensureAuthBootstrapStarted();

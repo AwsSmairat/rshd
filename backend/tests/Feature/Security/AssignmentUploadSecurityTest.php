@@ -8,7 +8,6 @@ use App\Enums\PaymentStatus;
 use App\Models\Assignment;
 use App\Models\SubjectStudent;
 use App\Models\User;
-use App\Services\PlatformSettingsService;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -87,27 +86,19 @@ class AssignmentUploadSecurityTest extends TestCase
     /**
      * @return array{0: User, 1: Assignment}
      */
-    public function test_submission_after_the_deadline_is_refused(): void
+    public function test_assignments_have_no_deadline(): void
     {
         [$student, $assignment] = $this->createAssignmentScenario();
-        $assignment->update(['due_date' => now()->subHour()]);
+        // An old date left on an assignment from before deadlines were dropped.
+        $assignment->update(['due_date' => now()->subMonth()]);
         Sanctum::actingAs($student);
 
-        $this->postJson('/api/v1/assignments/'.$assignment->id.'/submit', [
-            'answer_text' => 'متأخر',
-        ])->assertUnprocessable();
-    }
-
-    public function test_submission_after_the_deadline_is_taken_when_allowed(): void
-    {
-        [$student, $assignment] = $this->createAssignmentScenario();
-        $assignment->update(['due_date' => now()->subHour()]);
-        app(PlatformSettingsService::class)
-            ->set('allow_late_assignment_submission', true, 'students');
-        Sanctum::actingAs($student);
+        $this->getJson('/api/v1/assignments')
+            ->assertOk()
+            ->assertJsonPath('data.0.due_date', null);
 
         $this->postJson('/api/v1/assignments/'.$assignment->id.'/submit', [
-            'answer_text' => 'متأخر بإذن',
+            'answer_text' => 'تسليم في أي وقت',
         ])->assertOk();
     }
 

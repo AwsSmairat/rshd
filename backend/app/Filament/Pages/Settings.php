@@ -345,7 +345,6 @@ class Settings extends Page implements HasForms
             PSF::toggle('device_id_required', 'إلزام إرسال معرف الجهاز'),
             Forms\Components\TextInput::make('max_active_devices')->label('الحد الأقصى للأجهزة النشطة')->numeric()->minValue(1)->maxValue(5),
             PSF::toggle('allow_assignment_resubmission', 'السماح بإعادة تسليم الواجب'),
-            PSF::toggle('allow_late_assignment_submission', 'السماح بالتسليم بعد الموعد النهائي'),
             Forms\Components\TextInput::make('assignment_max_file_size_mb')->label('أقصى حجم لملف الواجب (MB)')->numeric()->minValue(1)->maxValue(100),
             Forms\Components\TagsInput::make('assignment_allowed_file_types')->label('أنواع ملفات الواجب المسموحة')->separator(','),
             PSF::toggle('allow_quiz_retake', 'السماح بإعادة الاختبار'),
@@ -379,8 +378,9 @@ class Settings extends Page implements HasForms
             PSF::toggle('push_notifications_enabled', 'تفعيل الإشعارات الفورية'),
             Forms\Components\Placeholder::make('push_note')
                 ->label('')
-                ->content('يتطلب تفعيل Firebase Cloud Messaging أو OneSignal لاحقاً.')
-                ->visible(fn (): bool => ! ($this->notificationsData['push_notifications_enabled'] ?? false))
+                ->content(fn (): string => app(\App\Services\Push\FcmClient::class)->isConfigured()
+                    ? 'Firebase مهيّأ على الخادم. تُرسل الإشعارات الفورية عبر طابور المهام، فيجب أن يعمل queue worker.'
+                    : 'مفتاح Firebase (Service Account) غير مضاف على الخادم بعد، فلن تُرسل الإشعارات الفورية حتى يُضاف.')
                 ->columnSpanFull(),
             PSF::toggle('notify_student_subject_activated', 'إشعار الطالب عند تفعيل المادة'),
             PSF::toggle('notify_student_assignment_created', 'إشعار الطالب عند إنشاء واجب'),

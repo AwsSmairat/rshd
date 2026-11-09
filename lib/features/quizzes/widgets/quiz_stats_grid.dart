@@ -33,6 +33,9 @@ class QuizStatsGrid extends StatelessWidget {
         quiz?.questionsCount ??
         quiz?.latestAttempt?.questionsCount;
 
+    final hasFinish =
+        attemptSubmittedAt != null && attemptSubmittedAt.trim().isNotEmpty;
+
     final stats = [
       _StatData(
         icon: Icons.format_list_numbered_rounded,
@@ -87,22 +90,28 @@ class QuizStatsGrid extends StatelessWidget {
                   context,
                   stats[0],
                   showRightBorder: true,
-                  showBottomBorder: true,
+                  showBottomBorder: hasFinish,
                 ),
               ),
               Expanded(
-                child: _buildCell(context, stats[1], showBottomBorder: true),
+                child: _buildCell(
+                  context,
+                  stats[1],
+                  showBottomBorder: hasFinish,
+                ),
               ),
             ],
           ),
-          Row(
-            children: [
-              Expanded(
-                child: _buildCell(context, stats[2], showRightBorder: true),
-              ),
-              Expanded(child: _buildCell(context, stats[3])),
-            ],
-          ),
+          // Before the first attempt there is no finish time to show.
+          if (hasFinish)
+            Row(
+              children: [
+                Expanded(
+                  child: _buildCell(context, stats[2], showRightBorder: true),
+                ),
+                Expanded(child: _buildCell(context, stats[3])),
+              ],
+            ),
         ],
       ),
     );

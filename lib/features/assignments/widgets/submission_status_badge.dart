@@ -47,14 +47,6 @@ class SubmissionStatusBadge extends StatelessWidget {
         icon: Icons.check_circle_outline,
       );
     }
-    if (assignment.isOverdue) {
-      return _StatusStyle(
-        label: AppStrings.of(context).t('منتهي'),
-        background: Color(0xFFFEE2E2),
-        foreground: Color(0xFF991B1B),
-        icon: Icons.warning_rounded,
-      );
-    }
     return _StatusStyle(
       label: AppStrings.of(context).t('لم يتم التسليم'),
       background: Color(0xFFF8EED6),

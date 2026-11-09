@@ -5,6 +5,7 @@ namespace App\Enums;
 enum AppNotificationType: string
 {
     case SubjectActivated = 'subject_activated';
+    case LessonPublished = 'lesson_published';
     case ActivationRequest = 'activation_request';
     case AssignmentCreated = 'assignment_created';
     case QuizCreated = 'quiz_created';
@@ -19,6 +20,7 @@ enum AppNotificationType: string
     {
         return match ($this) {
             self::SubjectActivated => 'تفعيل مادة',
+            self::LessonPublished => 'محاضرة جديدة',
             self::ActivationRequest => 'طلب تفعيل',
             self::AssignmentCreated => 'واجب جديد',
             self::QuizCreated => 'اختبار جديد',
@@ -47,7 +49,7 @@ enum AppNotificationType: string
     public static function manualFormOptions(): array
     {
         return collect(self::cases())
-            ->reject(fn (self $case): bool => $case === self::ActivationRequest)
+            ->reject(fn (self $case): bool => in_array($case, [self::ActivationRequest, self::AssignmentSubmitted], true))
             ->mapWithKeys(fn (self $case): array => [$case->value => $case->label()])
             ->all();
     }

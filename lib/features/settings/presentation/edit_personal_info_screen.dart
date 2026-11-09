@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../data/models/student_settings_model.dart';
+import '../widgets/birth_date_picker_sheet.dart';
 import 'student_settings_controller.dart';
 import '../../../core/l10n/app_strings.dart';
 
@@ -53,15 +54,20 @@ class _EditPersonalInfoScreenState
 
   Future<void> _pickBirthDate() async {
     final initial = _birthDate != null ? DateTime.tryParse(_birthDate!) : null;
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: initial ?? DateTime(2000),
-      firstDate: DateTime(1950),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
+    FocusScope.of(context).unfocus();
+    final picked = await showBirthDatePickerSheet(context, initial: initial);
+    if (picked != null && mounted) {
       setState(() => _birthDate = DateFormat('yyyy-MM-dd').format(picked));
     }
+  }
+
+  String _birthDateLabel(BuildContext context) {
+    final strings = AppStrings.of(context);
+    final parsed = _birthDate != null ? DateTime.tryParse(_birthDate!) : null;
+    if (parsed == null) {
+      return strings.t('اختر تاريخ ميلادك');
+    }
+    return formatBirthDate(strings, parsed);
   }
 
   Future<void> _save() async {
@@ -148,12 +154,9 @@ class _EditPersonalInfoScreenState
                 decoration: InputDecoration(
                   labelText: AppStrings.of(context).t('تاريخ الميلاد'),
                   prefixIcon: const Icon(Icons.cake_outlined, size: 20),
-                  suffixIcon: const Icon(
-                    Icons.calendar_month_rounded,
-                    size: 20,
-                  ),
+                  suffixIcon: const Icon(Icons.unfold_more_rounded, size: 20),
                 ),
-                child: Text(AppStrings.of(context).t(_birthDate ?? '—')),
+                child: Text(_birthDateLabel(context)),
               ),
             ),
             const SizedBox(height: 16),

@@ -161,7 +161,10 @@ class _QuizDetailsScreenState extends ConsumerState<QuizDetailsScreen> {
               if (score != null)
                 QuizResultSummaryCard(score: score)
               else
-                const QuizNotAttemptedCard(),
+                QuizNotAttemptedCard(
+                  durationMinutes: quiz.durationMinutes,
+                  allowRetake: allowQuizRetake,
+                ),
               const SizedBox(height: 24),
               ResultActionButtons(
                 primaryLabel: startLabel,

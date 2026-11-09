@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -76,19 +75,6 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
                         ).copyWith(color: AppColors.of(context).textMuted),
                       ),
                     ],
-                    if (assignment.dueDate != null &&
-                        assignment.dueDate!.isNotEmpty) ...[
-                      const SizedBox(height: 10),
-                      Text(
-                        AppStrings.of(context).t(
-                          'تاريخ التسليم: ${_formatDate(context, assignment.dueDate!)}',
-                        ),
-                        style: AppTextStyles.bodyOf(context).copyWith(
-                          fontSize: 13,
-                          color: AppColors.of(context).textMuted,
-                        ),
-                      ),
-                    ],
                     const SizedBox(height: 12),
                     SubmissionStatusBadge(assignment: assignment),
                   ],
@@ -101,16 +87,5 @@ class AssignmentSubmitInfoCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatDate(BuildContext context, String raw) {
-    final parsed = DateTime.tryParse(raw);
-    if (parsed == null) {
-      return raw;
-    }
-    return DateFormat(
-      'yyyy/MM/dd',
-      AppStrings.of(context).dateLocale,
-    ).format(parsed.toLocal());
   }
 }

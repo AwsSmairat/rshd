@@ -49,4 +49,16 @@ return [
         ))),
     ],
 
+    /*
+     * Firebase Cloud Messaging (HTTP v1). The service account JSON lives on
+     * the server only, outside git: either a file path or the JSON itself
+     * (base64 allowed) in FIREBASE_CREDENTIALS_JSON.
+     */
+    'firebase' => [
+        'project_id' => env('FIREBASE_PROJECT_ID', 'rshd-academy'),
+        'credentials' => env('FIREBASE_CREDENTIALS', storage_path('app/private/firebase/service-account.json')),
+        'credentials_json' => env('FIREBASE_CREDENTIALS_JSON'),
+        'push_queue' => env('PUSH_QUEUE', 'default'),
+    ],
+
 ];

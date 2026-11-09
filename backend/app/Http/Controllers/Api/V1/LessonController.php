@@ -81,7 +81,6 @@ class LessonController extends Controller
             'files',
             'assignments' => fn ($query) => $query
                 ->where('status', ContentStatus::Active)
-                ->orderBy('due_date')
                 ->orderBy('id'),
             'quizzes' => fn ($query) => $query
                 ->where('status', ContentStatus::Active)
@@ -92,7 +91,6 @@ class LessonController extends Controller
         if ($user?->isStudent()) {
             $relations['assignments'] = fn ($query) => $query
                 ->where('status', ContentStatus::Active)
-                ->orderBy('due_date')
                 ->orderBy('id')
                 ->with([
                     'submissions' => fn ($submissionQuery) => $submissionQuery

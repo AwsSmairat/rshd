@@ -242,6 +242,14 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     }
 
     /**
+     * @return HasMany<PushDeviceToken, $this>
+     */
+    public function pushDeviceTokens(): HasMany
+    {
+        return $this->hasMany(PushDeviceToken::class);
+    }
+
+    /**
      * @return HasMany<AppNotification, $this>
      */
     public function notifications(): HasMany

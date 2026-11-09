@@ -31,7 +31,8 @@ class UpcomingAssignmentsSection extends StatelessWidget {
           type: UpcomingTaskType.assignment,
           title: assignment.title,
           subtitle: assignment.subjectTitle ?? strings.studyAssignment,
-          date: DateTime.tryParse(assignment.dueDate ?? ''),
+          date: DateTime.tryParse(assignment.createdAt ?? ''),
+          showDate: false,
           onTap: () => context.push(AppRoutes.assignmentDetails(assignment.id)),
         ),
       );
